@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Federico Lelli — Ingegnere, sviluppo software, musicista</title>
+<meta name="description" content="Portfolio di Federico Lelli, ingegnere e docente a Milano: software full stack, sistemi, hardware embedded e automazione." />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta name="theme-color" content="#ffffff" />
+<link rel="canonical" href="https://federicolelli.com/" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="it_IT" />
+<meta property="og:site_name" content="Federico Lelli" />
+<meta property="og:title" content="Federico Lelli — Ingegnere, sviluppo software, musicista" />
+<meta property="og:description" content="Progetti: software, sistemi, hardware e automazione." />
+<meta property="og:url" content="https://federicolelli.com/" />
+<meta name="twitter:card" content="summary" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Federico Lelli",
+  "url": "https://federicolelli.com/",
+  "jobTitle": "Ingegnere e sviluppatore software",
+  "address": { "@type": "PostalAddress", "addressLocality": "Milano", "addressCountry": "IT" },
+  "sameAs": [
+    "https://github.com/Federicowitz",
+    "https://www.linkedin.com/in/federico-lelli-b67929265",
+    "https://www.youtube.com/@federicowitz."
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&family=Roboto+Mono:wght@400&family=Fredoka:wght@500;600&family=Caveat:wght@500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --ink: #1f1f1f;
+    --ink-soft: #444746;
+    --ink-faint: #8a8f98;
+    --line: #e8eaed;
+    --accent: #1a73e8;
+    --dot-live: #1e8e3e;
+    --dot-wip: #e8a300;
+    --dot-off: #b0b4ba;
+    --font: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-fun: 'Fredoka', var(--font);
+    --header-h: 60px;
+  }
+  * { box-sizing: border-box; }
+  html { overflow-x: clip; overscroll-behavior-y: none; scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px + env(safe-area-inset-top, 0px)); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    transition: background .4s ease, color .4s ease;
+    overflow-x: clip; /* hidden su body rompe lo scroll/barra URL su iOS e Chrome mobile */
+  }
+
+  body.fun-mode {
+    --bg: #fff7ef;
+    --ink: #2c2540;
+    --ink-soft: #4a3f66;
+    --ink-faint: #8f7fae;
+    --line: #f0dfe8;
+    --accent: #ff5d73;
+  }
+  body.fun-mode .name, body.fun-mode .title, body.fun-mode .brand, body.fun-mode .cat-heading, body.fun-mode .panel-title {
+    font-family: var(--font-fun);
+  }
+
+  main { max-width: 640px; margin: 0 auto; padding: calc(var(--header-h) + env(safe-area-inset-top, 0px)) 1.5rem 8vh; position: relative; }
+  svg { display:block; }
+
+  .fun { display: none; }
+  body.fun-mode .normal { display: none !important; }
+  body.fun-mode .fun { display: block; }
+  body.fun-mode .fun.inline { display: inline; }
+
+  /* ---------- Header (fixed, always visible) ---------- */
+  header.top-bar {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.9);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    padding-top: env(safe-area-inset-top, 0px);
+    transform: translateZ(0); /* layer GPU dedicato: evita ridisegni durante lo scroll */
+    z-index: 100;
+    transition: background .4s ease, border-color .4s ease;
+  }
+  body.fun-mode header.top-bar { background: rgba(255,247,239,0.9); }
+  .top-bar-inner {
+    max-width: 640px; margin: 0 auto; height: var(--header-h);
+    padding: 0 1.5rem; display: flex; align-items: center; gap: 0.9rem;
+  }
+  .brand { font-weight: 500; font-size: 0.98rem; }
+  .spacer { flex: 1; }
+  .burger { border: none; background: none; cursor: pointer; padding: 6px; display: flex; align-items: center; }
+  .burger svg { width: 21px; height: 21px; stroke: var(--ink); fill: none; stroke-width: 1.7; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    min-height: calc(100vh - var(--header-h) - env(safe-area-inset-top, 0px));
+    /* svh = viewport "piccolo" e stabile: non cambia quando la barra del browser si nasconde/mostra.
+       Prima era dvh, che ricalcolava il layout durante lo swipe e causava lo "scatto". */
+    min-height: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));
+    display: flex; flex-direction: column; justify-content: center; position: relative;
+  }
+  .name { font-size: 1.7rem; font-weight: 500; margin: 0 0 0.7rem; letter-spacing: -0.01em; position: relative; z-index: 2; }
+  .tagline { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.75; max-width: 40ch; margin: 0 0 2.5rem; position: relative; z-index: 2; }
+  .scroll-cue { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--ink-faint); text-decoration: none; font-size: 0.85rem; width: fit-content; position: relative; z-index: 2; }
+  .scroll-cue svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .scroll-cue:hover { color: var(--ink); }
+
+  .shape { position: absolute; opacity: 0; transform: scale(.6); transition: opacity .5s ease, transform .5s ease; pointer-events: none; z-index: 1; }
+  body.fun-mode .shape { opacity: .85; transform: scale(1); }
+  body.fun-mode .shape.float { animation: floaty 6s ease-in-out infinite; }
+  .shape-1 { top: 8%; right: -20px; width: 90px; }
+  .shape-2 { bottom: 18%; right: 18%; width: 46px; }
+  .shape-3 { top: 42%; right: 6%; width: 30px; }
+  .shape-4 { bottom: 8%; left: -10px; width: 70px; }
+  /* Codice C++ scritto a mano nello sfondo (three.js): solo nella versione "jargon".
+     100lvh = altezza fissa, non cambia quando la barra del browser mobile si nasconde. */
+  .bg-sketch {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100vh; height: 100lvh;
+    z-index: -1; pointer-events: none; opacity: 1; transition: opacity .4s ease;
+  }
+
+  /* Quadrato a matita (three.js): visibile solo nella versione "jargon" */
+  .sketch { position: absolute; top: 5%; right: -4px; width: 170px; height: 170px; z-index: 1; pointer-events: none; opacity: 1; transition: opacity .4s ease; }
+  .sketch canvas { display: block; width: 100%; height: 100%; }
+  body.fun-mode .sketch { opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility 0s .3s; }
+  @media (max-width: 480px) { .sketch { width: 128px; height: 128px; top: 3%; } }
+  @keyframes floaty { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-14px) scale(1); } }
+  @media (prefers-reduced-motion: reduce) { body.fun-mode .shape.float { animation: none; } }
+
+  /* ---------- Overlay (shared by drawer / devlog / modal) ---------- */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(20,20,25,0.4);
+    opacity: 0; pointer-events: none; transition: opacity .25s ease; z-index: 200;
+    touch-action: none;
+  }
+
+  /* Scroll lock: con un pannello aperto la pagina dietro non deve muoversi.
+     body fixed è l'unico metodo affidabile su iOS Safari (overflow:hidden non basta). */
+  body.scroll-locked { position: fixed; left: 0; right: 0; width: 100%; overflow: hidden; }
+  html { scrollbar-gutter: stable; }
+  /* Quando il pannello arriva a fine corsa lo scroll non "passa" alla pagina sotto */
+  .drawer, .devlog-panel, .modal { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  /* ---------- Drawer (reddit-style, right side) ---------- */
+  .drawer {
+    position: fixed; top: 0; right: 0; height: 100%; width: min(320px, 86vw);
+    background: var(--bg); box-shadow: -6px 0 30px rgba(0,0,0,.1);
+    transform: translateX(100%); transition: transform .3s ease, background .4s ease;
+    z-index: 201; display: flex; flex-direction: column;
+    padding: calc(1.25rem + env(safe-area-inset-top,0px)) 1.4rem calc(1.5rem + env(safe-area-inset-bottom,0px));
+    overflow-y: auto;
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
+  .drawer-close { border: none; background: none; cursor: pointer; padding: 4px; color: var(--ink-faint); }
+  .drawer-close svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+
+  .drawer-search { display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--line); padding: 6px 0; margin-bottom: 1.6rem; }
+  .drawer-search svg { width: 15px; height: 15px; stroke: var(--ink-faint); fill: none; stroke-width: 1.6; flex: none; }
+  .drawer-search input { border: none; outline: none; font-family: var(--font); font-size: 0.92rem; color: var(--ink); background: transparent; width: 100%; }
+  .drawer-search input::placeholder { color: var(--ink-faint); }
+
+  .drawer-label { font-size: 0.72rem; color: var(--ink-faint); text-transform: none; margin: 0 0 0.5rem; }
+  .drawer-nav { display: flex; flex-direction: column; gap: 0.15rem; margin-bottom: 1.6rem; }
+  .drawer-link {
+    display: block; width: 100%; padding: 0.55rem 0.1rem; color: var(--ink-soft); text-decoration: none;
+    font: inherit; font-size: 0.94rem; text-align: left; background: none; border: none;
+    cursor: pointer; border-radius: 6px; transition: color .15s ease;
+  }
+  .drawer-link:hover { color: var(--accent); }
+
+  .drawer-divider { border: none; border-top: 1px solid var(--line); margin: 0 0 1.4rem; }
+
+  .drawer-extra { display: flex; flex-direction: column; gap: 0.15rem; }
+  .drawer-extra .drawer-link { font-weight: 500; }
+  .drawer-extra .drawer-sub { display: block; font-size: 0.78rem; color: var(--ink-faint); margin-top: -0.15rem; margin-bottom: 0.4rem; }
+
+  /* ---------- Devlog full panel ---------- */
+  .devlog-panel {
+    position: fixed; top: 0; right: 0; height: 100%; width: 100%;
+    background: var(--bg); transform: translateX(100%); transition: transform .32s ease;
+    z-index: 210; overflow-y: auto;
+  }
+  .devlog-panel.open { transform: translateX(0); }
+  .panel-head {
+    position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line);
+    padding: calc(1rem + env(safe-area-inset-top,0px)) 1.5rem 1rem; display: flex; align-items: center; gap: 0.8rem; z-index: 2;
+  }
+  .back-btn { border: none; background: none; cursor: pointer; padding: 4px; color: var(--ink-soft); display: flex; }
+  .back-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .panel-title { font-size: 1.02rem; font-weight: 500; }
+  .panel-body { max-width: 640px; margin: 0 auto; padding: 2rem 1.5rem 6rem; }
+
+  .entry { padding: 1.3rem 0; border-bottom: 1px solid var(--line); }
+  .entry:first-child { padding-top: 0; }
+  .entry-date { font-size: 0.78rem; color: var(--ink-faint); font-family: 'Roboto Mono', monospace; margin-bottom: 0.3rem; }
+  .entry-title { font-size: 1.02rem; font-weight: 500; margin-bottom: 0.35rem; }
+  .entry-text { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.7; }
+
+  /* ---------- Contact modal ---------- */
+  .modal {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-46%) scale(.96);
+    width: min(420px, 90vw); max-height: 86vh; overflow-y: auto;
+    background: var(--bg); border-radius: 14px; padding: 1.8rem;
+    opacity: 0; pointer-events: none; transition: opacity .22s ease, transform .22s ease;
+    z-index: 211; box-shadow: 0 20px 60px rgba(0,0,0,.15);
+  }
+  .modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+  .modal h2 { font-size: 1.08rem; font-weight: 500; margin: 0; }
+  .modal p.hint { font-size: 0.85rem; color: var(--ink-faint); margin: -0.6rem 0 1.3rem; }
+
+  .field { margin-bottom: 1rem; }
+  .field label { display: block; font-size: 0.8rem; color: var(--ink-faint); margin-bottom: 0.3rem; }
+  .field input, .field textarea {
+    width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.7rem;
+    font-family: var(--font); font-size: 0.92rem; color: var(--ink); background: transparent; resize: vertical;
+  }
+  .field textarea { min-height: 90px; }
+  .radio-row { display: flex; gap: 1.2rem; margin-bottom: 1.2rem; }
+  .radio-row label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; color: var(--ink-soft); cursor: pointer; }
+
+  .submit-btn {
+    border: none; background: var(--ink); color: #fff; padding: 0.7rem 1.2rem; border-radius: 8px;
+    font-family: var(--font); font-size: 0.92rem; cursor: pointer; width: 100%; transition: background .15s ease;
+  }
+  body.fun-mode .submit-btn { background: var(--accent); }
+  .submit-btn:hover { opacity: .9; }
+
+  /* ---------- Sections ---------- */
+  .cat-section { margin-bottom: 3rem; scroll-margin-top: calc(var(--header-h) + 16px); }
+  .cat-heading { font-size: 0.95rem; font-weight: 500; color: var(--ink-soft); margin: 0 0 0.6rem; }
+
+  .row { padding: 1.1rem 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .rows .row:first-child { padding-top: 0; }
+  body.fun-mode .row { cursor: default; }
+
+  .row-head { display: flex; align-items: center; gap: 0.55rem; }
+  .dot { flex: none; width: 6px; height: 6px; border-radius: 50%; margin-bottom: 1px; }
+  .dot-live { background: var(--dot-live); }
+  .dot-wip  { background: var(--dot-wip); }
+  .dot-off  { background: var(--dot-off); }
+
+  .title { font-size: 1rem; font-weight: 500; color: var(--ink); flex: 1; transition: color .15s ease; }
+  .row:hover .title { color: var(--accent); }
+
+  .open-btn {
+    flex: none; border: 1px solid var(--line); background: none; border-radius: 50%;
+    width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--ink-faint); transition: all .15s ease;
+  }
+  .open-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .open-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+  .chev { margin-left: 2px; flex: none; transition: transform .18s ease; }
+  .chev svg { width: 14px; height: 14px; stroke: var(--ink-faint); fill: none; stroke-width: 1.6; }
+  .row.expanded .chev { transform: rotate(180deg); }
+  body.fun-mode .chev { display: none; }
+
+  .desc { color: var(--ink-faint); font-size: 0.9rem; line-height: 1.65; margin: 0.35rem 0 0 14px; }
+  .desc.long.normal { display: none; }
+  .row.expanded .desc.short.normal { display: none; }
+  .row.expanded .desc.long.normal { display: block; }
+  .desc.plain.fun { color: var(--ink-soft); }
+
+  .no-results { display: none; color: var(--ink-faint); font-size: 0.92rem; padding: 2rem 0; }
+  .no-results.show { display: block; }
+
+  /* ---------- Stack ---------- */
+  .stack { margin-bottom: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  .stack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem 2rem; }
+  .stack-label { display: block; font-size: 0.78rem; color: var(--ink-faint); margin-bottom: 0.25rem; }
+  .stack-list { margin: 0; font-size: 0.9rem; color: var(--ink-soft); line-height: 1.6; }
+  body.fun-mode .stack { display: none; }
+
+  /* ---------- Footer ---------- */
+  footer { padding-top: 2.2rem; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.2rem; }
+  .links { display: flex; gap: 1.4rem; }
+  .social { display: inline-flex; align-items: center; color: var(--ink-faint); transition: color .15s ease; }
+  .social:hover { color: var(--ink); }
+  .social svg { width: 18px; height: 18px; fill: currentColor; }
+  .sign { color: var(--ink-faint); font-size: 0.82rem; }
+
+  /* ---------- Fun toggle: fixed bottom-right ---------- */
+  .fun-fab {
+    position: fixed; bottom: calc(1.1rem + env(safe-area-inset-bottom,0px)); right: 1.1rem;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink-soft);
+    font-family: var(--font); font-size: 0.8rem; padding: 9px 16px; border-radius: 24px;
+    cursor: pointer; box-shadow: 0 2px 12px rgba(0,0,0,.08); z-index: 150; transition: all .2s ease;
+  }
+  .fun-fab:hover { border-color: var(--accent); color: var(--accent); }
+  body.fun-mode .fun-fab { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  @media (max-width: 480px) { .stack-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<canvas class="bg-sketch" id="bgSketch" aria-hidden="true"></canvas>
+
+<header class="top-bar">
+  <div class="top-bar-inner">
+    <span class="brand">Federico</span>
+    <div class="spacer"></div>
+    <button class="burger" id="burgerBtn" aria-label="Menu">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="brand">Menu</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Chiudi"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg></button>
+  </div>
+
+  <div class="drawer-search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
+    <input id="searchInput" type="text" placeholder="Cerca un progetto…" />
+  </div>
+
+  <p class="drawer-label">Progetti</p>
+  <nav class="drawer-nav">
+    <button type="button" class="drawer-link" data-route="/progetti/live">In produzione</button>
+    <button type="button" class="drawer-link" data-route="/progetti/finance">Finanza & automazione</button>
+    <button type="button" class="drawer-link" data-route="/progetti/games">Giochi</button>
+    <button type="button" class="drawer-link" data-route="/progetti/hardware">Hardware & bio</button>
+    <button type="button" class="drawer-link" data-route="/progetti/mobile">Mobile</button>
+  </nav>
+
+  <hr class="drawer-divider" />
+
+  <p class="drawer-label">Altro</p>
+  <div class="drawer-extra">
+    <button type="button" class="drawer-link" id="openDevlog" data-route="/diario">Cosa sto facendo ora
+      <span class="drawer-sub">un diario aggiornato di tanto in tanto</span>
+    </button>
+    <button type="button" class="drawer-link" id="openContact" data-route="/contatti">Ti serve una mano? · Collaboriamo?
+      <span class="drawer-sub">apre il modulo contatti</span>
+    </button>
+  </div>
+</aside>
+
+<div class="devlog-panel" id="devlogPanel">
+  <div class="panel-head">
+    <button class="back-btn" id="devlogBack" aria-label="Indietro"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <span class="panel-title">Cosa sto facendo ora</span>
+  </div>
+  <div class="panel-body">
+    <div class="entry">
+      <p class="entry-date">Settembre 2026</p>
+      <p class="entry-title">Dungeon procedurali quasi stabili</p>
+      <p class="entry-text">Il generatore di dungeon per il gioco open world regge il carico di più client contemporanei senza desync evidenti. Prossimo passo: bilanciare il combat system.</p>
+    </div>
+    <div class="entry">
+      <p class="entry-date">Agosto 2026</p>
+      <p class="entry-title">Datafalco, nuovo parser SDI</p>
+      <p class="entry-text">Aggiornato il parser XML per gestire alcune varianti di fattura che prima andavano controllate a mano. Meno eccezioni, meno notifiche notturne.</p>
+    </div>
+    <div class="entry">
+      <p class="entry-date">Luglio 2026</p>
+      <p class="entry-title">WriteX, entità personalizzate</p>
+      <p class="entry-text">Aggiunta la possibilità di creare tipi di nodo su misura nel grafo di scrittura, non solo personaggi e luoghi predefiniti.</p>
+    </div>
+    <div class="entry">
+      <p class="entry-date">Maggio 2026</p>
+      <p class="entry-title">Datafalco live</p>
+      <p class="entry-text">Aggiornato il parser XML per gestire alcune varianti di fattura che prima andavano controllate a
+        mano. Meno eccezioni.</p>
+    </div>
+    
+  </div>
+</div>
+
+<div class="modal" id="contactModal">
+  <div class="modal-head">
+    <h2>Scrivimi</h2>
+    <button class="drawer-close" id="modalClose" aria-label="Chiudi"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg></button>
+  </div>
+  <p class="hint">Compila il modulo: si aprirà la tua app di posta con il messaggio pronto.</p>
+  <form id="contactForm">
+    <div class="radio-row">
+      <label><input type="radio" name="reason" value="aiuto" checked /> Mi serve una mano</label>
+      <label><input type="radio" name="reason" value="collab" /> Vorrei collaborare</label>
+    </div>
+    <div class="field">
+      <label for="cName">Nome</label>
+      <input id="cName" type="text" required />
+    </div>
+    <div class="field">
+      <label for="cEmail">Email</label>
+      <input id="cEmail" type="email" required />
+    </div>
+    <div class="field">
+      <label for="cMsg">Messaggio</label>
+      <textarea id="cMsg" required></textarea>
+    </div>
+    <button class="submit-btn" type="submit">Invia</button>
+  </form>
+</div>
+
+<main>
+
+  <section class="hero" id="hero">
+    <svg class="shape shape-1 float" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#ffd166"/></svg>
+    <svg class="shape shape-2 float" viewBox="0 0 100 100"><polygon points="50,6 94,90 6,90" fill="#17c3b2"/></svg>
+    <svg class="shape shape-3 float" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="18" fill="#ff5d73"/></svg>
+    <svg class="shape shape-4 float" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#8c7cf0"/></svg>
+
+    <div class="sketch" id="sketch" aria-hidden="true"></div>
+
+    <p class="name">Federico</p>
+    <p class="tagline normal">Ingegnere, docente, sviluppo software, musicista.</p>
+    <p class="tagline fun">Human Being.<br><span style="font-size:0.82em;">creo cose.</span></p>
+    <a class="scroll-cue" href="#projects">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      <span class="normal">progetti</span>
+      <span class="fun inline">roba fatta</span>
+    </a>
+  </section>
+
+  <div id="projects">
+
+  <section class="cat-section" data-cat="live" id="cat-live">
+    <h2 class="cat-heading"><span class="normal">In produzione</span><span class="fun">Cose che funzionano già</span></h2>
+    <div class="rows">
+
+      <div class="row" data-url="https://datafalco.eu">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">Datafalco</span>
+          <button class="open-btn" data-url="https://datafalco.eu" aria-label="Apri Datafalco"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Full Stack - web app di Business Intelligence</p>
+        <p class="desc long normal">Piattaforma SaaS in produzione: integrazione bidirezionale con le API di Fatture in Cloud, parser XML fatturazione elettronica Ospitata su Supabase e Render.</p>
+        <p class="desc plain fun">Un programma che controlla prezzi e volumi dalle fatture al posto tuo: le legge, le controlla e ti dice dove guadagni e perdi.</p>
+      </div>
+
+      <div class="row" data-url="https://github.com/Federicowitz">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">UltraShare</span>
+          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri UltraShare su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Trasferimento file peer-to-peer, senza server intermedio.</p>
+        <p class="desc long normal">Infrastruttura di trasferimento P2P crittografata senza relay cloud: scrittura diretta su disco via stream, con controllo del backpressure per non saturare la RAM su file di grandi dimensioni. Basata su WebRTC DataChannels.</p>
+        <p class="desc plain fun">Manda file enormi da un computer all'altro, senza passare da internet o da un server di mezzo.</p>
+      </div>
+
+      <div class="row" data-url="https://github.com/Federicowitz">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">Remandio</span>
+          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri Remandio su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Base di conoscenza personale, locale e a schema libero.</p>
+        <p class="desc long normal">Personal knowledge base ad architettura locale: definizione dinamica degli schemi a runtime, importazione da liste testuali non strutturate, sincronizzazione deterministica via merge JSON.</p>
+        <p class="desc plain fun">Un'agenda personale che si adatta a come vuoi organizzare le tue cose, non il contrario.</p>
+      </div>
+
+      <div class="row" data-url="https://github.com/Federicowitz">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">WriteX / Scrybix</span>
+          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri WriteX / Scrybix su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Pagina locale per il versioning della scrittura, con opzione cloud.</p>
+        <p class="desc long normal">Ambiente di scrittura e versioning non lineare a grafo, con creazione di grafi ed entità personalizzate, storage locale via IndexedDB e sincronizzazione cloud opzionale. Espone un bridge runtime per la co-scrittura programmatica con agenti IA.</p>
+        <p class="desc plain fun">Un posto per scrivere storie dove puoi creare personaggi e collegamenti come una mappa, e tornare indietro nel tempo a qualsiasi versione.</p>
+      </div>
+
+      <div class="row" data-url="https://github.com/Federicowitz">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">File Stager</span>
+          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri File Stager su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Estensione VS Code, ponte tra l'albero file e la clipboard di sistema.</p>
+        <p class="desc long normal">Estensione che elimina l'attrito tra il file tree di VS Code e il file manager del sistema operativo: copia e incolla bidirezionale di file e cartelle tramite le API native dell'OS.</p>
+        <p class="desc plain fun">Un trucco per programmatori: rende più veloce copiare e spostare file dentro e fuori dall'editor di codice.</p>
+      </div>
+
+      <div class="row" data-url="https://github.com/Federicowitz">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">Timetable solver</span>
+          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri Timetable solver su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Motore a vincoli per generare orari scolastici.</p>
+        <p class="desc long normal">Risolutore a programmazione vincolata (Google OR-Tools, CP-SAT): minimizza i buchi in orario, gestisce compresenze di laboratorio, vincoli a blocchi consecutivi e il congelamento di assegnazioni parziali.</p>
+        <p class="desc plain fun">Fa gli orari scolastici al posto delle segreterie, senza buchi e senza litigate tra docenti.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cat-section" data-cat="finance" id="cat-finance">
+    <h2 class="cat-heading"><span class="normal">Finanza & automazione</span><span class="fun">Robot per i soldi e le scartoffie</span></h2>
+    <div class="rows">
+
+      <div class="row">
+        <div class="row-head">
+          <span class="dot dot-off"></span>
+          <span class="title">Agente di trading multi-LLM</span>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Daemon multi-LLM che orchestra un flusso di trading.</p>
+        <p class="desc long normal">Architettura a micro-agenti con scheduler ciclico e memoria incrementale tra cicli: integra modelli locali (Ollama) e cloud (Gemini, Claude, Groq), orchestrando chiamate a broker e ricerca news.</p>
+        <p class="desc plain fun">Un robot che segue i mercati finanziari giorno e notte e decide da solo cosa fare.</p>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <span class="dot dot-off"></span>
+          <span class="title">Riconciliazione scadenziari</span>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Normalizza partitari ed export contabili, riconcilia gli scadenziari.</p>
+        <p class="desc long normal">Tool client-side ad alta sicurezza per normalizzare partitari contabili ed export massivi XLS, riconciliare i crediti a scadere ed emettere scadenziari PDF pronti per la direzione.</p>
+        <p class="desc plain fun">Controlla automaticamente chi deve pagare cosa e quando, senza spulciare fogli Excel a mano.</p>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <span class="dot dot-off"></span>
+          <span class="title">Automazione ordini GDO</span>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Pipeline che trasforma ordini PDF della GDO in tracciati per il magazzino.</p>
+        <p class="desc long normal">Pipeline di document ingestion per il settore agroalimentare: parsing di ordini fornitura PDF vettoriali, instradamento multi-stabilimento e compilazione automatica dei fogli di carico.</p>
+        <p class="desc plain fun">Legge gli ordini dei supermercati e prepara tutto per il magazzino, senza che nessuno li ricopi a mano.</p>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <span class="dot dot-off"></span>
+          <span class="title">Monitoraggio prezzi di mercato</span>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">App desktop per leggere i bollettini di mercato e calcolarne gli scostamenti.</p>
+        <p class="desc long normal">Applicazione drag & drop per l'acquisizione dei bollettini settimanali di mercato (CUN Parma e Libero Mercato): normalizza le voci merceologiche e calcola i delta storici per aggiornare i listini.</p>
+        <p class="desc plain fun">Tiene d'occhio i prezzi del mercato ogni settimana e avvisa quando qualcosa cambia.</p>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <span class="dot dot-off"></span>
+          <span class="title">Scraper e valutazione immobiliare</span>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Scraper e motore di valutazione per il mercato immobiliare.</p>
+        <p class="desc long normal">Pipeline di scraping anti-detection e motore di analisi comparativa: confronta un immobile con le transazioni di zona su una matrice pesata (locali, accessori, ascensore), stimando il margine di guadagno.</p>
+        <p class="desc plain fun">Guarda le case in vendita in una zona e ti dice se conviene comprarle.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cat-section" data-cat="games" id="cat-games">
+    <h2 class="cat-heading"><span class="normal">Giochi</span><span class="fun">Giochi</span></h2>
+    <div class="rows">
+
+      <div class="row" data-url="https://github.com/Federicowitz">
+        <div class="row-head">
+          <span class="dot dot-wip"></span>
+          <span class="title">Dungeon open world, PvP/PvE</span>
+          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Dungeon procedurali, multiplayer PvP/PvE, in sviluppo.</p>
+        <p class="desc long normal">Architettura multiplayer in tempo reale su server headless Debian (VPS Oracle): stato autoritativo, pacchetti UDP compressi, tick rate dedicato e sincronizzazione del combat system. Ancora in collaudo attivo.</p>
+        <p class="desc plain fun">Un videogioco online dove tanti giocatori esplorano insieme dungeon generati al momento. Ancora in cantiere.</p>
+      </div>
+
+      <div class="row" data-url="https://github.com/Federicowitz">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">Gioco mobile multiplayer, rete P2P</span>
+          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Gioco mobile multiplayer su rete P2P locale.</p>
+        <p class="desc long normal">I client sincronizzano entità dinamiche e collisioni su rete mesh decentralizzata, senza un server di matchmaking centrale — pensato per minimizzare overhead e consumo dati su mobile.</p>
+        <p class="desc plain fun">Un gioco per telefono dove i giocatori si collegano tra loro direttamente, senza passare da un server centrale.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cat-section" data-cat="hardware" id="cat-hardware">
+    <h2 class="cat-heading"><span class="normal">Hardware & bio</span><span class="fun">Cose che si toccano</span></h2>
+    <div class="rows">
+
+      <div class="row" data-url="https://www.politesi.polimi.it/handle/10589/165245">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">PoliMotion</span>
+          <button class="open-btn" data-url="https://www.politesi.polimi.it/handle/10589/165245" aria-label="Leggi la tesi"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Sistema embedded, plug and play, di sensing gestuale controllo MIDI costruito da zero.</p>
+        <p class="desc long normal">Prototipo cyber-fisico completo per la tesi di laurea: progettazione e saldatura manuale del circuito, modellazione e stampa 3D dello chassis, firmware embedded in tempo reale e interfaccia grafica di telemetria. Tesi, Politecnico di Milano.</p>
+        <p class="desc plain fun">Un aggeggio costruito a mano, saldato pezzo per pezzo, che modifica i suoni in base alla posizione delle mani.</p>
+      </div>
+
+      <div class="row" data-url="https://github.com/Federicowitz">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">Telemetria EEG (Muse)</span>
+          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Acquisizione ed elaborazione di segnali elettroencefalografici.</p>
+        <p class="desc long normal">Pipeline per l'acquisizione dei segnali Muse EEG: normalizzazione delle bande d'onda, asimmetria frontale Alpha, monitoraggio posturale e generazione automatica di report.</p>
+        <p class="desc plain fun">Legge le onde del cervello con una fascia e le trasforma in numeri comprensibili.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cat-section" data-cat="mobile" id="cat-mobile">
+    <h2 class="cat-heading"><span class="normal">Mobile</span><span class="fun">App sul telefono</span></h2>
+    <div class="rows">
+
+      <div class="row" data-url="https://github.com/Federicowitz">
+        <div class="row-head">
+          <span class="dot dot-live"></span>
+          <span class="title">Wallet Solana con firma isolata</span>
+          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Wallet decentralizzato con firma isolata sul mobile, con web app semplificata.</p>
+        <p class="desc long normal">Infrastruttura con isolamento crittografico: interfaccia web disaccoppiata per comporre le istruzioni on-chain, firma privata confinata rigorosamente nel client mobile nativo.</p>
+        <p class="desc plain fun">Un portafoglio di criptovalute dove la chiave segreta resta sempre sul telefono, mai online.</p>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <span class="dot dot-off"></span>
+          <span class="title">App per organizzare documenti</span>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">App mobile per organizzare documenti d'ufficio.</p>
+        <p class="desc long normal">Ordina e ritrova rapidamente PDF, Word, Excel, PowerPoint e file di testo. Costruita con Gemini.</p>
+        <p class="desc plain fun">Mette in ordine da sola i tuoi documenti — PDF, Word, Excel — e li ritrova in un attimo.</p>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <span class="dot dot-off"></span>
+          <span class="title">App per organizzare il file system</span>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">App mobile per organizzare l'intero file system.</p>
+        <p class="desc long normal">Gemella della precedente, applicata all'intero file system del telefono anziché ai soli documenti d'ufficio. Costruita con Gemini.</p>
+        <p class="desc plain fun">Come sopra, ma per tutti i file del telefono, non solo i documenti.</p>
+      </div>
+
+    </div>
+  </section>
+
+  </div>
+
+  <p class="no-results" id="noResults"></p>
+
+  <section class="stack">
+    <h2 class="cat-heading">Strumenti</h2>
+    <div class="stack-grid">
+      <div><span class="stack-label">Linguaggi</span><p class="stack-list">C++, C#, Node.js, Python</p></div>
+      <div><span class="stack-label">Sistemi & server</span><p class="stack-list">Debian, Docker, Nginx, UFW</p></div>
+      <div><span class="stack-label">Cloud</span><p class="stack-list">Oracle Cloud, GCP, Supabase, Render, Vercel, GitHub</p></div>
+      <div><span class="stack-label">IA & agenti</span><p class="stack-list">Codex, Claude Code, Gemini, Antigravity, Ollama, ComfyUI</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <nav class="links">
+      <a class="social" href="https://github.com/Federicowitz" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      </a>
+      <a class="social" href="https://www.youtube.com/@federicowitz." target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+        <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+      <a class="social" href="https://www.linkedin.com/in/federico-lelli-b67929265" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+      </a>
+    </nav>
+    <span class="sign">Milano</span>
+  </footer>
+
+</main>
+
+<button class="fun-fab" id="funToggle">
+  <span class="normal">speak as you eat</span>
+  <span class="fun inline">back to jargon</span>
+</button>
+
+<script>
+  var body = document.body;
+  var overlay = document.getElementById('overlay');
+  var drawer = document.getElementById('drawer');
+  var devlogPanel = document.getElementById('devlogPanel');
+  var contactModal = document.getElementById('contactModal');
+  var openPanelEl = null;
+
+  function escHandler(e) { if (e.key === 'Escape') dismissPanel(); }
+
+  var lockY = 0;
+  function lockScroll() {
+    if (body.classList.contains('scroll-locked')) return;
+    lockY = window.scrollY;
+    body.style.top = -lockY + 'px';
+    body.classList.add('scroll-locked');
+  }
+  function unlockScroll() {
+    if (!body.classList.contains('scroll-locked')) return;
+    body.classList.remove('scroll-locked');
+    body.style.top = '';
+    window.scrollTo({ top: lockY, behavior: 'instant' });
+  }
+
+  function openPanel(el) {
+    closePanel(true);
+    lockScroll();
+    el.classList.add('open');
+    overlay.classList.add('open');
+    openPanelEl = el;
+    document.addEventListener('keydown', escHandler);
+  }
+  function closePanel(keepLock) {
+    if (openPanelEl) openPanelEl.classList.remove('open');
+    overlay.classList.remove('open');
+    openPanelEl = null;
+    document.removeEventListener('keydown', escHandler);
+    if (keepLock !== true) unlockScroll();
+  }
+
+  /* ---------- Routing lato client (History API) ----------
+     /               home
+     /progetti       lista progetti
+     /progetti/live  una categoria (live, finance, games, hardware, mobile)
+     /diario         pannello "Cosa sto facendo ora"
+     /contatti       modulo contatti
+     Su Vercel tutti questi path puntano a index.html (vedi vercel.json). */
+  function route(path, smooth) {
+    path = path.replace(/\/+$/, '') || '/';
+    var behavior = smooth ? 'smooth' : 'auto';
+    if (path === '/diario') { openPanel(devlogPanel); return; }
+    if (path === '/contatti') { openPanel(contactModal); return; }
+    closePanel();
+    if (path === '/progetti') {
+      document.getElementById('projects').scrollIntoView({ behavior: behavior });
+    } else if (path.indexOf('/progetti/') === 0) {
+      var sec = document.getElementById('cat-' + path.slice('/progetti/'.length));
+      if (sec) sec.scrollIntoView({ behavior: behavior });
+    } else {
+      window.scrollTo({ top: 0, behavior: behavior });
+    }
+  }
+  // Interruttore: false = i path restano nel codice ma sono spenti (nessun URL cambia, nessun link).
+  // Per attivarli un giorno: metti true e ripristina i rewrites in vercel.json.
+  var ROUTING = false;
+
+  function navigate(path) {
+    if (ROUTING && path !== location.pathname) history.pushState({}, '', path);
+    route(path, true);
+  }
+  // chiusura di un pannello da parte dell'utente
+  function dismissPanel() {
+    closePanel();
+    if (ROUTING && (location.pathname === '/diario' || location.pathname === '/contatti')) history.pushState({}, '', '/');
+  }
+
+  document.querySelectorAll('[data-route]').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      navigate(el.getAttribute('data-route'));
+    });
+  });
+  if (ROUTING) window.addEventListener('popstate', function () { route(location.pathname, false); });
+
+  document.getElementById('burgerBtn').addEventListener('click', function () { openPanel(drawer); });
+  document.getElementById('drawerClose').addEventListener('click', closePanel);
+  overlay.addEventListener('click', dismissPanel);
+  document.getElementById('devlogBack').addEventListener('click', dismissPanel);
+  document.getElementById('modalClose').addEventListener('click', dismissPanel);
+
+  // apertura diretta di un path (es. condivisione di /diario o /progetti/games)
+  if (ROUTING && location.pathname !== '/' && location.pathname !== '/index.html') {
+    window.addEventListener('load', function () { route(location.pathname, false); });
+  }
+
+  document.getElementById('contactForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var reason = document.querySelector('input[name="reason"]:checked').value === 'aiuto' ? 'Mi serve una mano' : 'Vorrei collaborare';
+    var name = document.getElementById('cName').value;
+    var email = document.getElementById('cEmail').value;
+    var msg = document.getElementById('cMsg').value;
+    var subject = encodeURIComponent(reason + ' — da ' + name);
+    var body_ = encodeURIComponent(msg + '\n\n— ' + name + ' (' + email + ')');
+    window.location.href = 'mailto:TUA-EMAIL@example.com?subject=' + subject + '&body=' + body_;
+  });
+
+  var searchInput = document.getElementById('searchInput');
+  var noResults = document.getElementById('noResults');
+  searchInput.addEventListener('input', function () {
+    var q = searchInput.value.trim().toLowerCase();
+    var totalVisible = 0;
+    document.querySelectorAll('.cat-section').forEach(function (sec) {
+      var anyVisible = false;
+      sec.querySelectorAll('.row').forEach(function (row) {
+        var show = !q || row.textContent.toLowerCase().indexOf(q) !== -1;
+        row.style.display = show ? '' : 'none';
+        if (show) { anyVisible = true; totalVisible++; }
+      });
+      sec.style.display = anyVisible ? '' : 'none';
+    });
+    if (totalVisible === 0 && q) {
+      noResults.textContent = 'Nessun progetto corrisponde a "' + searchInput.value.trim() + '".';
+      noResults.classList.add('show');
+    } else {
+      noResults.classList.remove('show');
+    }
+  });
+
+  document.querySelectorAll('.row').forEach(function (row) {
+    row.addEventListener('click', function (e) {
+      if (body.classList.contains('fun-mode')) return;
+      if (e.target.closest('.open-btn')) return;
+      row.classList.toggle('expanded');
+    });
+  });
+
+  document.querySelectorAll('.open-btn').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      window.open(btn.dataset.url, '_blank', 'noopener');
+    });
+  });
+
+  document.getElementById('funToggle').addEventListener('click', function () {
+    body.classList.toggle('fun-mode');
+  });
+</script>
+
+<script type="module">
+  import * as THREE from 'three';
+
+  const host = document.getElementById('sketch');
+  if (host) try {
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // --- numeri casuali ripetibili: il disegno è sempre lo stesso a ogni caricamento
+    function mulberry32(a) {
+      return function () {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+    const rand = mulberry32(11);
+
+    // Un tratto "a mano": linea con leggera ondulazione e un po' di sbavatura oltre gli angoli
+    function stroke(ax, ay, bx, by, amp, over, segs) {
+      const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy);
+      const ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
+      const s0 = -over * rand(), s1 = len + over * rand();
+      const p1 = rand() * 6.28, p2 = rand() * 6.28, f1 = 1 + rand() * 1.5, f2 = 2.5 + rand() * 2;
+      const pts = [];
+      for (let i = 0; i <= segs; i++) {
+        const t = i / segs, s = s0 + (s1 - s0) * t;
+        const off = amp * (Math.sin(t * Math.PI * f1 + p1) * 0.7 + Math.sin(t * Math.PI * f2 + p2) * 0.3);
+        pts.push(ax + ux * s + nx * off, ay + uy * s + ny * off, 0);
+      }
+      return pts;
+    }
+    function toSegments(pts) {
+      const out = [];
+      for (let i = 0; i + 3 < pts.length; i += 3) out.push(pts[i], pts[i + 1], pts[i + 2], pts[i + 3], pts[i + 4], pts[i + 5]);
+      return out;
+    }
+    function lines(positions, opacity) {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      const m = new THREE.LineBasicMaterial({ color: 0x2f2f2f, transparent: true, opacity: opacity, depthTest: false });
+      return new THREE.LineSegments(g, m);
+    }
+
+    const group = new THREE.Group();
+
+    // contorno: 3 passate sovrapposte, come quando si ripassa il tratto a matita
+    const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+    for (let pass = 0; pass < 3; pass++) {
+      const pos = [];
+      for (let i = 0; i < 4; i++) {
+        const a = corners[i], b = corners[(i + 1) % 4];
+        pos.push.apply(pos, toSegments(stroke(a[0], a[1], b[0], b[1], 0.022, 0.07, 24)));
+      }
+      group.add(lines(pos, 0.5));
+    }
+
+    // tratteggio diagonale leggero, appena accennato
+    const hatch = [];
+    for (let c = -1.5; c <= 1.5; c += 0.5) {
+      const x0 = Math.max(-1, c - 1), x1 = Math.min(1, c + 1);
+      if (x1 - x0 < 0.2) continue;
+      hatch.push.apply(hatch, toSegments(stroke(x0, x0 - c, x1, x1 - c, 0.012, 0, 12)));
+    }
+    group.add(lines(hatch, 0.16));
+
+    group.rotation.x = 0.45;
+    group.rotation.z = 0.12;
+
+    const scene = new THREE.Scene();
+    scene.add(group);
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
+    camera.position.z = 5.2;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
+    host.appendChild(renderer.domElement);
+
+    function resize() {
+      const w = host.clientWidth, h = host.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    }
+    new ResizeObserver(resize).observe(host);
+    resize();
+
+    // --- animazione: gira solo se serve (jargon attivo, pagina visibile, quadrato a schermo)
+    let inView = true, last = 0, raf = 0;
+    const SPEED = 0.45; // rad/s: lento, sobrio
+
+    function shouldRun() {
+      return !reduceMotion && inView && !document.hidden && !document.body.classList.contains('fun-mode');
+    }
+    function frame(now) {
+      raf = 0;
+      if (!shouldRun()) { last = 0; return; }
+      const dt = last ? Math.min((now - last) / 1000, 0.1) : 0;
+      last = now;
+      group.rotation.y += dt * SPEED;
+      renderer.render(scene, camera);
+      raf = requestAnimationFrame(frame);
+    }
+    function kick() { if (!raf && shouldRun()) raf = requestAnimationFrame(frame); }
+
+    if (reduceMotion) { group.rotation.y = 0.6; renderer.render(scene, camera); }
+
+    new IntersectionObserver(function (e) { inView = e[0].isIntersecting; kick(); }).observe(host);
+    document.addEventListener('visibilitychange', kick);
+    new MutationObserver(kick).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    kick();
+  } catch (err) {
+    host.style.display = 'none'; // niente WebGL: la pagina funziona lo stesso
+  }
+</script>
+
+<script type="module">
+  import * as THREE from 'three';
+
+  /* Sfondo: frammenti di C++ "scritti a matita" che galleggiano piano e scorrono con un
+     leggero parallasse. Ogni lettera è un pezzo a sé: con "speak as you eat" cadono tutte
+     sul fondo e rimbalzano; con "back to jargon" tornano ognuna al proprio posto.
+     Tutto innocuo: sono solo battute. */
+  const canvas = document.getElementById('bgSketch');
+  (async function () {
+    if (!canvas) return;
+    try {
+      const bodyEl = document.body;
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // aspetta il font a mano libera (max ~1.5 s), poi disegna comunque
+      try {
+        await Promise.race([
+          document.fonts.load('30px Caveat'),
+          new Promise(function (r) { setTimeout(r, 1500); })
+        ]);
+      } catch (e) {}
+
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = a + 0x6D2B79F5 | 0;
+          let t = Math.imul(a ^ a >>> 15, 1 | a);
+          t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+      const rand = mulberry32(2026);
+
+      // ---- i frammenti (indent con 3 spazi perché il font è proporzionale)
+      const SNIPPETS = [
+        { lines: ['int main() {', '   while (true) {', '      coffee++;', '      if (coffee > 3) panic();', '   }', '}'], box: false },
+        { lines: ['// TODO: dormire', '// FIXME: domani', '// HACK: funziona, non toccare'], box: true },
+        { lines: ['while (true) {', '   fork_party();   // invita tutti', '}', '// nessun processo è stato maltrattato'], box: false },
+        { lines: ['#include <universe>', 'auto answer = 42;'], box: true },
+        { lines: ['if (bug) {', '   blame(compiler);', '} else {', '   take_credit();', '}'], box: false },
+        { lines: ['std::cout << "ciao, curioso\\n";', 'return 0;   // mai, in realtà'], box: false },
+        { lines: ['template <class T>', 'T idea = T::sketch();'], box: true },
+        { lines: ['for (;;) musica();', '// delete reality;   // no.'], box: false }
+      ];
+      // posizione orizzontale (frazione dello spazio libero), opacità, scala, rotazione
+      const LAYOUT = [
+        { fx: 0.04, op: 0.17, s: 1.00, rot: -0.07 },
+        { fx: 0.70, op: 0.15, s: 0.90, rot:  0.05 },
+        { fx: 0.18, op: 0.16, s: 1.05, rot:  0.04 },
+        { fx: 0.82, op: 0.14, s: 0.95, rot: -0.05 },
+        { fx: 0.05, op: 0.15, s: 0.90, rot:  0.08 },
+        { fx: 0.60, op: 0.16, s: 1.00, rot: -0.04 },
+        { fx: 0.30, op: 0.14, s: 0.95, rot:  0.06 },
+        { fx: 0.75, op: 0.15, s: 1.00, rot: -0.08 }
+      ];
+
+      const FONT = '30px Caveat, "Segoe Print", "Bradley Hand", cursive';
+      const FS_LINE = 40, PAD = 24, DENSITY = 2, ATLAS_W = 1024;
+
+      // ---- misure: larghezza di ogni frammento e posizione di ogni lettera
+      const mctx = document.createElement('canvas').getContext('2d');
+      mctx.font = FONT;
+
+      const chars = [];
+      let ax = 0, ay = 0;
+      const snipSize = SNIPPETS.map(function (snip, si) {
+        let maxW = 0;
+        snip.lines.forEach(function (line, li) {
+          let x = PAD;
+          for (const ch of line) {
+            const cw = mctx.measureText(ch).width;
+            if (ch !== ' ') {
+              const cellW = Math.ceil(cw) + 10;
+              if (ax + cellW > ATLAS_W) { ax = 0; ay += FS_LINE; }
+              chars.push({
+                si: si, ch: ch, cellW: cellW, ax: ax, ay: ay,
+                lx: x + cw / 2, ly: PAD + FS_LINE * li + FS_LINE / 2,   // centro nel frammento (px)
+                pileOff: rand() * 10, ph: rand() * 6.28, al: 1, sc: 1, merge: 0, mu: rand() * 6.28, mr: Math.sqrt(rand()), spin: (rand() - 0.5) * 3, touched: false, fadeAt: 0,
+                state: 'rest', next: null, startAt: 0,
+                x: 0, y: 0, a: 0, vx: 0, vy: 0, av: 0,
+                fx0: 0, fy0: 0, fa0: 0, rt0: 0, rdur: 1, arc: 0,
+                hw: 1, hh: 1, ox: 0, oy: 0, floorY: 0
+              });
+              ax += cellW;
+            }
+            x += cw;
+          }
+          maxW = Math.max(maxW, x - PAD);
+        });
+        return { w: Math.ceil(maxW + PAD * 2), h: FS_LINE * snip.lines.length + PAD * 2 };
+      });
+      const ATLAS_H = ay + FS_LINE;
+
+      // ---- atlante: ogni lettera disegnata una volta, con la sua piccola imperfezione a matita
+      const atlas = document.createElement('canvas');
+      atlas.width = ATLAS_W * DENSITY; atlas.height = ATLAS_H * DENSITY;
+      const actx = atlas.getContext('2d');
+      actx.scale(DENSITY, DENSITY);
+      actx.font = FONT; actx.fillStyle = '#2f2f2f';
+      chars.forEach(function (c) {
+        actx.save();
+        actx.translate(c.ax + 5, c.ay + 30 + (rand() - 0.5) * 2.4);
+        actx.rotate((rand() - 0.5) * 0.05);
+        actx.globalAlpha = 0.9; actx.fillText(c.ch, 0, 0);
+        actx.globalAlpha = 0.4; actx.fillText(c.ch, 0.7, 0.6);   // seconda passata: grana della matita
+        actx.restore();
+      });
+      const atlasTex = new THREE.CanvasTexture(atlas);
+      atlasTex.colorSpace = THREE.SRGBColorSpace;
+      atlasTex.anisotropy = 4;
+
+      // ---- rettangoli storti attorno ad alcuni frammenti (non cadono: sfumano)
+      function wobblyRect(ctx, x, y, w, h) {
+        const c = [[x, y], [x + w, y], [x + w, y + h], [x, y + h], [x, y]];
+        for (let pass = 0; pass < 2; pass++) {
+          ctx.beginPath();
+          for (let i = 0; i < 4; i++) {
+            const a = c[i], b = c[i + 1];
+            const j = function () { return (rand() - 0.5) * 3; };
+            if (i === 0) ctx.moveTo(a[0] + j(), a[1] + j());
+            ctx.quadraticCurveTo((a[0] + b[0]) / 2 + j() * 2, (a[1] + b[1]) / 2 + j() * 2, b[0] + j(), b[1] + j());
+          }
+          ctx.lineWidth = 1.3; ctx.globalAlpha = 0.5; ctx.stroke();
+        }
+      }
+      function makeBoxTexture(w, h) {
+        const cv = document.createElement('canvas');
+        cv.width = w * DENSITY; cv.height = h * DENSITY;
+        const ctx = cv.getContext('2d');
+        ctx.scale(DENSITY, DENSITY);
+        ctx.strokeStyle = '#2f2f2f';
+        wobblyRect(ctx, 8, 8, w - 16, h - 16);
+        const tex = new THREE.CanvasTexture(cv);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        return tex;
+      }
+
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setClearColor(0x000000, 0);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -10, 10); // unità = pixel CSS
+
+      // ---- una sola mesh con tutte le lettere (4 vertici ciascuna), aggiornata a ogni frame
+      const N = chars.length;
+      const pos = new Float32Array(N * 12), uv = new Float32Array(N * 8), col = new Float32Array(N * 16), idx = new Uint16Array(N * 6);
+      chars.forEach(function (c, i) {
+        const u0 = c.ax / ATLAS_W, u1 = (c.ax + c.cellW) / ATLAS_W;
+        const vt = 1 - c.ay / ATLAS_H, vb = 1 - (c.ay + FS_LINE) / ATLAS_H;
+        uv.set([u0, vt, u1, vt, u1, vb, u0, vb], i * 8);
+        const al = LAYOUT[c.si].op;
+        for (let v = 0; v < 4; v++) col.set([1, 1, 1, al], i * 16 + v * 4);
+        idx.set([i * 4, i * 4 + 1, i * 4 + 2, i * 4, i * 4 + 2, i * 4 + 3], i * 6);
+      });
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage));
+      geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+      geo.setAttribute('color', new THREE.BufferAttribute(col, 4));
+      geo.setIndex(new THREE.BufferAttribute(idx, 1));
+      const glyphMesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+        map: atlasTex, vertexColors: true, transparent: true, depthTest: false, depthWrite: false, side: THREE.DoubleSide
+      }));
+      glyphMesh.frustumCulled = false;
+      scene.add(glyphMesh);
+
+      const boxGeo = new THREE.PlaneGeometry(1, 1);
+      const items = SNIPPETS.map(function (snip, i) {
+        const d = snipSize[i], L = LAYOUT[i];
+        let box = null;
+        if (snip.box) {
+          box = new THREE.Mesh(boxGeo, new THREE.MeshBasicMaterial({
+            map: makeBoxTexture(d.w, d.h), transparent: true, opacity: L.op, depthTest: false, depthWrite: false
+          }));
+          scene.add(box);
+        }
+        return { w: d.w, h: d.h, L: L, phase: rand() * 6.28, box: box, S: 1, pw: 0, ph: 0, x: 0, y0: 0, sx: 0, sy: 0, ang: 0 };
+      });
+
+      // ---- forme geometriche molto trasparenti: una per frammento, vicino a dove atterrano le sue lettere
+      const SHAPES = [
+        { kind: 'circle',   r: 74, color: 0xffd166, op: 0.22, rot: 0 },
+        { kind: 'triangle', r: 70, color: 0x17c3b2, op: 0.17, rot: 0.2 },
+        { kind: 'square',   r: 56, color: 0xff5d73, op: 0.15, rot: 0.3 },
+        { kind: 'ring',     r: 62, color: 0x8c7cf0, op: 0.20, rot: 0 },
+        { kind: 'hexagon',  r: 64, color: 0x17c3b2, op: 0.15, rot: 0.1 },
+        { kind: 'pentagon', r: 60, color: 0xffd166, op: 0.20, rot: -0.2 },
+        { kind: 'diamond',  r: 58, color: 0x8c7cf0, op: 0.16, rot: 0 },
+        { kind: 'circle',   r: 46, color: 0xff5d73, op: 0.16, rot: 0 }
+      ];
+      function shapeGeometry(kind) {
+        const H2 = Math.PI / 2;
+        if (kind === 'circle')   return new THREE.CircleGeometry(1, 64);
+        if (kind === 'triangle') return new THREE.CircleGeometry(1, 3, H2);
+        if (kind === 'square')   return new THREE.CircleGeometry(1, 4, Math.PI / 4);
+        if (kind === 'diamond')  return new THREE.CircleGeometry(1, 4);
+        if (kind === 'hexagon')  return new THREE.CircleGeometry(1, 6);
+        if (kind === 'pentagon') return new THREE.CircleGeometry(1, 5, H2);
+        return new THREE.RingGeometry(0.62, 1, 64);   // ring
+      }
+      const shapes = SHAPES.map(function (sp) {
+        const mesh = new THREE.Mesh(shapeGeometry(sp.kind), new THREE.MeshBasicMaterial({
+          color: sp.color, transparent: true, opacity: 0, depthTest: false, depthWrite: false
+        }));
+        mesh.visible = false;
+        mesh.renderOrder = 0;
+        mesh.rotation.z = sp.rot;
+        scene.add(mesh);
+        return { mesh: mesh, op: sp.op, r: sp.r, cx: 0, cy: 0 };
+      });
+      glyphMesh.renderOrder = 1;
+      const shapeSum = new Float32Array(SNIPPETS.length), shapeCount = new Float32Array(SNIPPETS.length);
+      chars.forEach(function (c) { shapeCount[c.si]++; });
+
+      // sonda: altezza "piccola" e stabile del viewport (visibile anche con la barra del browser mobile)
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:100vh;height:100svh;pointer-events:none;visibility:hidden';
+      bodyEl.appendChild(probe);
+
+      let W = 0, H = 0, P = 0, k = 1, floorBase = 0;
+      let mode = bodyEl.classList.contains('fun-mode') ? 'fun' : 'jargon';
+      let cur = 0, time = 0, boxA = 1, boxResumeAt = 0;
+      const tmp = { x: 0, y: 0, a: 0 };
+
+      function scrollTarget() {
+        const y = bodyEl.classList.contains('scroll-locked') ? (window.lockY || 0) : window.scrollY;
+        return y * 0.28;
+      }
+      // posizione "a riposo" di una lettera: segue il suo frammento (parallasse + galleggiamento)
+      function restPos(c) {
+        const it = items[c.si], cs = Math.cos(it.ang), sn = Math.sin(it.ang);
+        tmp.x = it.sx + c.ox * cs - c.oy * sn;
+        tmp.y = it.sy + c.ox * sn + c.oy * cs;
+        tmp.a = it.ang;
+      }
+      function computePoses(t, drift) {
+        items.forEach(function (it) {
+          it.sy = ((((it.y0 - cur) % P) + P) % P) - 210 + Math.sin(t * 0.25 + it.phase) * 7 * drift;
+          it.sx = it.x + Math.sin(t * 0.18 + it.phase) * 5 * drift;
+          it.ang = it.L.rot + Math.sin(t * 0.2 + it.phase) * 0.012 * drift;
+        });
+      }
+      // il fondo ha dei "monticelli": le lettere si accumulano in modo un po' irregolare
+      function floorFor(c) {
+        return floorBase - c.hh - (18 + 14 * Math.sin(c.x * 0.012) + 10 * Math.sin(c.x * 0.031 + 1.3)) - c.pileOff;
+      }
+
+      function writeAndRender() {
+        shapeSum.fill(0);
+        for (let i = 0; i < N; i++) {
+          const c = chars[i], cs = Math.cos(c.a), sn = Math.sin(c.a), o = i * 12;
+          const hw = c.hw * c.sc, hh = c.hh * c.sc;
+          shapeSum[c.si] += c.merge;
+          const al = LAYOUT[c.si].op * c.al;
+          for (let v = 0; v < 4; v++) col[i * 16 + v * 4 + 3] = al;
+          // angoli: alto-sx, alto-dx, basso-dx, basso-sx (coordinate schermo, y verso il basso)
+          const lx = [-hw, hw, hw, -hw], ly = [-hh, -hh, hh, hh];
+          for (let v = 0; v < 4; v++) {
+            const X = c.x + lx[v] * cs - ly[v] * sn, Y = c.y + lx[v] * sn + ly[v] * cs;
+            pos[o + v * 3] = X - W / 2;
+            pos[o + v * 3 + 1] = H / 2 - Y;
+            pos[o + v * 3 + 2] = 0;
+          }
+        }
+        geo.attributes.position.needsUpdate = true;
+        geo.attributes.color.needsUpdate = true;
+        shapes.forEach(function (sh, j) {
+          const f = shapeCount[j] ? shapeSum[j] / shapeCount[j] : 0;   // quanto la forma è "piena" di lettere
+          sh.mesh.visible = f > 0.003;
+          sh.mesh.material.opacity = sh.op * f;
+          sh.mesh.position.set(sh.cx - W / 2, H / 2 - sh.cy, 0);
+        });
+        items.forEach(function (it) {
+          if (!it.box) return;
+          it.box.visible = boxA > 0.01;
+          it.box.material.opacity = it.L.op * boxA;
+          it.box.position.set(it.sx - W / 2, H / 2 - it.sy, 0);
+          it.box.rotation.z = -it.ang;
+        });
+        renderer.render(scene, camera);
+      }
+
+      function layout() {
+        const w = canvas.clientWidth, h = canvas.clientHeight;
+        if (!w || !h) return;
+        const oldW = W;
+        W = w; H = h;
+        renderer.setSize(w, h, false);
+        camera.left = -w / 2; camera.right = w / 2; camera.top = h / 2; camera.bottom = -h / 2;
+        camera.updateProjectionMatrix();
+        k = Math.min(1, Math.max(0.55, w / 900));   // più piccoli su mobile
+        P = h + 420;                                // periodo del loop di parallasse
+        const fl = probe.clientHeight;
+        floorBase = fl > 0 ? Math.min(fl, h) : h;
+        items.forEach(function (it, i) {
+          it.S = it.L.s * k;
+          it.pw = it.w * it.S; it.ph = it.h * it.S;
+          it.x = it.L.fx * Math.max(0, W - it.pw) + it.pw / 2;
+          it.y0 = ((i + 0.5) / items.length) * P;
+          if (it.box) it.box.scale.set(it.pw, it.ph, 1);
+        });
+        computePoses(time, reduceMotion ? 0 : 1);
+        shapes.forEach(function (sh, j) {
+          const r = SHAPES[j].r * Math.max(0.65, k);
+          sh.r = r;
+          sh.cx = Math.min(W - r * 0.8, Math.max(r * 0.8, items[j].x));
+          sh.cy = floorBase - r * 0.4;
+          sh.mesh.scale.set(r, r, 1);
+        });
+        chars.forEach(function (c) {
+          const it = items[c.si];
+          c.hw = c.cellW / 2 * it.S; c.hh = FS_LINE / 2 * it.S;
+          c.ox = (c.lx - it.w / 2) * it.S; c.oy = (c.ly - it.h / 2) * it.S;
+          if (c.state === 'ground') { if (oldW) c.x *= W / oldW; c.y = floorFor(c); }
+          else if (c.state === 'rest') { restPos(c); c.x = tmp.x; c.y = tmp.y; c.a = tmp.a; }
+        });
+        writeAndRender();
+      }
+
+      // ---- cambio di modalità: in fun le lettere cadono e confluiscono in forme geometriche
+      //      trasparenti; tornando a jargon ogni forma si scioglie nelle sue lettere
+      function easeInOutCubic(p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+
+      // punto (in pixel) dentro la forma della lettera, fisso per ogni lettera
+      function shapePoint(c) {
+        const sh = shapes[c.si];
+        return { x: sh.cx + Math.cos(c.mu) * c.mr * sh.r * 0.6, y: sh.cy + Math.sin(c.mu) * c.mr * sh.r * 0.6 };
+      }
+      function startMerge(c, dur) {
+        c.fx0 = c.x; c.fy0 = c.y; c.fa0 = c.a;
+        c.rt0 = time; c.rdur = dur;
+        c.state = 'merge';
+      }
+      function begin(c) {
+        const what = c.next;
+        c.next = null;
+        if (what === 'fall') {
+          if (c.y > H) c.y = -40 - rand() * 200;     // era fuori schermo in basso: rientra dall'alto
+          c.vx = (rand() - 0.5) * 50; c.vy = 0; c.av = (rand() - 0.5) * 6;
+          c.touched = false; c.al = 1; c.sc = 1; c.merge = 0;
+          c.state = 'fall';
+        } else {                                      // 'emerge': esce dalla sua forma e torna al posto
+          const pt = shapePoint(c);
+          c.fx0 = pt.x; c.fy0 = pt.y;
+          c.rt0 = time; c.rdur = 0.9 + rand() * 0.5; c.arc = (rand() - 0.5) * 120;
+          c.state = 'emerge';
+        }
+      }
+      function setMode(m) {
+        if (m === mode) return;
+        mode = m;
+        if (reduceMotion) return;                    // con movimento ridotto: nessuna animazione, vedi snapAll
+        if (mode === 'fun') {
+          chars.forEach(function (c) {
+            if (c.state === 'rest' || c.state === 'emerge') { c.next = 'fall'; c.startAt = time + rand() * 0.9; }
+            else c.next = null;                      // già in caduta, in fusione o dentro la forma: non cambia nulla
+          });
+        } else {
+          boxResumeAt = time + 0.8;
+          chars.forEach(function (c) {
+            c.next = null;
+            if (c.state === 'fall' || c.state === 'ground') startMerge(c, 0.3);   // confluiscono in fretta, poi riemergono
+          });
+        }
+      }
+      // senza animazione: stato finale subito (movimento ridotto, oppure pagina caricata già in fun)
+      function snapAll() {
+        cur = scrollTarget();
+        computePoses(0, 0);
+        chars.forEach(function (c) {
+          c.next = null;
+          if (mode === 'fun') { c.state = 'gone'; c.al = 0; c.sc = 0.3; c.merge = 1; }
+          else { c.state = 'rest'; c.al = 1; c.sc = 1; c.merge = 0; restPos(c); c.x = tmp.x; c.y = tmp.y; c.a = tmp.a; }
+        });
+        boxA = mode === 'fun' ? 0 : 1;
+        writeAndRender();
+      }
+
+      // ---- un passo di simulazione; restituisce true se non c'è più nulla che si muove
+      const G = 2400; // px/s²
+      function step(dt) {
+        cur += (scrollTarget() - cur) * 0.12;       // inseguimento morbido dello scroll
+        computePoses(time, 1);
+        let moving = false;
+        for (let i = 0; i < N; i++) {
+          const c = chars[i];
+          if (c.next && time >= c.startAt) begin(c);
+          const st = c.state;
+          if (st === 'rest') {
+            restPos(c); c.x = tmp.x; c.y = tmp.y; c.a = tmp.a;
+            if (c.next) moving = true;
+          } else if (st === 'fall' || st === 'ground') {
+            moving = true;
+            if (st === 'fall') {
+              c.vy += G * dt; c.x += c.vx * dt; c.y += c.vy * dt; c.a += c.av * dt;
+              const fy = floorFor(c);
+              if (c.y >= fy) {
+                c.y = fy;
+                if (!c.touched) { c.touched = true; c.fadeAt = time + 0.15 + rand() * 0.45; }  // al primo contatto, poi confluisce
+                if (Math.abs(c.vy) > 140) { c.vy = -c.vy * 0.3; c.vx *= 0.7; c.av *= 0.6; }
+                else {
+                  c.vy = 0;
+                  const f = Math.pow(0.02, dt);
+                  c.vx *= f; c.av *= f;
+                  if (Math.abs(c.vx) < 4 && Math.abs(c.av) < 0.15) { c.vx = 0; c.av = 0; c.state = 'ground'; }
+                }
+              }
+            }
+            if (c.touched && time >= c.fadeAt) startMerge(c, 0.7 + rand() * 0.3);
+          } else if (st === 'merge') {
+            moving = true;
+            const p = (time - c.rt0) / c.rdur, pt = shapePoint(c);
+            if (p >= 1) { c.state = 'gone'; c.al = 0; c.sc = 0.3; c.merge = 1; c.x = pt.x; c.y = pt.y; }
+            else {
+              const e = easeInOutCubic(p);
+              c.x = c.fx0 + (pt.x - c.fx0) * e;
+              c.y = c.fy0 + (pt.y - c.fy0) * e;
+              c.a = c.fa0 + c.spin * e;
+              c.sc = 1 - 0.7 * e;                   // la lettera si rimpicciolisce entrando nella forma
+              c.al = 1 - e;
+              c.merge = e;
+            }
+          } else if (st === 'gone') {
+            // dentro la forma: in jargon la lettera riemerge, con un'onda da sinistra a destra
+            if (mode === 'jargon' && !c.next) {
+              restPos(c);
+              c.next = 'emerge';
+              c.startAt = time + (tmp.x / Math.max(W, 1)) * 0.7 + rand() * 0.25;
+            }
+            if (c.next) moving = true;
+          } else if (st === 'emerge') {
+            moving = true;
+            const p = (time - c.rt0) / c.rdur;
+            restPos(c);
+            if (p >= 1) { c.state = 'rest'; c.al = 1; c.sc = 1; c.merge = 0; c.x = tmp.x; c.y = tmp.y; c.a = tmp.a; }
+            else {
+              const e = easeInOutCubic(p);
+              c.x = c.fx0 + (tmp.x - c.fx0) * e + c.arc * Math.sin(Math.PI * p);
+              c.y = c.fy0 + (tmp.y - c.fy0) * e;
+              c.a = tmp.a + c.spin * (1 - e);
+              c.sc = 0.3 + 0.7 * e;
+              c.al = Math.min(1, p * 1.6);
+              c.merge = 1 - e;                      // la forma si svuota man mano che le lettere escono
+            }
+          }
+        }
+        // i rettangoli sfumano via con le lettere e tornano quando le lettere stanno riemergendo
+        const target = mode === 'fun' ? 0 : (time >= boxResumeAt ? 1 : 0);
+        if (boxA !== target) {
+          const d = target - boxA, stepA = dt * 2.5;
+          boxA = Math.abs(d) <= stepA ? target : boxA + Math.sign(d) * stepA;
+          moving = true;
+        }
+        return !moving && mode === 'fun';            // in jargon si galleggia sempre
+      }
+
+      // ---- ciclo di animazione: attivo solo se serve
+      let raf = 0, last = 0, idle = false;
+      function frame(now) {
+        raf = 0;
+        if (document.hidden || idle) { last = 0; return; }
+        const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
+        last = now; time += dt;
+        idle = step(dt);
+        writeAndRender();
+        if (idle) { last = 0; return; }
+        raf = requestAnimationFrame(frame);
+      }
+      function kick() {
+        if (reduceMotion) { snapAll(); return; }
+        idle = false;
+        if (!raf && !document.hidden) raf = requestAnimationFrame(frame);
+      }
+
+      new ResizeObserver(layout).observe(canvas);
+      layout();
+      if (mode === 'fun') snapAll();
+      window.addEventListener('scroll', function () { if (reduceMotion || (mode === 'jargon' && !raf)) kick(); }, { passive: true });
+      document.addEventListener('visibilitychange', kick);
+      new MutationObserver(function () {
+        setMode(bodyEl.classList.contains('fun-mode') ? 'fun' : 'jargon');
+        kick();
+      }).observe(bodyEl, { attributes: true, attributeFilter: ['class'] });
+      kick();
+    } catch (err) {
+      canvas.style.display = 'none'; // niente WebGL: la pagina funziona lo stesso
+    }
+  })();
+</script>
+
+</body>
+</html>
