@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi C++ tipi di dato, bool, char e ASCII</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Esercizi C++ su tipi di dato, bool, char e ASCII</h1>
+      <p>
+        Esercizi senza cicli per capire int, float, double, bool, char, string, conversioni,
+        troncamento dei decimali, casting e dimensione in memoria dei tipi.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+
+    <section class="note">
+      <h2>Indicazioni generali</h2>
+      <ul id="rulesList"></ul>
+    </section>
+
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+
+  <script>
+    window.exercisePageConfig = {
+      storageKey: "cpp-types-char-ascii-progress-v2",
+      rules: [
+        "Non usare cicli in questa scheda: lavora solo con variabili, input, output, operatori, if e casting.",
+        "Scegli il tipo prima di scrivere il codice: int, float, double, bool, char o string.",
+        "Osserva quando C++ converte automaticamente un valore e quando serve un cast esplicito.",
+        "Ricorda che int non conserva la parte decimale.",
+        "Ricorda che bool stampato normalmente mostra 0 per false e 1 per true.",
+        "Usa sizeof per osservare quanti byte occupano i tipi, senza parlare di indirizzi."
+      ],
+      exercises: [
+        ["1. Scheda tipi base", "Tipi", "Dichiara una variabile per eta, altezza, peso, iniziale del nome, promosso e nome.", ["Usa int per eta.", "Usa double per altezza e peso.", "Usa char per l'iniziale.", "Usa bool per promosso.", "Usa string per nome.", "Assegna valori nel codice e stampali."], ["L'obiettivo e scegliere il tipo corretto, non leggere input."]],
+        ["2. Input con tipi diversi", "Input", "Leggi nome, eta, altezza, iniziale e se lo studente e promosso.", ["Usa string, int, double, char e bool.", "Leggi i valori con cin.", "Stampa una frase riassuntiva.", "Per bool prova a inserire 0 e 1."], ["Con cin un bool viene letto facilmente come 0 o 1."]],
+        ["3. Stampare bool come numero", "Bool", "Dichiara due variabili bool, una true e una false, poi stampale.", ["Dichiara bool acceso = true.", "Dichiara bool spento = false.", "Stampa entrambe con cout.", "Osserva che vengono visualizzati 1 e 0."], ["true corrisponde a 1, false corrisponde a 0 quando stampati come numeri."]],
+        ["4. Bool da confronto", "Bool", "Leggi due numeri interi e salva in variabili bool il risultato dei confronti.", ["Leggi a e b.", "Crea bool uguali = a == b.", "Crea bool primoMaggiore = a > b.", "Crea bool secondoMaggiore = b > a.", "Stampa i tre bool."], ["I confronti producono valori booleani."]],
+        ["5. Bool e if", "Bool", "Leggi un voto e salva in un bool se il voto e sufficiente.", ["Leggi un double voto.", "Crea bool sufficiente = voto >= 6.", "Stampa il valore numerico del bool.", "Usa if per stampare un messaggio leggibile."], ["Il bool puo essere sia stampato sia usato in una condizione."]],
+        ["6. Bool con operatori logici", "Bool", "Leggi eta e voto. Crea un bool che indica se lo studente puo partecipare a un progetto.", ["Leggi int eta.", "Leggi double voto.", "Crea bool ammesso = eta >= 16 && voto >= 7.", "Stampa il valore di ammesso.", "Stampa anche un messaggio con if."], ["&& significa entrambe le condizioni vere."]],
+        ["7. Int con numero decimale assegnato", "Int", "Assegna un valore decimale a una variabile int e osserva cosa viene stampato.", ["Scrivi int numero = 7.9;.", "Stampa numero.", "Aggiungi un commento nel codice che spieghi il risultato."], ["La parte decimale viene tagliata, non arrotondata."]],
+        ["8. Troncamento da double a int", "Int", "Leggi un double e salvalo anche dentro un int.", ["Leggi double valore.", "Crea int tagliato = valore.", "Stampa valore e tagliato.", "Prova con 3.14, 8.99 e -2.7."], ["Il troncamento verso zero e diverso dall'arrotondamento."]],
+        ["9. Prezzo con int sbagliato", "Int", "Mostra perche int non e adatto a un prezzo con centesimi.", ["Dichiara double prezzoDouble = 12.99.", "Dichiara int prezzoInt = prezzoDouble.", "Stampa entrambi.", "Spiega nel testo stampato quale informazione si perde."], ["I centesimi vengono persi."]],
+        ["10. Divisione tra int", "Int", "Leggi due interi e stampa il risultato della divisione tra interi.", ["Leggi int a e int b.", "Gestisci b uguale a 0.", "Stampa a / b.", "Prova 7 e 2."], ["7 / 2 con int produce 3."]],
+        ["11. Divisione decimale con double", "Double", "Risolvi l'esercizio precedente ottenendo un risultato decimale.", ["Leggi due int.", "Converti almeno uno dei due valori a double.", "Stampa il risultato decimale.", "Gestisci divisione per zero."], ["Puoi usare double risultato = (double)a / b;."]],
+        ["12. Cast esplicito stile C", "Casting", "Leggi due int e calcola la media usando un cast esplicito.", ["Leggi a e b.", "Calcola double media = (double)(a + b) / 2.", "Stampa la media.", "Prova con 7 e 8."], ["Senza cast potresti perdere la parte decimale se dividi tra interi."]],
+        ["13. Cast con static_cast", "Casting", "Riscrivi il calcolo della media usando static_cast<double>.", ["Leggi due int.", "Usa static_cast<double>(a + b).", "Dividi per 2.", "Stampa il risultato."], ["static_cast e piu esplicito e leggibile."]],
+        ["14. Da double a int con cast esplicito", "Casting", "Leggi un double e convertilo a int con static_cast<int>.", ["Leggi double valore.", "Crea int convertito = static_cast<int>(valore).", "Stampa entrambi.", "Scrivi nel messaggio che la parte decimale viene tagliata."], ["Il cast non arrotonda."]],
+        ["15. Float e double a confronto", "Float/double", "Dichiara lo stesso numero decimale in float e in double e stampali.", ["Dichiara float f = 1.0f / 3.0f.", "Dichiara double d = 1.0 / 3.0.", "Stampa entrambi.", "Osserva eventuali differenze."], ["Per vedere piu cifre puoi includere iomanip e usare setprecision."]],
+        ["16. Precisione con setprecision", "Float/double", "Stampa float e double con molte cifre decimali.", ["Includi iomanip.", "Usa cout << setprecision(15).", "Stampa un float e un double.", "Confronta l'output."], ["double conserva in genere piu precisione di float."]],
+        ["17. Somma con float", "Float", "Somma tre valori float e stampa il risultato.", ["Dichiara tre float.", "Calcola la somma.", "Stampa il risultato.", "Ripeti usando double in un secondo blocco."], ["Il punto non e fare cicli, ma confrontare precisione e tipo."]],
+        ["18. Peso dei tipi con sizeof", "sizeof", "Stampa quanti byte occupano int, float, double, bool e char.", ["Usa sizeof(int).", "Usa sizeof(float).", "Usa sizeof(double).", "Usa sizeof(bool).", "Usa sizeof(char)."], ["I valori possono dipendere dal compilatore, ma di solito char vale 1 byte."]],
+        ["19. sizeof di variabili", "sizeof", "Dichiara variabili di tipi diversi e stampa sizeof sulla variabile.", ["Dichiara int n.", "Dichiara float f.", "Dichiara double d.", "Dichiara bool ok.", "Dichiara char c.", "Stampa sizeof(n), sizeof(f), sizeof(d), sizeof(ok), sizeof(c)."], ["sizeof funziona sia sui tipi sia sulle variabili."]],
+        ["20. Memoria: float o double", "Scelta tipi", "Scegli se usare float o double per tre casi: altezza persona, saldo bancario, temperatura.", ["Dichiara una variabile per ogni caso.", "Usa il tipo che ritieni piu adatto.", "Stampa i valori.", "Scrivi nei messaggi perche hai scelto quel tipo."], ["Per semplicita didattica, double e spesso la scelta piu sicura per decimali."]],
+        ["21. Assegnazione tra tipi compatibili", "Conversioni", "Prova ad assegnare un int a un double.", ["Dichiara int intero = 5.", "Dichiara double decimale = intero.", "Stampa entrambi.", "Osserva che il valore diventa 5.0 come concetto."], ["Questa conversione non perde informazione importante."]],
+        ["22. Assegnazione con perdita", "Conversioni", "Prova ad assegnare un double a un int.", ["Dichiara double decimale = 5.75.", "Dichiara int intero = decimale.", "Stampa entrambi.", "Spiega la perdita della parte decimale."], ["Questa conversione puo perdere dati."]],
+        ["23. Assegnazione non sensata: string in int", "Errori di tipo", "Scrivi un piccolo programma che prova ad assegnare una string a un int e osserva l'errore.", ["Dichiara string testo = \"ciao\".", "Prova a scrivere int numero = testo.", "Compila e leggi l'errore.", "Poi commenta la riga sbagliata e fai compilare il programma."], ["Due tipi incompatibili non possono essere assegnati direttamente."]],
+        ["24. Assegnazione non sensata: char in string?", "Errori di tipo", "Confronta char e string assegnando un singolo carattere nei modi corretti e scorretti.", ["Dichiara char iniziale = 'A'.", "Dichiara string testo = \"A\".", "Prova a usare virgolette sbagliate e osserva l'errore.", "Correggi il programma."], ["'A' e un char, \"A\" e una string."]],
+        ["25. Singoli apici e doppi apici", "Char/string", "Mostra la differenza tra 'a' e \"a\".", ["Dichiara char lettera = 'a'.", "Dichiara string parola = \"a\".", "Stampa entrambi.", "Prova a scambiare gli assegnamenti e osserva cosa succede."], ["Char usa apici singoli, string usa doppi apici."]],
+        ["26. Char come numero", "Char/ASCII", "Leggi un char e stampalo anche come int.", ["Leggi char c.", "Crea int codice = c.", "Stampa c e codice.", "Prova con A, B, a, 0."], ["Un char contiene un codice numerico."]],
+        ["27. Codice ASCII manuale", "ASCII", "Leggi un numero intero e convertilo in char.", ["Leggi int codice.", "Crea char c = static_cast<char>(codice).", "Stampa c.", "Prova con 65, 66, 97 e 48."], ["65 corrisponde spesso ad A in ASCII."]],
+        ["28. Carattere successivo", "ASCII", "Leggi un char e stampa il carattere successivo.", ["Leggi char c.", "Crea char successivo = c + 1.", "Stampa entrambi.", "Stampa anche i due codici numerici."], ["L'operazione funziona perche char si comporta anche come codice."]],
+        ["29. Differenza tra due caratteri", "ASCII", "Leggi due char e stampa la differenza tra i loro codici.", ["Leggi primo e secondo carattere.", "Converti entrambi a int.", "Calcola codiceSecondo - codicePrimo.", "Stampa il risultato."], ["Tra 'A' e 'B' la differenza e 1."]],
+        ["30. Da minuscola a maiuscola con cast implicito", "ASCII", "Leggi una lettera minuscola e trasformala in maiuscola sottraendo 32.", ["Leggi char c.", "Controlla con if che sia tra 'a' e 'z'.", "Crea char maiuscola = c - 32.", "Stampa il risultato."], ["In ASCII la distanza tra minuscole e maiuscole e 32."]],
+        ["31. Da maiuscola a minuscola", "ASCII", "Leggi una lettera maiuscola e trasformala in minuscola aggiungendo 32.", ["Leggi char c.", "Controlla che sia tra 'A' e 'Z'.", "Crea char minuscola = c + 32.", "Stampa il risultato."], ["A diventa a, B diventa b."]],
+        ["32. Riconoscere una cifra", "Char", "Leggi un char e stabilisci se e una cifra.", ["Leggi char c.", "Usa if con c >= '0' && c <= '9'.", "Stampa cifra oppure non cifra."], ["Non usare cicli e non usare funzioni gia pronte."]],
+        ["33. Valore numerico di una cifra", "Char", "Leggi un char cifra e ottieni il suo valore intero.", ["Controlla che sia tra '0' e '9'.", "Calcola int valore = c - '0'.", "Stampa il valore.", "Se non e cifra, stampa errore."], ["'7' - '0' produce 7."]],
+        ["34. Somma di due cifre char", "Char", "Leggi due caratteri cifra e stampa la somma dei loro valori numerici.", ["Valida entrambi i caratteri.", "Converti ciascuno sottraendo '0'.", "Somma i valori interi.", "Stampa il risultato."], ["Non sommare direttamente i codici ASCII."]],
+        ["35. Classificare un carattere", "Char", "Leggi un char e classificalo come maiuscola, minuscola, cifra o altro.", ["Usa if, else if, else.", "Controlla gli intervalli ASCII.", "Stampa la categoria trovata."], ["Usa condizioni composte con &&."]],
+        ["36. Bool da carattere", "Bool/char", "Leggi un carattere e salva in bool se e una lettera maiuscola.", ["Leggi char c.", "Crea bool maiuscola = c >= 'A' && c <= 'Z'.", "Stampa il bool.", "Usa if per stampare un messaggio leggibile."], ["Vedrai 1 per vero e 0 per falso."]],
+        ["37. boolalpha", "Bool", "Stampa un bool prima come 0/1 e poi come true/false.", ["Dichiara bool valore = true.", "Stampa valore normalmente.", "Stampa valore usando boolalpha.", "Ripeti con false."], ["Serve includere iostream; boolalpha si usa con cout."]],
+        ["38. noboolalpha", "Bool", "Dopo aver usato boolalpha, torna a stampare bool come 0/1.", ["Dichiara un bool.", "Stampa con boolalpha.", "Poi usa noboolalpha.", "Stampa di nuovo lo stesso bool."], ["boolalpha e noboolalpha sono manipolatori di output."]],
+        ["39. Riepilogo conversioni", "Riepilogo", "Leggi un double e un char. Stampa il double originale, il double convertito a int, il char e il suo codice.", ["Leggi double valore.", "Leggi char c.", "Usa static_cast<int>(valore).", "Usa static_cast<int>(c).", "Stampa tutto con etichette chiare."], ["Un solo esercizio per vedere due conversioni diverse."]],
+        ["40. Riepilogo tipi", "Riepilogo", "Crea un programma che usa int, float, double, bool, char e string e stampa per ognuno valore e sizeof.", ["Dichiara una variabile per ogni tipo.", "Assegna valori nel codice.", "Stampa valore e sizeof della variabile.", "Non usare cicli."], ["Ripeti manualmente una riga di cout per ogni variabile."]]
+      ]
+    };
+  </script>
+  <script src="../js/exercise-page.js"></script>
+</body>
+</html>

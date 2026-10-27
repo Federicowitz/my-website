@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>19. Ricerca e filtro studenti</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Ricerca e filtro studenti</h1>
+
+  <input id="nameInput" type="text" placeholder="Nome">
+  <input id="surnameInput" type="text" placeholder="Cognome">
+  <input id="voteInput" type="text" placeholder="Voto">
+  <button id="button" type="button">Aggiungi studente</button>
+
+  <hr>
+
+  <input id="searchInput" type="text" placeholder="Cerca per nome o cognome">
+
+  <label>
+    <input id="onlyPassedInput" type="checkbox">
+    Mostra solo sufficienti
+  </label>
+
+  <p id="message"></p>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Cognome</th>
+        <th>Voto</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script>
+    const nameInput = document.getElementById("nameInput");
+    const surnameInput = document.getElementById("surnameInput");
+    const voteInput = document.getElementById("voteInput");
+    const button = document.getElementById("button");
+    const searchInput = document.getElementById("searchInput");
+    const onlyPassedInput = document.getElementById("onlyPassedInput");
+    const message = document.getElementById("message");
+    const tableBody = document.getElementById("tableBody");
+
+    const students = [];
+
+    const render = () => {
+      const search = searchInput.value.trim().toLowerCase();
+      const onlyPassed = onlyPassedInput.checked;
+
+      const filteredStudents = students.filter((student) => {
+        const fullName = `${student.nome} ${student.cognome}`.toLowerCase();
+        const matchesSearch = fullName.includes(search);
+        const matchesVote = onlyPassed === false || student.voto >= 6;
+
+        return matchesSearch && matchesVote;
+      });
+
+      const html = filteredStudents.map((student) => {
+        return `
+          <tr>
+            <td>${student.nome}</td>
+            <td>${student.cognome}</td>
+            <td>${student.voto}</td>
+          </tr>
+        `;
+      }).join("");
+
+      tableBody.innerHTML = html;
+    };
+
+    button.onclick = () => {
+      const nome = nameInput.value.trim();
+      const cognome = surnameInput.value.trim();
+      const voto = parseFloat(voteInput.value);
+
+      if (nome === "" || cognome === "") {
+        message.innerText = "Errore: nome e cognome sono obbligatori.";
+        return;
+      }
+
+      if (Number.isNaN(voto) || voto < 1 || voto > 10) {
+        message.innerText = "Errore: il voto deve essere un numero tra 1 e 10.";
+        return;
+      }
+
+      students.push({
+        nome: nome,
+        cognome: cognome,
+        voto: voto
+      });
+
+      nameInput.value = "";
+      surnameInput.value = "";
+      voteInput.value = "";
+      message.innerText = "";
+
+      render();
+    };
+
+    searchInput.oninput = () => {
+      render();
+    };
+
+    onlyPassedInput.oninput = () => {
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>

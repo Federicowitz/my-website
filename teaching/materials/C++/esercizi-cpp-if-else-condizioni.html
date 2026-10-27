@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi C++ if else, else if e condizioni logiche</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Esercizi C++ su if, else if, if annidati e condizioni logiche</h1>
+      <p>
+        Raccolta di esercizi senza cicli per consolidare condizioni semplici, condizioni composte,
+        catene if else if, if annidati, operatori logici e casi limite.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+
+    <section class="note">
+      <h2>Indicazioni generali</h2>
+      <ul id="rulesList"></ul>
+    </section>
+
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+
+  <script>
+    window.exercisePageConfig = {
+      storageKey: "cpp-if-else-conditions-progress-v1",
+      rules: [
+        "Non usare cicli in questa scheda.",
+        "Usa if, else, else if e if annidati quando servono.",
+        "Scrivi condizioni leggibili e controlla bene gli operatori ==, !=, <, >, <=, >=.",
+        "Usa && quando devono essere vere piu condizioni insieme.",
+        "Usa || quando basta che sia vera almeno una condizione.",
+        "Usa ! per negare una condizione solo quando rende il codice piu chiaro.",
+        "Gestisci sempre i casi limite: uguaglianza, zero, valori fuori intervallo, input non valido."
+      ],
+      exercises: [
+        ["1. Positivo, negativo o zero", "If base", "Leggi un numero intero e stampa se e positivo, negativo oppure zero.", ["Usa if, else if, else.", "Gestisci esattamente il caso zero.", "Stampa un messaggio diverso per ogni caso."], ["Controlla prima > 0, poi < 0, poi else."]],
+        ["2. Pari o dispari", "If base", "Leggi un numero intero e stampa se e pari o dispari.", ["Usa l'operatore %.", "Se numero % 2 == 0 stampa pari.", "Altrimenti stampa dispari."], ["Lo zero e pari."]],
+        ["3. Maggiorenne", "If base", "Leggi l'eta e stampa se la persona e maggiorenne o minorenne.", ["Usa >= 18.", "Gestisci eta negativa con un messaggio di errore.", "Usa else per il caso minorenne."], ["Prima controlla se eta < 0."]],
+        ["4. Voto sufficiente", "If base", "Leggi un voto e stampa sufficiente o insufficiente.", ["Valida che il voto sia tra 0 e 10.", "Se voto >= 6 stampa sufficiente.", "Altrimenti insufficiente."], ["Qui serve distinguere input non valido dai voti validi."]],
+        ["5. Numero compreso tra 1 e 100", "Condizioni logiche", "Leggi un numero e stampa se e compreso tra 1 e 100 inclusi.", ["Usa &&.", "Stampa dentro intervallo oppure fuori intervallo.", "Gestisci gli estremi 1 e 100 come validi."], ["Condizione: numero >= 1 && numero <= 100."]],
+        ["6. Fuori intervallo", "Condizioni logiche", "Leggi un numero e stampa se e fuori dall'intervallo 10-20.", ["Usa ||.", "Fuori significa minore di 10 oppure maggiore di 20.", "Gli estremi 10 e 20 non sono fuori."], ["Condizione: numero < 10 || numero > 20."]],
+        ["7. Accesso con eta e permesso", "Condizioni logiche", "Leggi eta e se l'utente ha un permesso speciale. Stampa se puo entrare.", ["Usa bool permesso.", "L'accesso e consentito se eta >= 18 oppure permesso e true.", "Stampa anche il valore booleano della condizione."], ["Per permesso puoi leggere 0 o 1."]],
+        ["8. Progetto scolastico", "Condizioni logiche", "Leggi eta e media. Lo studente e ammesso se eta >= 16 e media >= 7.", ["Usa &&.", "Stampa ammesso o non ammesso.", "Gestisci eta negativa e media fuori 0-10."], ["Prima valida gli input, poi valuta l'ammissione."]],
+        ["9. Sconto negozio", "If else", "Leggi totale spesa. Applica sconto 10% se supera 100 euro.", ["Usa double.", "Se totale > 100 calcola totale scontato.", "Altrimenti lascia il totale invariato.", "Stampa il totale finale."], ["Non serve ciclo."]],
+        ["10. Sconto con tessera", "Condizioni logiche", "Leggi totale e se il cliente ha la tessera. Sconto se totale > 100 oppure tessera true.", ["Usa bool tessera.", "Usa ||.", "Calcola sconto 10%.", "Stampa se lo sconto e stato applicato."], ["Attenzione: basta una delle due condizioni."]],
+        ["11. Tre fasce di voto", "Else if", "Leggi un voto e classificalo: insufficiente, sufficiente, buono.", ["Valida 0-10.", "Meno di 6 insufficiente.", "Da 6 a meno di 8 sufficiente.", "Da 8 a 10 buono."], ["Usa una catena if else if else."]],
+        ["12. Cinque fasce di voto", "Else if", "Classifica un voto in gravemente insufficiente, insufficiente, sufficiente, buono, ottimo.", ["0-3.99 gravemente insufficiente.", "4-5.99 insufficiente.", "6-6.99 sufficiente.", "7-8.99 buono.", "9-10 ottimo."], ["Ordina le soglie in modo chiaro."]],
+        ["13. Giorno della settimana", "Else if", "Leggi un numero da 1 a 7 e stampa il giorno corrispondente.", ["1 lunedi.", "2 martedi.", "Continua fino a 7 domenica.", "Per altri numeri stampa errore."], ["Esercizio volutamente con else if, non switch."]],
+        ["14. Mese e stagione", "Else if", "Leggi il numero del mese e stampa la stagione indicativa.", ["12, 1, 2 inverno.", "3, 4, 5 primavera.", "6, 7, 8 estate.", "9, 10, 11 autunno.", "Altri valori errore."], ["Usa || per raggruppare mesi."]],
+        ["15. Calcolatrice con operatore", "Else if", "Leggi due numeri e un operatore +, -, *, /.", ["Usa char operatore.", "Esegui l'operazione corretta.", "Gestisci divisione per zero.", "Gestisci operatore non valido."], ["La divisione richiede un if annidato per controllare il divisore."]],
+        ["16. Login semplice", "If annidati", "Leggi username e password. L'accesso riesce solo se entrambi sono corretti.", ["Controlla prima lo username.", "Se lo username e corretto, controlla la password.", "Stampa messaggi diversi per username errato e password errata."], ["Questo e un buon caso per if annidato."]],
+        ["17. Biglietto cinema", "If annidati", "Calcola il prezzo del biglietto in base a eta e giorno della settimana.", ["Prezzo base 10.", "Se eta < 12 prezzo 6.", "Se eta >= 65 prezzo 7.", "Se giorno e 'M' applica ulteriore sconto 2 euro.", "Non scendere sotto 0."], ["Puoi annidare il controllo del giorno dopo aver calcolato il prezzo."]],
+        ["18. Triangolo valido", "Condizioni logiche", "Leggi tre lati e stabilisci se possono formare un triangolo.", ["Tutti i lati devono essere positivi.", "Ogni lato deve essere minore della somma degli altri due.", "Stampa valido o non valido."], ["Usa && per unire tutte le condizioni."]],
+        ["19. Tipo di triangolo", "If annidati", "Se il triangolo e valido, stampa se e equilatero, isoscele o scaleno.", ["Prima verifica la validita.", "Solo se valido classifica il triangolo.", "Equilatero: tre lati uguali.", "Isoscele: almeno due lati uguali.", "Scaleno: tutti diversi."], ["Annida la classificazione dentro il caso valido."]],
+        ["20. Anno bisestile", "Condizioni logiche", "Leggi un anno e stabilisci se e bisestile.", ["Bisestile se divisibile per 400.", "Oppure divisibile per 4 ma non per 100.", "Stampa bisestile o non bisestile."], ["Condizione: anno % 400 == 0 || (anno % 4 == 0 && anno % 100 != 0)."]],
+        ["21. Coordinate cartesiane", "Else if", "Leggi x e y e indica quadrante o asse.", ["Se x e 0 e y e 0 stampa origine.", "Se x e 0 stampa asse Y.", "Se y e 0 stampa asse X.", "Altrimenti stampa quadrante 1, 2, 3 o 4."], ["Controlla prima origine e assi."]],
+        ["22. Valore assoluto", "If base", "Leggi un numero e stampa il suo valore assoluto.", ["Se il numero e negativo, cambia segno.", "Altrimenti lascia invariato.", "Stampa risultato."], ["Non usare funzioni di libreria."]],
+        ["23. Numero a due cifre", "Condizioni logiche", "Leggi un intero e stampa se ha due cifre positive.", ["Valido se da 10 a 99.", "Stampa due cifre oppure no.", "I numeri negativi non sono validi per questa traccia."], ["Usa &&."]],
+        ["24. Numero a due cifre anche negativo", "Condizioni logiche", "Leggi un intero e stampa se ha due cifre considerando anche i negativi.", ["Valido se tra 10 e 99 oppure tra -99 e -10.", "Usa || e &&.", "Stampa risultato."], ["Servono parentesi per rendere chiara la condizione."]],
+        ["25. Carattere maiuscolo/minuscolo/cifra", "Char", "Leggi un char e classificalo.", ["Se tra 'A' e 'Z' stampa maiuscola.", "Se tra 'a' e 'z' stampa minuscola.", "Se tra '0' e '9' stampa cifra.", "Altrimenti stampa altro."], ["Usa else if in ordine."]],
+        ["26. Vocale o consonante", "Char", "Leggi una lettera minuscola e stampa se e vocale o consonante.", ["Prima verifica che sia tra 'a' e 'z'.", "Poi controlla a, e, i, o, u.", "Se non e lettera stampa errore."], ["Questo richiede if annidato."]],
+        ["27. Vocale maiuscola o minuscola", "Condizioni logiche", "Leggi un char e stampa se e una vocale, accettando maiuscole e minuscole.", ["Controlla a/e/i/o/u e A/E/I/O/U.", "Usa ||.", "Stampa vocale o non vocale."], ["La condizione sara lunga: usa parentesi se aiuta."]],
+        ["28. Password robusta base", "Condizioni logiche", "Leggi tre informazioni: lunghezza password, contieneNumero, contieneMaiuscola.", ["La password e valida se lunghezza >= 8 e contieneNumero true e contieneMaiuscola true.", "Leggi i bool come 0 o 1.", "Stampa valida o non valida."], ["Esempio didattico senza analizzare davvero una stringa."]],
+        ["29. Accesso palestra", "Condizioni logiche", "Leggi eta, certificatoMedico e consensoGenitore.", ["Se eta >= 18 basta certificatoMedico.", "Se eta < 18 servono certificatoMedico e consensoGenitore.", "Eta negativa e errore."], ["Qui un if annidato rende il ragionamento piu chiaro."]],
+        ["30. Spedizione ordine", "Condizioni logiche", "Leggi importo e zona. Calcola costo spedizione.", ["Zona A: 5 euro.", "Zona B: 8 euro.", "Zona C: 12 euro.", "Se importo >= 100 spedizione gratuita.", "Zona non valida: errore."], ["Controlla prima se importo e valido."]],
+        ["31. Tassa in fasce", "Else if", "Leggi reddito e calcola una tassa semplificata.", ["Reddito negativo: errore.", "Fino a 10000 tassa 0%.", "Fino a 30000 tassa 10%.", "Oltre 30000 tassa 20%.", "Stampa importo tassa."], ["Usa else if ordinati dal piu basso al piu alto."]],
+        ["32. Tariffa parcheggio", "Else if", "Leggi ore di parcheggio e calcola prezzo.", ["Ore <= 0 errore.", "Fino a 1 ora: 2 euro.", "Fino a 3 ore: 5 euro.", "Oltre 3 ore: 10 euro.", "Stampa prezzo."], ["Attenzione agli estremi."]],
+        ["33. Fascia oraria", "Condizioni logiche", "Leggi un'ora da 0 a 23 e stampa notte, mattina, pomeriggio o sera.", ["0-5 notte.", "6-12 mattina.", "13-18 pomeriggio.", "19-23 sera.", "Fuori intervallo errore."], ["Valida prima 0-23."]],
+        ["34. Numero ordinabile", "If annidati", "Leggi tre numeri e stampa quale e il maggiore.", ["Gestisci uguaglianze.", "Se tutti uguali stampalo.", "Se due sono uguali e maggiori del terzo, segnalalo.", "Altrimenti stampa il maggiore unico."], ["Questo richiede ragionare sui casi."]],
+        ["35. Ordinare due numeri", "If base", "Leggi due numeri e stampali in ordine crescente.", ["Se il primo e minore o uguale al secondo, stampa a poi b.", "Altrimenti stampa b poi a.", "Gestisci uguaglianza."], ["Non serve scambiare variabili."]],
+        ["36. Validare data semplice", "If annidati", "Leggi giorno e mese e verifica se la data e valida ignorando gli anni bisestili.", ["Mese tra 1 e 12.", "Aprile, giugno, settembre, novembre hanno 30 giorni.", "Febbraio ha 28 giorni.", "Gli altri mesi hanno 31 giorni.", "Giorno deve essere nel range corretto."], ["Puoi prima determinare il numero massimo di giorni del mese."]],
+        ["37. Semaforo", "Else if", "Leggi un carattere R, G, V per rosso, giallo, verde e stampa l'azione.", ["R: fermati.", "G: rallenta.", "V: passa.", "Altri caratteri: errore."], ["Puoi accettare anche minuscole come variante."]],
+        ["38. Operatore logico NOT", "Condizioni logiche", "Leggi un bool connesso e stampa messaggio usando !.", ["Leggi connesso come 0 o 1.", "Se !connesso stampa non sei connesso.", "Altrimenti stampa sei connesso."], ["Usa ! solo dove migliora la lettura."]],
+        ["39. Condizione complessa con parentesi", "Condizioni logiche", "Leggi eta, voto e permesso. Ammesso se voto >= 8 oppure eta >= 18 e permesso true.", ["Usa bool permesso.", "Scrivi la condizione con parentesi.", "Stampa ammesso/non ammesso.", "Prova casi diversi."], ["Decidi se eta e permesso devono stare insieme: voto >= 8 || (eta >= 18 && permesso)."]],
+        ["40. Riepilogo condizioni", "Riepilogo", "Leggi eta, voto, assenze e comportamento. Stabilisci se uno studente passa un corso.", ["Input validi: eta positiva, voto 0-10, assenze >= 0, comportamento tra 1 e 5.", "Passa se voto >= 6, assenze <= 10 e comportamento >= 3.", "Se voto >= 9 puo passare anche con assenze fino a 15.", "Stampa motivo del rifiuto quando non passa."], ["Esercizio completo su validazione, &&, ||, else if e if annidati."]]
+      ]
+    };
+  </script>
+  <script src="../js/exercise-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi C++ do while base</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Esercizi C++ sul ciclo do while</h1>
+      <p>Esercizi introduttivi sul ciclo do while, utile quando il blocco deve essere eseguito almeno una volta.</p>
+    </div>
+  </header>
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+    <section class="note"><h2>Indicazioni generali</h2><ul id="rulesList"></ul></section>
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+  <script>
+    window.exercisePageConfig = {
+      storageKey: "cpp-do-while-exercises-progress-v1",
+      rules: [
+        "Usa do while come struttura principale.",
+        "Ricorda che il blocco viene eseguito almeno una volta.",
+        "Leggi o aggiorna dentro il ciclo il valore usato nella condizione.",
+        "Il punto e virgola dopo while(condizione); e obbligatorio.",
+        "Usa do while soprattutto per menu, validazione input e richieste ripetute."
+      ],
+      exercises: [
+        ["1. Stampare un messaggio almeno una volta", "Base", "Stampa un messaggio dentro un do while che viene eseguito una sola volta.", ["Crea una variabile continua.", "Esegui il blocco almeno una volta.", "Fai terminare il ciclo dopo la prima stampa."], ["Imposta la condizione in modo che diventi falsa dopo il primo giro."]],
+        ["2. Contare da 1 a 10", "Base", "Stampa i numeri da 1 a 10 usando do while.", ["Inizializza un contatore a 1.", "Stampa il contatore.", "Incrementalo.", "Continua finche il contatore e minore o uguale a 10."], ["La condizione si controlla dopo il blocco."]],
+        ["3. Contare da 10 a 1", "Base", "Stampa i numeri da 10 a 1 con do while.", ["Parti da 10.", "Stampa il valore corrente.", "Decrementa.", "Termina dopo aver stampato 1."], ["La condizione puo essere numero >= 1."]],
+        ["4. Chiedere un numero positivo", "Validazione", "Chiedi un numero finche l'utente non inserisce un valore positivo.", ["Leggi il numero dentro il do.", "Se non e positivo, il ciclo deve ripetere la richiesta.", "Alla fine stampa il numero valido."], ["La condizione di ripetizione puo essere numero <= 0."]],
+        ["5. Voto valido", "Validazione", "Chiedi un voto finche non e compreso tra 0 e 10.", ["Leggi un double.", "Ripeti se il voto e minore di 0 o maggiore di 10.", "Stampa il voto accettato."], ["Usa || nella condizione."]],
+        ["6. Password", "Validazione", "Chiedi una password finche non corrisponde a quella salvata nel codice.", ["Usa una string per la password corretta.", "Leggi il tentativo.", "Ripeti finche il tentativo e diverso.", "Stampa un messaggio di accesso riuscito."], ["Il do while e adatto perche almeno un tentativo va chiesto."]],
+        ["7. Menu saluto", "Menu", "Mostra un menu con opzioni 1 saluta e 0 esci.", ["Mostra il menu dentro il do.", "Leggi la scelta.", "Se la scelta e 1, stampa un saluto.", "Ripeti finche la scelta non e 0."], ["La scelta deve essere letta a ogni giro."]],
+        ["8. Menu calcolatrice semplice", "Menu", "Crea un menu che permette di sommare due numeri o uscire.", ["Opzione 1: leggi due numeri e stampa la somma.", "Opzione 0: esci.", "Gestisci opzioni non valide.", "Usa do while."], ["Puoi usare if, else if, else."]],
+        ["9. Ripeti frase", "Input", "Chiedi una frase e un numero. Stampa la frase quel numero di volte.", ["Valida che il numero sia positivo.", "Usa do while per la stampa.", "Conta quante volte hai stampato."], ["Se il numero e 1, la frase deve essere stampata una volta."]],
+        ["10. Somma finche vuoi", "Sentinella", "Chiedi numeri all'utente e domanda se vuole continuare.", ["Leggi un numero.", "Aggiungilo alla somma.", "Chiedi s/n.", "Ripeti finche l'utente risponde s."], ["La variabile scelta puo essere char."]],
+        ["11. Media finche vuoi", "Sentinella", "Come sopra, ma calcola la media dei numeri inseriti.", ["Mantieni somma e conteggio.", "Chiedi almeno un numero.", "Alla fine calcola media.", "Stampa somma, conteggio e media."], ["Il conteggio parte da 0 e aumenta dopo ogni numero valido."]],
+        ["12. Indovina numero", "Gioco", "L'utente prova a indovinare un numero segreto fisso.", ["Chiedi un tentativo almeno una volta.", "Ripeti finche il tentativo non e corretto.", "Dai un suggerimento alto/basso.", "Conta i tentativi."], ["Il numero segreto puo essere una costante int."]],
+        ["13. Conferma uscita", "Menu", "Chiedi all'utente se vuole uscire dal programma finche non risponde s o n.", ["Leggi un char.", "Accetta solo s oppure n.", "Ripeti per ogni altro carattere.", "Stampa la scelta finale."], ["Esercizio utile per validare caratteri."]],
+        ["14. Bancomat minimo", "Menu", "Crea un menu con mostra saldo, versa, preleva, esci.", ["Usa saldo iniziale.", "Ripeti il menu con do while.", "Aggiorna saldo su versamento e prelievo.", "Non permettere prelievi superiori al saldo."], ["La condizione finale e scelta != 0."]],
+        ["15. Numero pari obbligatorio", "Validazione", "Chiedi un numero finche non e pari.", ["Leggi un intero.", "Ripeti se numero % 2 != 0.", "Alla fine stampa numero pari."], ["Il primo numero potrebbe gia essere pari."]],
+        ["16. Intervallo personalizzato", "Validazione", "Chiedi minimo, massimo e poi un valore compreso in quell'intervallo.", ["Leggi minimo e massimo.", "Chiedi un valore.", "Ripeti finche il valore e fuori intervallo.", "Stampa il valore valido."], ["Assumi che minimo sia minore o uguale a massimo."]],
+        ["17. Menu conversioni", "Menu", "Menu con 1 euro-dollari, 2 metri-centimetri, 0 esci.", ["Mostra il menu.", "Leggi la scelta.", "Per ogni conversione leggi il valore.", "Ripeti finche la scelta e 0."], ["Usa costanti per i fattori di conversione."]],
+        ["18. Conta errori password", "Validazione", "Chiedi la password finche e corretta e conta gli errori.", ["Conta i tentativi sbagliati.", "Ripeti finche la password e diversa.", "Alla fine stampa quanti errori sono stati fatti."], ["Incrementa errori solo quando il tentativo e sbagliato."]],
+        ["19. Login con massimo 3 tentativi", "Validazione", "Chiedi una password al massimo tre volte.", ["Usa do while.", "Termina se la password e corretta.", "Termina anche dopo 3 tentativi.", "Stampa se accesso riuscito o bloccato."], ["La condizione combina password errata e tentativi minori di 3."]],
+        ["20. Acquisti ripetuti", "Simulazione", "Leggi prezzi di prodotti finche l'utente vuole continuare e stampa il totale.", ["Leggi un prezzo.", "Aggiungilo al totale.", "Chiedi se continuare.", "Alla fine stampa totale."], ["Puoi usare char risposta."]],
+        ["21. Temperatura valida", "Validazione", "Chiedi una temperatura realistica tra -50 e 60 gradi.", ["Leggi la temperatura.", "Ripeti se fuori intervallo.", "Stampa temperatura accettata."], ["Usa double."]],
+        ["22. Scelta difficolta", "Menu", "Chiedi una difficolta tra 1, 2 e 3 finche e valida.", ["Mostra le tre opzioni.", "Leggi scelta.", "Ripeti se scelta non e 1, 2 o 3.", "Stampa la difficolta scelta."], ["La condizione puo usare && oppure negare un confronto."]],
+        ["23. Simulatore carburante", "Simulazione", "Parti da litri nel serbatoio e chiedi consumi di viaggio finche il carburante basta.", ["Leggi litri iniziali.", "Dentro il do leggi consumo.", "Sottrai se possibile.", "Chiedi se continuare.", "Blocca se il consumo supera i litri."], ["Controlla bene l'ordine delle operazioni."]],
+        ["24. Riepilogo do while", "Riepilogo", "Crea un menu completo che permette di inserire numeri, vedere somma, vedere media e uscire.", ["Usa do while per il menu.", "Opzione 1 inserisce un numero.", "Opzione 2 mostra la somma.", "Opzione 3 mostra la media.", "Opzione 0 esce.", "Gestisci il caso media senza numeri."], ["Questo esercizio mette insieme menu, accumulatori e controlli."]]
+      ]
+    };
+  </script>
+  <script src="../js/exercise-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>6. Funzioni matematiche</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Funzioni matematiche</h1>
+  <p>Apri la console del browser per vedere i risultati.</p>
+
+  <script>
+    const somma = (a, b) => {
+      return a + b;
+    };
+
+    const sottrazione = (a, b) => {
+      return a - b;
+    };
+
+    const moltiplicazione = (a, b) => {
+      return a * b;
+    };
+
+    const divisione = (a, b) => {
+      if (b === 0) {
+        return "Errore: divisione per zero";
+      }
+
+      return a / b;
+    };
+
+    console.log(somma(10, 5));
+    console.log(sottrazione(10, 5));
+    console.log(moltiplicazione(10, 5));
+    console.log(divisione(10, 5));
+    console.log(divisione(10, 0));
+  </script>
+</body>
+</html>

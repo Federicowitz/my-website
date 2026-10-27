@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi C++ base</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Esercizi C++ base</h1>
+      <p>
+        Esercizi introduttivi su input, output, variabili, tipi di dato, operazioni aritmetiche e condizioni semplici.
+        Ogni esercizio è indipendente dagli altri.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+
+    <section class="note">
+      <h2>Indicazioni generali</h2>
+      <ul id="rulesList"></ul>
+    </section>
+
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+
+  <script>
+    const storageKey = "cpp-base-exercises-progress-v1";
+
+    const rules = [
+      "Ogni punto è un esercizio diverso.",
+      "Puoi testarli su un compilatore online C++.",
+      "Usa cout per stampare a video.",
+      "Usa cin per leggere valori inseriti dall'utente.",
+      "Dichiara sempre le variabili prima di usarle.",
+      "Scegli il tipo di dato corretto: int, float, double, char o string.",
+      "Per ora usa solo if, else if ed else quando servono.",
+      "Non usare cicli, array o funzioni: arriveranno più avanti."
+    ];
+
+    const exercises = [
+      {
+        title: "1. Stampare un messaggio",
+        level: "Output",
+        text: "Scrivi un programma che stampi a video un messaggio di benvenuto.",
+        requirements: [
+          "Il programma deve stampare una frase a scelta.",
+          "Usa cout.",
+          "Il programma non deve leggere input dall'utente."
+        ],
+        hints: [
+          "Controlla di aver incluso iostream.",
+          "Ricorda il punto e virgola alla fine dell'istruzione."
+        ]
+      },
+      {
+        title: "2. Stampare nome ed età",
+        level: "Variabili",
+        text: "Scrivi un programma che dichiari una variabile string per il nome e una variabile int per l'età, poi stampi una frase completa.",
+        requirements: [
+          "Dichiara una variabile per il nome.",
+          "Dichiara una variabile per l'età.",
+          "Assegna tu i valori nel codice.",
+          "Stampa una frase usando entrambe le variabili."
+        ],
+        hints: [
+          "Per usare string può servire includere string.",
+          "Esempio di frase: Mi chiamo Mario e ho 16 anni."
+        ]
+      },
+      {
+        title: "3. Leggere un numero intero",
+        level: "Input",
+        text: "L'utente inserisce un numero intero e il programma lo ristampa a video.",
+        requirements: [
+          "Dichiara una variabile int.",
+          "Leggi il valore con cin.",
+          "Stampa il valore inserito dall'utente."
+        ],
+        hints: [
+          "Prima di cin stampa un messaggio che spiega cosa inserire.",
+          "cin salva il valore dentro una variabile."
+        ]
+      },
+      {
+        title: "4. Quadrato di un intero",
+        level: "Operazioni",
+        text: "L'utente inserisce un numero intero e viene stampato il suo quadrato.",
+        requirements: [
+          "Leggi un valore intero.",
+          "Calcola il quadrato.",
+          "Stampa il risultato."
+        ],
+        hints: [
+          "Il quadrato di x si può calcolare con x * x.",
+          "Salva il risultato in una variabile prima di stamparlo."
+        ]
+      },
+      {
+        title: "5. Metà di un numero decimale",
+        level: "Operazioni",
+        text: "L'utente inserisce un numero con la virgola e viene stampata la sua metà.",
+        requirements: [
+          "Usa float oppure double.",
+          "Leggi il numero con cin.",
+          "Calcola la metà.",
+          "Stampa il risultato."
+        ],
+        hints: [
+          "Nel codice C++ i numeri decimali usano il punto, non la virgola.",
+          "Esempio: 7.5, non 7,5."
+        ]
+      },
+      {
+        title: "6. Somma di due interi",
+        level: "Operazioni",
+        text: "L'utente inserisce due numeri interi e viene stampata la loro somma.",
+        requirements: [
+          "Dichiara due variabili int.",
+          "Leggi entrambi i valori.",
+          "Calcola la somma.",
+          "Stampa il risultato."
+        ],
+        hints: [
+          "Puoi usare due istruzioni cin separate oppure una sola istruzione con due variabili.",
+          "Esempio: cin >> a >> b;"
+        ]
+      },
+      {
+        title: "7. Prodotto di due interi",
+        level: "Operazioni",
+        text: "L'utente inserisce due numeri interi e viene stampato il loro prodotto.",
+        requirements: [
+          "Leggi due numeri interi.",
+          "Moltiplica i due valori.",
+          "Stampa il risultato."
+        ],
+        hints: [
+          "L'operatore di moltiplicazione è *.",
+          "Usa nomi chiari per le variabili, per esempio numero1 e numero2."
+        ]
+      },
+      {
+        title: "8. Prodotto tra intero e decimale",
+        level: "Tipi di dato",
+        text: "L'utente inserisce un numero intero e un numero decimale. Il programma stampa il loro prodotto.",
+        requirements: [
+          "Usa una variabile int.",
+          "Usa una variabile float oppure double.",
+          "Calcola il prodotto.",
+          "Stampa il risultato."
+        ],
+        hints: [
+          "Il risultato dovrebbe essere salvato in una variabile decimale.",
+          "Se moltiplichi int e double, il risultato può contenere decimali."
+        ]
+      },
+      {
+        title: "9. Area del rettangolo",
+        level: "Operazioni",
+        text: "L'utente inserisce base e altezza di un rettangolo. Il programma calcola e stampa l'area.",
+        requirements: [
+          "Leggi base e altezza.",
+          "Scegli un tipo di dato adatto.",
+          "Calcola area = base * altezza.",
+          "Stampa una frase con il risultato."
+        ],
+        hints: [
+          "Base e altezza potrebbero essere decimali.",
+          "double è spesso una scelta più precisa di float."
+        ]
+      },
+      {
+        title: "10. Perimetro del rettangolo",
+        level: "Operazioni",
+        text: "L'utente inserisce base e altezza di un rettangolo. Il programma calcola e stampa il perimetro.",
+        requirements: [
+          "Leggi base e altezza.",
+          "Calcola il perimetro.",
+          "Stampa il risultato."
+        ],
+        hints: [
+          "La formula è 2 * (base + altezza).",
+          "Usa le parentesi per evitare errori di precedenza."
+        ]
+      },
+      {
+        title: "11. Conversione euro-dollari",
+        level: "Operazioni",
+        text: "L'utente inserisce una quantità in euro. Il programma stampa il valore convertito in dollari usando un cambio scelto nel codice.",
+        requirements: [
+          "Leggi un importo in euro.",
+          "Dichiara una costante per il cambio.",
+          "Calcola il valore convertito.",
+          "Stampa il risultato."
+        ],
+        hints: [
+          "Puoi usare const double cambio = 1.08;",
+          "Il cambio non deve essere letto dall'utente in questo esercizio."
+        ]
+      },
+      {
+        title: "12. Carattere successivo",
+        level: "Char",
+        text: "L'utente inserisce un carattere. Il programma stampa quel carattere, poi aggiunge 1 alla variabile e la stampa di nuovo.",
+        requirements: [
+          "Usa una variabile char.",
+          "Leggi il carattere con cin.",
+          "Stampa il carattere iniziale.",
+          "Aggiungi 1 alla variabile.",
+          "Stampa il nuovo carattere."
+        ],
+        hints: [
+          "I caratteri sono collegati a codici numerici.",
+          "Cerca il significato di codifica ASCII.",
+          "ASCII si pronuncia circa aschi."
+        ]
+      },
+      {
+        title: "13. Numero positivo o negativo",
+        level: "If semplice",
+        text: "L'utente inserisce un numero intero. Il programma stampa se il numero è positivo, negativo oppure zero.",
+        requirements: [
+          "Leggi un numero intero.",
+          "Usa if, else if ed else.",
+          "Stampa positivo se il numero è maggiore di 0.",
+          "Stampa negativo se il numero è minore di 0.",
+          "Stampa zero se il numero è uguale a 0."
+        ],
+        hints: [
+          "Controlla prima > 0, poi < 0, poi usa else.",
+          "L'operatore di uguaglianza è ==."
+        ]
+      },
+      {
+        title: "14. Pari o dispari",
+        level: "If semplice",
+        text: "L'utente inserisce un numero intero. Il programma stampa se il numero è pari oppure dispari.",
+        requirements: [
+          "Leggi un numero intero.",
+          "Usa l'operatore modulo %.",
+          "Se il resto della divisione per 2 è 0, il numero è pari.",
+          "Altrimenti è dispari."
+        ],
+        hints: [
+          "numero % 2 restituisce il resto della divisione per 2.",
+          "Un numero pari ha resto 0."
+        ]
+      },
+      {
+        title: "15. Maggiorenne o minorenne",
+        level: "If semplice",
+        text: "L'utente inserisce la propria età. Il programma stampa se è maggiorenne oppure minorenne.",
+        requirements: [
+          "Leggi l'età come numero intero.",
+          "Se l'età è maggiore o uguale a 18 stampa maggiorenne.",
+          "Altrimenti stampa minorenne."
+        ],
+        hints: [
+          "L'operatore maggiore o uguale si scrive >=.",
+          "Non serve usare else if: basta if ed else."
+        ]
+      },
+      {
+        title: "16. Voto sufficiente o insufficiente",
+        level: "If semplice",
+        text: "L'utente inserisce un voto decimale. Se è maggiore o uguale a 6 viene stampato sufficiente, altrimenti insufficiente.",
+        requirements: [
+          "Scegli un tipo di dato adatto al voto.",
+          "Leggi il voto.",
+          "Usa una condizione con >= 6.",
+          "Stampa sufficiente oppure insufficiente."
+        ],
+        hints: [
+          "Un voto può avere decimali, quindi int non è sempre adatto.",
+          "Usa float o double."
+        ]
+      },
+      {
+        title: "17. Voto con giudizio",
+        level: "If multiplo",
+        text: "L'utente inserisce un voto. Il programma stampa ottimo, distinto oppure insufficiente in base al valore.",
+        requirements: [
+          "Se il voto è maggiore di 7.75, stampa ottimo.",
+          "Se il voto è compreso tra 6 e 7.75, stampa distinto.",
+          "Se il voto è sotto 6, stampa insufficiente.",
+          "Usa if, else if ed else."
+        ],
+        hints: [
+          "Se controlli prima voto > 7.75, poi puoi controllare voto >= 6.",
+          "Attenzione ai casi limite: 6, 7.75 e 7.76."
+        ]
+      },
+      {
+        title: "18. Maggiore tra due numeri",
+        level: "If semplice",
+        text: "L'utente inserisce due numeri. Il programma stampa quale dei due è maggiore oppure se sono uguali.",
+        requirements: [
+          "Leggi due numeri.",
+          "Confronta il primo con il secondo.",
+          "Stampa il maggiore.",
+          "Gestisci anche il caso in cui siano uguali."
+        ],
+        hints: [
+          "Servono tre casi: primo maggiore, secondo maggiore, uguali.",
+          "Puoi usare if, else if, else."
+        ]
+      },
+      {
+        title: "19. Media di tre voti",
+        level: "Calcoli e if",
+        text: "L'utente inserisce tre voti. Il programma calcola la media e stampa le informazioni finali.",
+        requirements: [
+          "Leggi tre voti.",
+          "Calcola la media.",
+          "Stampa la media.",
+          "Stampa anche se la media è sufficiente o insufficiente.",
+          "Aggiungi un messaggio finale a tua scelta."
+        ],
+        hints: [
+          "La media è (voto1 + voto2 + voto3) / 3.",
+          "Per evitare divisione intera, usa double o float."
+        ]
+      },
+      {
+        title: "20. Prezzo con sconto",
+        level: "Calcoli e if",
+        text: "L'utente inserisce il prezzo di un prodotto. Se il prezzo è maggiore di 100 euro, applica uno sconto del 10%, altrimenti lascia il prezzo invariato.",
+        requirements: [
+          "Leggi il prezzo.",
+          "Se il prezzo è maggiore di 100, calcola lo sconto.",
+          "Stampa il prezzo finale.",
+          "Stampa anche se lo sconto è stato applicato oppure no."
+        ],
+        hints: [
+          "Il 10% di un prezzo si calcola con prezzo * 0.10.",
+          "Il prezzo scontato è prezzo - sconto."
+        ]
+      },
+      {
+        title: "21. Ordinare due numeri",
+        level: "Difficile",
+        text: "L'utente inserisce due numeri in ordine casuale. Il programma li stampa in ordine crescente.",
+        requirements: [
+          "Leggi due numeri.",
+          "Se il primo è minore o uguale al secondo, stampa prima il primo e poi il secondo.",
+          "Altrimenti stampa prima il secondo e poi il primo.",
+          "Gestisci correttamente anche il caso di numeri uguali."
+        ],
+        hints: [
+          "Esempio: se l'utente inserisce 15 e 11, il programma deve stampare 11 e 15.",
+          "Non serve scambiare le variabili: puoi semplicemente decidere l'ordine di stampa."
+        ]
+      },
+      {
+        title: "22. Ordinare tre numeri",
+        level: "Molto difficile",
+        text: "L'utente inserisce tre numeri. Il programma li stampa in ordine crescente.",
+        requirements: [
+          "Leggi tre numeri.",
+          "Stampa i numeri dal più piccolo al più grande.",
+          "Gestisci anche numeri uguali.",
+          "Usa solo condizioni if, else if ed else."
+        ],
+        hints: [
+          "Puoi confrontare tutte le possibili disposizioni dei tre numeri.",
+          "Un'altra strategia è scambiare i valori usando una variabile temporanea.",
+          "Esempio di variabile temporanea: temp = a; a = b; b = temp;"
+        ]
+      }
+    ];
+
+    const rulesList = document.getElementById("rulesList");
+    const exerciseList = document.getElementById("exerciseList");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    const resetButton = document.getElementById("resetButton");
+    const markAllButton = document.getElementById("markAllButton");
+
+    const createElement = (tagName, className, text) => {
+      const element = document.createElement(tagName);
+      if (className) {
+        element.className = className;
+      }
+      if (text !== undefined) {
+        element.innerText = text;
+      }
+      return element;
+    };
+
+    const appendListItems = (parent, items) => {
+      items.forEach((item) => {
+        const li = document.createElement("li");
+        li.innerText = item;
+        parent.appendChild(li);
+      });
+    };
+
+    const loadProgress = () => {
+      const saved = localStorage.getItem(storageKey);
+      if (!saved) {
+        return {};
+      }
+
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        return {};
+      }
+    };
+
+    const saveProgress = (progress) => {
+      localStorage.setItem(storageKey, JSON.stringify(progress));
+    };
+
+    let progress = loadProgress();
+
+    const updateProgressText = () => {
+      const completed = exercises.filter((exercise, index) => progress[index] === true).length;
+      const percentage = exercises.length === 0 ? 0 : Math.round((completed / exercises.length) * 100);
+      progressText.innerText = `Esercizi completati: ${completed} / ${exercises.length}`;
+      progressFill.style.width = `${percentage}%`;
+    };
+
+    const renderRules = () => {
+      rulesList.innerHTML = "";
+      appendListItems(rulesList, rules);
+    };
+
+    const renderExercises = () => {
+      exerciseList.innerHTML = "";
+
+      exercises.forEach((exercise, index) => {
+        const article = createElement("article", "exercise");
+        article.id = `exercise-${index}`;
+        if (progress[index] === true) {
+          article.classList.add("done");
+        }
+
+        const header = createElement("div", "exercise-header");
+        const titleGroup = document.createElement("div");
+
+        const level = createElement("span", "level", exercise.level);
+        const title = createElement("h2", "", exercise.title);
+        titleGroup.appendChild(level);
+        titleGroup.appendChild(title);
+
+        const label = createElement("label", "check-label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = progress[index] === true;
+        checkbox.dataset.index = index;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode("Fatto"));
+
+        header.appendChild(titleGroup);
+        header.appendChild(label);
+
+        const paragraph = createElement("p", "", exercise.text);
+
+        const requirementsTitle = createElement("h3", "", "Richieste");
+        const requirementsList = document.createElement("ul");
+        appendListItems(requirementsList, exercise.requirements);
+
+        const hintsTitle = createElement("h3", "", "Suggerimenti");
+        const hintsList = document.createElement("ul");
+        appendListItems(hintsList, exercise.hints);
+
+        article.appendChild(header);
+        article.appendChild(paragraph);
+        article.appendChild(requirementsTitle);
+        article.appendChild(requirementsList);
+        article.appendChild(hintsTitle);
+        article.appendChild(hintsList);
+
+        exerciseList.appendChild(article);
+      });
+
+      const checkboxes = document.querySelectorAll("input[type='checkbox'][data-index]");
+      checkboxes.forEach((checkbox) => {
+        checkbox.onchange = () => {
+          const index = checkbox.dataset.index;
+          progress[index] = checkbox.checked;
+          saveProgress(progress);
+          renderExercises();
+          updateProgressText();
+        };
+      });
+    };
+
+    resetButton.onclick = () => {
+      const confirmed = confirm("Vuoi cancellare il completamento di tutti gli esercizi?");
+      if (!confirmed) {
+        return;
+      }
+
+      progress = {};
+      saveProgress(progress);
+      renderExercises();
+      updateProgressText();
+    };
+
+    markAllButton.onclick = () => {
+      exercises.forEach((exercise, index) => {
+        progress[index] = true;
+      });
+      saveProgress(progress);
+      renderExercises();
+      updateProgressText();
+    };
+
+    renderRules();
+    renderExercises();
+    updateProgressText();
+  </script>
+</body>
+</html>

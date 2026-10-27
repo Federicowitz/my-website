@@ -1,0 +1,216 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Progetto completo — API persone con Express</title></head><body><article class="reading"><div class="eyebrow">LABORATORIO FINALE</div><h1>Progetto completo — API persone con Express</h1>
+<p>Questo esercizio unisce <strong>Express, JSON, parametri della route, query string, middleware, GET, POST, PUT, PATCH, DELETE e gestione errori</strong>. È un'estensione didattica sviluppata per questa guida: il corso originale affronta questi pezzi in lezioni separate. L'archivio è volutamente <strong>in memoria</strong>.</p>
+<h2>1. Preparazione</h2>
+<pre><code class="language-bash">mkdir api-persone
+cd api-persone
+npm init -y
+npm install express@5
+</code></pre>
+<p>Crea un file <code>server.cjs</code> con il contenuto seguente.</p>
+<h2>2. Server completo (un solo file)</h2>
+<pre><code class="language-js">const express = require(&#x27;express&#x27;);
+const app = express();
+const PORT = 3000;
+
+let persone = [
+  { id: 1, nome: &#x27;Anna&#x27;, ruolo: &#x27;designer&#x27; },
+  { id: 2, nome: &#x27;Luca&#x27;, ruolo: &#x27;developer&#x27; }
+];
+let prossimoId = 3;
+
+// Middleware: registra metodo, percorso e tempo impiegato.
+app.use((req, res, next) =&gt; {
+  const inizio = Date.now();
+  res.on(&#x27;finish&#x27;, () =&gt; {
+    console.log(req.method, req.originalUrl, res.statusCode,
+      `${Date.now() - inizio}ms`);
+  });
+  next();
+});
+
+// Il parser viene dopo il logger e prima delle route.
+app.use(express.json({ limit: &#x27;32kb&#x27; }));
+
+function nomeValido(nome) {
+  return typeof nome === &#x27;string&#x27; &amp;&amp;
+    nome.trim().length &gt;= 2 &amp;&amp; nome.trim().length &lt;= 80;
+}
+function idRichiesto(req, res) {
+  const testo = req.params.id;
+  const id = Number(testo);
+  if (!/^[1-9]\d*$/.test(testo) || !Number.isSafeInteger(id)) {
+    res.status(400).json({ errore: &#x27;ID non valido&#x27; });
+    return null;
+  }
+  return id;
+}
+
+// GET /api/persone?cerca=an&amp;limite=10
+app.get(&#x27;/api/persone&#x27;, (req, res) =&gt; {
+  const { cerca = &#x27;&#x27;, limite: testoLimite = &#x27;20&#x27; } = req.query;
+  if (typeof cerca !== &#x27;string&#x27; || typeof testoLimite !== &#x27;string&#x27; ||
+      !/^[1-9]\d*$/.test(testoLimite)) {
+    return res.status(400).json({ errore: &#x27;Query non valida&#x27; });
+  }
+  const limite = Number(testoLimite);
+  if (!Number.isSafeInteger(limite) || limite &gt; 100)
+    return res.status(400).json({ errore: &#x27;Limite da 1 a 100&#x27; });
+  const risultati = persone.filter(p =&gt;
+    p.nome.toLowerCase().includes(cerca.toLowerCase())
+  ).slice(0, limite);
+  res.json({ totale: risultati.length, dati: risultati });
+});
+
+// GET /api/persone/:id
+app.get(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = idRichiesto(req, res);
+  if (id === null) return;
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  res.json(persona);
+});
+
+// POST /api/persone
+app.post(&#x27;/api/persone&#x27;, (req, res) =&gt; {
+  const { nome, ruolo = &#x27;utente&#x27; } = req.body ?? {};
+  if (!nomeValido(nome) || typeof ruolo !== &#x27;string&#x27; || !ruolo.trim() || ruolo.trim().length &gt; 80)
+    return res.status(400).json({ errore: &#x27;Dati non validi&#x27; });
+  const persona = { id: prossimoId++, nome: nome.trim(), ruolo: ruolo.trim() };
+  persone.push(persona);
+  res.status(201).location(`/api/persone/${persona.id}`).json(persona);
+});
+
+// PUT /api/persone/:id
+app.put(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = idRichiesto(req, res);
+  if (id === null) return;
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  const { nome, ruolo } = req.body ?? {};
+  if (!nomeValido(nome) || typeof ruolo !== &#x27;string&#x27; || !ruolo.trim() || ruolo.trim().length &gt; 80)
+    return res.status(400).json({ errore: &#x27;Dati non validi&#x27; });
+  persona.nome = nome.trim();
+  persona.ruolo = ruolo.trim();
+  res.json(persona);
+});
+
+// PATCH /api/persone/:id — modifica soltanto il ruolo
+app.patch(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = idRichiesto(req, res);
+  if (id === null) return;
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  const ruolo = req.body?.ruolo;
+  if (typeof ruolo !== &#x27;string&#x27; || !ruolo.trim() || ruolo.trim().length &gt; 80)
+    return res.status(400).json({ errore: &#x27;Ruolo non valido&#x27; });
+  persona.ruolo = ruolo.trim();
+  res.json(persona);
+});
+
+// DELETE /api/persone/:id
+app.delete(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = idRichiesto(req, res);
+  if (id === null) return;
+  const prima = persone.length;
+  persone = persone.filter(p =&gt; p.id !== id);
+  if (persone.length === prima)
+    return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  res.status(204).end();
+});
+
+app.use((req, res) =&gt; res.status(404).json({ errore: &#x27;Endpoint non trovato&#x27; }));
+app.use((err, req, res, next) =&gt; {
+  if (res.headersSent) return next(err);
+  if (err.type === &#x27;entity.parse.failed&#x27;)
+    return res.status(400).json({ errore: &#x27;JSON malformato&#x27; });
+  if (err.type === &#x27;entity.too.large&#x27;)
+    return res.status(413).json({ errore: &#x27;Body oltre 32kb&#x27; });
+  if (Number.isInteger(err.status) &amp;&amp; err.status &gt;= 400 &amp;&amp; err.status &lt; 500)
+    return res.status(err.status).json({ errore: &#x27;Richiesta non valida&#x27; });
+  console.error(err);
+  res.status(500).json({ errore: &#x27;Errore interno&#x27; });
+});
+app.listen(PORT, &#x27;127.0.0.1&#x27;, () =&gt; console.log(`API: http://localhost:${PORT}`));
+</code></pre>
+<h2>3. Provalo con il terminale</h2><p>I comandi <code>curl</code> multilinea seguenti usano la sintassi Bash. Per PowerShell trovi subito dopo una sequenza equivalente. Apri una cartella dedicata all’esercizio e tieni attivo un solo server sulla porta 3000. Per chiuderlo usa Ctrl+C nel suo terminale.</p>
+<pre><code class="language-bash">node server.cjs
+</code></pre>
+<p>In un <strong>secondo terminale</strong>:</p>
+<pre><code class="language-bash">curl -i http://localhost:3000/api/persone
+curl -i 'http://localhost:3000/api/persone?cerca=an&amp;limite=1'
+curl -i http://localhost:3000/api/persone/1
+curl -i -X POST http://localhost:3000/api/persone \
+  -H 'Content-Type: application/json' \
+  -d '{&quot;nome&quot;:&quot;Giulia&quot;,&quot;ruolo&quot;:&quot;analista&quot;}'
+curl -i -X PUT http://localhost:3000/api/persone/3 \
+  -H 'Content-Type: application/json' \
+  -d '{&quot;nome&quot;:&quot;Giulia&quot;,&quot;ruolo&quot;:&quot;senior analyst&quot;}'
+curl -i -X DELETE http://localhost:3000/api/persone/3
+</code></pre>
+<h3>La stessa sequenza in PowerShell</h3><pre><code class="language-powershell"># Secondo terminale PowerShell; il server deve essere già attivo
+$base = &#x27;http://127.0.0.1:3000/api/persone&#x27;
+Invoke-RestMethod -Uri $base
+$json = @{ nome = &#x27;Giulia&#x27;; ruolo = &#x27;analista&#x27; } | ConvertTo-Json
+$persona = Invoke-RestMethod -Method Post -Uri $base -ContentType &#x27;application/json&#x27; -Body $json
+$uri = &quot;$base/$($persona.id)&quot;
+Invoke-RestMethod -Uri $uri
+$json = @{ nome = &#x27;Giulia Rossi&#x27;; ruolo = &#x27;analista senior&#x27; } | ConvertTo-Json
+Invoke-RestMethod -Method Put -Uri $uri -ContentType &#x27;application/json&#x27; -Body $json
+$json = @{ ruolo = &#x27;responsabile&#x27; } | ConvertTo-Json
+Invoke-RestMethod -Method Patch -Uri $uri -ContentType &#x27;application/json&#x27; -Body $json
+Invoke-RestMethod -Method Delete -Uri $uri
+Invoke-RestMethod -Uri $base
+</code></pre><p>La DELETE riuscita non produce contenuto. L’ID viene ricavato dalla POST: la sequenza funziona anche se hai già creato altre persone. In Windows PowerShell gli errori HTTP di Invoke-RestMethod possono essere mostrati come eccezioni, mentre Postman rende status e body direttamente ispezionabili.</p><h2>4. Risultati e limiti</h2>
+<table>
+<thead>
+<tr>
+  <th>Richiesta</th>
+  <th>Risultato atteso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>GET elenco</td>
+  <td><code>200</code>, oggetto con <code>totale</code> e <code>dati</code></td>
+</tr>
+<tr>
+  <td>GET ID inesistente</td>
+  <td><code>404</code></td>
+</tr>
+<tr>
+  <td>POST valido</td>
+  <td><code>201</code>, nuova persona con ID</td>
+</tr>
+<tr>
+  <td>POST con nome vuoto</td>
+  <td><code>400</code></td>
+</tr>
+<tr>
+  <td>PUT valido</td>
+  <td><code>200</code>, persona aggiornata</td>
+</tr>
+<tr>
+  <td>DELETE valido</td>
+  <td><code>204</code>, nessun corpo</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Non è una API pronta per la produzione:</strong> mancano database persistente, autenticazione/autorizzazione, rate limiting, test automatici, logging strutturato e validazione completa degli input. L'obiettivo è esercitarsi sui concetti del corso.</p>
+<h2>5. Il viaggio di una richiesta, passo per passo</h2>
+<div class="flow" aria-label="Flusso di una richiesta"><span>Client</span><span>→ Logger</span><span>→ Parser JSON</span><span>→ Route</span><span>→ Validazione</span><span>→ Array in RAM</span><span>→ Risposta</span></div>
+<p>Per una POST, il client invia un testo JSON. Il logger registra una funzione sull’evento <code>finish</code> della risposta, poi chiama next. Il parser interpreta il testo. La route legge i campi ammessi, li valida e costruisce una nuova persona; push aggiorna l’array. Infine status, Location e json preparano e inviano la risposta. A quel punto il listener finish registra status e durata: questa misura la conclusione dell’invio dal server, non dimostra che l’utente abbia già letto il contenuto.</p>
+<table><thead><tr><th>Parte</th><th>Responsabilità</th><th>Cosa controllare</th></tr></thead><tbody>
+<tr><td>nomeValido</td><td>Verifica nome testuale di 2–80 caratteri dopo trim</td><td>Non accetta numeri o soli spazi</td></tr>
+<tr><td>idRichiesto</td><td>Legge e valida l’ID numerico nel percorso</td><td>Restituisce null dopo una risposta 400</td></tr>
+<tr><td>GET elenco</td><td>Filtra e limita i risultati</td><td>Query ripetute o limite fuori da 1–100 danno 400</td></tr>
+<tr><td>POST</td><td>Crea e assegna l’identità</td><td>Nome richiesto; ruolo predefinito utente se assente</td></tr>
+<tr><td>PUT</td><td>Sostituisce i campi modificabili</td><td>Nome e ruolo obbligatori</td></tr>
+<tr><td>PATCH</td><td>Modifica il solo ruolo</td><td>Nome resta invariato; gli altri campi sono ignorati</td></tr>
+<tr><td>DELETE</td><td>Rimuove la persona mantenendo gli altri ID</td><td>204 senza body, oppure 404</td></tr>
+<tr><td>Error handler</td><td>Traduce errori del parser e del server</td><td>400 per JSON malformato; 413 per body troppo grande; 500 per errore interno</td></tr>
+</tbody></table>
+<p><code>totale</code> è qui il numero di risultati restituiti dopo il limite, non il numero di tutte le corrispondenze possibili. Non sono implementati offset o cursori di paginazione. <code>res.headersSent</code> indica che gli header sono già partiti: in quel caso il gestore passa l’errore alla gestione successiva, evitando una seconda risposta. Per approfondire: <a href="https://expressjs.com/en/guide/error-handling/">gestione errori Express</a> e <a href="https://expressjs.com/en/resources/middleware/body-parser/">errori dei parser</a>.</p>
+<h3>Controlli negativi con risultati attesi</h3>
+<ul><li><code>GET /api/persone/abc</code> → 400; <code>GET /api/persone/999</code> → 404.</li><li><code>GET /api/persone?limite=0</code> o <code>?limite=2&amp;limite=3</code> → 400.</li><li>POST con <code>{"nome":" "}</code> → 400 e nessun inserimento.</li><li>POST con JSON troncato, per esempio <code>{"nome":</code> → 400, non 500.</li><li>PUT senza ruolo → 400; PATCH con ruolo valido → 200 senza cambiare nome.</li><li>DELETE ripetuta sullo stesso ID → prima 204, poi 404.</li><li>Riavvio del server → dati iniziali ripristinati: l’array non è persistente.</li></ul>
+<p>Il contatore e l’array sono condivisi soltanto nel singolo processo. Per dati durevoli e più istanze serve un archivio coordinato. Gli esempi non implementano utenti autenticati: il campo ruolo è un semplice dato descrittivo della persona e non conferisce permessi all’applicazione.</p>
+</article><script src="../../../reader.js"></script></body></html>

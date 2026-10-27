@@ -1,0 +1,20 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Installazione e ambiente</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 02 · Fondamenti</div><h2>Installazione e ambiente</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>LTS</dt><dd>Long-Term Support: linea di versioni mantenuta nel tempo con correzioni e aggiornamenti di sicurezza.</dd><dt>Terminale, shell e CLI</dt><dd>Il terminale mostra l’interfaccia testuale; la shell, per esempio PowerShell, interpreta i comandi; una CLI è un programma utilizzabile tramite comandi.</dd><dt>PATH e directory di lavoro</dt><dd>PATH è l’elenco di cartelle in cui la shell cerca gli eseguibili. La directory di lavoro è la cartella da cui un comando viene eseguito.</dd><dt>Editor e REPL</dt><dd>Un editor modifica i file di codice. Una REPL legge un’espressione, la esegue, stampa il risultato e attende il comando successivo.</dd></dl></div>
+<p>Installa una <strong>versione LTS attualmente supportata</strong> dal sito ufficiale di Node.js. Il corso originale mostra versioni 14 e 16: sono riferimenti storici, non versioni da installare oggi. Usa un editor come Visual Studio Code; le estensioni sono facoltative.</p>
+<pre><code class="language-bash">node --version
+npm --version
+mkdir corso-node
+cd corso-node
+</code></pre>
+<p>Crea <code>index.js</code> e lancialo:</p>
+<pre><code class="language-bash">node index.js
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> per aprire la console interattiva basta eseguire <code>node</code>, scrivere <code>2 + 2</code> e uscire con <code>.exit</code>. <strong>Controllo:</strong> se <code>node</code> non viene riconosciuto, riapri il terminale e verifica l'installazione e il PATH.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>L’installer rende disponibile <code>node</code>; npm è il gestore di pacchetti normalmente distribuito insieme a Node. Visual Studio Code serve a scrivere e salvare i file, mentre il terminale avvia il runtime. Scrivere codice nell’editor non lo esegue: occorre salvarlo e passare il file a <code>node</code>.</p><p>Le estensioni mostrate nella trascrizione propongono frammenti di codice, detti <strong>snippet</strong>. Sono facoltative e non installano né Node né Express. Tieni aperta nel terminale la cartella che contiene il tuo script: un file esistente in un’altra cartella può risultare “non trovato”.</p><h3>Un altro esempio guidato</h3><pre><code class="language-powershell"># PowerShell: un comando per riga
+node --version
+npm --version
+Get-Location
+node -e &quot;console.log(&#x27;Installazione riuscita&#x27;)&quot;
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>--version</code> chiede la versione; <code>Get-Location</code> mostra la cartella attuale; <code>-e</code> esegue il breve programma passato come testo e stampa <code>Installazione riuscita</code>. Per avviare un file con spazi nel nome usa <code>node "primo esempio.cjs"</code>.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Scegli una linea LTS ancora supportata dalla <a href="https://nodejs.org/en/about/previous-releases">tabella ufficiale delle release</a>. Le versioni 14 e 16 della registrazione sono fuori supporto. Non occorre installare pacchetti globali per iniziare.</aside><p class="exercise"><strong>Prova tu.</strong> Apri una nuova shell dopo l’installazione e ripeti i controlli. Se <code>node</code> funziona ma npm è bloccato da PowerShell, prova <code>npm.cmd --version</code> prima di modificare impostazioni del sistema.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

@@ -1,0 +1,35 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Express Router e organizzazione</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 28 · CRUD e architettura</div><h2>Express Router e organizzazione</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Router e prefisso</dt><dd>Un Router è un insieme componibile di route e middleware. Il prefisso di montaggio collega quel gruppo a una parte dell’URL dell’app.</dd><dt>Controller, service e repository</dt><dd>Il controller gestisce ingresso e risposta HTTP; il service applica regole del dominio; il repository legge e scrive i dati. Sono ruoli organizzativi, non oggetti creati automaticamente da Express.</dd><dt>MVC</dt><dd>Model–View–Controller: separa modello e dati, presentazione e gestione dell’interazione. In un’API JSON la presentazione non è necessariamente una pagina HTML.</dd></dl></div>
+<p>Con l'aumentare delle route conviene separarle dal file principale. <code>express.Router()</code> consente di raggruppare endpoint e middleware.</p>
+<pre><code class="language-js">// routes/persone.cjs
+const express = require('express');
+const router = express.Router();
+router.get('/', (req, res) =&gt; res.json([{ id: 1, nome: 'Anna' }]));
+router.get('/:id', (req, res) =&gt; res.json({ id: Number(req.params.id) }));
+module.exports = router;
+</code></pre>
+<pre><code class="language-js">// server.cjs
+const express = require('express');
+const personeRouter = require('./routes/persone.cjs');
+const app = express();
+app.use('/api/persone', personeRouter);
+app.listen(3000);
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> un futuro progetto può dividere codice in <code>routes/</code>, <code>controllers/</code>, <code>services/</code> e <code>repositories/</code>. Il video finale accenna a sviluppi successivi (MVC e database), ma queste parti <strong>non sono spiegate</strong> nel materiale introduttivo fornito.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>app.use("/api/persone", personeRouter)</code> affida al router le richieste sotto quel prefisso. All’interno scrivi <code>router.get("/")</code> e <code>router.get("/:id")</code>. Ripetere <code>/api/persone</code> dentro il router produrrebbe un percorso duplicato. Per una richiesta al router, <code>req.originalUrl</code> conserva l’URL originale, mentre Express gestisce il percorso relativo al montaggio.</p><p>La catena completa può essere: server → parser e middleware → router → controller → service → repository → risposta. Il router sceglie chi gestisce la richiesta; non è lui, da solo, a rendere persistenti i dati. Parti da pochi file con responsabilità chiare e separali quando questo rende il flusso più comprensibile.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// controllers/salute.cjs
+function leggiSalute(req, res) {
+  res.json({ ok: true });
+}
+module.exports = { leggiSalute };
+
+// routes/salute.cjs — secondo file
+const router = require(&#x27;express&#x27;).Router();
+const { leggiSalute } = require(&#x27;../controllers/salute.cjs&#x27;);
+router.get(&#x27;/&#x27;, leggiSalute);
+module.exports = router;
+
+// server.cjs — aggiunta prima di listen e della 404
+// app.use(&#x27;/api/salute&#x27;, require(&#x27;./routes/salute.cjs&#x27;));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Crea le due cartelle e i due file separati. Nel server già configurato aggiungi la riga app.use togliendo <code>//</code>. <code>GET /api/salute</code> viene selezionata dal router e la risposta è costruita dal controller. Non chiamare <code>leggiSalute()</code> mentre registri la route: passa il riferimento alla funzione.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Express non impone MVC né una struttura unica. Separare il modulo che costruisce l’app da quello che chiama listen aiuta i test; separare accesso dati e regole aiuta a sostituire l’array con un database. Questi sono approfondimenti aggiunti al percorso introduttivo.</aside><p class="exercise"><strong>Prova tu.</strong> Sposta le route CRUD nel router persone e controlla che gli URL pubblici restino identici. Poi indica in quale file metteresti una regola “nome non vuoto” e in quale una query di lettura.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

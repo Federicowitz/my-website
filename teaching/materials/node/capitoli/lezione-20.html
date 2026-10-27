@@ -1,0 +1,25 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Parametri della route</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 20 · Express e API</div><h2>Parametri della route</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Parametro di percorso e ID</dt><dd>Un parametro di percorso è un segmento variabile della route. Un ID è un identificatore della risorsa: può essere numerico oppure una stringa, secondo il modello dati.</dd><dt>find e valore assente</dt><dd><code>find</code> restituisce il primo elemento che soddisfa una condizione; se nessuno la soddisfa restituisce <code>undefined</code>.</dd><dt>Conversione e intero sicuro</dt><dd>La conversione cambia il tipo di un valore. Un intero sicuro è rappresentabile senza perdita di precisione nel formato Number di JavaScript.</dd></dl></div>
+<p>I parametri della route identificano una risorsa all'interno dell'URL. Nel percorso <code>/api/persone/:id</code>, il segmento <code>:id</code> è letto da <code>req.params.id</code>.</p>
+<pre><code class="language-js">const persone = [{ id: 1, nome: 'Anna' }, { id: 2, nome: 'Luca' }];
+app.get('/api/persone/:id', (req, res) =&gt; {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) return res.status(400).json({ errore: 'ID non valido' });
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: 'Non trovata' });
+  res.json(persona);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>/api/persone/2</code> restituisce Luca; <code>/api/persone/abc</code> restituisce <code>400</code>, mentre <code>/api/persone/999</code> restituisce <code>404</code>.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Express riempie <code>req.params</code> usando i nomi preceduti da due punti. In <code>/articoli/:categoria/:id</code> puoi leggere <code>req.params.categoria</code> e <code>req.params.id</code>. La forma <code>const { id } = req.params</code> è destructuring, non una richiesta al database.</p><p>Se gli ID dell’array sono numeri, confrontare <code>p.id === req.params.id</code> fallisce perché <code>"2"</code> è una stringa. Convertire e validare risolve il problema. Non convertire però un ID testuale, per esempio un UUID, come se fosse numerico. Distingui ID scritto male (400) e ID valido che non esiste (404).</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento da inserire in un&#x27;app Express
+app.get(&#x27;/articoli/:categoria/:id&#x27;, (req, res) =&gt; {
+  const { categoria, id: testoId } = req.params;
+  const id = Number(testoId);
+  if (!/^[1-9]\d*$/.test(testoId) || !Number.isSafeInteger(id)) {
+    return res.status(400).json({ errore: &#x27;ID numerico positivo richiesto&#x27; });
+  }
+  res.json({ categoria, id });
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>/articoli/node/12</code> restituisce categoria node e ID numerico 12. L’espressione regolare controlla che la stringa contenga solo cifre e inizi da 1 a 9; <code>isSafeInteger</code> controlla il numero. Questo endpoint dimostra il parsing e non verifica l’esistenza di un articolo.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Definisci una politica coerente: <code>Number("1e2")</code> vale 100, ma un ID composto solo da cifre può rifiutare quella notazione. Registra percorsi fissi come <code>/persone/statistiche</code> prima di <code>/persone/:id</code>, per non interpretare “statistiche” come ID.</aside><p class="exercise"><strong>Prova tu.</strong> Prova 12, abc, 0 e 1e2. Spiega perché il controllo numerico e la ricerca della risorsa rispondono a due domande diverse.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

@@ -1,0 +1,9 @@
+{
+  "name": "f3lab-school",
+  "private": true,
+  "scripts": {
+    "catalog": "node scripts/catalog.cjs",
+    "check": "node scripts/check.cjs",
+    "preview": "node scripts/preview.cjs"
+  }
+}

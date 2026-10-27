@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi C++ riepilogo prima parte</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Esercizi C++ di riepilogo della prima parte</h1>
+      <p>Verifica progressiva su input, output, variabili, tipi, operatori, condizioni e cicli base.</p>
+    </div>
+  </header>
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+    <section class="note"><h2>Indicazioni generali</h2><ul id="rulesList"></ul></section>
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+  <script>
+    window.exercisePageConfig = {
+      storageKey: "cpp-recap-first-part-progress-v1",
+      rules: [
+        "Ogni esercizio puo richiedere argomenti diversi gia visti.",
+        "Scegli tu tra if, while, do while e for quando non specificato.",
+        "Controlla sempre input, tipi di dato e divisioni per zero.",
+        "Scrivi programmi leggibili con nomi di variabili chiari.",
+        "Prima di scrivere codice, individua input, elaborazione e output."
+      ],
+      exercises: [
+        ["1. Scheda personale", "Input/output", "Leggi nome, eta, altezza e iniziale del cognome, poi stampa una scheda ordinata.", ["Usa string, int, double e char.", "Leggi tutti i dati.", "Stampa una frase completa."], ["Scegli il tipo giusto per ogni informazione."]],
+        ["2. Calcolo spesa", "Operatori", "Leggi prezzo unitario e quantita, poi stampa totale e totale con IVA.", ["Usa double per i prezzi.", "Usa int per la quantita.", "Usa una costante IVA.", "Stampa entrambi i totali."], ["IVA esempio: 22%."]],
+        ["3. Area e perimetro", "Operatori", "Leggi base e altezza di un rettangolo e stampa area e perimetro.", ["Usa double.", "Calcola due risultati.", "Stampa con testo chiaro."], ["Perimetro = 2 * (base + altezza)."]],
+        ["4. Numero maggiore", "If", "Leggi due numeri e stampa il maggiore oppure indica che sono uguali.", ["Usa if, else if, else.", "Gestisci uguaglianza."], ["Confronta prima a > b, poi b > a."]],
+        ["5. Ordinare tre numeri", "If", "Leggi tre numeri e stampali in ordine crescente.", ["Gestisci numeri uguali.", "Usa condizioni o scambi.", "Stampa il risultato finale."], ["Puoi usare una variabile temporanea."]],
+        ["6. Calcolatrice", "If/menu", "Leggi due numeri e un operatore tra +, -, *, /. Stampa il risultato.", ["Usa char per l'operatore.", "Gestisci operatore non valido.", "Gestisci divisione per zero."], ["Usa if else if."]],
+        ["7. Conversione temperatura", "If", "Leggi una temperatura e una scelta C/F. Converti Celsius-Fahrenheit o viceversa.", ["Usa char scelta.", "Applica la formula corretta.", "Gestisci scelta non valida."], ["F = C * 9 / 5 + 32."]],
+        ["8. Biglietto trasporti", "If", "Calcola il prezzo del biglietto in base a eta e distanza.", ["Leggi eta e km.", "Prezzo base = km * tariffa.", "Applica sconto minorenni o over 65.", "Stampa totale."], ["Definisci una tariffa al km."]],
+        ["9. Conteggio semplice", "While", "Leggi N e stampa i numeri da 1 a N.", ["Valida N positivo.", "Usa while.", "Stampa ogni valore."], ["Se N e 0, chiedilo di nuovo o stampa errore."]],
+        ["10. Somma controllata", "While", "Leggi numeri finche la somma non supera 100.", ["Somma i valori inseriti.", "Conta quanti numeri sono stati letti.", "Stampa somma e conteggio."], ["Condizione sul totale."]],
+        ["11. Media voti", "For", "Leggi N voti, valida ogni voto e calcola la media dei validi.", ["N e scelto dall'utente.", "Voto valido tra 0 e 10.", "Conta validi e invalidi.", "Stampa media."], ["Se nessun voto e valido, non dividere."]],
+        ["12. Menu ripetuto", "Do while", "Crea un menu con 1 quadrato, 2 cubo, 0 esci.", ["Mostra il menu almeno una volta.", "Leggi scelta.", "Esegui operazioni.", "Gestisci scelta non valida."], ["do while e adatto ai menu."]],
+        ["13. Statistiche numeri", "Riepilogo", "Leggi N numeri e stampa somma, media, massimo e minimo.", ["Usa ciclo.", "Gestisci N positivo.", "Aggiorna massimo e minimo.", "Stampa riepilogo."], ["Leggi il primo numero per inizializzare massimo e minimo."]],
+        ["14. Classifica voti", "Riepilogo", "Leggi N voti e conta insufficienti, sufficienti, buoni e ottimi.", ["Valida i voti.", "Usa if else if.", "Stampa i conteggi."], ["Definisci bene le soglie."]],
+        ["15. Password e tentativi", "Riepilogo", "Chiedi password con massimo 3 tentativi.", ["Usa string.", "Conta tentativi.", "Termina se corretta.", "Stampa esito."], ["Combina ciclo e condizione."]],
+        ["16. Numero primo", "Riepilogo", "Leggi un numero e stabilisci se e primo.", ["Valida maggiore di 1.", "Cerca divisori.", "Usa un booleano.", "Stampa risultato."], ["Controlla divisori da 2 a n - 1."]],
+        ["17. Divisori e somma", "Riepilogo", "Leggi un numero e stampa tutti i divisori e la loro somma.", ["Usa for.", "Usa %.", "Accumula la somma.", "Stampa divisori e somma."], ["Puoi stampare i divisori mentre li trovi."]],
+        ["18. Registro vendite", "Riepilogo", "Leggi vendite giornaliere finche arriva -1 e stampa totale, media e vendita massima.", ["-1 termina.", "Conta giorni validi.", "Non accettare vendite negative diverse da -1.", "Gestisci nessun dato."], ["Usa sentinella e validazione."]],
+        ["19. Simulazione conto", "Riepilogo", "Menu conto corrente con saldo, deposito, prelievo, uscita.", ["Usa do while.", "Valida importi.", "Non permettere saldo negativo.", "Mostra saldo quando richiesto."], ["Esercizio completo da far svolgere con calma."]],
+        ["20. Sequenza personalizzata", "Riepilogo", "Leggi inizio, fine e passo. Stampa la sequenza.", ["Valida passo diverso da 0.", "Gestisci sequenza crescente e decrescente.", "Usa ciclo adatto."], ["La condizione cambia in base al segno del passo."]],
+        ["21. Codice sconto", "Riepilogo", "Leggi totale spesa e codice cliente. Applica sconto diverso per A, B, C.", ["Usa char per codice.", "A sconto 20%, B 10%, C 5%.", "Nessuno sconto per altri codici.", "Stampa totale finale."], ["Puoi usare if else if."]],
+        ["22. Mini gioco indovina", "Riepilogo", "Numero segreto fisso, massimo 5 tentativi, suggerimenti alto/basso.", ["Conta tentativi.", "Termina se indovinato.", "Termina dopo 5 errori.", "Stampa esito."], ["Combina while e if."]],
+        ["23. Disegno con asterischi", "Riepilogo", "Leggi N e stampa un quadrato pieno e poi un triangolo crescente.", ["Usa cicli annidati.", "Stampa due figure separate.", "Valida N positivo."], ["Ottimo per controllare righe e colonne."]],
+        ["24. Riepilogo finale", "Verifica", "Crea un programma che gestisce voti finche -1 e stampa media, massimo, minimo, sufficienti e insufficienti.", ["Usa sentinella.", "Valida voti 0-10.", "Aggiorna tutte le statistiche.", "Gestisci nessun voto valido."], ["Questa puo diventare verifica pratica."]]
+      ]
+    };
+  </script>
+  <script src="../js/exercise-page.js"></script>
+</body>
+</html>

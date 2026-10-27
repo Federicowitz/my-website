@@ -1,0 +1,27 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Servire file statici</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 17 · Express e API</div><h2>Servire file statici</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>File statico e directory pubblica</dt><dd>Un file statico viene inviato senza generare il contenuto da un template a ogni richiesta. La directory pubblica contiene i file che scegli di rendere raggiungibili dai client.</dd><dt>Mount path e sendFile</dt><dd>Il mount path è il prefisso URL a cui colleghi un middleware. <code>res.sendFile</code> invia uno specifico file, normalmente indicato con percorso assoluto o con una directory root.</dd><dt>HTML, CSS e JavaScript client</dt><dd>HTML descrive la struttura della pagina; CSS il suo aspetto; il JavaScript client viene eseguito dal browser dopo il caricamento.</dd></dl></div>
+<p>I file statici (HTML, CSS, immagini e JavaScript client) possono essere serviti direttamente da una directory con <code>express.static</code>.</p>
+<pre><code class="language-js">// server.cjs
+const express = require('express');
+const path = require('node:path');
+const app = express();
+app.use(express.static(path.join(__dirname, 'public')));
+app.listen(3000);
+</code></pre>
+<pre><code class="language-html">&lt;!-- public/index.html --&gt;
+&lt;!doctype html&gt;&lt;html lang=&quot;it&quot;&gt;&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt;Demo&lt;/title&gt;&lt;h1&gt;Benvenuto nel sito statico&lt;/h1&gt;&lt;/html&gt;
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> creando <code>public/stile.css</code> il file diventa recuperabile con <code>/stile.css</code>. <strong>Nota:</strong> l'esempio usa CommonJS e quindi <code>__dirname</code>. Evita di mettere nella cartella pubblica credenziali o file sensibili.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>express.static</code> restituisce un middleware: Express lo esegue sulle richieste che arrivano a quel punto. Con <code>app.use(express.static(...))</code>, un file <code>public/stile.css</code> si richiede come <code>/stile.css</code>, senza scrivere public nell’URL. Un <code>index.html</code> può essere servito automaticamente per la directory.</p><p>Il corso usa anche <code>homepage.html</code>, <code>about.html</code>, <code>contatti.html</code> e una pagina 404 con <code>sendFile</code>. La cartella fisica e il percorso web non devono coincidere: puoi esporre i file sotto <code>/assets</code>. “Statico” riguarda come il server produce la risposta: un file JavaScript statico può comunque rendere interattiva la pagina.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Dentro l&#x27;app Express CommonJS, prima della 404 finale
+const path = require(&#x27;node:path&#x27;);
+const cartella = path.join(__dirname, &#x27;public&#x27;);
+app.use(&#x27;/assets&#x27;, express.static(cartella));
+app.get(&#x27;/about&#x27;, (req, res, next) =&gt; {
+  res.sendFile(path.join(cartella, &#x27;about.html&#x27;), errore =&gt; {
+    if (errore) next(errore);
+  });
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Crea <code>public/about.html</code> con un titolo e un paragrafo. <code>/about</code> invia quel file; un eventuale <code>public/stile.css</code> è raggiungibile a <code>/assets/stile.css</code>. <code>next(errore)</code> passa un errore di invio alla gestione degli errori.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Il solo invio di un HTML già scritto non è SSR dinamico: il rendering server viene approfondito nella prossima lezione. Usa un percorso legato al modulo per non dipendere dalla cartella di avvio; esponi solo file destinati al pubblico.</aside><p class="exercise"><strong>Prova tu.</strong> Collega un foglio CSS da about.html con <code>href="/assets/stile.css"</code>. Crea anche una 404 e inviala con <code>res.status(404).sendFile(...)</code>, gestendo gli errori di invio.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

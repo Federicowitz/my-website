@@ -1,0 +1,32 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Creare un server HTTP</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 08 · HTTP e runtime</div><h2>Creare un server HTTP</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>HTTP e server HTTP</dt><dd>HTTP è il protocollo con cui un client invia richieste e riceve risposte. Un server HTTP resta in ascolto e applica una funzione a ogni richiesta ricevuta.</dd><dt>Porta e localhost</dt><dd>Una porta identifica un punto di accesso di rete di un processo. <code>localhost</code> indica il computer locale; 3000 è una porta di sviluppo convenzionale.</dd><dt>req, res e route</dt><dd><code>req</code> è l’oggetto della richiesta; <code>res</code> costruisce la risposta. Una route è una regola che collega metodo e percorso a una funzione di gestione.</dd><dt>Header e status</dt><dd>Gli header sono metadati della richiesta o risposta. Lo status è il codice numerico che ne descrive l’esito; 200 indica successo, 404 risorsa non trovata.</dd></dl></div>
+<p>Node include <code>node:http</code>, utile per capire il funzionamento di un server senza librerie esterne.</p>
+<pre><code class="language-js">// server.cjs
+const http = require('node:http');
+const server = http.createServer((req, res) =&gt; {
+  if (req.url === '/' &amp;&amp; req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end('Benvenuto!');
+  }
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Non trovato');
+});
+server.listen(3000, () =&gt; console.log('http://localhost:3000'));
+</code></pre>
+<p>Avvia con <code>node server.cjs</code>, visita <code>http://localhost:3000</code> e prova <code>/manca</code> per il 404.</p>
+<p><strong>Concetto chiave:</strong> <code>req</code> contiene i dati della richiesta, <code>res</code> costruisce la risposta. Per il routing complesso, Express riduce il codice ripetitivo.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>http.createServer</code> crea il server e registra la callback, ma non apre da solo la porta. <code>listen</code> lo mette in ascolto. Il callback di <code>listen</code> viene eseguito all’avvio; quello di <code>createServer</code> viene richiamato per ogni richiesta.</p><p><code>res.writeHead</code> imposta status e header; <code>res.write</code> può inviare una parte del contenuto; <code>res.end</code> conclude la risposta, eventualmente con l’ultimo contenuto. Dopo aver risposto, un <code>return</code> evita di cadere nel ramo 404. Un server resta attivo perché ha risorse di rete in ascolto: fermalo con <strong>Ctrl+C</strong>.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// ora.cjs — node ora.cjs
+const http = require(&#x27;node:http&#x27;);
+const server = http.createServer((req, res) =&gt; {
+  const url = new URL(req.url, &#x27;http://localhost&#x27;);
+  if (req.method === &#x27;GET&#x27; &amp;&amp; url.pathname === &#x27;/ora&#x27;) {
+    res.writeHead(200, { &#x27;Content-Type&#x27;: &#x27;application/json; charset=utf-8&#x27; });
+    return res.end(JSON.stringify({ ora: new Date().toISOString() }));
+  }
+  res.writeHead(404, { &#x27;Content-Type&#x27;: &#x27;text/plain; charset=utf-8&#x27; });
+  res.end(&#x27;Percorso non trovato&#x27;);
+});
+server.listen(3000, &#x27;127.0.0.1&#x27;, () =&gt; console.log(&#x27;Apri http://127.0.0.1:3000/ora&#x27;));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>new URL</code> separa il percorso dalla query: anche <code>/ora?formato=iso</code> ha pathname <code>/ora</code>. La data è convertita in testo ISO; <code>JSON.stringify</code> produce il body JSON. Un’altra route riceve 404. Il server dell’esempio ascolta solo sull’interfaccia locale.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Nel modulo HTTP nativo <code>req.url</code> comprende la query string; un confronto diretto con <code>"/"</code> non riconosce <code>/?x=1</code>. <code>EADDRINUSE</code> indica spesso una porta già occupata: chiudi il processo precedente o scegli un’altra porta.</aside><p class="exercise"><strong>Prova tu.</strong> Apri <code>/ora</code> due volte e confronta i timestamp; prova poi un percorso inesistente e controlla lo status negli strumenti di rete del browser.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

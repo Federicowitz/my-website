@@ -1,0 +1,19 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>npm: pacchetti e comandi</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 09 · Progetto e tooling</div><h2>npm: pacchetti e comandi</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Pacchetto, dipendenza e registry</dt><dd>Un pacchetto è codice distribuito con metadati; una dipendenza è un pacchetto richiesto dal progetto. Il registry è il servizio da cui npm scarica i pacchetti.</dd><dt>Installazione locale e globale</dt><dd>Locale significa nella struttura del progetto; globale significa nella posizione configurata per gli strumenti della macchina, selezionata con <code>-g</code>.</dd><dt>node_modules e dipendenze transitive</dt><dd><code>node_modules</code> contiene i pacchetti installati. Le dipendenze transitive sono quelle richieste dalle tue dipendenze.</dd><dt>CI</dt><dd>Continuous Integration: controlli automatici eseguiti sul progetto, per esempio installazione e test a ogni modifica.</dd></dl></div>
+<p><strong>npm</strong> è il gestore dei pacchetti usato normalmente con Node.js. Permette di installare librerie esterne e di eseguire script definiti nel progetto.</p>
+<pre><code class="language-bash">npm init -y
+npm install express@5
+npm install --save-dev nodemon
+npm uninstall nodemon
+npm ls --depth=0
+npm run dev
+</code></pre>
+<p><code>npm run dev</code> funziona solo se esiste uno script <code>dev</code> nel <code>package.json</code>. <strong>Esempio aggiuntivo:</strong> per riprodurre installazioni coerenti in progetti dotati di lockfile usa <code>npm ci</code> anziché <code>npm install</code> in CI. Non copiare casualmente dipendenze da tutorial datati.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il corso mostra librerie come Lodash e Bootstrap per rendere concreto il concetto di pacchetto: il primo offre funzioni di utilità, il secondo componenti e stili per il frontend. Installare un pacchetto non significa che sia tutto eseguibile nel browser o tutto utile a Node: dipende dal pacchetto.</p><p><code>npm init -y</code> crea il manifesto con valori iniziali. <code>npm install express</code> installa la dipendenza locale e aggiorna manifesto e lockfile. <code>npm uninstall</code> rimuove il pacchetto dalle dipendenze dichiarate e aggiorna l’installazione: evita di cancellare a mano cartelle casuali in <code>node_modules</code>.</p><h3>Un altro esempio guidato</h3><pre><code class="language-bash"># Dentro una cartella di esercizio
+npm init -y
+npm install express@5
+npm ls --depth=0
+npm explain express
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>npm ls --depth=0</code> mostra le dipendenze dirette, senza espandere tutto l’albero. <code>npm explain express</code> spiega perché il pacchetto è installato. <code>@5</code> richiede la major 5; il lockfile registra la versione precisa risolta.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per riprodurre un progetto già provvisto di lockfile usa <code>npm ci</code>: richiede coerenza con il manifesto, ricrea <code>node_modules</code> e non aggiorna il lockfile. Vedi <a href="https://docs.npmjs.com/cli/v11/commands/npm-ci/">npm ci</a>. <code>npx</code> può eseguire strumenti anche scaricandoli se assenti: controlla quale comando stai richiamando.</aside><p class="exercise"><strong>Prova tu.</strong> Spiega la differenza tra il comando npm che installa Express e il codice <code>require("express")</code> che lo carica durante l’esecuzione.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

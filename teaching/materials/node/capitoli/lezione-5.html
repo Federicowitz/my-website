@@ -1,0 +1,32 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Creare moduli</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 05 · Moduli e I/O</div><h2>Creare moduli</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Modulo, importazione ed esportazione</dt><dd>Un modulo è un’unità di codice con un proprio ambito. Esportare significa rendere un valore utilizzabile da altri file; importare significa ottenere quel valore.</dd><dt>CommonJS ed ESM</dt><dd>CommonJS usa <code>require</code> e <code>module.exports</code>. ESM significa ECMAScript Modules: è il sistema standard JavaScript basato su <code>import</code> ed <code>export</code>.</dd><dt>Destructuring e cache</dt><dd>Il destructuring estrae proprietà da un oggetto. Una cache conserva un risultato per riutilizzarlo: i moduli caricati vengono normalmente riutilizzati nelle importazioni successive dello stesso processo.</dd></dl></div>
+<p>Dividere un programma in moduli rende il codice più leggibile, testabile e riutilizzabile. Nel corso si usa soprattutto <strong>CommonJS</strong> (<code>require</code>, <code>module.exports</code>).</p>
+<p><strong>Esempio CommonJS:</strong></p>
+<pre><code class="language-js">// saluti.cjs
+function saluta(nome) { return `Ciao, ${nome}!`; }
+module.exports = { saluta };
+</code></pre>
+<pre><code class="language-js">// main.cjs
+const { saluta } = require('./saluti.cjs');
+console.log(saluta('Anna'));
+</code></pre>
+<p><strong>Alternativa ES Modules:</strong></p>
+<pre><code class="language-js">// saluti.mjs
+export const saluta = nome =&gt; `Ciao, ${nome}!`;
+// main.mjs
+import { saluta } from './saluti.mjs';
+console.log(saluta('Marco'));
+</code></pre>
+<p><strong>Nota:</strong> l'importazione può eseguire il codice al livello superiore del modulo; evita effetti collaterali inattesi all'import.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Nel testo, separare nomi e funzioni dal file principale serve a dare a ogni file una responsabilità. Il modulo dei nomi contiene i dati; il modulo delle utilità contiene funzioni; il file principale li collega. Una variabile rimane privata finché non viene esportata.</p><p>In CommonJS <code>module.exports = saluta</code> esporta direttamente la funzione; <code>module.exports = { saluta }</code> esporta un oggetto che la contiene. Nel secondo caso <code>const { saluta } = require(...)</code> estrae quella proprietà. Scrivere solo <code>exports = qualcosa</code> non sostituisce <code>module.exports</code>. Inoltre importare un array non ne crea automaticamente una copia: lo stesso oggetto esportato può essere condiviso fra moduli.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// prezzi.mjs
+export function conIva(prezzo, aliquota = 0.22) {
+  return prezzo * (1 + aliquota);
+}
+
+// main.mjs — salva questa parte in un secondo file
+import { conIva } from &#x27;./prezzi.mjs&#x27;;
+console.log(conIva(100).toFixed(2));
+// Avvio: node main.mjs
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>prezzi.mjs</code> definisce il calcolo, <code>main.mjs</code> lo usa e stampa <code>122.00</code>. <code>./</code> significa “rispetto al file che importa”; <code>../</code> sale alla cartella superiore. <code>toFixed(2)</code> produce una stringa con due decimali.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per nuovi esempi puoi scegliere ESM; CommonJS resta supportato e non è automaticamente deprecato. Specifica <code>"type": "module"</code> per usare ESM nei file <code>.js</code>, oppure usa <code>.mjs</code>. Per le importazioni ESM relative indica l’estensione. Evita di cambiare sistema a metà esempio senza adattare il resto.</aside><p class="exercise"><strong>Prova tu.</strong> Esporta anche <code>senzaIva</code>, importala nel file principale e verifica che da 122 torni circa a 100. I numeri decimali JavaScript possono avere approssimazioni.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

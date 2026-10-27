@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi C++ while base</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Esercizi C++ sul ciclo while</h1>
+      <p>
+        Raccolta ampia di esercizi base sul ciclo while: conteggi, accumulatori, sentinelle, validazione input,
+        menu semplici e prime simulazioni. Ogni esercizio e indipendente dagli altri.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+
+    <section class="note">
+      <h2>Indicazioni generali</h2>
+      <ul id="rulesList"></ul>
+    </section>
+
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+
+  <script>
+    const storageKey = "cpp-while-exercises-progress-v1";
+
+    const rules = [
+      "Usa il ciclo while come struttura principale dell'esercizio.",
+      "Inizializza sempre le variabili prima del while.",
+      "Aggiorna dentro il ciclo la variabile che permette al while di terminare.",
+      "Fai attenzione ai cicli infiniti.",
+      "Quando serve, usa una variabile accumulatore per somme, prodotti o conteggi.",
+      "Quando leggi input ripetuti, scegli se usare un numero di ripetizioni o un valore sentinella.",
+      "Non usare for, do-while, array o funzioni, a meno che la traccia lo chieda esplicitamente."
+    ];
+
+    const exercises = [
+      {
+        title: "1. Contare da 1 a 10",
+        level: "Base",
+        text: "Stampa i numeri interi da 1 a 10 usando un ciclo while.",
+        requirements: ["Dichiara un contatore inizializzato a 1.", "Il ciclo deve continuare finche il contatore e minore o uguale a 10.", "Stampa il contatore a ogni giro.", "Incrementa il contatore dentro il ciclo."],
+        hints: ["Il contatore deve cambiare dentro il while.", "L'incremento si puo scrivere con i = i + 1 oppure i++."]
+      },
+      {
+        title: "2. Contare da 10 a 1",
+        level: "Base",
+        text: "Stampa i numeri da 10 a 1 in ordine decrescente.",
+        requirements: ["Parti da 10.", "Il ciclo deve terminare dopo aver stampato 1.", "Decrementa il contatore a ogni giro."],
+        hints: ["La condizione puo essere contatore >= 1.", "Il decremento si puo scrivere contatore--."]
+      },
+      {
+        title: "3. Numeri pari da 2 a 20",
+        level: "Base",
+        text: "Stampa tutti i numeri pari da 2 a 20.",
+        requirements: ["Parti da 2.", "A ogni giro stampa il numero corrente.", "Aumenta il numero di 2.", "Non usare if."],
+        hints: ["Se parti da un numero pari e aggiungi 2, resti sempre sui pari."]
+      },
+      {
+        title: "4. Numeri dispari da 1 a 19",
+        level: "Base",
+        text: "Stampa tutti i numeri dispari da 1 a 19.",
+        requirements: ["Parti da 1.", "Stampa il valore corrente.", "Aumenta il valore di 2 a ogni giro."],
+        hints: ["La logica e simile all'esercizio sui pari."]
+      },
+      {
+        title: "5. Tabellina del 5",
+        level: "Base",
+        text: "Stampa la tabellina del 5 da 5 x 1 fino a 5 x 10.",
+        requirements: ["Usa un contatore da 1 a 10.", "Calcola 5 * contatore.", "Stampa una riga per ogni moltiplicazione."],
+        hints: ["Esempio di riga: 5 x 3 = 15."]
+      },
+      {
+        title: "6. Tabellina scelta dall'utente",
+        level: "Input",
+        text: "L'utente inserisce un numero e il programma stampa la sua tabellina da 1 a 10.",
+        requirements: ["Leggi un numero intero.", "Usa un contatore da 1 a 10.", "Stampa numero * contatore a ogni giro."],
+        hints: ["La struttura e uguale alla tabellina del 5, ma il numero viene letto con cin."]
+      },
+      {
+        title: "7. Somma da 1 a N",
+        level: "Accumulatori",
+        text: "L'utente inserisce N. Il programma calcola la somma dei numeri da 1 a N.",
+        requirements: ["Leggi N.", "Usa un contatore che parte da 1.", "Usa una variabile somma inizializzata a 0.", "Aggiungi il contatore alla somma a ogni giro."],
+        hints: ["Se N vale 4, la somma e 1 + 2 + 3 + 4."]
+      },
+      {
+        title: "8. Prodotto da 1 a N",
+        level: "Accumulatori",
+        text: "L'utente inserisce N. Il programma calcola il prodotto dei numeri da 1 a N.",
+        requirements: ["Leggi N.", "Usa una variabile prodotto inizializzata a 1.", "Moltiplica prodotto per il contatore.", "Stampa il risultato finale."],
+        hints: ["Non inizializzare il prodotto a 0, altrimenti il risultato restera sempre 0."]
+      },
+      {
+        title: "9. Fattoriale",
+        level: "Accumulatori",
+        text: "L'utente inserisce un numero intero non negativo. Il programma calcola il fattoriale.",
+        requirements: ["Leggi un intero n.", "Calcola n * (n - 1) * ... * 1.", "Gestisci correttamente il caso n = 0.", "Usa while."],
+        hints: ["Per definizione 0! vale 1.", "Puoi partire con prodotto = 1."]
+      },
+      {
+        title: "10. Somma di N numeri inseriti",
+        level: "Input ripetuto",
+        text: "L'utente decide quanti numeri inserire. Il programma legge quei numeri e ne stampa la somma.",
+        requirements: ["Leggi la quantita di numeri.", "Ripeti la lettura esattamente quella quantita di volte.", "Aggiorna una somma a ogni lettura.", "Stampa la somma finale."],
+        hints: ["Servono un contatore, una variabile numero e una variabile somma."]
+      },
+      {
+        title: "11. Media di N numeri",
+        level: "Input ripetuto",
+        text: "L'utente inserisce quanti numeri vuole leggere, poi inserisce i numeri. Il programma stampa la media.",
+        requirements: ["Leggi n.", "Leggi n numeri con un while.", "Calcola la somma.", "Dividi la somma per n.", "Gestisci il caso n uguale a 0."],
+        hints: ["Per ottenere una media decimale usa double.", "Se n e 0, non puoi dividere per 0."]
+      },
+      {
+        title: "12. Contare i positivi",
+        level: "Conteggi",
+        text: "L'utente inserisce N numeri. Il programma conta quanti sono positivi.",
+        requirements: ["Leggi N.", "Ripeti N volte la lettura di un numero.", "Se il numero e maggiore di 0, incrementa un contatore.", "Stampa il contatore finale."],
+        hints: ["Il contatore dei positivi parte da 0."]
+      },
+      {
+        title: "13. Contare pari e dispari",
+        level: "Conteggi",
+        text: "L'utente inserisce N numeri interi. Il programma conta quanti sono pari e quanti dispari.",
+        requirements: ["Leggi N.", "Per ogni numero usa l'operatore %.", "Aggiorna il contatore dei pari o quello dei dispari.", "Stampa entrambi i risultati."],
+        hints: ["Un numero e pari se numero % 2 == 0."]
+      },
+      {
+        title: "14. Massimo tra N numeri",
+        level: "Confronti",
+        text: "L'utente inserisce N numeri. Il programma stampa il maggiore.",
+        requirements: ["Leggi N.", "Leggi il primo numero prima del ciclo o gestisci il primo giro in modo speciale.", "Confronta ogni numero con il massimo corrente.", "Stampa il massimo finale."],
+        hints: ["Evita di inizializzare il massimo a 0 se l'utente puo inserire numeri negativi."]
+      },
+      {
+        title: "15. Minimo tra N numeri",
+        level: "Confronti",
+        text: "L'utente inserisce N numeri. Il programma stampa il minore.",
+        requirements: ["Leggi N.", "Memorizza un minimo corrente.", "Aggiorna il minimo quando trovi un numero piu piccolo.", "Stampa il minimo finale."],
+        hints: ["La strategia e simile all'esercizio sul massimo."]
+      },
+      {
+        title: "16. Numeri fino a zero",
+        level: "Sentinella",
+        text: "L'utente inserisce numeri interi. Il programma continua finche l'utente non inserisce 0.",
+        requirements: ["Leggi un numero prima del while.", "Il while deve continuare finche il numero e diverso da 0.", "Dentro il ciclo stampa il numero e poi leggine uno nuovo.", "Il valore 0 non deve essere stampato."],
+        hints: ["Il valore 0 e la sentinella."]
+      },
+      {
+        title: "17. Somma fino a zero",
+        level: "Sentinella",
+        text: "L'utente inserisce numeri. Il programma somma tutti i numeri inseriti fino a quando arriva 0.",
+        requirements: ["Inizializza somma a 0.", "Leggi il primo numero.", "Continua finche il numero e diverso da 0.", "Aggiungi alla somma solo i numeri diversi da 0.", "Stampa la somma finale."],
+        hints: ["Leggi un nuovo numero alla fine del ciclo."]
+      },
+      {
+        title: "18. Conteggio fino a numero negativo",
+        level: "Sentinella",
+        text: "L'utente inserisce numeri. Il programma conta quanti numeri non negativi vengono inseriti prima del primo numero negativo.",
+        requirements: ["Il ciclo termina quando il numero e minore di 0.", "Conta solo i numeri maggiori o uguali a 0.", "Stampa il conteggio finale."],
+        hints: ["Il numero negativo serve solo per terminare."]
+      },
+      {
+        title: "19. Media fino a zero",
+        level: "Sentinella",
+        text: "L'utente inserisce numeri. Il programma calcola la media dei numeri inseriti prima dello 0.",
+        requirements: ["Somma i numeri diversi da 0.", "Conta quanti numeri validi sono stati inseriti.", "Alla fine dividi somma per conteggio.", "Gestisci il caso in cui il primo numero sia 0."],
+        hints: ["Se il conteggio e 0, non puoi calcolare la media."]
+      },
+      {
+        title: "20. Password semplice",
+        level: "Validazione",
+        text: "Chiedi all'utente una password finche non inserisce la parola corretta.",
+        requirements: ["Scegli una password nel codice.", "Leggi un tentativo.", "Ripeti la richiesta finche il tentativo e diverso dalla password.", "Alla fine stampa Accesso consentito."],
+        hints: ["Per stringhe uguali puoi usare ==.", "Serve includere string."]
+      },
+      {
+        title: "21. Numero nel range",
+        level: "Validazione",
+        text: "Chiedi all'utente un numero tra 1 e 100. Continua a richiederlo finche non e valido.",
+        requirements: ["Leggi un numero.", "Se e minore di 1 o maggiore di 100, chiedilo di nuovo.", "Quando il numero e valido, stampalo."],
+        hints: ["La condizione del while puo usare ||."]
+      },
+      {
+        title: "22. Menu ripetuto",
+        level: "Menu",
+        text: "Mostra un menu con tre opzioni: 1 saluta, 2 stampa una frase, 0 esci.",
+        requirements: ["Stampa il menu.", "Leggi la scelta.", "Ripeti finche la scelta non e 0.", "Esegui un'azione diversa per 1 e 2.", "Gestisci le scelte non valide."],
+        hints: ["Dopo ogni scelta diversa da 0, mostra di nuovo il menu."]
+      },
+      {
+        title: "23. Bancomat semplificato",
+        level: "Menu",
+        text: "Simula un conto con saldo iniziale. L'utente puo versare, prelevare o uscire.",
+        requirements: ["Usa un saldo iniziale scelto nel codice.", "Menu: 1 versa, 2 preleva, 3 mostra saldo, 0 esci.", "Il prelievo deve essere permesso solo se il saldo basta.", "Ripeti finche l'utente sceglie 0."],
+        hints: ["Il saldo deve essere aggiornato dopo versamenti e prelievi."]
+      },
+      {
+        title: "24. Indovinare un numero fisso",
+        level: "Gioco semplice",
+        text: "Il programma contiene un numero segreto. L'utente prova a indovinarlo.",
+        requirements: ["Scegli un numero segreto nel codice.", "Leggi un tentativo.", "Ripeti finche il tentativo non e corretto.", "Dopo ogni errore stampa se il tentativo e troppo alto o troppo basso."],
+        hints: ["Non serve generare un numero casuale."]
+      },
+      {
+        title: "25. Conta tentativi",
+        level: "Gioco semplice",
+        text: "Estendi l'esercizio precedente contando quanti tentativi servono per indovinare.",
+        requirements: ["Usa un contatore tentativi.", "Incrementalo a ogni tentativo.", "Alla fine stampa il numero di tentativi usati."],
+        hints: ["Il contatore parte da 0 oppure da 1, ma deve essere coerente."]
+      },
+      {
+        title: "26. Potenza con moltiplicazioni",
+        level: "Accumulatori",
+        text: "L'utente inserisce base ed esponente intero non negativo. Calcola la potenza usando moltiplicazioni ripetute.",
+        requirements: ["Leggi base ed esponente.", "Inizializza risultato a 1.", "Ripeti esponente volte.", "A ogni giro moltiplica risultato per base."],
+        hints: ["Se l'esponente e 0, il risultato deve rimanere 1."]
+      },
+      {
+        title: "27. Divisione come sottrazioni",
+        level: "Logica",
+        text: "L'utente inserisce dividendo e divisore positivi. Calcola il quoziente intero con sottrazioni ripetute.",
+        requirements: ["Leggi dividendo e divisore.", "Sottrai il divisore finche possibile.", "Conta quante sottrazioni riesci a fare.", "Stampa quoziente e resto."],
+        hints: ["Il resto e cio che rimane del dividendo dopo le sottrazioni."]
+      },
+      {
+        title: "28. Moltiplicazione come somme",
+        level: "Logica",
+        text: "L'utente inserisce due numeri interi positivi. Calcola il prodotto usando solo somme ripetute.",
+        requirements: ["Leggi a e b.", "Somma a per b volte oppure b per a volte.", "Usa un contatore.", "Stampa il risultato."],
+        hints: ["Esempio: 4 * 3 = 4 + 4 + 4."]
+      },
+      {
+        title: "29. Cifre di un numero",
+        level: "Numeri",
+        text: "L'utente inserisce un numero intero positivo. Il programma conta quante cifre ha.",
+        requirements: ["Leggi un numero positivo.", "Dividi il numero per 10 a ogni giro.", "Conta quante divisioni fai prima di arrivare a 0.", "Gestisci il caso numero = 0."],
+        hints: ["La divisione intera per 10 elimina l'ultima cifra."]
+      },
+      {
+        title: "30. Somma delle cifre",
+        level: "Numeri",
+        text: "L'utente inserisce un numero intero positivo. Il programma calcola la somma delle sue cifre.",
+        requirements: ["Estrai l'ultima cifra con % 10.", "Aggiungila alla somma.", "Elimina l'ultima cifra con / 10.", "Ripeti finche il numero diventa 0."],
+        hints: ["Per 472, le cifre sono 2, 7 e 4."]
+      },
+      {
+        title: "31. Numero invertito",
+        level: "Numeri",
+        text: "L'utente inserisce un numero positivo. Il programma stampa il numero con le cifre invertite.",
+        requirements: ["Estrai una cifra alla volta.", "Costruisci un nuovo numero con invertito = invertito * 10 + cifra.", "Aggiorna il numero con divisione per 10.", "Stampa il risultato."],
+        hints: ["Se inserisci 123, il risultato deve essere 321."]
+      },
+      {
+        title: "32. Verificare palindromo numerico",
+        level: "Numeri",
+        text: "L'utente inserisce un numero positivo. Il programma dice se il numero e palindromo.",
+        requirements: ["Salva il numero originale.", "Calcola il numero invertito.", "Confronta originale e invertito.", "Stampa se e palindromo oppure no."],
+        hints: ["121 e palindromo, 123 no."]
+      },
+      {
+        title: "33. Primo multiplo maggiore",
+        level: "Ricerca",
+        text: "L'utente inserisce un numero n e un limite. Trova il primo multiplo di n maggiore del limite.",
+        requirements: ["Leggi n e limite.", "Parti da n.", "Aggiungi n finche il valore non supera il limite.", "Stampa il valore trovato."],
+        hints: ["Esempio: n = 7 e limite = 20, il primo multiplo maggiore e 21."]
+      },
+      {
+        title: "34. Conto alla rovescia personalizzato",
+        level: "Base",
+        text: "L'utente inserisce un numero di partenza. Il programma conta alla rovescia fino a 0.",
+        requirements: ["Leggi il numero iniziale.", "Stampa tutti i valori dal numero fino a 0.", "Decrementa a ogni giro."],
+        hints: ["La condizione puo essere numero >= 0."]
+      },
+      {
+        title: "35. Solo numeri pari inseriti",
+        level: "Validazione",
+        text: "Chiedi numeri all'utente finche non inserisce un numero pari.",
+        requirements: ["Leggi un numero.", "Se e dispari, chiedine un altro.", "Quando e pari, stampa un messaggio di conferma."],
+        hints: ["Un numero dispari ha numero % 2 != 0."]
+      },
+      {
+        title: "36. Somma solo dei pari",
+        level: "Conteggi",
+        text: "L'utente inserisce N numeri. Il programma somma solo quelli pari.",
+        requirements: ["Leggi N.", "Ripeti N letture.", "Se il numero e pari, aggiungilo alla somma.", "Stampa la somma finale."],
+        hints: ["I numeri dispari vanno ignorati."]
+      },
+      {
+        title: "37. Contare voti sufficienti",
+        level: "Conteggi",
+        text: "L'utente inserisce N voti. Il programma conta quanti sono maggiori o uguali a 6.",
+        requirements: ["Leggi N.", "Leggi N voti.", "Conta i voti >= 6.", "Stampa il conteggio."],
+        hints: ["Usa double se vuoi ammettere voti decimali."]
+      },
+      {
+        title: "38. Validare un voto",
+        level: "Validazione",
+        text: "Chiedi un voto all'utente finche non inserisce un valore compreso tra 0 e 10.",
+        requirements: ["Leggi un voto.", "Ripeti se il voto e minore di 0 o maggiore di 10.", "Quando e valido, stampalo."],
+        hints: ["La condizione di errore usa ||."]
+      },
+      {
+        title: "39. Somma finche non supera 100",
+        level: "Sentinella",
+        text: "L'utente inserisce numeri. Il programma continua a sommare finche la somma non supera 100.",
+        requirements: ["Inizializza somma a 0.", "Finche somma e minore o uguale a 100, leggi un nuovo numero.", "Aggiungi il numero alla somma.", "Alla fine stampa la somma."],
+        hints: ["Decidi se vuoi stampare anche quanti numeri sono stati inseriti."]
+      },
+      {
+        title: "40. Raddoppio fino al limite",
+        level: "Simulazione",
+        text: "Parti da un valore 1 e raddoppialo finche non supera un limite inserito dall'utente.",
+        requirements: ["Leggi il limite.", "Parti da valore = 1.", "Stampa ogni valore.", "Moltiplica per 2 a ogni giro.", "Termina quando il valore supera il limite."],
+        hints: ["Esempio con limite 20: 1, 2, 4, 8, 16."]
+      },
+      {
+        title: "41. Crescita di un capitale",
+        level: "Simulazione",
+        text: "Un capitale cresce di una percentuale fissa ogni anno. Calcola dopo quanti anni raggiunge un obiettivo.",
+        requirements: ["Leggi capitale iniziale, percentuale e obiettivo.", "Ripeti finche il capitale e minore dell'obiettivo.", "A ogni giro aumenta il capitale.", "Conta gli anni.", "Stampa anni e capitale finale."],
+        hints: ["Se la percentuale e 5, l'aumento e capitale * 5 / 100."]
+      },
+      {
+        title: "42. Risparmio mensile",
+        level: "Simulazione",
+        text: "L'utente inserisce un obiettivo di risparmio e quanto risparmia ogni mese. Calcola quanti mesi servono.",
+        requirements: ["Leggi obiettivo e risparmio mensile.", "Parti da totale = 0.", "Aggiungi il risparmio ogni mese.", "Conta i mesi.", "Stampa il numero di mesi."],
+        hints: ["Controlla che il risparmio mensile sia maggiore di 0."]
+      },
+      {
+        title: "43. Carburante residuo",
+        level: "Simulazione",
+        text: "Un serbatoio contiene litri iniziali. Ogni viaggio consuma un certo numero di litri. Simula viaggi finche il carburante basta.",
+        requirements: ["Leggi litri iniziali e consumo per viaggio.", "Finche i litri sono sufficienti, sottrai il consumo.", "Conta quanti viaggi sono possibili.", "Stampa viaggi e carburante rimasto."],
+        hints: ["La condizione puo essere litri >= consumo."]
+      },
+      {
+        title: "44. Menu calcolatrice",
+        level: "Menu",
+        text: "Crea una mini calcolatrice che ripete il menu finche l'utente non sceglie di uscire.",
+        requirements: ["Menu: 1 somma, 2 sottrazione, 3 moltiplicazione, 4 divisione, 0 esci.", "Per ogni operazione leggi due numeri.", "Stampa il risultato.", "Gestisci la divisione per zero.", "Ripeti il menu."],
+        hints: ["Puoi usare if, else if ed else per gestire le scelte."]
+      },
+      {
+        title: "45. Numero primo",
+        level: "Ricerca",
+        text: "L'utente inserisce un numero intero maggiore di 1. Il programma dice se e primo.",
+        requirements: ["Leggi n.", "Prova i divisori da 2 a n - 1.", "Se trovi un divisore, il numero non e primo.", "Usa while.", "Stampa il risultato finale."],
+        hints: ["Un numero e divisibile per d se n % d == 0."]
+      },
+      {
+        title: "46. Primi N multipli",
+        level: "Base",
+        text: "L'utente inserisce un numero e quanti multipli vuole vedere. Il programma stampa i primi N multipli.",
+        requirements: ["Leggi numero e quantita.", "Usa un contatore da 1 a quantita.", "Stampa numero * contatore."],
+        hints: ["Esempio: numero 3 e quantita 4 produce 3, 6, 9, 12."]
+      },
+      {
+        title: "47. Sequenza di Fibonacci",
+        level: "Sequenze",
+        text: "L'utente inserisce quanti termini della sequenza di Fibonacci vuole stampare.",
+        requirements: ["Leggi n.", "Stampa i primi n termini.", "Usa due variabili per i termini precedenti.", "Aggiorna le variabili dentro il while."],
+        hints: ["La sequenza inizia con 0, 1, 1, 2, 3, 5."]
+      },
+      {
+        title: "48. Somma alternata",
+        level: "Sequenze",
+        text: "L'utente inserisce N. Calcola 1 - 2 + 3 - 4 + 5 ... fino a N.",
+        requirements: ["Usa un contatore da 1 a N.", "Se il contatore e dispari, aggiungilo.", "Se e pari, sottrailo.", "Stampa il risultato."],
+        hints: ["Usa l'operatore % per distinguere pari e dispari."]
+      },
+      {
+        title: "49. Validare piu dati",
+        level: "Validazione",
+        text: "Chiedi eta e voto finale. Continua a richiedere i dati finche eta non e positiva e voto non e compreso tra 0 e 10.",
+        requirements: ["Leggi eta e voto.", "Ripeti se almeno uno dei due valori non e valido.", "Alla fine stampa i dati validi."],
+        hints: ["La condizione del while puo combinare piu controlli con ||."]
+      },
+      {
+        title: "50. Registro voti semplice",
+        level: "Riepilogo",
+        text: "L'utente inserisce voti finche scrive -1. Il programma stampa media, voto massimo, voto minimo e numero di voti sufficienti.",
+        requirements: ["Usa -1 come valore sentinella.", "Leggi voti tra 0 e 10.", "Ignora o segnala voti non validi.", "Aggiorna somma, conteggio, massimo, minimo e sufficienti.", "Alla fine stampa il riepilogo.", "Gestisci il caso in cui non venga inserito nessun voto valido."],
+        hints: ["Questo esercizio combina sentinella, validazione, accumulatori e confronti.", "Per massimo e minimo puoi usare il primo voto valido come valore iniziale."]
+      }
+    ];
+
+    const rulesList = document.getElementById("rulesList");
+    const exerciseList = document.getElementById("exerciseList");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    const resetButton = document.getElementById("resetButton");
+    const markAllButton = document.getElementById("markAllButton");
+
+    const createElement = (tagName, className, text) => {
+      const element = document.createElement(tagName);
+      if (className) {
+        element.className = className;
+      }
+      if (text !== undefined) {
+        element.innerText = text;
+      }
+      return element;
+    };
+
+    const appendListItems = (parent, items) => {
+      items.forEach((item) => {
+        const li = document.createElement("li");
+        li.innerText = item;
+        parent.appendChild(li);
+      });
+    };
+
+    const loadProgress = () => {
+      const saved = localStorage.getItem(storageKey);
+      if (!saved) {
+        return {};
+      }
+
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        return {};
+      }
+    };
+
+    const saveProgress = (progress) => {
+      localStorage.setItem(storageKey, JSON.stringify(progress));
+    };
+
+    let progress = loadProgress();
+
+    const updateProgressText = () => {
+      const completed = exercises.filter((exercise, index) => progress[index] === true).length;
+      const percentage = exercises.length === 0 ? 0 : Math.round((completed / exercises.length) * 100);
+      progressText.innerText = `Esercizi completati: ${completed} / ${exercises.length}`;
+      progressFill.style.width = `${percentage}%`;
+    };
+
+    const renderRules = () => {
+      rulesList.innerHTML = "";
+      appendListItems(rulesList, rules);
+    };
+
+    const renderExercises = () => {
+      exerciseList.innerHTML = "";
+
+      exercises.forEach((exercise, index) => {
+        const article = createElement("article", "exercise");
+        article.id = `exercise-${index}`;
+        if (progress[index] === true) {
+          article.classList.add("done");
+        }
+
+        const header = createElement("div", "exercise-header");
+        const titleGroup = document.createElement("div");
+
+        const level = createElement("span", "level", exercise.level);
+        const title = createElement("h2", "", exercise.title);
+        titleGroup.appendChild(level);
+        titleGroup.appendChild(title);
+
+        const label = createElement("label", "check-label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = progress[index] === true;
+        checkbox.dataset.index = index;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode("Fatto"));
+
+        header.appendChild(titleGroup);
+        header.appendChild(label);
+
+        const paragraph = createElement("p", "", exercise.text);
+
+        const requirementsTitle = createElement("h3", "", "Richieste");
+        const requirementsList = document.createElement("ul");
+        appendListItems(requirementsList, exercise.requirements);
+
+        const hintsTitle = createElement("h3", "", "Suggerimenti");
+        const hintsList = document.createElement("ul");
+        appendListItems(hintsList, exercise.hints);
+
+        article.appendChild(header);
+        article.appendChild(paragraph);
+        article.appendChild(requirementsTitle);
+        article.appendChild(requirementsList);
+        article.appendChild(hintsTitle);
+        article.appendChild(hintsList);
+
+        exerciseList.appendChild(article);
+      });
+
+      const checkboxes = document.querySelectorAll("input[type='checkbox'][data-index]");
+      checkboxes.forEach((checkbox) => {
+        checkbox.onchange = () => {
+          const index = checkbox.dataset.index;
+          progress[index] = checkbox.checked;
+          saveProgress(progress);
+          renderExercises();
+          updateProgressText();
+        };
+      });
+    };
+
+    resetButton.onclick = () => {
+      const confirmed = confirm("Vuoi cancellare il completamento di tutti gli esercizi?");
+      if (!confirmed) {
+        return;
+      }
+
+      progress = {};
+      saveProgress(progress);
+      renderExercises();
+      updateProgressText();
+    };
+
+    markAllButton.onclick = () => {
+      exercises.forEach((exercise, index) => {
+        progress[index] = true;
+      });
+      saveProgress(progress);
+      renderExercises();
+      updateProgressText();
+    };
+
+    renderRules();
+    renderExercises();
+    updateProgressText();
+  </script>
+</body>
+</html>

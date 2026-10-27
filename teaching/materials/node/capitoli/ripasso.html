@@ -1,0 +1,31 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Ripasso e percorso di studio</title></head><body><article class="reading"><div class="eyebrow">CONSOLIDAMENTO</div><h1>Ripasso e percorso di studio</h1>
+<h2>Come affrontare il materiale</h2>
+<ol>
+<li><strong>Fondamenti (01–04):</strong> esegui script, distingui Node dal browser, conosci <code>process</code>.</li>
+<li><strong>Moduli e I/O (05–07):</strong> importa moduli e confronta letture sincrone/asincrone.</li>
+<li><strong>HTTP e runtime (08, 12–15):</strong> crea un server, osserva event loop, eventi e stream.</li>
+<li><strong>Progetto e tooling (09–11):</strong> usa npm, <code>package.json</code> e riavvio automatico.</li>
+<li><strong>Express e API (16–23):</strong> crea route, JSON, filtri, middleware e testa le richieste.</li>
+<li><strong>CRUD (24–28):</strong> completa il progetto finale, poi separa le route.</li>
+</ol>
+<h2>Errori frequenti da evitare</h2>
+<ul>
+<li>Scambiare <code>req.params.id</code> (una stringa) con un numero senza conversione e validazione.</li>
+<li>Credere che <code>async</code> renda non bloccante un calcolo CPU impegnativo.</li>
+<li>Restituire <code>200</code> quando la risorsa non esiste invece di <code>404</code>.</li>
+<li>Dimenticare <code>express.json()</code> prima delle route che leggono il body JSON.</li>
+<li>Pensare che <code>require</code> e <code>import</code> siano intercambiabili senza configurazione.</li>
+<li>Usare percorsi di file relativi senza sapere da quale cartella si avvia il processo.</li>
+<li>Trattare i dati in RAM come se fossero persistenti.</li>
+</ul>
+<h2>Cinque esercizi progressivi</h2>
+<ol>
+<li><strong>Base:</strong> modifica il primo script affinché stampi pari o dispari per i numeri da 1 a 20.</li>
+<li><strong>Moduli:</strong> crea <code>calcoli.cjs</code> con <code>somma()</code> e <code>media()</code>, importale in <code>main.cjs</code>.</li>
+<li><strong>File:</strong> salva un array di appunti in <code>appunti.json</code>, poi rileggilo tramite <code>node:fs/promises</code>.</li>
+<li><strong>HTTP:</strong> aggiungi <code>/ora</code> al server HTTP e restituisci un timestamp ISO in JSON.</li>
+<li><strong>CRUD:</strong> aggiungi all’API completa una ricerca per <code>ruolo</code> ed estendi la PATCH perché accetti anche il nome, validando almeno un campo modificabile.</li>
+</ol>
+<h2>Domande di ripasso con risposta</h2><dl><dt>Chi esegue il codice della route?</dt><dd>Node esegue la funzione JavaScript che Express ha selezionato in base a metodo, percorso e ordine dei middleware.</dd><dt>Perché req.body può essere assente?</dt><dd>Il parser può mancare, essere registrato troppo tardi, non riconoscere il Content-Type o non avere un body da interpretare.</dd><dt>Perché una POST scompare dopo un salvataggio?</dt><dd>Se il watcher riavvia il processo, l’array in RAM viene ricreato. La persistenza richiede un salvataggio esplicito.</dd><dt>Un await rende il calcolo parallelo?</dt><dd>No: permette di attendere una Promise senza bloccare la funzione chiamante nello stesso modo di una chiamata sincrona, ma un calcolo pesante sul thread principale resta bloccante.</dd><dt>Qual è la differenza fra 400 e 404?</dt><dd>400 descrive input non valido; 404 una risorsa o route non trovata, secondo il contratto dell’API.</dd></dl><h2>Cosa studiare dopo</h2>
+<p>Il corso introduttivo termina sostanzialmente con Express Router. Per sviluppare backend reali approfondisci <strong>database e SQL</strong>, autenticazione, autorizzazione, convalida degli input, test, sicurezza delle API, gestione errori, TypeScript e deploy. Il filmato conclusivo del testo fornito presenta un <strong>corso separato a pagamento</strong>: non è una lezione tecnica da riassumere come parte delle 28.</p>
+</article><script src="../../../reader.js"></script></body></html>

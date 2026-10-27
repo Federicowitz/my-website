@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>11. Leggere un input</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Saluto personalizzato</h1>
+
+  <input id="nameInput" type="text" placeholder="Inserisci il nome">
+  <button id="button" type="button">Saluta</button>
+  <div id="result"></div>
+
+  <script>
+    const nameInput = document.getElementById("nameInput");
+    const button = document.getElementById("button");
+    const result = document.getElementById("result");
+
+    button.onclick = () => {
+      const nome = nameInput.value.trim();
+
+      if (nome === "") {
+        result.innerText = "Errore: inserisci un nome.";
+        return;
+      }
+
+      result.innerText = `Ciao, ${nome}.`;
+    };
+  </script>
+</body>
+</html>

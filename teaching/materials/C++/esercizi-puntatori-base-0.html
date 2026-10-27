@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi C++ puntatori base</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Esercizi C++ sui puntatori</h1>
+      <p>
+        Percorso introduttivo sui puntatori: prima lettura del codice e risposta multipla, poi piccoli esercizi di scrittura.
+        Gli esercizi sono pensati per lavorare su indirizzi, dereferenziazione, assegnazioni e array.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="reshuffleButton" type="button">Mescola risposte</button>
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+
+    <section class="theory">
+      <h2>Preambolo minimo</h2>
+      <ul id="theoryList"></ul>
+    </section>
+
+    <section class="note">
+      <h2>Indicazioni</h2>
+      <ul id="rulesList"></ul>
+    </section>
+
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+
+  <script>
+    const storageKey = "cpp-pointer-exercises-progress-v1";
+    const answersStorageKey = "cpp-pointer-exercises-answers-v1";
+
+    const theory = [
+      "Una variabile normale contiene un valore. Per esempio int x = 5 significa che x contiene il valore 5.",
+      "L'operatore & davanti a una variabile restituisce il suo indirizzo di memoria. Per esempio &x significa indirizzo di x.",
+      "Un puntatore è una variabile che contiene un indirizzo. Per esempio int* p può contenere l'indirizzo di una variabile int.",
+      "L'operatore * davanti a un puntatore permette di accedere al valore contenuto all'indirizzo puntato. Questa operazione si chiama dereferenziazione.",
+      "Se p contiene l'indirizzo di x, allora *p permette di leggere o modificare x.",
+      "Attenzione: int* p dichiara un puntatore. Invece *p, usato dopo la dichiarazione, significa valore puntato da p.",
+      "Gli array non sono puntatori, ma in molte espressioni il nome dell'array decade a puntatore al primo elemento.",
+      "Se int v[3] = {10, 20, 30}; allora v spesso si comporta come &v[0]. Quindi *v vale 10.",
+      "Scrivere v = qualcosa non è permesso: un array non è una variabile puntatore riassegnabile.",
+      "Se int* p = v; allora p punta al primo elemento dell'array e *(p + 1) indica il secondo elemento."
+    ];
+
+    const rules = [
+      "Negli esercizi a risposta multipla leggi il codice e scegli cosa viene stampato.",
+      "Gli indirizzi reali di memoria non sono prevedibili: quando compare un indirizzo, ragiona sul concetto, non sul numero esatto.",
+      "Le risposte vengono mescolate automaticamente a ogni caricamento della pagina.",
+      "Dopo la risposta compare una spiegazione.",
+      "Negli esercizi di scrittura usa solo main, variabili, puntatori, input/output e condizioni semplici se richieste.",
+      "Per ora evita new, delete, malloc, funzioni, classi e strutture."
+    ];
+
+    const exercises = [
+      {
+        type: "quiz",
+        title: "1. Indirizzo di una variabile",
+        level: "Lettura",
+        text: "Osserva il codice. Quale affermazione è corretta?",
+        code: `int x = 10;
+cout << &x;`,
+        answers: [
+          {
+            text: "Stampa l'indirizzo di memoria della variabile x.",
+            correct: true
+          },
+          {
+            text: "Stampa il valore 10.",
+            correct: false
+          },
+          {
+            text: "Stampa sempre 0.",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché & non si può usare con int.",
+            correct: false
+          }
+        ],
+        explanation: "L'operatore & restituisce l'indirizzo della variabile. Il valore stampato dipende dall'esecuzione, quindi non va imparato come numero fisso."
+      },
+      {
+        type: "quiz",
+        title: "2. Dichiarazione di un puntatore",
+        level: "Lettura",
+        text: "Che cosa rappresenta p in questo codice?",
+        code: `int x = 7;
+int* p = &x;`,
+        answers: [
+          {
+            text: "p è un puntatore a int e contiene l'indirizzo di x.",
+            correct: true
+          },
+          {
+            text: "p è una copia del valore 7.",
+            correct: false
+          },
+          {
+            text: "p è una variabile char.",
+            correct: false
+          },
+          {
+            text: "p contiene un valore casuale perché non è inizializzato.",
+            correct: false
+          }
+        ],
+        explanation: "int* p dichiara un puntatore a int. Con p = &x, dentro p viene salvato l'indirizzo della variabile x."
+      },
+      {
+        type: "quiz",
+        title: "3. Dereferenziazione semplice",
+        level: "Lettura",
+        text: "Che cosa viene stampato?",
+        code: `int x = 7;
+int* p = &x;
+cout << *p;`,
+        answers: [
+          {
+            text: "7",
+            correct: true
+          },
+          {
+            text: "L'indirizzo di x",
+            correct: false
+          },
+          {
+            text: "0",
+            correct: false
+          },
+          {
+            text: "Il codice non compila",
+            correct: false
+          }
+        ],
+        explanation: "p contiene l'indirizzo di x. Scrivere *p significa accedere al valore contenuto all'indirizzo puntato, quindi al valore di x."
+      },
+      {
+        type: "quiz",
+        title: "4. Modifica tramite puntatore",
+        level: "Lettura",
+        text: "Che cosa viene stampato?",
+        code: `int x = 5;
+int* p = &x;
+*p = 12;
+cout << x;`,
+        answers: [
+          {
+            text: "12",
+            correct: true
+          },
+          {
+            text: "5",
+            correct: false
+          },
+          {
+            text: "L'indirizzo di x",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché *p non può stare a sinistra dell'uguale.",
+            correct: false
+          }
+        ],
+        explanation: "*p indica x, perché p punta a x. Quindi *p = 12 modifica direttamente il valore di x."
+      },
+      {
+        type: "quiz",
+        title: "5. Puntatore e valore originale",
+        level: "Lettura",
+        text: "Che cosa viene stampato?",
+        code: `int x = 3;
+int* p = &x;
+x = 9;
+cout << *p;`,
+        answers: [
+          {
+            text: "9",
+            correct: true
+          },
+          {
+            text: "3",
+            correct: false
+          },
+          {
+            text: "L'indirizzo di p",
+            correct: false
+          },
+          {
+            text: "Un valore casuale",
+            correct: false
+          }
+        ],
+        explanation: "p continua a puntare a x. Se x cambia valore, anche *p legge il nuovo valore di x."
+      },
+      {
+        type: "quiz",
+        title: "6. Copia del valore o collegamento?",
+        level: "Lettura",
+        text: "Che cosa viene stampato?",
+        code: `int x = 4;
+int y = x;
+y = 20;
+cout << x;`,
+        answers: [
+          {
+            text: "4",
+            correct: true
+          },
+          {
+            text: "20",
+            correct: false
+          },
+          {
+            text: "L'indirizzo di x",
+            correct: false
+          },
+          {
+            text: "Il codice non compila",
+            correct: false
+          }
+        ],
+        explanation: "Qui non ci sono puntatori. y riceve una copia del valore di x. Cambiare y non modifica x."
+      },
+      {
+        type: "quiz",
+        title: "7. Due puntatori alla stessa variabile",
+        level: "Lettura",
+        text: "Che cosa viene stampato?",
+        code: `int x = 8;
+int* p = &x;
+int* q = &x;
+*q = 15;
+cout << *p;`,
+        answers: [
+          {
+            text: "15",
+            correct: true
+          },
+          {
+            text: "8",
+            correct: false
+          },
+          {
+            text: "L'indirizzo di q",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché due puntatori non possono puntare alla stessa variabile.",
+            correct: false
+          }
+        ],
+        explanation: "p e q puntano entrambi a x. Modificare *q significa modificare x. Di conseguenza *p legge lo stesso valore aggiornato."
+      },
+      {
+        type: "quiz",
+        title: "8. Cambiare destinazione del puntatore",
+        level: "Lettura",
+        text: "Che cosa viene stampato?",
+        code: `int a = 2;
+int b = 5;
+int* p = &a;
+p = &b;
+cout << *p;`,
+        answers: [
+          {
+            text: "5",
+            correct: true
+          },
+          {
+            text: "2",
+            correct: false
+          },
+          {
+            text: "7",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché un puntatore non può cambiare indirizzo.",
+            correct: false
+          }
+        ],
+        explanation: "p inizialmente punta ad a, poi viene riassegnato e punta a b. Quindi *p vale b, cioè 5."
+      },
+      {
+        type: "quiz",
+        title: "9. Attenzione a p e *p",
+        level: "Lettura",
+        text: "Che cosa viene stampato?",
+        code: `int x = 6;
+int* p = &x;
+cout << p;`,
+        answers: [
+          {
+            text: "Un indirizzo di memoria.",
+            correct: true
+          },
+          {
+            text: "6",
+            correct: false
+          },
+          {
+            text: "Il carattere p.",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché p deve sempre avere davanti *." ,
+            correct: false
+          }
+        ],
+        explanation: "p è il puntatore, quindi contiene un indirizzo. *p invece è il valore contenuto all'indirizzo puntato."
+      },
+      {
+        type: "quiz",
+        title: "10. Puntatore non inizializzato",
+        level: "Lettura",
+        text: "Qual è il problema principale di questo codice?",
+        code: `int* p;
+cout << *p;`,
+        answers: [
+          {
+            text: "p non è inizializzato: dereferenziarlo è un errore grave.",
+            correct: true
+          },
+          {
+            text: "Stampa sicuramente 0.",
+            correct: false
+          },
+          {
+            text: "Stampa sicuramente 1.",
+            correct: false
+          },
+          {
+            text: "Il codice è sempre corretto perché ogni puntatore punta automaticamente a una variabile valida.",
+            correct: false
+          }
+        ],
+        explanation: "Un puntatore non inizializzato contiene un indirizzo non controllato. Usare *p in questo caso porta a comportamento indefinito."
+      },
+      {
+        type: "quiz",
+        title: "11. Puntatore nullo",
+        level: "Lettura",
+        text: "Quale affermazione è corretta?",
+        code: `int* p = nullptr;
+cout << p;`,
+        answers: [
+          {
+            text: "p non punta a nessuna variabile valida.",
+            correct: true
+          },
+          {
+            text: "p punta automaticamente a una variabile int con valore 0.",
+            correct: false
+          },
+          {
+            text: "*p si può usare tranquillamente.",
+            correct: false
+          },
+          {
+            text: "nullptr è uguale a un carattere vuoto.",
+            correct: false
+          }
+        ],
+        explanation: "nullptr indica che il puntatore non punta a un oggetto valido. Stampare p può mostrare un indirizzo nullo, ma dereferenziare *p sarebbe sbagliato."
+      },
+      {
+        type: "quiz",
+        title: "12. Array e primo elemento",
+        level: "Array e puntatori",
+        text: "Che cosa viene stampato?",
+        code: `int v[3] = {10, 20, 30};
+cout << *v;`,
+        answers: [
+          {
+            text: "10",
+            correct: true
+          },
+          {
+            text: "20",
+            correct: false
+          },
+          {
+            text: "L'intero array",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché un array non può mai essere usato con *." ,
+            correct: false
+          }
+        ],
+        explanation: "In questa espressione il nome dell'array decade a puntatore al primo elemento. Quindi *v equivale a v[0]."
+      },
+      {
+        type: "quiz",
+        title: "13. Array e aritmetica dei puntatori",
+        level: "Array e puntatori",
+        text: "Che cosa viene stampato?",
+        code: `int v[3] = {10, 20, 30};
+cout << *(v + 1);`,
+        answers: [
+          {
+            text: "20",
+            correct: true
+          },
+          {
+            text: "10",
+            correct: false
+          },
+          {
+            text: "30",
+            correct: false
+          },
+          {
+            text: "11",
+            correct: false
+          }
+        ],
+        explanation: "v decade a puntatore al primo elemento. v + 1 punta al secondo elemento. Quindi *(v + 1) equivale a v[1]."
+      },
+      {
+        type: "quiz",
+        title: "14. Puntatore a un array",
+        level: "Array e puntatori",
+        text: "Che cosa viene stampato?",
+        code: `int v[3] = {4, 8, 12};
+int* p = v;
+cout << *p;`,
+        answers: [
+          {
+            text: "4",
+            correct: true
+          },
+          {
+            text: "8",
+            correct: false
+          },
+          {
+            text: "12",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché manca & davanti a v.",
+            correct: false
+          }
+        ],
+        explanation: "Quando assegni v a int* p, il nome dell'array decade a puntatore al primo elemento. Quindi p punta a v[0]."
+      },
+      {
+        type: "quiz",
+        title: "15. Modifica di un array tramite puntatore",
+        level: "Array e puntatori",
+        text: "Che cosa viene stampato?",
+        code: `int v[3] = {4, 8, 12};
+int* p = v;
+*(p + 2) = 50;
+cout << v[2];`,
+        answers: [
+          {
+            text: "50",
+            correct: true
+          },
+          {
+            text: "12",
+            correct: false
+          },
+          {
+            text: "8",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché p + 2 non è valido.",
+            correct: false
+          }
+        ],
+        explanation: "p punta al primo elemento dell'array. p + 2 punta al terzo elemento. Quindi *(p + 2) modifica v[2]."
+      },
+      {
+        type: "quiz",
+        title: "16. Array non riassegnabile",
+        level: "Array e puntatori",
+        text: "Qual è il problema di questo codice?",
+        code: `int a[3] = {1, 2, 3};
+int b[3] = {4, 5, 6};
+a = b;`,
+        answers: [
+          {
+            text: "Non compila: un array non può essere riassegnato così.",
+            correct: true
+          },
+          {
+            text: "Copia correttamente tutti gli elementi di b dentro a.",
+            correct: false
+          },
+          {
+            text: "Scambia a e b.",
+            correct: false
+          },
+          {
+            text: "Azzera entrambi gli array.",
+            correct: false
+          }
+        ],
+        explanation: "Gli array possono decadere a puntatori in molte espressioni, ma non sono variabili puntatore riassegnabili. a = b non è una copia valida di array."
+      },
+      {
+        type: "quiz",
+        title: "17. Confronto tra indirizzi",
+        level: "Lettura",
+        text: "Che cosa viene stampato?",
+        code: `int x = 3;
+int* p = &x;
+int* q = &x;
+
+if (p == q) {
+    cout << "uguali";
+} else {
+    cout << "diversi";
+}`,
+        answers: [
+          {
+            text: "uguali",
+            correct: true
+          },
+          {
+            text: "diversi",
+            correct: false
+          },
+          {
+            text: "3",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché i puntatori non si possono confrontare.",
+            correct: false
+          }
+        ],
+        explanation: "p e q contengono lo stesso indirizzo, cioè l'indirizzo di x. Quindi p == q è vero."
+      },
+      {
+        type: "quiz",
+        title: "18. Confronto tra valori puntati",
+        level: "Lettura",
+        text: "Che cosa viene stampato?",
+        code: `int a = 5;
+int b = 5;
+int* p = &a;
+int* q = &b;
+
+if (*p == *q) {
+    cout << "valori uguali";
+} else {
+    cout << "valori diversi";
+}`,
+        answers: [
+          {
+            text: "valori uguali",
+            correct: true
+          },
+          {
+            text: "valori diversi",
+            correct: false
+          },
+          {
+            text: "indirizzi uguali",
+            correct: false
+          },
+          {
+            text: "Il codice non compila perché *p == *q è vietato.",
+            correct: false
+          }
+        ],
+        explanation: "a e b sono due variabili diverse, ma contengono entrambe 5. Con *p e *q confrontiamo i valori, non gli indirizzi."
+      },
+      {
+        type: "writing",
+        title: "19. Scrittura: stampare valore e indirizzo",
+        level: "Scrittura guidata",
+        text: "Scrivi un programma che dichiara una variabile intera, assegna un valore e stampa sia il valore sia l'indirizzo.",
+        requirements: [
+          "Dichiara una variabile int.",
+          "Assegna un valore a scelta.",
+          "Stampa il valore della variabile.",
+          "Stampa l'indirizzo della variabile usando &."
+        ],
+        hints: [
+          "Non serve dichiarare un puntatore in questo esercizio.",
+          "Per stampare l'indirizzo usa cout << &nomeVariabile;"
+        ]
+      },
+      {
+        type: "writing",
+        title: "20. Scrittura: puntatore a una variabile",
+        level: "Scrittura guidata",
+        text: "Scrivi un programma che dichiara una variabile int e un puntatore che punta a quella variabile.",
+        requirements: [
+          "Dichiara una variabile int x.",
+          "Dichiara un puntatore int* p.",
+          "Assegna a p l'indirizzo di x.",
+          "Stampa x.",
+          "Stampa *p."
+        ],
+        hints: [
+          "p deve contenere &x.",
+          "Se tutto è corretto, x e *p devono stampare lo stesso valore."
+        ]
+      },
+      {
+        type: "writing",
+        title: "21. Scrittura: modificare una variabile tramite puntatore",
+        level: "Scrittura guidata",
+        text: "Scrivi un programma in cui l'utente inserisce un numero. Poi modifica quel numero usando un puntatore e stampa il risultato finale.",
+        requirements: [
+          "Leggi un numero intero da input.",
+          "Crea un puntatore che punta alla variabile letta.",
+          "Usa il puntatore per aumentare il valore di 10.",
+          "Stampa il valore finale della variabile originale."
+        ],
+        hints: [
+          "Se p punta a x, puoi modificare x usando *p.",
+          "Esempio logico: *p = *p + 10;"
+        ]
+      },
+      {
+        type: "writing",
+        title: "22. Scrittura: confrontare due valori tramite puntatori",
+        level: "Scrittura guidata",
+        text: "Scrivi un programma che legge due numeri interi, crea due puntatori e stampa il valore maggiore usando i puntatori.",
+        requirements: [
+          "Leggi due numeri interi.",
+          "Crea un puntatore per il primo numero.",
+          "Crea un puntatore per il secondo numero.",
+          "Confronta i valori puntati.",
+          "Stampa il maggiore o segnala che sono uguali."
+        ],
+        hints: [
+          "Confronta *p e *q, non p e q.",
+          "p e q sono indirizzi; *p e *q sono i valori."
+        ]
+      },
+      {
+        type: "writing",
+        title: "23. Scrittura: primo elemento di un array tramite puntatore",
+        level: "Scrittura guidata",
+        text: "Scrivi un programma che dichiara un array di tre interi e stampa il primo elemento usando un puntatore.",
+        requirements: [
+          "Dichiara un array di tre interi.",
+          "Dichiara un puntatore int* p.",
+          "Assegna al puntatore il nome dell'array.",
+          "Stampa il primo elemento usando *p."
+        ],
+        hints: [
+          "Se int v[3] = {1, 2, 3}; puoi scrivere int* p = v;",
+          "In questo contesto v decade a puntatore al primo elemento."
+        ]
+      },
+      {
+        type: "writing",
+        title: "24. Scrittura: modificare un elemento dell'array tramite puntatore",
+        level: "Scrittura guidata",
+        text: "Scrivi un programma che dichiara un array di tre interi, modifica il secondo elemento usando un puntatore e stampa tutto l'array.",
+        requirements: [
+          "Dichiara un array di tre interi.",
+          "Crea un puntatore al primo elemento dell'array.",
+          "Modifica il secondo elemento usando il puntatore.",
+          "Stampa i tre elementi dell'array.",
+          "Per ora puoi stampare i tre elementi uno alla volta, senza ciclo."
+        ],
+        hints: [
+          "Il secondo elemento è raggiungibile con *(p + 1).",
+          "*(p + 1) corrisponde a v[1]."
+        ]
+      }
+    ];
+
+    const theoryList = document.getElementById("theoryList");
+    const rulesList = document.getElementById("rulesList");
+    const exerciseList = document.getElementById("exerciseList");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    const resetButton = document.getElementById("resetButton");
+    const markAllButton = document.getElementById("markAllButton");
+    const reshuffleButton = document.getElementById("reshuffleButton");
+
+    const createElement = (tagName, className, text) => {
+      const element = document.createElement(tagName);
+      if (className) {
+        element.className = className;
+      }
+      if (text !== undefined) {
+        element.innerText = text;
+      }
+      return element;
+    };
+
+    const appendListItems = (parent, items) => {
+      items.forEach((item) => {
+        const li = document.createElement("li");
+        li.innerText = item;
+        parent.appendChild(li);
+      });
+    };
+
+    const shuffleArray = (array) => {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = temp;
+      }
+      return copy;
+    };
+
+    const loadJsonObject = (key) => {
+      const saved = localStorage.getItem(key);
+      if (!saved) {
+        return {};
+      }
+
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        return {};
+      }
+    };
+
+    const saveJsonObject = (key, value) => {
+      localStorage.setItem(key, JSON.stringify(value));
+    };
+
+    let progress = loadJsonObject(storageKey);
+    let selectedAnswers = loadJsonObject(answersStorageKey);
+    let shuffledAnswers = {};
+
+    const buildShuffledAnswers = () => {
+      shuffledAnswers = {};
+      exercises.forEach((exercise, index) => {
+        if (exercise.type === "quiz") {
+          shuffledAnswers[index] = shuffleArray(exercise.answers.map((answer, answerIndex) => ({
+            ...answer,
+            originalIndex: answerIndex
+          })));
+        }
+      });
+    };
+
+    const updateProgressText = () => {
+      const completed = exercises.filter((exercise, index) => progress[index] === true).length;
+      const percentage = exercises.length === 0 ? 0 : Math.round((completed / exercises.length) * 100);
+      progressText.innerText = `Esercizi completati: ${completed} / ${exercises.length}`;
+      progressFill.style.width = `${percentage}%`;
+    };
+
+    const renderList = (element, items) => {
+      element.innerHTML = "";
+      appendListItems(element, items);
+    };
+
+    const renderQuizAnswers = (article, exercise, index) => {
+      const answersTitle = createElement("h3", "", "Risposte");
+      const answersBox = createElement("div", "answers");
+      const explanationBox = createElement("div", "explanation");
+
+      const selected = selectedAnswers[index];
+      const answers = shuffledAnswers[index] || [];
+
+      answers.forEach((answer) => {
+        const button = createElement("button", "answer-button", answer.text);
+        button.type = "button";
+
+        if (selected !== undefined) {
+          button.disabled = true;
+          if (answer.correct) {
+            button.classList.add("correct");
+          }
+          if (selected === answer.originalIndex && !answer.correct) {
+            button.classList.add("wrong");
+          }
+        }
+
+        button.onclick = () => {
+          selectedAnswers[index] = answer.originalIndex;
+          progress[index] = true;
+          saveJsonObject(answersStorageKey, selectedAnswers);
+          saveJsonObject(storageKey, progress);
+          renderExercises();
+          updateProgressText();
+        };
+
+        answersBox.appendChild(button);
+      });
+
+      if (selected !== undefined) {
+        const selectedAnswer = exercise.answers[selected];
+        const result = createElement("div", selectedAnswer.correct ? "result-text correct" : "result-text wrong", selectedAnswer.correct ? "Risposta corretta" : "Risposta errata");
+        const explanation = createElement("div", "", exercise.explanation);
+        explanationBox.classList.add("visible");
+        explanationBox.appendChild(result);
+        explanationBox.appendChild(explanation);
+      }
+
+      article.appendChild(answersTitle);
+      article.appendChild(answersBox);
+      article.appendChild(explanationBox);
+    };
+
+    const renderWritingExercise = (article, exercise) => {
+      const requirementsTitle = createElement("h3", "", "Richieste");
+      const requirementsList = document.createElement("ul");
+      appendListItems(requirementsList, exercise.requirements);
+
+      const hintsTitle = createElement("h3", "", "Suggerimenti");
+      const hintsList = document.createElement("ul");
+      appendListItems(hintsList, exercise.hints);
+
+      article.appendChild(requirementsTitle);
+      article.appendChild(requirementsList);
+      article.appendChild(hintsTitle);
+      article.appendChild(hintsList);
+    };
+
+    const renderExercises = () => {
+      exerciseList.innerHTML = "";
+
+      exercises.forEach((exercise, index) => {
+        const article = createElement("article", "exercise");
+        article.id = `exercise-${index}`;
+        if (progress[index] === true) {
+          article.classList.add("done");
+        }
+
+        const header = createElement("div", "exercise-header");
+        const titleGroup = document.createElement("div");
+
+        const level = createElement("span", "level", exercise.level);
+        const title = createElement("h2", "", exercise.title);
+        titleGroup.appendChild(level);
+        titleGroup.appendChild(title);
+
+        const label = createElement("label", "check-label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = progress[index] === true;
+        checkbox.dataset.index = index;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode("Fatto"));
+
+        header.appendChild(titleGroup);
+        header.appendChild(label);
+
+        const paragraph = createElement("p", "", exercise.text);
+
+        article.appendChild(header);
+        article.appendChild(paragraph);
+
+        if (exercise.code) {
+          const pre = document.createElement("pre");
+          const code = document.createElement("code");
+          code.innerText = exercise.code;
+          pre.appendChild(code);
+          article.appendChild(pre);
+        }
+
+        if (exercise.type === "quiz") {
+          renderQuizAnswers(article, exercise, index);
+        } else {
+          renderWritingExercise(article, exercise);
+        }
+
+        exerciseList.appendChild(article);
+      });
+
+      const checkboxes = document.querySelectorAll("input[type='checkbox'][data-index]");
+      checkboxes.forEach((checkbox) => {
+        checkbox.onchange = () => {
+          const index = checkbox.dataset.index;
+          progress[index] = checkbox.checked;
+          saveJsonObject(storageKey, progress);
+          renderExercises();
+          updateProgressText();
+        };
+      });
+    };
+
+    resetButton.onclick = () => {
+      const confirmed = confirm("Vuoi cancellare completamento e risposte di tutti gli esercizi?");
+      if (!confirmed) {
+        return;
+      }
+
+      progress = {};
+      selectedAnswers = {};
+      saveJsonObject(storageKey, progress);
+      saveJsonObject(answersStorageKey, selectedAnswers);
+      buildShuffledAnswers();
+      renderExercises();
+      updateProgressText();
+    };
+
+    markAllButton.onclick = () => {
+      exercises.forEach((exercise, index) => {
+        progress[index] = true;
+      });
+      saveJsonObject(storageKey, progress);
+      renderExercises();
+      updateProgressText();
+    };
+
+    reshuffleButton.onclick = () => {
+      selectedAnswers = {};
+      saveJsonObject(answersStorageKey, selectedAnswers);
+      buildShuffledAnswers();
+      renderExercises();
+      updateProgressText();
+    };
+
+    renderList(theoryList, theory);
+    renderList(rulesList, rules);
+    buildShuffledAnswers();
+    renderExercises();
+    updateProgressText();
+  </script>
+</body>
+</html>

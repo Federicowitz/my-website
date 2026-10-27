@@ -1,0 +1,26 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Middleware: ordine e next</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 22 · Express e API</div><h2>Middleware: ordine e next</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Catena di middleware e next</dt><dd>La catena è la sequenza registrata nell’app. <code>next()</code> passa il controllo alla funzione successiva compatibile; <code>next(err)</code> attiva il percorso di gestione errori.</dd><dt>Autenticazione e autorizzazione</dt><dd>L’autenticazione verifica chi è il chiamante; l’autorizzazione verifica se può compiere quella specifica operazione.</dd><dt>Logging e gestione errori</dt><dd>Il logging registra eventi utili a capire il comportamento del programma. Un gestore errori traduce un problema in una risposta controllata.</dd></dl></div>
+<p>Un <strong>middleware</strong> è una funzione che opera tra richiesta e risposta. Può leggere/modificare <code>req</code>, rispondere o passare il controllo con <code>next()</code>; l'<strong>ordine</strong> di registrazione conta.</p>
+<pre><code class="language-js">app.use((req, res, next) =&gt; {
+  console.log(req.method, req.path);
+  next();
+});
+app.use(express.json());
+app.get('/salute', (req, res) =&gt; res.json({ ok: true }));
+app.use((req, res) =&gt; res.status(404).json({ errore: 'Route inesistente' }));
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> un middleware di autenticazione può controllare una sessione prima delle route private. <strong>Attenzione:</strong> se non invii una risposta e non chiami <code>next()</code>, la richiesta resta in sospeso. Un middleware di errore ha firma <code>(err, req, res, next)</code>.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Nel testo il middleware viene prima scritto nel file principale, poi esportato in un modulo e infine applicato solo a un prefisso. <code>app.use("/api", fn)</code> limita la funzione a quel gruppo; <code>app.get("/profilo", controllo, handler)</code> la lega a una route. Puoi passare più middleware o un array di funzioni.</p><p>Un middleware ha tre possibilità: risponde e si ferma, chiama next, oppure segnala un errore. <code>next()</code> non equivale a <code>return</code>: il codice dopo può ancora eseguire. Usa <code>return next()</code> quando vuoi terminare subito il ramo. Un middleware che stampa “accesso effettuato” non autentica realmente nessuno.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento: middleware specifico per una route
+function richiediFormatoJson(req, res, next) {
+  if (!req.is(&#x27;application/json&#x27;)) {
+    return res.status(415).json({ errore: &#x27;Invia application/json&#x27; });
+  }
+  return next();
+}
+app.post(&#x27;/api/eco&#x27;, richiediFormatoJson, express.json(), (req, res) =&gt; {
+  res.json({ ricevuto: req.body });
+});
+// Evita di registrare anche un&#x27;altra POST /api/eco prima di questa.
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Il controllo legge il Content-Type e può rispondere 415, formato non supportato. Se passa, il parser interpreta JSON e l’handler risponde. L’ordine è controllo del formato → parser → handler; l’esempio assume che un parser globale precedente non abbia già letto il body.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Con Express 5 una Promise rigettata da un handler async restituito viene inoltrata alla gestione errori. Gli errori in callback scollegate richiedono ancora gestione esplicita. L’error handler va dopo le route e mantiene la firma a quattro parametri. Vedi <a href="https://expressjs.com/en/guide/migrating-5/#rejected-promises">Promise in Express 5</a>.</aside><p class="exercise"><strong>Prova tu.</strong> Aggiungi log prima e dopo next e osserva l’ordine. Scrivi poi una 404 prima della route: vedrai perché quella route non viene più raggiunta.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

@@ -1,0 +1,54 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Richieste HTTP: struttura e metodi</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 15 · HTTP e runtime</div><h2>Richieste HTTP: struttura e metodi</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>URL, host e percorso</dt><dd>L’URL identifica una risorsa: schema, host, eventuale porta, percorso e query. L’host identifica il computer o servizio di destinazione; il percorso identifica la risorsa presso quel servizio.</dd><dt>Body, Content-Type e Accept</dt><dd>Il body è il contenuto del messaggio. <code>Content-Type</code> descrive il formato inviato; <code>Accept</code> indica i formati di risposta accettati dal client.</dd><dt>HTTPS e TLS</dt><dd>HTTPS è HTTP protetto da TLS, che cifra il trasporto e autentica normalmente il server tramite certificati.</dd><dt>Idempotenza</dt><dd>Un’operazione è idempotente se ripeterla produce lo stesso effetto finale sullo stato desiderato. Non implica risposte identiche a ogni chiamata.</dd></dl></div>
+<p>Una richiesta HTTP include <strong>metodo</strong>, <strong>percorso</strong>, <strong>header</strong> e opzionalmente un <strong>body</strong>. Una risposta include <strong>codice di stato</strong>, header e body. HTTP è un protocollo richiesta-risposta; HTTPS aggiunge la protezione TLS.</p>
+<table>
+<thead>
+<tr>
+  <th>Metodo</th>
+  <th>Uso tipico</th>
+  <th>Esempio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>GET</td>
+  <td>Leggere</td>
+  <td><code>GET /api/persone</code></td>
+</tr>
+<tr>
+  <td>POST</td>
+  <td>Creare</td>
+  <td><code>POST /api/persone</code></td>
+</tr>
+<tr>
+  <td>PUT</td>
+  <td>Sostituire/aggiornare completamente</td>
+  <td><code>PUT /api/persone/1</code></td>
+</tr>
+<tr>
+  <td>PATCH</td>
+  <td>Modificare parzialmente</td>
+  <td><code>PATCH /api/persone/1</code></td>
+</tr>
+<tr>
+  <td>DELETE</td>
+  <td>Eliminare</td>
+  <td><code>DELETE /api/persone/1</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Codici frequenti:</strong> <code>200</code> OK, <code>201</code> creato, <code>204</code> riuscito senza contenuto, <code>400</code> richiesta errata, <code>404</code> non trovato, <code>500</code> errore del server.</p>
+<pre><code class="language-bash">curl -i http://localhost:3000/
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> un browser che apre un URL invia normalmente una GET; per inviare JSON e scegliere altri metodi puoi usare <code>curl</code>, Postman o il <code>fetch()</code> del frontend.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il browser invia la richiesta, il server la interpreta e costruisce la risposta. Aprire una pagina può produrre diverse richieste: documento HTML, foglio di stile, JavaScript, immagini e favicon. Un errore sulla favicon non significa necessariamente che la route principale abbia fallito.</p><p>I metodi esprimono l’intenzione: GET legge, POST richiede un’elaborazione o una creazione, PUT sostituisce, PATCH modifica parzialmente, DELETE elimina. Una risposta <code>404</code> significa che il server ha risposto ma non ha trovato quella risorsa; una connessione rifiutata significa invece che non sei riuscito a contattarlo su quell’indirizzo e porta.</p><h3>Un altro esempio guidato</h3><pre><code class="language-http">GET /api/persone?limite=2 HTTP/1.1
+Host: localhost:3000
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{&quot;dati&quot;:[{&quot;id&quot;:1,&quot;nome&quot;:&quot;Anna&quot;}]}
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> È uno schema didattico di richiesta e risposta HTTP/1.1, non un file JavaScript da avviare. La riga iniziale identifica metodo e destinazione; la riga vuota separa header e body. Il codice 200 appartiene alla risposta, non alla richiesta.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> GET è definito come metodo sicuro, cioè con semantica di lettura; PUT e DELETE sono idempotenti. PATCH non è automaticamente idempotente. POST non rende segreto il body: per proteggere il trasporto serve HTTPS. Vedi i <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods">metodi HTTP</a>.</aside><p class="exercise"><strong>Prova tu.</strong> Apri gli strumenti sviluppatore del browser, scheda Rete/Network: identifica richiesta, status, Content-Type e contenuto della risposta. Non confondere il testo di un errore JSON con lo status HTTP.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

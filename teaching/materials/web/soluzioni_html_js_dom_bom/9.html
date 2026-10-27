@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>9. Primo evento click</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Primo evento click</h1>
+
+  <button id="button" type="button">Clicca</button>
+  <p id="result">Testo iniziale.</p>
+
+  <script>
+    const button = document.getElementById("button");
+    const result = document.getElementById("result");
+
+    button.onclick = () => {
+      result.innerText = "Hai cliccato il pulsante.";
+    };
+  </script>
+</body>
+</html>

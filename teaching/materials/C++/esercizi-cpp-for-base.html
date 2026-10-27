@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi C++ ciclo for base</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Esercizi C++ sul ciclo for</h1>
+      <p>Esercizi base sul ciclo for, pensati per ripetizioni con numero di iterazioni noto.</p>
+    </div>
+  </header>
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+    <section class="note"><h2>Indicazioni generali</h2><ul id="rulesList"></ul></section>
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+  <script>
+    window.exercisePageConfig = {
+      storageKey: "cpp-for-exercises-progress-v1",
+      rules: [
+        "Usa il ciclo for quando sai quante volte ripetere un'azione.",
+        "Controlla le tre parti del for: inizializzazione, condizione, aggiornamento.",
+        "Dai nomi chiari ai contatori, per esempio i, riga, colonna.",
+        "Per somme e prodotti usa accumulatori dichiarati prima del ciclo.",
+        "Non usare array se non richiesto."
+      ],
+      exercises: [
+        ["1. Da 1 a 10", "Base", "Stampa i numeri da 1 a 10 usando un ciclo for.", ["Usa un contatore i.", "Parti da 1.", "Termina a 10 incluso.", "Stampa i a ogni giro."], ["Forma tipica: for (int i = 1; i <= 10; i++)."]],
+        ["2. Da 10 a 1", "Base", "Stampa i numeri da 10 a 1.", ["Parti da 10.", "Decrementa il contatore.", "Termina dopo 1."], ["Nel for puoi usare i--."]],
+        ["3. Pari fino a 50", "Base", "Stampa i numeri pari da 2 a 50.", ["Parti da 2.", "Aumenta di 2.", "Non usare if."], ["Aggiornamento: i += 2."]],
+        ["4. Dispari fino a 49", "Base", "Stampa i numeri dispari da 1 a 49.", ["Parti da 1.", "Aumenta di 2.", "Stampa ogni valore."], ["Simile all'esercizio dei pari."]],
+        ["5. Tabellina scelta", "Base", "L'utente inserisce un numero. Stampa la tabellina da 1 a 10.", ["Leggi numero.", "Usa for da 1 a 10.", "Stampa numero * i."], ["Esempio: 7 x 3 = 21."]],
+        ["6. Somma da 1 a N", "Accumulatori", "Leggi N e calcola la somma da 1 a N.", ["Leggi N.", "Inizializza somma a 0.", "Usa for da 1 a N.", "Stampa somma."], ["La somma si aggiorna con somma += i."]],
+        ["7. Fattoriale", "Accumulatori", "Leggi N e calcola N! con for.", ["Leggi N.", "Inizializza prodotto a 1.", "Moltiplica per ogni valore da 1 a N.", "Gestisci N = 0."], ["0! vale 1."]],
+        ["8. Potenza", "Accumulatori", "Leggi base ed esponente non negativo. Calcola la potenza con for.", ["Leggi base ed esponente.", "Ripeti esponente volte.", "Moltiplica il risultato per la base."], ["Il risultato iniziale deve essere 1."]],
+        ["9. Somma di N numeri", "Input ripetuto", "L'utente inserisce N numeri. Calcola la somma.", ["Leggi N.", "Usa for per leggere N valori.", "Aggiorna la somma.", "Stampa il totale."], ["Il ciclo for governa quante letture fare."]],
+        ["10. Media di N numeri", "Input ripetuto", "L'utente inserisce N numeri. Calcola la media.", ["Leggi N.", "Leggi N numeri.", "Somma i valori.", "Dividi per N.", "Evita divisione per zero."], ["Usa double per la media."]],
+        ["11. Conta positivi", "Conteggi", "Leggi N numeri e conta quanti sono positivi.", ["Usa for.", "Leggi un numero per giro.", "Se e positivo, incrementa il contatore."], ["Il contatore dei positivi parte da 0."]],
+        ["12. Conta pari e dispari", "Conteggi", "Leggi N interi e conta pari e dispari.", ["Usa % 2.", "Aggiorna due contatori separati.", "Stampa entrambi."], ["Un solo if else basta."]],
+        ["13. Massimo", "Confronti", "Leggi N numeri e stampa il massimo.", ["Gestisci il primo numero.", "Confronta i successivi.", "Aggiorna massimo se serve."], ["Non inizializzare massimo a 0 se sono ammessi negativi."]],
+        ["14. Minimo", "Confronti", "Leggi N numeri e stampa il minimo.", ["Leggi almeno un valore.", "Memorizza minimo corrente.", "Aggiorna quando trovi un valore minore."], ["Strategia identica al massimo."]],
+        ["15. Multipli di 3", "Filtri", "Stampa i numeri da 1 a 100 divisibili per 3.", ["Usa for da 1 a 100.", "Usa if con % 3.", "Stampa solo i multipli."], ["n % 3 == 0."]],
+        ["16. Somma dei multipli di 5", "Filtri", "Calcola la somma dei multipli di 5 tra 1 e 100.", ["Usa for.", "Controlla divisibilita per 5.", "Accumula solo i multipli."], ["Puoi anche partire da 5 e incrementare di 5."]],
+        ["17. Quadrati", "Sequenze", "Stampa i quadrati dei numeri da 1 a N.", ["Leggi N.", "Per ogni i stampa i * i.", "Usa for."], ["Esempio: 4 produce 1, 4, 9, 16."]],
+        ["18. Cubi", "Sequenze", "Stampa i cubi dei numeri da 1 a N.", ["Leggi N.", "Calcola i * i * i.", "Stampa ogni cubo."], ["Attenzione alla leggibilita della formula."]],
+        ["19. Somma alternata", "Sequenze", "Calcola 1 - 2 + 3 - 4 + ... fino a N.", ["Leggi N.", "Usa if su pari/dispari.", "Aggiungi i dispari e sottrai i pari."], ["Usa i % 2."]],
+        ["20. Disegnare una riga", "Output", "Leggi N e stampa N asterischi sulla stessa riga.", ["Leggi N.", "Usa for.", "Stampa * senza andare a capo ogni volta."], ["Con cout << '*'; resti sulla stessa riga."]],
+        ["21. Quadrato di asterischi", "Cicli annidati", "Leggi lato e stampa un quadrato pieno di asterischi.", ["Usa un for per le righe.", "Usa un for interno per le colonne.", "Vai a capo alla fine di ogni riga."], ["Questo introduce i cicli annidati."]],
+        ["22. Rettangolo", "Cicli annidati", "Leggi righe e colonne e stampa un rettangolo di asterischi.", ["Leggi due dimensioni.", "Usa due for annidati.", "Stampa il numero corretto di righe e colonne."], ["Il ciclo esterno controlla le righe."]],
+        ["23. Triangolo crescente", "Cicli annidati", "Leggi N e stampa un triangolo con 1, 2, 3 ... asterischi per riga.", ["Usa righe da 1 a N.", "Per ogni riga stampa tanti asterischi quanto il numero della riga."], ["Il limite del ciclo interno dipende dalla riga."]],
+        ["24. Triangolo decrescente", "Cicli annidati", "Leggi N e stampa un triangolo decrescente di asterischi.", ["Prima riga con N asterischi.", "Ultima riga con 1 asterisco.", "Usa for annidati."], ["Il numero di colonne diminuisce."]],
+        ["25. Tavola pitagorica", "Cicli annidati", "Stampa una tavola pitagorica da 1 a 10.", ["Usa due for da 1 a 10.", "Calcola riga * colonna.", "Stampa i risultati in forma tabellare."], ["Puoi usare tab con '\\t'."]],
+        ["26. Divisori di un numero", "Ricerca", "Leggi N e stampa tutti i suoi divisori.", ["Usa for da 1 a N.", "Se N % i == 0, stampa i."], ["Un divisore produce resto 0."]],
+        ["27. Contare divisori", "Ricerca", "Leggi N e conta quanti divisori ha.", ["Usa for.", "Incrementa un contatore per ogni divisore.", "Stampa il conteggio."], ["Serve per preparare il numero primo."]],
+        ["28. Numero primo", "Ricerca", "Leggi N e stabilisci se e primo.", ["Conta i divisori oppure cerca divisori tra 2 e N - 1.", "Usa una variabile booleana.", "Stampa primo/non primo."], ["Un numero primo ha esattamente due divisori positivi."]],
+        ["29. Fibonacci con for", "Sequenze", "Leggi quanti termini stampare della sequenza di Fibonacci.", ["Gestisci i primi due termini.", "Usa for per i termini successivi.", "Aggiorna due variabili precedenti."], ["Sequenza: 0, 1, 1, 2, 3, 5."]],
+        ["30. Riepilogo for", "Riepilogo", "Leggi N numeri e stampa somma, media, massimo, minimo, pari e dispari.", ["Usa un solo for.", "Aggiorna tutti i valori durante la lettura.", "Gestisci N non valido.", "Stampa un riepilogo finale."], ["Esercizio completo su for, if e accumulatori."]]
+      ]
+    };
+  </script>
+  <script src="../js/exercise-page.js"></script>
+</body>
+</html>

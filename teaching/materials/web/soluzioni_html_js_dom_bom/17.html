@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>17. Lista con rimozione elementi</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Lista con rimozione elementi</h1>
+
+  <input id="itemInput" type="text" placeholder="Inserisci un elemento">
+  <button id="addButton" type="button">Aggiungi</button>
+  <ul id="list"></ul>
+
+  <script>
+    const itemInput = document.getElementById("itemInput");
+    const addButton = document.getElementById("addButton");
+    const list = document.getElementById("list");
+
+    const items = [];
+
+    const removeItem = (index) => {
+      items.splice(index, 1);
+      render();
+    };
+
+    const render = () => {
+      const html = items.map((item, index) => {
+        return `
+          <li>
+            ${item}
+            <button type="button" onclick="removeItem(${index})">Rimuovi</button>
+          </li>
+        `;
+      }).join("");
+
+      list.innerHTML = html;
+    };
+
+    addButton.onclick = () => {
+      const value = itemInput.value.trim();
+
+      if (value === "") {
+        return;
+      }
+
+      items.push(value);
+      itemInput.value = "";
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>

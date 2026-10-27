@@ -1,0 +1,26 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>EventEmitter e programmazione a eventi</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 13 · HTTP e runtime</div><h2>EventEmitter e programmazione a eventi</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Evento, emittente e listener</dt><dd>Un evento è una notifica con un nome ed eventuali dati. L’emittente la produce; un listener è la funzione registrata per reagire.</dd><dt>EventEmitter e istanza</dt><dd><code>EventEmitter</code> è la classe di Node per notifiche a eventi. Un’istanza, creata con <code>new</code>, è un oggetto con i propri listener.</dd><dt>on, once, emit e off</dt><dd><code>on</code> registra un listener; <code>once</code> lo registra per una sola esecuzione; <code>emit</code> emette; <code>off</code> rimuove un listener specifico.</dd></dl></div>
+<p><code>EventEmitter</code> fornisce un modello per emettere eventi e registrare ascoltatori. È utile per notifiche interne, strumenti e flussi applicativi.</p>
+<pre><code class="language-js">// eventi.cjs
+const { EventEmitter } = require('node:events');
+const bus = new EventEmitter();
+bus.on('utenteCreato', utente =&gt; console.log('Creato:', utente.nome));
+bus.once('primoAccesso', () =&gt; console.log('Solo una volta'));
+bus.emit('utenteCreato', { nome: 'Luca' });
+bus.emit('primoAccesso');
+bus.emit('primoAccesso'); // nessun secondo log
+</code></pre>
+<p><strong>Attenzione:</strong> <code>emit()</code> invoca <strong>sincronamente</strong> gli ascoltatori registrati. <code>EventEmitter</code> non crea automaticamente code persistenti né rende le funzioni asincrone. Gestisci con cura gli eventi <code>error</code>.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>L’ordine conta: registra gli ascoltatori prima di emettere l’evento. Un normale EventEmitter non conserva un evento per chi si iscrive dopo. Gli argomenti passati dopo il nome in <code>emit</code> vengono consegnati ai listener nello stesso ordine.</p><p>La registrazione non chiama subito la funzione; <code>emit</code> chiama invece in modo sincrono gli ascoltatori già registrati. Se un listener avvia lavoro asincrono, quel lavoro ha la propria durata: l’emittente non aspetta automaticamente tutte le Promise. Il modello serve per disaccoppiare una notifica dalle reazioni, ma non garantisce consegna persistente fra processi.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// ascoltatori.cjs — node ascoltatori.cjs
+const { EventEmitter } = require(&#x27;node:events&#x27;);
+const eventi = new EventEmitter();
+function registra(id, totale) {
+  console.log(`Ordine ${id}: ${totale} euro`);
+}
+eventi.on(&#x27;ordine&#x27;, registra);
+eventi.emit(&#x27;ordine&#x27;, 7, 25);
+eventi.off(&#x27;ordine&#x27;, registra);
+eventi.emit(&#x27;ordine&#x27;, 8, 30);
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Viene stampato solo l’ordine 7. Per rimuovere un listener serve il riferimento alla stessa funzione: una nuova arrow function, anche con lo stesso corpo, è un altro oggetto funzione. Nell’esempio iniziale il secondo <code>primoAccesso</code> non stampa nulla perché il listener era registrato con <code>once</code>.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> L’evento speciale <code>error</code> richiede attenzione: emetterlo senza listener può terminare il processo. Anche registrare listener senza rimuoverli quando non servono più può accumulare memoria. Le API a eventi restano attuali; Promise e async/await risolvono un problema diverso.</aside><p class="exercise"><strong>Prova tu.</strong> Aggiungi due listener allo stesso evento e verifica l’ordine delle stampe; poi emetti prima di registrarli per osservare che l’evento non viene riprodotto.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

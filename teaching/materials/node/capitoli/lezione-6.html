@@ -1,0 +1,23 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Moduli built-in: OS e PATH</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 06 · Moduli e I/O</div><h2>Moduli built-in: OS e PATH</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Built-in, OS e architettura</dt><dd>Built-in significa integrato nel runtime. OS è il sistema operativo. L’architettura indica la famiglia di istruzioni dell’ambiente, per esempio x64 o arm64.</dd><dt>Percorso assoluto e relativo</dt><dd>Un percorso assoluto parte dalla radice o dall’unità; uno relativo dipende da una cartella di riferimento.</dd><dt>Byte e separatore</dt><dd>Un byte è un’unità di informazione di otto bit. Il separatore divide i segmenti di un percorso: Windows e sistemi Unix possono usarne di diversi.</dd></dl></div>
+<p>I moduli integrati sono già disponibili e <strong>non si installano con npm</strong>. <code>node:os</code> fornisce dati sul sistema; <code>node:path</code> gestisce percorsi in modo multipiattaforma.</p>
+<pre><code class="language-js">// os-path.cjs
+const os = require('node:os');
+const path = require('node:path');
+console.log(os.platform(), os.arch());
+console.log('RAM totale (GiB):', (os.totalmem() / 1024**3).toFixed(1));
+const file = path.join(__dirname, 'dati', 'utenti.json');
+console.log(file);
+console.log(path.basename(file)); // utenti.json
+console.log(path.extname(file));  // .json
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>path.resolve('dati', 'utenti.json')</code> crea un percorso assoluto a partire dalla directory di lavoro corrente; <code>path.join</code> combina segmenti e normalizza il percorso. Non concatenare a mano separatori per costruire percorsi.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>os.type()</code> descrive il sistema, <code>os.release()</code> la sua release, <code>os.freemem()</code> la memoria libera e <code>os.totalmem()</code> quella totale, in byte. Dividere per <code>1024 ** 3</code> dà gibibyte, abbreviati GiB, anche quando un esempio usa genericamente l’etichetta GB.</p><p><code>path.join</code> unisce segmenti e normalizza separatori e <code>..</code>; <code>path.resolve</code> costruisce un percorso assoluto; <code>basename</code> estrae il nome finale e <code>extname</code> l’estensione. Nessuna di queste funzioni crea cartelle o verifica che il file esista: manipolano percorsi come testo.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// percorsi.cjs — node percorsi.cjs
+const path = require(&#x27;node:path&#x27;);
+const os = require(&#x27;node:os&#x27;);
+const destinazione = path.join(os.tmpdir(), &#x27;corso-node&#x27;, &#x27;log.txt&#x27;);
+console.log(path.parse(destinazione));
+console.log(&#x27;Estensione:&#x27;, path.extname(destinazione));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>os.tmpdir()</code> restituisce la cartella temporanea del sistema. <code>path.parse</code> restituisce un oggetto con radice, cartella, nome completo, estensione e nome senza estensione. L’ultima riga stampa <code>.txt</code>; nessun file viene scritto.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Il prefisso <code>node:</code> rende esplicito che stai usando un modulo integrato. Normalizzare un percorso non autorizza l’accesso: un percorso costruito da input utente deve anche essere controllato rispetto alle cartelle consentite.</aside><p class="exercise"><strong>Prova tu.</strong> Confronta <code>path.resolve("dati")</code> con <code>path.join(__dirname, "dati")</code> avviando lo script da un’altra cartella.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

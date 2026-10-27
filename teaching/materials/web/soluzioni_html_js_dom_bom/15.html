@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>15. Orologio digitale</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Orologio digitale</h1>
+
+  <div id="clock"></div>
+
+  <script>
+    const clock = document.getElementById("clock");
+
+    const formatNumber = (value) => {
+      if (value < 10) {
+        return `0${value}`;
+      }
+
+      return value;
+    };
+
+    const render = () => {
+      const now = new Date();
+
+      const hours = formatNumber(now.getHours());
+      const minutes = formatNumber(now.getMinutes());
+      const seconds = formatNumber(now.getSeconds());
+
+      clock.innerText = `${hours}:${minutes}:${seconds}`;
+    };
+
+    render();
+
+    setInterval(() => {
+      render();
+    }, 1000);
+  </script>
+</body>
+</html>

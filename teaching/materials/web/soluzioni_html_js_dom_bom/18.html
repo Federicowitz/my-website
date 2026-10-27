@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>18. Tabella studenti</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Tabella studenti</h1>
+
+  <input id="nameInput" type="text" placeholder="Nome">
+  <input id="surnameInput" type="text" placeholder="Cognome">
+  <input id="voteInput" type="text" placeholder="Voto">
+  <button id="button" type="button">Aggiungi studente</button>
+
+  <p id="message"></p>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Cognome</th>
+        <th>Voto</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script>
+    const nameInput = document.getElementById("nameInput");
+    const surnameInput = document.getElementById("surnameInput");
+    const voteInput = document.getElementById("voteInput");
+    const button = document.getElementById("button");
+    const message = document.getElementById("message");
+    const tableBody = document.getElementById("tableBody");
+
+    const students = [];
+
+    const render = () => {
+      const html = students.map((student) => {
+        return `
+          <tr>
+            <td>${student.nome}</td>
+            <td>${student.cognome}</td>
+            <td>${student.voto}</td>
+          </tr>
+        `;
+      }).join("");
+
+      tableBody.innerHTML = html;
+    };
+
+    button.onclick = () => {
+      const nome = nameInput.value.trim();
+      const cognome = surnameInput.value.trim();
+      const voto = parseFloat(voteInput.value);
+
+      if (nome === "" || cognome === "") {
+        message.innerText = "Errore: nome e cognome sono obbligatori.";
+        return;
+      }
+
+      if (Number.isNaN(voto) || voto < 1 || voto > 10) {
+        message.innerText = "Errore: il voto deve essere un numero tra 1 e 10.";
+        return;
+      }
+
+      students.push({
+        nome: nome,
+        cognome: cognome,
+        voto: voto
+      });
+
+      nameInput.value = "";
+      surnameInput.value = "";
+      voteInput.value = "";
+      message.innerText = "";
+
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>

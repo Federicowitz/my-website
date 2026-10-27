@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>16. Lista dinamica</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Lista dinamica</h1>
+
+  <input id="itemInput" type="text" placeholder="Inserisci un elemento">
+  <button id="button" type="button">Aggiungi</button>
+  <ul id="list"></ul>
+
+  <script>
+    const itemInput = document.getElementById("itemInput");
+    const button = document.getElementById("button");
+    const list = document.getElementById("list");
+
+    const items = [];
+
+    const render = () => {
+      const html = items.map((item) => {
+        return `<li>${item}</li>`;
+      }).join("");
+
+      list.innerHTML = html;
+    };
+
+    button.onclick = () => {
+      const value = itemInput.value.trim();
+
+      if (value === "") {
+        return;
+      }
+
+      items.push(value);
+      itemInput.value = "";
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>

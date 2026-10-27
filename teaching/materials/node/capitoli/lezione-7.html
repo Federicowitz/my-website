@@ -1,0 +1,36 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>File system: sync e async</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 07 · Moduli e I/O</div><h2>File system: sync e async</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>File system, encoding e Buffer</dt><dd>Il file system organizza file e cartelle. L’encoding stabilisce come convertire byte in testo: UTF-8 è una scelta comune. Un Buffer contiene byte, non una stringa JavaScript.</dd><dt>Sincrono e asincrono</dt><dd>Una chiamata sincrona restituisce il risultato prima di proseguire e può bloccare il thread. Una chiamata asincrona avvia il lavoro e ne rende disponibile il risultato successivamente.</dd><dt>Promise, async e await</dt><dd>Una Promise rappresenta un esito futuro, riuscito o fallito. Una funzione <code>async</code> restituisce una Promise; <code>await</code> sospende quella funzione finché la Promise si risolve o fallisce.</dd><dt>try/catch</dt><dd><code>try</code> delimita operazioni che possono fallire; <code>catch</code> riceve l’errore e permette di gestirlo.</dd></dl></div>
+<p><code>fs</code> consente di leggere e scrivere file. Le operazioni <code>*Sync</code> <strong>bloccano</strong> il thread JavaScript fino al termine; per server e attività I/O frequenti preferisci le API asincrone.</p>
+<pre><code class="language-js">// file.cjs
+const fs = require('node:fs');
+fs.writeFileSync('nota.txt', 'Prima riga\n');
+fs.appendFileSync('nota.txt', 'Seconda riga\n');
+console.log(fs.readFileSync('nota.txt', 'utf8'));
+</code></pre>
+<p><strong>Stessa operazione con Promise:</strong></p>
+<pre><code class="language-js">// file-async.mjs
+import { readFile, writeFile, appendFile } from 'node:fs/promises';
+try {
+  await writeFile('nota.txt', 'Prima riga\n');
+  await appendFile('nota.txt', 'Seconda riga\n');
+  const testo = await readFile('nota.txt', 'utf8');
+  console.log(testo);
+} catch (errore) {
+  console.error('Errore file:', errore.message);
+}
+</code></pre>
+<p><strong>Precisazione:</strong> <code>writeFile</code> sovrascrive per impostazione predefinita; <code>appendFile</code> aggiunge in fondo. Non mischiare letture e scritture concorrenti dello stesso file senza coordinarle.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>La versione a callback del corso segue la convenzione <strong>error-first</strong>: il primo parametro contiene l’eventuale errore, il secondo il risultato. Senza <code>utf8</code>, una lettura restituisce normalmente un Buffer. Se devi leggere due file e poi scrivere il contenuto combinato, devi aspettare entrambe le letture: posizionare la scrittura sotto le chiamate asincrone non basta.</p><p>Le Promise evitano di annidare molte callback. Due <code>await</code> consecutivi mantengono l’ordine delle operazioni; <code>Promise.all</code> può attendere più letture indipendenti. Non rende sicure scritture concorrenti sullo stesso file. Le API sincrone possono andare bene per piccoli script o preparazione iniziale; dentro una route rallentano anche gli altri utenti.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// lettura.cjs — crea prima nota.txt nella cartella di avvio
+const fs = require(&#x27;node:fs&#x27;);
+console.log(&#x27;1. Avvio lettura&#x27;);
+fs.readFile(&#x27;nota.txt&#x27;, &#x27;utf8&#x27;, (errore, testo) =&gt; {
+  if (errore) {
+    console.error(&#x27;Lettura fallita:&#x27;, errore.code);
+    return;
+  }
+  console.log(&#x27;3. Contenuto:&#x27;, testo);
+});
+console.log(&#x27;2. Il programma può proseguire&#x27;);
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Le righe 1 e 2 vengono stampate prima della callback. Se il file manca, leggi tipicamente <code>ENOENT</code>, codice che segnala un percorso inesistente. <code>return</code> impedisce di usare <code>testo</code> dopo l’errore. Il percorso relativo viene risolto dalla directory di lavoro.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per nuovo codice asincrono l’interfaccia <code>node:fs/promises</code> con <code>await</code> è spesso più leggibile. Le callback restano valide. Usa stream, spiegati alla lezione 14, se non vuoi tenere in memoria un file intero.</aside><p class="exercise"><strong>Prova tu.</strong> Rinomina il file di input e osserva il ramo di errore; poi ripristinalo. Verifica che la scrittura con <code>writeFile</code> sostituisca davvero il contenuto precedente prima di usarla su dati importanti.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

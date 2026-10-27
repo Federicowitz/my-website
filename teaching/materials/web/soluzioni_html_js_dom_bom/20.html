@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>20. Mini applicazione finale: registro locale</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Registro studenti</h1>
+
+  <input id="nameInput" type="text" placeholder="Nome">
+  <input id="surnameInput" type="text" placeholder="Cognome">
+  <input id="classInput" type="text" placeholder="Classe">
+  <input id="averageInput" type="text" placeholder="Media">
+  <button id="addButton" type="button">Aggiungi studente</button>
+
+  <hr>
+
+  <input id="searchInput" type="text" placeholder="Cerca per nome o cognome">
+  <button id="sortButton" type="button">Ordina per media</button>
+
+  <p id="message"></p>
+  <p id="totalStudents"></p>
+  <p id="generalAverage"></p>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Cognome</th>
+        <th>Classe</th>
+        <th>Media</th>
+        <th>Azione</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script>
+    const nameInput = document.getElementById("nameInput");
+    const surnameInput = document.getElementById("surnameInput");
+    const classInput = document.getElementById("classInput");
+    const averageInput = document.getElementById("averageInput");
+    const addButton = document.getElementById("addButton");
+    const searchInput = document.getElementById("searchInput");
+    const sortButton = document.getElementById("sortButton");
+    const message = document.getElementById("message");
+    const totalStudents = document.getElementById("totalStudents");
+    const generalAverage = document.getElementById("generalAverage");
+    const tableBody = document.getElementById("tableBody");
+
+    const savedStudents = localStorage.getItem("students");
+
+    let students = [];
+
+    if (savedStudents !== null) {
+      students = JSON.parse(savedStudents);
+    }
+
+    let sortAscending = true;
+
+    const saveStudents = () => {
+      localStorage.setItem("students", JSON.stringify(students));
+    };
+
+    const removeStudent = (index) => {
+      students.splice(index, 1);
+      saveStudents();
+      render();
+    };
+
+    const render = () => {
+      const search = searchInput.value.trim().toLowerCase();
+
+      const filteredStudents = students
+        .map((student, index) => {
+          return {
+            student: student,
+            originalIndex: index
+          };
+        })
+        .filter((row) => {
+          const fullName = `${row.student.nome} ${row.student.cognome}`.toLowerCase();
+
+          return fullName.includes(search);
+        });
+
+      const html = filteredStudents.map((row) => {
+        return `
+          <tr>
+            <td>${row.student.nome}</td>
+            <td>${row.student.cognome}</td>
+            <td>${row.student.classe}</td>
+            <td>${row.student.media}</td>
+            <td>
+              <button type="button" onclick="removeStudent(${row.originalIndex})">Elimina</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      tableBody.innerHTML = html;
+
+      totalStudents.innerText = `Totale studenti: ${students.length}`;
+
+      if (students.length === 0) {
+        generalAverage.innerText = "Media generale: 0";
+        return;
+      }
+
+      const sum = students.reduce((acc, student) => {
+        return acc + student.media;
+      }, 0);
+
+      const average = sum / students.length;
+
+      generalAverage.innerText = `Media generale: ${average.toFixed(2)}`;
+    };
+
+    addButton.onclick = () => {
+      const nome = nameInput.value.trim();
+      const cognome = surnameInput.value.trim();
+      const classe = classInput.value.trim();
+      const media = parseFloat(averageInput.value);
+
+      if (nome === "" || cognome === "" || classe === "") {
+        message.innerText = "Errore: nome, cognome e classe sono obbligatori.";
+        return;
+      }
+
+      if (Number.isNaN(media) || media < 1 || media > 10) {
+        message.innerText = "Errore: la media deve essere un numero tra 1 e 10.";
+        return;
+      }
+
+      students.push({
+        nome: nome,
+        cognome: cognome,
+        classe: classe,
+        media: media
+      });
+
+      nameInput.value = "";
+      surnameInput.value = "";
+      classInput.value = "";
+      averageInput.value = "";
+      message.innerText = "";
+
+      saveStudents();
+      render();
+    };
+
+    searchInput.oninput = () => {
+      render();
+    };
+
+    sortButton.onclick = () => {
+      students.sort((a, b) => {
+        if (sortAscending === true) {
+          return a.media - b.media;
+        }
+
+        return b.media - a.media;
+      });
+
+      sortAscending = !sortAscending;
+
+      saveStudents();
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>API JSON e server-side rendering</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 18 · Express e API</div><h2>API JSON e server-side rendering</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>API web e rappresentazione</dt><dd>Un’API web offre operazioni tramite HTTP. Una rappresentazione è il formato con cui una risorsa viene descritta al client, per esempio JSON o HTML.</dd><dt>Rendering, SSR e CSR</dt><dd>Rendering significa costruire la vista. SSR, Server-Side Rendering, la costruisce sul server; CSR, Client-Side Rendering, la costruisce nel browser usando JavaScript.</dd><dt>Template engine ed escaping</dt><dd>Un template engine combina un modello di pagina con dati. L’escaping trasforma caratteri speciali per visualizzarli come testo anziché interpretarli come markup.</dd></dl></div>
+<p>Il corso distingue due modalità: <strong>API</strong>, che restituiscono normalmente dati come JSON, e <strong>SSR</strong>, in cui il server genera HTML per il browser. Sono approcci combinabili.</p>
+<pre><code class="language-js">app.get('/api/profilo', (req, res) =&gt; {
+  res.json({ id: 1, nome: 'Sara' });
+});
+app.get('/pagina', (req, res) =&gt; {
+  res.type('html').send('&lt;h1&gt;Pagina generata dal server&lt;/h1&gt;');
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> un frontend React può chiamare <code>/api/profilo</code> e costruire la vista nel browser; un'app SSR potrebbe invece renderizzare lato server un template con lo stesso profilo. In entrambi i casi serve gestire correttamente errori e dati in ingresso.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Con un’API JSON il backend recupera e controlla i dati; il frontend decide come mostrarli. Con SSR il backend recupera i dati e genera anche l’HTML della vista, spesso usando un template engine. La scelta riguarda dove si prepara la pagina, non se esista o meno un database.</p><p>Le due modalità possono convivere: un sito serve pagine HTML e offre endpoint JSON per aggiornare singole parti. Un array restituito come JSON non si trasforma da solo in una tabella: serve codice client o un template. Analogamente, servire un file HTML senza modificarlo rimane semplice distribuzione di contenuto statico.</p><h3>Un altro esempio guidato</h3><pre><code class="language-html">&lt;!-- demo-client.html: servilo dalla cartella public dell&#x27;app --&gt;
+&lt;p id=&quot;nome&quot;&gt;Caricamento...&lt;/p&gt;
+&lt;script&gt;
+async function carica() {
+  const risposta = await fetch(&#x27;/api/profilo&#x27;);
+  if (!risposta.ok) throw new Error(`HTTP ${risposta.status}`);
+  const profilo = await risposta.json();
+  document.querySelector(&#x27;#nome&#x27;).textContent = profilo.nome;
+}
+carica().catch(() =&gt; {
+  document.querySelector(&#x27;#nome&#x27;).textContent = &#x27;Impossibile caricare&#x27;;
+});
+&lt;/script&gt;
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Usa l’endpoint <code>/api/profilo</code> della lezione e servi questa pagina dalla stessa app. Il browser esegue fetch, riceve JSON e aggiorna il testo con <code>Sara</code>. <code>response.json()</code> interpreta il body; <code>textContent</code> visualizza il nome come testo, senza inserirlo come HTML.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Una API può restituire formati diversi da JSON: JSON è una scelta comune, non la definizione di API. Non concatenare direttamente input non attendibile dentro HTML: usa template con escaping o inserisci testo con API sicure del DOM.</aside><p class="exercise"><strong>Prova tu.</strong> Sostituisci il percorso fetch con uno inesistente e verifica il messaggio di errore. Il controllo <code>risposta.ok</code> è necessario perché fetch non rigetta automaticamente per una risposta 404.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

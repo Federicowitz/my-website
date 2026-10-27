@@ -1,0 +1,29 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>API POST: creare risorse</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 25 · CRUD e architettura</div><h2>API POST: creare risorse</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Creazione e validazione</dt><dd>Creare significa aggiungere una risorsa con una propria identità. Validare significa controllare i dati prima che modifichino lo stato.</dd><dt>Normalizzazione e whitelist</dt><dd>Normalizzare significa portare dati in una forma coerente, per esempio togliere spazi esterni. Una whitelist è l’elenco dei campi esplicitamente accettati.</dd><dt>Location</dt><dd>Header di risposta che può indicare l’URL della risorsa appena creata.</dd></dl></div>
+<p><strong>POST</strong> inserisce una nuova risorsa. I dati arrivano spesso nel body JSON, da validare prima dell'inserimento.</p>
+<pre><code class="language-js">app.use(express.json());
+let prossimoId = 3;
+app.post('/api/persone', (req, res) =&gt; {
+  const nome = req.body?.nome;
+  if (typeof nome !== 'string' || !nome.trim()) {
+    return res.status(400).json({ errore: 'Nome obbligatorio' });
+  }
+  const persona = { id: prossimoId++, nome: nome.trim() };
+  persone.push(persona);
+  res.status(201).json(persona);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> due POST con lo stesso nome generano due record con ID distinti. In un'app reale occorrono regole di unicità e un database se sono richiesti.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il client invia il nome; il server controlla tipo e contenuto, assegna l’ID e aggiunge il record. Il client non deve scegliere l’ID per questa POST. <code>trim()</code> rimuove gli spazi iniziali e finali; va chiamato dopo aver verificato che il valore sia una stringa.</p><p><code>prossimoId++</code> usa il valore corrente e poi incrementa il contatore. È sufficiente per l’esempio con un singolo processo e dati in RAM. Non usare <code>persone.length + 1</code>: dopo una cancellazione potresti riutilizzare un ID già presente. In un sistema persistente la generazione degli ID va coordinata con l’archivio.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento per l&#x27;API: persone e prossimoId già definiti
+app.post(&#x27;/api/iscritti&#x27;, (req, res) =&gt; {
+  const nome = req.body?.nome;
+  if (typeof nome !== &#x27;string&#x27; || nome.trim().length &lt; 2) {
+    return res.status(400).json({ errore: &#x27;Nome di almeno 2 caratteri&#x27; });
+  }
+  const persona = { id: prossimoId++, nome: nome.trim() };
+  persone.push(persona);
+  return res.status(201).location(`/api/persone/${persona.id}`).json(persona);
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Il parser JSON deve essere registrato prima della route. <code>?.</code> legge nome senza errore se il body manca. <code>push</code> modifica l’array; la risposta 201 restituisce la nuova persona. Location rimanda alla route di dettaglio già esistente per la stessa collezione.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Nel corso il successo viene talvolta restituito con 200: per questa creazione 201 comunica meglio il risultato. Costruisci il record con i campi ammessi invece di copiare indiscriminatamente tutto <code>req.body</code>. L’array rimane volatile e non viene scritto sul disco.</aside><p class="exercise"><strong>Prova tu.</strong> Invia un ID nel body e verifica che il server usi quello generato da lui. Invia poi due POST uguali: senza una regola di unicità o idempotenza creano due persone diverse.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

@@ -1,0 +1,1 @@
+document.querySelectorAll('pre').forEach(pre=>{const b=document.createElement('button');b.className='copy-code';b.textContent='Copia codice';b.onclick=async()=>{try{await navigator.clipboard.writeText(pre.innerText);b.textContent='Copiato';setTimeout(()=>b.textContent='Copia codice',1400)}catch{b.textContent='Seleziona e copia il codice'}};pre.after(b)});

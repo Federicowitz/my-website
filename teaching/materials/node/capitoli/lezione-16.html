@@ -1,0 +1,31 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Introduzione a Express</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 16 · Express e API</div><h2>Introduzione a Express</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Express e app</dt><dd>Express è il framework che organizza la gestione HTTP sopra Node. <code>express()</code> crea un’applicazione, qui chiamata <code>app</code>.</dd><dt>Routing, handler ed endpoint</dt><dd>Il routing seleziona la funzione in base a metodo e percorso. L’handler gestisce la richiesta. Un endpoint è un punto di accesso dell’API, generalmente identificato da metodo e URL.</dd><dt>Middleware</dt><dd>Funzione nella catena di gestione di una richiesta: può eseguire controlli, preparare dati, rispondere o passare il controllo alla funzione successiva.</dd></dl></div>
+<p><strong>Express</strong> è un framework web che semplifica server, middleware e routing. Non sostituisce Node: vi gira sopra.</p>
+<pre><code class="language-bash">mkdir mini-express
+cd mini-express
+npm init -y
+npm install express@5
+</code></pre>
+<pre><code class="language-js">// server.cjs
+const express = require('express');
+const app = express();
+app.get('/', (req, res) =&gt; res.send('Home Express'));
+app.get('/saluti/:nome', (req, res) =&gt; {
+  res.json({ messaggio: `Ciao ${req.params.nome}` });
+});
+app.listen(3000, () =&gt; console.log('http://localhost:3000'));
+</code></pre>
+<p>Esegui <code>node server.cjs</code>. <strong>Esempio aggiuntivo:</strong> visita <code>/saluti/Anna</code>. Il callback della route riceve <code>req</code> (richiesta) e <code>res</code> (risposta).</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>require("express")</code> carica il pacchetto installato. <code>express()</code> costruisce l’app; <code>app.get</code> registra una route GET; <code>app.listen</code> crea e avvia il server HTTP. Express estende gli oggetti di Node con strumenti come <code>res.send</code>, <code>res.json</code> e <code>req.params</code>.</p><p><code>res.status(201)</code> imposta lo status ma non invia da solo la risposta. <code>res.send</code> e <code>res.json</code> la inviano e normalmente la concludono. La concatenazione <code>res.status(...).json(...)</code> funziona perché <code>status</code> restituisce lo stesso oggetto risposta. Invia una sola risposta per richiesta.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// mini.cjs — npm install express@5; poi node mini.cjs
+const express = require(&#x27;express&#x27;);
+const app = express();
+app.get(&#x27;/salute&#x27;, (req, res) =&gt; {
+  return res.status(200).json({ servizio: &#x27;attivo&#x27; });
+});
+app.use((req, res) =&gt; {
+  res.status(404).json({ errore: &#x27;Percorso non trovato&#x27; });
+});
+app.listen(3000, &#x27;127.0.0.1&#x27;, () =&gt; console.log(&#x27;Server pronto sulla porta 3000&#x27;));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>GET /salute</code> restituisce 200 e JSON. Una richiesta non gestita arriva al middleware finale e riceve 404. Il middleware senza percorso si applica a tutte le richieste che lo raggiungono. Deve stare dopo le route, altrimenti risponde prima di esse.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Questa guida usa Express 5 per i nuovi esempi. Alcune forme dei percorsi del vecchio Express 4 sono cambiate: per una 404 generale il middleware finale senza percorso evita il vecchio <code>app.all("*")</code>. Fonte: <a href="https://expressjs.com/en/guide/migrating-5/">migrazione a Express 5</a>.</aside><p class="exercise"><strong>Prova tu.</strong> Aggiungi <code>GET /versione</code> prima della 404 e restituisci <code>process.version</code>. Prova anche <code>POST /salute</code>: avere una route GET non registra automaticamente una POST.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

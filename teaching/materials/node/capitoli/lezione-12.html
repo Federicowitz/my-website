@@ -1,0 +1,24 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Event loop e non-blocking</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 12 · HTTP e runtime</div><h2>Event loop e non-blocking</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Call stack ed event loop</dt><dd>Il call stack tiene traccia delle funzioni in esecuzione. L’event loop coordina quando eseguire callback di timer, rete e altre operazioni, quando lo stack permette di farlo.</dd><dt>Concorrenza e parallelismo</dt><dd>Concorrenza significa gestire più attività nello stesso periodo; parallelismo significa eseguirle davvero nello stesso istante su risorse distinte.</dd><dt>Thread pool e libuv</dt><dd>Un thread pool è un gruppo di thread riutilizzati per certi lavori. libuv è la libreria su cui Node basa parte della gestione di I/O, event loop e thread pool.</dd><dt>Microtask e CPU-bound</dt><dd>Le microtask includono reazioni alle Promise e vengono elaborate in specifici punti dell’esecuzione. CPU-bound indica lavoro dominato dal calcolo, anziché dall’attesa di dati.</dd></dl></div>
+<p>L'event loop orchestra l'esecuzione del codice e dei callback quando le operazioni asincrone terminano. Non confondere <strong>asincronia</strong>, <strong>parallelismo</strong> e <strong>multithreading</strong>: il codice JavaScript di un processo Node normalmente gira su un thread principale, mentre parte del lavoro I/O è delegata al sistema operativo o al thread pool.</p>
+<pre><code class="language-js">console.log('A');
+setTimeout(() =&gt; console.log('C (timer)'), 0);
+Promise.resolve().then(() =&gt; console.log('B (microtask)'));
+console.log('D');
+// A, D, B, C
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>await readFile(...)</code> lascia spazio ad altre operazioni durante l'attesa; un ciclo <code>while</code> che occupa la CPU per molti secondi <strong>blocca</strong> comunque l'event loop. Per calcoli pesanti valuta worker thread o processi separati.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Nella banca, lo sportellista non si moltiplica: coordina le pratiche. Allo stesso modo il JavaScript principale esegue un pezzo di codice alla volta; il sistema operativo può gestire attese di rete e il thread pool alcune operazioni, fra cui molte operazioni sui file. Dire “ogni richiesta ha un thread” oppure “Node usa un solo thread in assoluto” descrive male il funzionamento.</p><p>Nell’esempio A/D/B/C, le due stampe sincrone vengono prima della reazione della Promise; il timer non può interrompere il codice già in esecuzione. <code>setTimeout(fn, 0)</code> significa pianificare appena possibile dopo la soglia del timer, non chiamare subito <code>fn</code>. La parola <code>async</code> non sposta un ciclo pesante su un altro thread.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// attese.mjs — node attese.mjs
+import { setTimeout as pausa } from &#x27;node:timers/promises&#x27;;
+async function lavoro(nome, ms) {
+  await pausa(ms);
+  return nome;
+}
+const risultati = await Promise.all([
+  lavoro(&#x27;lento&#x27;, 80),
+  lavoro(&#x27;veloce&#x27;, 20)
+]);
+console.log(risultati);
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Le due attese vengono avviate prima di attenderne l’esito insieme. Il risultato è <code>["lento", "veloce"]</code>: <code>Promise.all</code> preserva l’ordine degli input, non quello di completamento. Se una Promise fallisce, l’attesa complessiva fallisce; le altre operazioni non sono cancellate automaticamente.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per calcoli pesanti considera <code>worker_threads</code>, cioè thread che eseguono altro JavaScript, oppure processi separati. L’ordine di casi più complessi con <code>setImmediate</code> e timer dipende dal contesto: evita regole assolute ricavate da una sola prova. Vedi <a href="https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick">event loop di Node</a>.</aside><p class="exercise"><strong>Prova tu.</strong> Sostituisci Promise.all con due await consecutivi e confronta il tempo complessivo: nel primo caso è vicino all’attesa maggiore, nel secondo alla somma, con variazioni dovute alla schedulazione.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

@@ -1,0 +1,36 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>package.json e versioni</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 10 · Progetto e tooling</div><h2>package.json e versioni</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Manifesto e lockfile</dt><dd>Il manifesto dichiara il progetto e gli intervalli di versioni accettati. Il lockfile registra l’albero risolto con versioni precise e informazioni di integrità.</dd><dt>SemVer</dt><dd>Semantic Versioning: schema <code>major.minor.patch</code>. La major segnala modifiche incompatibili dichiarate, la minor funzionalità compatibili, la patch correzioni compatibili.</dd><dt>Script npm</dt><dd>Comando con un nome definito nell’oggetto <code>scripts</code>, avviabile con <code>npm run nome</code>. <code>npm start</code> è la forma breve per lo script start.</dd></dl></div>
+<p><code>package.json</code> è il manifesto del progetto: metadati, script e dipendenze. <code>package-lock.json</code> registra le versioni risolte ed è normalmente da includere nel versionamento.</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;laboratorio-node&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;private&quot;: true,
+  &quot;type&quot;: &quot;module&quot;,
+  &quot;scripts&quot;: {
+    &quot;start&quot;: &quot;node server.js&quot;,
+    &quot;dev&quot;: &quot;node --watch server.js&quot;
+  },
+  &quot;dependencies&quot;: {
+    &quot;express&quot;: &quot;^5.0.0&quot;
+  }
+}
+</code></pre>
+<p><strong>Attenzione:</strong> la versione di Express qui è <strong>illustrativa</strong>, non un vincolo da incollare ciecamente. È meglio usare <code>npm install express</code>, lasciando che npm scriva la versione effettivamente installata.</p>
+<ul>
+<li><code>^1.2.3</code>: permette aggiornamenti compatibili secondo SemVer all'interno della major 1.</li>
+<li><code>~1.2.3</code>: permette generalmente aggiornamenti patch nella minor 2.</li>
+<li><code>dependencies</code>: necessarie all'esecuzione; <code>devDependencies</code>: strumenti di sviluppo.</li>
+</ul>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>name</code> identifica il pacchetto; <code>version</code> è la versione del tuo progetto, non quella di Node; <code>private: true</code> impedisce la pubblicazione accidentale con npm. <code>type</code> sceglie l’interpretazione dei file <code>.js</code>. <code>main</code>, quando presente, descrive un punto di ingresso del pacchetto per chi lo carica: non sostituisce lo script <code>start</code>.</p><p><code>dependencies</code> raccoglie ciò che serve in esecuzione; <code>devDependencies</code> gli strumenti usati nello sviluppo. Negli script, npm aggiunge al PATH i comandi dei pacchetti locali: per questo <code>nodemon</code> può funzionare senza installazione globale. Conserva nel controllo di versione manifesto e lockfile; normalmente escludi <code>node_modules</code>.</p><h3>Un altro esempio guidato</h3><pre><code class="language-json">{
+  &quot;name&quot;: &quot;prima-api&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;private&quot;: true,
+  &quot;scripts&quot;: {
+    &quot;start&quot;: &quot;node server.cjs&quot;,
+    &quot;dev&quot;: &quot;node --watch server.cjs&quot;,
+    &quot;check&quot;: &quot;node --check server.cjs&quot;
+  }
+}
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> È un manifesto iniziale valido: salvalo come <code>package.json</code> nella cartella dell’esercizio, crea <code>server.cjs</code> e installa Express per aggiungere la dipendenza. <code>npm run check</code> controlla la sintassi senza avviare il server. JSON richiede doppi apici e non accetta commenti o virgole finali.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> <code>^1.2.3</code> indica versioni da 1.2.3 fino a prima di 2.0.0; <code>~1.2.3</code> fino a prima di 1.3.0. Prima della major 1 le regole del caret sono più restrittive: <code>^0.2.3</code> non include 0.3.0. Un numero esatto come <code>1.2.3</code> non è un intervallo.</aside><p class="exercise"><strong>Prova tu.</strong> Crea <code>saluto.cjs</code> con una stampa e aggiungi <code>"saluto": "node saluto.cjs"</code> agli script; avvialo con <code>npm run saluto</code>.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

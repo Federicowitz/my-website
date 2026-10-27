@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>8. Modificare più elementi della pagina</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1 id="title">Titolo iniziale</h1>
+  <p id="paragraph">Paragrafo iniziale.</p>
+  <div id="content"></div>
+
+  <script>
+    const title = document.getElementById("title");
+    const paragraph = document.getElementById("paragraph");
+    const content = document.getElementById("content");
+
+    title.innerText = "Titolo modificato da JavaScript";
+    paragraph.innerText = "Paragrafo modificato da JavaScript.";
+    content.innerText = "Testo inserito nel div vuoto.";
+  </script>
+</body>
+</html>

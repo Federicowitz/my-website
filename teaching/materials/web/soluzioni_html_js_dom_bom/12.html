@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>12. Somma di due numeri da form</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Somma di due numeri</h1>
+
+  <input id="number1" type="text" placeholder="Primo numero">
+  <input id="number2" type="text" placeholder="Secondo numero">
+  <button id="button" type="button">Calcola</button>
+  <div id="result"></div>
+
+  <script>
+    const number1 = document.getElementById("number1");
+    const number2 = document.getElementById("number2");
+    const button = document.getElementById("button");
+    const result = document.getElementById("result");
+
+    button.onclick = () => {
+      const value1 = parseFloat(number1.value);
+      const value2 = parseFloat(number2.value);
+
+      if (Number.isNaN(value1) || Number.isNaN(value2)) {
+        result.innerText = "Errore: inserisci due numeri validi.";
+        return;
+      }
+
+      const somma = value1 + value2;
+      result.innerText = `Risultato: ${somma}`;
+    };
+  </script>
+</body>
+</html>

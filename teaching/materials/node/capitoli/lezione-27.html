@@ -1,0 +1,25 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>API DELETE: eliminare</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 27 · CRUD e architettura</div><h2>API DELETE: eliminare</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>findIndex e splice</dt><dd><code>findIndex</code> trova la posizione di un elemento e restituisce -1 se manca. <code>splice</code> modifica l’array eliminando o inserendo elementi a partire da una posizione.</dd><dt>204 No Content</dt><dd>Risposta di successo senza body. Il client non deve tentare di leggerla come JSON.</dd><dt>Cancellazione logica</dt><dd>Alternativa alla rimozione fisica: si marca un record come eliminato e lo si esclude dalle normali letture, secondo le regole applicative.</dd></dl></div>
+<p><strong>DELETE</strong> rimuove una risorsa individuata normalmente da un ID. Evita di confondere l'ID pubblico con l'indice dell'array: possono essere diversi.</p>
+<pre><code class="language-js">app.delete('/api/persone/:id', (req, res) =&gt; {
+  const id = Number(req.params.id);
+  const posizione = persone.findIndex(p =&gt; p.id === id);
+  if (posizione === -1)
+    return res.status(404).json({ errore: 'Non trovata' });
+  persone.splice(posizione, 1);
+  res.status(204).end();
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> dopo aver eliminato l'ID 1, gli altri ID non dovrebbero essere ricalcolati. <code>204</code> non ha body; <code>200</code> con una conferma JSON è un'alternativa.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>findIndex</code> collega l’ID pubblico alla posizione corrente nell’array. Verifica sempre -1: chiamare <code>splice(-1, 1)</code> elimina l’ultimo elemento, anche se quello richiesto non esiste. Dopo la rimozione non ricalcolare gli ID dei sopravvissuti: i loro URL devono continuare a identificare le stesse persone.</p><p>Una seconda DELETE può ricevere 404 dopo che la prima ha ricevuto 204. Questo non contraddice l’idempotenza: in entrambi i casi lo stato finale desiderato è che la risorsa non esista. Alcune API scelgono 204 anche se il record è già assente: documenta la politica.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// elimina.mjs — client Node per l&#x27;API del laboratorio attiva
+const risposta = await fetch(&#x27;http://localhost:3000/api/persone/1&#x27;, {
+  method: &#x27;DELETE&#x27;
+});
+if (risposta.status === 204) {
+  console.log(&#x27;Eliminazione riuscita, nessun body da leggere&#x27;);
+} else {
+  console.log(&#x27;Status:&#x27;, risposta.status, &#x27;Risposta:&#x27;, await risposta.text());
+}
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Alla prima esecuzione ottieni normalmente 204. La seconda restituisce 404 e il messaggio dell’API, se il server non è stato riavviato. <code>response.json()</code> su una risposta 204 fallirebbe perché non c’è testo JSON da interpretare.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> La rimozione in RAM non equivale a una cancellazione persistente. In sistemi reali vanno definite anche dipendenze fra record, permessi e possibilità di recupero; la cancellazione logica è una scelta di modello, non una proprietà automatica del metodo DELETE.</aside><p class="exercise"><strong>Prova tu.</strong> Elimina un ID intermedio e recupera gli altri. Verifica che un ID inesistente non causi la cancellazione accidentale dell’ultimo elemento.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

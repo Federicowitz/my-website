@@ -1,0 +1,31 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>API PUT: aggiornare</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 26 · CRUD e architettura</div><h2>API PUT: aggiornare</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>PUT e PATCH</dt><dd>PUT esprime la sostituzione della rappresentazione della risorsa all’URL indicato. PATCH esprime una modifica parziale descritta dal body.</dd><dt>Campi modificabili e identità</dt><dd>I campi modificabili costituiscono i dati che l’API permette al client di cambiare. L’identità della risorsa resta quella selezionata dall’URL.</dd><dt>Indice dell’array</dt><dd>Posizione numerica di un elemento, a partire da zero: non è l’ID dell’elemento e può cambiare dopo una cancellazione.</dd></dl></div>
+<p><strong>PUT</strong> serve convenzionalmente a sostituire la rappresentazione della risorsa; il corso lo usa per aggiornare un elemento di un array. Per modifiche parziali si usa spesso <strong>PATCH</strong>.</p>
+<pre><code class="language-js">app.put('/api/persone/:id', (req, res) =&gt; {
+  const id = Number(req.params.id);
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: 'Non trovata' });
+  const nome = req.body?.nome;
+  if (typeof nome !== 'string' || !nome.trim())
+    return res.status(400).json({ errore: 'Nome non valido' });
+  persona.nome = nome.trim();
+  res.json(persona);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> con <code>PUT /api/persone/2</code> e body <code>{&quot;nome&quot;:&quot;Marco&quot;}</code>, l'oggetto con ID 2 viene aggiornato senza cambiare ID.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>La trascrizione parte da un aggiornamento diretto nell’array. Per renderlo affidabile, prima cerca la persona per ID, poi valida tutto ciò che vuoi modificare. Non usare l’ID direttamente come indice: la persona 5 potrebbe trovarsi in posizione 2 oppure non esserci.</p><p>Nel modello ridotto con il solo campo nome, l’esempio PUT sopra sostituisce tutti i dati modificabili. Nel laboratorio i campi sono nome e ruolo: una PUT richiede entrambi. Se vuoi cambiare solo ruolo conservando nome, usa un contratto PATCH. Anche una PATCH può essere idempotente quando assegna valori, ma non lo è necessariamente quando esprime operazioni come “incrementa”.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento: aggiunta all&#x27;API persone con campo ruolo
+app.patch(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = Number(req.params.id);
+  if (!Number.isSafeInteger(id) || id &lt;= 0)
+    return res.status(400).json({ errore: &#x27;ID non valido&#x27; });
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  const ruolo = req.body?.ruolo;
+  if (typeof ruolo !== &#x27;string&#x27; || !ruolo.trim() || ruolo.trim().length &gt; 80)
+    return res.status(400).json({ errore: &#x27;Ruolo non valido&#x27; });
+  persona.ruolo = ruolo.trim();
+  res.json(persona);
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Inviando <code>{"ruolo":"editor"}</code> modifichi il ruolo senza toccare nome e ID. Questa PATCH accetta il solo campo ruolo come modifica; un body senza ruolo non è valido. È una scelta del contratto, non un formato universale per tutte le PATCH.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Una PUT può anche creare una risorsa secondo il contratto dell’API; qui restituiamo 404 se manca. Non obbligare il client a rispedire un ID nel body e non permettere che un ID diverso sovrascriva quello selezionato dal percorso.</aside><p class="exercise"><strong>Prova tu.</strong> Invia la stessa PUT due volte: lo stato finale deve restare uguale. Confronta poi una PUT senza ruolo nel laboratorio con la PATCH qui sopra.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

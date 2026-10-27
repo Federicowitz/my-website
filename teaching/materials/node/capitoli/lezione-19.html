@@ -1,0 +1,22 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>JSON come formato di scambio</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 19 · Express e API</div><h2>JSON come formato di scambio</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>JSON e oggetto JavaScript</dt><dd>JSON, JavaScript Object Notation, è un formato di testo per dati. Un oggetto JavaScript è invece un valore già presente in memoria: le due cose non sono identiche.</dd><dt>Serializzazione e parsing</dt><dd>Serializzare significa convertire un valore in testo trasmissibile. Fare parsing significa analizzare il testo e ricostruire una struttura di dati.</dd><dt>Schema e validazione</dt><dd>Uno schema descrive campi, tipi e vincoli attesi. La validazione verifica che i dati rispettino quelle regole, dopo che il testo è stato interpretato.</dd></dl></div>
+<p>JSON è un formato testuale con oggetti, array, stringhe, numeri, booleani e <code>null</code>. In Express <code>res.json()</code> serializza un oggetto JavaScript e imposta la risposta JSON.</p>
+<pre><code class="language-js">app.use(express.json()); // interpreta richieste con body JSON
+app.get('/api/prodotti', (req, res) =&gt; {
+  res.json([{ id: 1, nome: 'Tastiera', prezzo: 45 }]);
+});
+app.post('/api/eco', (req, res) =&gt; {
+  res.status(201).json({ ricevuto: req.body });
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> invia <code>{&quot;nome&quot;:&quot;Mouse&quot;}</code> con header <code>Content-Type: application/json</code>. <strong>Sicurezza:</strong> il fatto che <code>req.body</code> sia stato interpretato come JSON non significa che i dati siano validi: controlla tipi, lunghezze e valori.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>res.json(oggetto)</code> serializza il valore e imposta il formato della risposta. <code>express.json()</code> compie l’operazione opposta per le richieste con Content-Type JSON: legge il body e rende il valore disponibile come <code>req.body</code>. Non serve per poter inviare JSON con una GET; serve per leggere JSON in ingresso.</p><p>JSON usa doppi apici per chiavi e stringhe, non accetta commenti, funzioni o <code>undefined</code>. Una data JavaScript viene normalmente serializzata come stringa; un array può contenere oggetti, numeri e altri valori JSON. Il middleware non decide se un prezzo è positivo o se un nome è troppo lungo: sono regole applicative da verificare dopo.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// conversioni.cjs — node conversioni.cjs
+const persona = { nome: &#x27;Anna&#x27;, attiva: true, ruoli: [&#x27;editor&#x27;] };
+const testo = JSON.stringify(persona);
+const ricostruita = JSON.parse(testo);
+console.log(typeof testo);       // string
+console.log(ricostruita.nome);   // Anna
+console.log(persona === ricostruita); // false
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>JSON.stringify</code> crea testo; <code>JSON.parse</code> crea una nuova struttura dati. Il confronto finale è falso perché i due oggetti hanno identità diverse. Non passare a <code>res.json</code> una stringa già serializzata se vuoi trasmettere un oggetto: finiresti per inviare una stringa JSON.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per un body JSON usa <code>express.json({ limit: "32kb" })</code> prima delle route interessate; per form HTML tradizionali può servire <code>express.urlencoded</code>. Sono parser diversi. Distingui sintassi JSON malformata (400), body troppo grande (413) e errore interno (500).</aside><p class="exercise"><strong>Prova tu.</strong> Prova JSON con una virgola finale e osserva il fallimento di JSON.parse. Poi invia un JSON valido ma con <code>nome: 123</code>: il parser riesce, la validazione del nome deve fallire.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

@@ -1,0 +1,1012 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Manuale offline Node.js ed Express: 28 lezioni ampliate, definizioni, esempi guidati e API CRUD con PATCH"><title>Node.js ed Express — Manuale unico del corso</title><style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1d2935;--muted:#607181;--accent:#176a64;--line:#e3e9eb;--code:#15212c}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.72 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}.layout{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:100vh}.sidebar{position:sticky;top:0;height:100vh;overflow:auto;background:#fff;border-right:1px solid var(--line);padding:23px 18px}.brand{font-size:18px;font-weight:800;letter-spacing:-.04em}.small{color:var(--muted);font-size:12px;margin:5px 0 17px}#search{width:100%;border:1px solid #cdd8dc;border-radius:9px;padding:10px 12px;font:inherit;font-size:14px;background:#fff}.navlink{display:block;text-decoration:none;color:#344755;padding:7px 9px;font-size:13px;line-height:1.4;border-radius:7px}.navlink:hover,.navlink:focus{background:#e9f2f0;color:#105c56}.nav-section{margin:17px 8px 5px;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#788993}.nav-extra{border-top:1px solid var(--line);padding-top:14px;margin-top:15px}.content{width:min(100%,980px);margin:auto;padding:34px 52px 90px}.hero{background:#123e45;color:#fff;padding:48px;border-radius:18px;margin-bottom:28px}.hero h1{font-size:clamp(30px,4vw,48px);letter-spacing:-.055em;line-height:1.15;margin:10px 0}.hero p{color:#d4e5e6;max-width:670px}.meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}.meta span{border:1px solid #699096;border-radius:30px;padding:5px 11px;font-size:12px}.lesson{background:var(--panel);border:1px solid var(--line);padding:30px 37px;border-radius:13px;margin:20px 0;scroll-margin-top:20px}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.lesson h2{font-size:27px;letter-spacing:-.035em;line-height:1.3;margin:8px 0 15px}.lesson h1{font-size:31px;letter-spacing:-.04em;line-height:1.25}.lesson h3{font-size:19px;margin-top:30px}.lesson p{margin:12px 0}.lesson ul,.lesson ol{padding-left:25px}.lesson li{margin:7px 0}.lesson strong{color:#123f45}pre{background:var(--code);color:#e8f1f6;padding:19px 18px;border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.6;margin:17px 0;white-space:pre}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.91em}p code,li code,td code{background:#eaf1f1;border-radius:4px;padding:2px 5px;color:#144e4d}.code-wrap{position:relative}.copy{position:absolute;top:9px;right:9px;border:1px solid #455864;background:#273c4b;color:#f7fbfe;padding:4px 9px;border-radius:5px;cursor:pointer;font-size:11px}.copy:hover{background:#355768}table{border-collapse:collapse;width:100%;font-size:14px;margin:19px 0}th,td{border-bottom:1px solid var(--line);text-align:left;vertical-align:top;padding:10px}th{background:#f1f5f5;color:#174c4a}.top{display:inline-block;margin-top:12px;color:var(--accent);font-size:13px;text-decoration:none}.intro{background:#fff;padding:23px 27px;border-left:4px solid var(--accent);border-radius:6px;margin-bottom:26px}.intro strong{color:#125c58}.sidebar a.extra-link{color:var(--accent);font-weight:700}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px}.menu-toggle{display:none}.hidden{display:none!important}@media(max-width:850px){.layout{display:block}.menu-toggle{display:block;position:fixed;bottom:16px;right:16px;z-index:20;border:0;background:#125d58;color:white;border-radius:30px;padding:13px 18px;font-weight:700;box-shadow:0 5px 20px #0003}.sidebar{position:fixed;z-index:19;top:0;left:0;width:min(82vw,320px);transform:translateX(-101%);transition:transform .2s;box-shadow:6px 0 20px #0001}.sidebar.open{transform:translateX(0)}.content{padding:20px 15px 65px}.hero{padding:32px 24px}.lesson{padding:23px 19px}.lesson h2{font-size:24px}pre{font-size:12px}body.nav-open:after{content:'';position:fixed;inset:0;background:#0006;z-index:18}}@media print{.sidebar,.menu-toggle,.copy,.top{display:none!important}.layout{display:block}.content{padding:0;width:100%}.hero{background:#fff;color:#000;border:1px solid #aaa}.hero p{color:#444}.lesson{break-inside:avoid;border:0;border-bottom:1px solid #bbb;padding:20px 0}pre{white-space:pre-wrap;color:#000;background:#f1f1f1}}
+
+.definitions{background:#f0f6f5;border:1px solid #d9e7e3;border-radius:10px;padding:15px 20px;margin:20px 0}.definitions h3{margin:0 0 12px;font-size:16px}.definitions dl{margin:0}.definitions dt{font-weight:750;color:#164b48;margin-top:12px}.definitions dd{margin:3px 0 10px;font-size:15px}.deepening{border-top:1px solid var(--line);margin-top:27px}.modern{border-left:4px solid #bb8a35;background:#fff8e9;padding:14px 18px;margin:18px 0;border-radius:5px}.expected{background:#f3f7fa;padding:13px 17px;border-radius:7px}.exercise{border:1px dashed #a8c2bd;padding:13px 17px;border-radius:7px}.lesson a{color:var(--accent)}.lesson a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.table-scroll{overflow:auto}th{white-space:normal}.flow{display:flex;gap:8px;flex-wrap:wrap;padding:14px;background:#edf4f3;border-radius:8px}.flow span{padding:7px 10px;background:white;border:1px solid var(--line);border-radius:6px}@media print{.lesson{break-inside:auto}h2,h3,dt{break-after:avoid}pre,.definitions,.modern,.expected,.exercise{break-inside:avoid}.deepening{border-top:1px solid #bbb}}
+</style><link rel="stylesheet" href="../../reader.css"></head><body id="inizio"><button class="menu-toggle" id="toggle" aria-label="Apri indice">Indice</button><div class="layout"><aside class="sidebar" id="sidebar"><div class="brand">NODE.JS / EXPRESS</div><div class="small">Manuale unico · 28 lezioni</div><input id="search" type="search" placeholder="Cerca argomento o lezione..." aria-label="Cerca un argomento nelle lezioni"><div class="nav-section">Indice delle lezioni</div><a class="navlink" href="#lezione-1" data-title="01 — cos’è node.js"><span>01 — Cos’è Node.js</span></a><a class="navlink" href="#lezione-2" data-title="02 — installazione e ambiente"><span>02 — Installazione e ambiente</span></a><a class="navlink" href="#lezione-3" data-title="03 — prime righe di codice"><span>03 — Prime righe di codice</span></a><a class="navlink" href="#lezione-4" data-title="04 — oggetti globali e process"><span>04 — Oggetti globali e process</span></a><a class="navlink" href="#lezione-5" data-title="05 — creare moduli"><span>05 — Creare moduli</span></a><a class="navlink" href="#lezione-6" data-title="06 — moduli built-in: os e path"><span>06 — Moduli built-in: OS e PATH</span></a><a class="navlink" href="#lezione-7" data-title="07 — file system: sync e async"><span>07 — File system: sync e async</span></a><a class="navlink" href="#lezione-8" data-title="08 — creare un server http"><span>08 — Creare un server HTTP</span></a><a class="navlink" href="#lezione-9" data-title="09 — npm: pacchetti e comandi"><span>09 — npm: pacchetti e comandi</span></a><a class="navlink" href="#lezione-10" data-title="10 — package.json e versioni"><span>10 — package.json e versioni</span></a><a class="navlink" href="#lezione-11" data-title="11 — riavvio automatico: nodemon e watch"><span>11 — Riavvio automatico: nodemon e watch</span></a><a class="navlink" href="#lezione-12" data-title="12 — event loop e non-blocking"><span>12 — Event loop e non-blocking</span></a><a class="navlink" href="#lezione-13" data-title="13 — eventemitter e programmazione a eventi"><span>13 — EventEmitter e programmazione a eventi</span></a><a class="navlink" href="#lezione-14" data-title="14 — stream: dati a pezzi"><span>14 — Stream: dati a pezzi</span></a><a class="navlink" href="#lezione-15" data-title="15 — richieste http: struttura e metodi"><span>15 — Richieste HTTP: struttura e metodi</span></a><a class="navlink" href="#lezione-16" data-title="16 — introduzione a express"><span>16 — Introduzione a Express</span></a><a class="navlink" href="#lezione-17" data-title="17 — servire file statici"><span>17 — Servire file statici</span></a><a class="navlink" href="#lezione-18" data-title="18 — api json e server-side rendering"><span>18 — API JSON e server-side rendering</span></a><a class="navlink" href="#lezione-19" data-title="19 — json come formato di scambio"><span>19 — JSON come formato di scambio</span></a><a class="navlink" href="#lezione-20" data-title="20 — parametri della route"><span>20 — Parametri della route</span></a><a class="navlink" href="#lezione-21" data-title="21 — query string e filtri"><span>21 — Query string e filtri</span></a><a class="navlink" href="#lezione-22" data-title="22 — middleware: ordine e next"><span>22 — Middleware: ordine e next</span></a><a class="navlink" href="#lezione-23" data-title="23 — testare le api con postman"><span>23 — Testare le API con Postman</span></a><a class="navlink" href="#lezione-24" data-title="24 — api get: elenco e dettaglio"><span>24 — API GET: elenco e dettaglio</span></a><a class="navlink" href="#lezione-25" data-title="25 — api post: creare risorse"><span>25 — API POST: creare risorse</span></a><a class="navlink" href="#lezione-26" data-title="26 — api put: aggiornare"><span>26 — API PUT: aggiornare</span></a><a class="navlink" href="#lezione-27" data-title="27 — api delete: eliminare"><span>27 — API DELETE: eliminare</span></a><a class="navlink" href="#lezione-28" data-title="28 — express router e organizzazione"><span>28 — Express Router e organizzazione</span></a><div class="nav-extra"><a class="navlink extra-link" href="#mappa">Mappa: chi fa cosa</a><a class="navlink extra-link" href="#progetto">Progetto API completo</a><a class="navlink extra-link" href="#ripasso">Esercizi e ripasso</a><a class="navlink extra-link" href="#riferimenti">Fonti e pratiche attuali</a></div></aside><main class="content"><header class="hero"><div style="font-weight:800;letter-spacing:.14em;font-size:11px">GUIDA DI STUDIO · OFFLINE</div><h1>Node.js ed Express,<br>dal primo script alle API</h1><p>Un manuale ragionato delle 28 lezioni: definizioni al primo incontro, spiegazioni di chi fa cosa, esempi commentati e un laboratorio API completo.</p><div class="meta"><span>28 lezioni</span><span>Esempi guidati in ogni lezione</span><span>1 progetto finale</span><span>Nessuna connessione richiesta</span></div></header><div class="intro"><strong>Come usare questo manuale.</strong> Il percorso segue le 28 lezioni tecniche dei testi forniti. Ogni lezione contiene definizioni, esempi, spiegazioni dei ruoli, precisazioni sulle pratiche attuali e una prova guidata. È richiesta una conoscenza iniziale di JavaScript; i concetti di backend vengono introdotti nel testo. <strong>I blocchi completi indicano il file da creare; i frammenti vanno inseriti nell’app già preparata e non incollati tutti insieme.</strong> Avvia un solo server di esercizio per volta e fermalo con Ctrl+C. Il manuale si apre direttamente nel browser, anche offline.</div><section class="lesson extra" id="mappa"><div class="eyebrow">ORIENTAMENTO</div><h2>La mappa: chi fa cosa</h2>
+<p>Questa tabella anticipa i ruoli del percorso; le definizioni dettagliate e il codice si trovano nelle singole lezioni. Una API è un’interfaccia di programmazione; CRUD indica Create, Read, Update, Delete, cioè creare, leggere, aggiornare ed eliminare dati.</p>
+<table><thead><tr><th>Componente</th><th>Compito</th><th>Dove lo incontri</th></tr></thead><tbody>
+<tr><td>JavaScript</td><td>Linguaggio con cui scrivi istruzioni e regole</td><td>In tutto il manuale</td></tr>
+<tr><td>V8</td><td>Motore che esegue JavaScript</td><td><a href="#lezione-1">Lezione 1</a></td></tr>
+<tr><td>Node.js</td><td>Ambiente che esegue il codice e offre accesso a file, rete e processi</td><td><a href="#lezione-1">Lezione 1</a></td></tr>
+<tr><td>npm</td><td>Installa pacchetti e avvia script del progetto</td><td><a href="#lezione-9">Lezione 9</a></td></tr>
+<tr><td>HTTP</td><td>Regole per richieste e risposte tra client e server</td><td><a href="#lezione-8">Lezioni 8 e 15</a></td></tr>
+<tr><td>Express</td><td>Framework per organizzare middleware e route sopra Node</td><td><a href="#lezione-16">Lezione 16</a></td></tr>
+<tr><td>Client: browser, Postman, fetch</td><td>Invia richieste; il browser può anche costruire e mostrare una pagina</td><td><a href="#lezione-18">Lezioni 18 e 23</a></td></tr>
+<tr><td>Array e database</td><td>L’array conserva dati nel processo; un database può conservarli e coordinarne l’accesso nel tempo</td><td><a href="#lezione-24">Lezione 24 e laboratorio</a></td></tr>
+</tbody></table><h3>Come copiare gli esempi</h3><p>I commenti indicano nomi dei file e comandi. Se un blocco contiene più nomi di file, separane il contenuto nei file corrispondenti. I frammenti con <code>app</code> presuppongono un’app Express già creata: inseriscili prima della 404 e dell’error handler. Una route duplicata può essere intercettata dalla prima registrata: sostituisci l’esempio precedente anziché accumularne copie. Gli esempi CommonJS usano <code>.cjs</code>; quelli ES Modules usano <code>.mjs</code>.</p></section><section class="lesson" id="lezione-1" data-title="cos’è node.js fondamenti"><div class="eyebrow">LEZIONE 01 · Fondamenti</div><h2>Cos’è Node.js</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Runtime</dt><dd>Ambiente che esegue un programma e gli fornisce servizi: Node.js è il runtime, JavaScript è il linguaggio del codice.</dd><dt>V8</dt><dd>Motore JavaScript usato anche da Chrome: esegue JavaScript e può compilarlo in codice macchina. Il codice non viene prima tradotto in C++.</dd><dt>Frontend e backend</dt><dd>Il frontend è la parte con cui interagisce l’utente, spesso nel browser; il backend gestisce richieste, regole e dati sul server.</dd><dt>API, I/O e thread</dt><dd>API significa interfaccia di programmazione: funzioni e regole con cui usare un componente. I/O significa input/output, come leggere un file o scambiare dati in rete. Un thread è un flusso di esecuzione di istruzioni.</dd><dt>DOM e framework</dt><dd>Il DOM è la rappresentazione della pagina HTML manipolabile dal browser. Un framework è una struttura software che organizza lo sviluppo: Express sarà il framework web di questa guida.</dd></dl></div>
+<p>Node.js è un <strong>ambiente di esecuzione JavaScript fuori dal browser</strong>. Usa il motore V8 e mette a disposizione API lato server: file system, rete, processi e altro. Non è un linguaggio diverso da JavaScript, né un framework web.</p>
+<ul>
+<li><strong>Browser:</strong> dispone di DOM, <code>window</code>, interfaccia grafica e Web API.</li>
+<li><strong>Node.js:</strong> dispone di <code>process</code>, file system, server HTTP e API di sistema. Non esiste un DOM di default.</li>
+<li><strong>Event loop:</strong> permette di coordinare molte operazioni I/O senza bloccare il thread JavaScript mentre si aspetta un risultato. Questo <strong>non</strong> significa che qualsiasi calcolo sia automaticamente parallelo.</li>
+</ul>
+<pre><code class="language-js">console.log('Ciao da Node.js');
+console.log('Versione:', process.version);
+console.log('Sistema operativo:', process.platform);
+</code></pre>
+<p><strong>Esempio pratico.</strong> Un server può avviare la lettura di un file e nel frattempo continuare a gestire altre richieste. Se invece esegue un ciclo CPU molto pesante sul thread principale, le altre richieste possono rallentare.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Nella metafora della banca del testo, lo sportellista è il thread JavaScript: riceve le richieste e avvia le operazioni. Il lavoro che richiede attesa può essere affidato al sistema operativo o ad altri componenti di Node; quando è pronto, il codice riprende a elaborarne il risultato. Questo permette di servire più utenti senza tenere fermo lo sportello per ogni attesa.</p>
+ <p>Il <strong>server</strong> è il programma che offre un servizio; il computer che lo ospita viene spesso chiamato anch’esso server. Il <strong>client</strong> è il programma che lo contatta, ad esempio un browser. Node può eseguire anche strumenti da terminale, senza creare alcun server. V8 esegue JavaScript, Node fornisce le API, il sistema operativo gestisce risorse come file e rete.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// ambiente.cjs — avvio: node ambiente.cjs
+console.log(&#x27;JavaScript:&#x27;, [1, 2, 3].map(n =&gt; n * 2));
+console.log(&#x27;API Node:&#x27;, process.version);
+console.log(&#x27;DOM disponibile?&#x27;, typeof document);
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> La prima riga stampa un array con <code>2, 4, 6</code>; <code>map</code> trasforma ogni elemento. La seconda legge la versione del runtime. La terza stampa <code>undefined</code>: in un normale script Node non c’è una pagina da manipolare.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Node offre anche API condivise con il web, per esempio <code>fetch</code> per richieste HTTP in uscita. “Fuori dal browser” non significa che tutte le API del browser siano assenti: il DOM, però, non è fornito automaticamente.</aside><p class="exercise"><strong>Prova tu.</strong> Indica chi esegue JavaScript, chi mostra la pagina e chi legge un file dal disco. Risposta: il motore nel runtime, il browser e le API di Node con il sistema operativo.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-2" data-title="installazione e ambiente fondamenti"><div class="eyebrow">LEZIONE 02 · Fondamenti</div><h2>Installazione e ambiente</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>LTS</dt><dd>Long-Term Support: linea di versioni mantenuta nel tempo con correzioni e aggiornamenti di sicurezza.</dd><dt>Terminale, shell e CLI</dt><dd>Il terminale mostra l’interfaccia testuale; la shell, per esempio PowerShell, interpreta i comandi; una CLI è un programma utilizzabile tramite comandi.</dd><dt>PATH e directory di lavoro</dt><dd>PATH è l’elenco di cartelle in cui la shell cerca gli eseguibili. La directory di lavoro è la cartella da cui un comando viene eseguito.</dd><dt>Editor e REPL</dt><dd>Un editor modifica i file di codice. Una REPL legge un’espressione, la esegue, stampa il risultato e attende il comando successivo.</dd></dl></div>
+<p>Installa una <strong>versione LTS attualmente supportata</strong> dal sito ufficiale di Node.js. Il corso originale mostra versioni 14 e 16: sono riferimenti storici, non versioni da installare oggi. Usa un editor come Visual Studio Code; le estensioni sono facoltative.</p>
+<pre><code class="language-bash">node --version
+npm --version
+mkdir corso-node
+cd corso-node
+</code></pre>
+<p>Crea <code>index.js</code> e lancialo:</p>
+<pre><code class="language-bash">node index.js
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> per aprire la console interattiva basta eseguire <code>node</code>, scrivere <code>2 + 2</code> e uscire con <code>.exit</code>. <strong>Controllo:</strong> se <code>node</code> non viene riconosciuto, riapri il terminale e verifica l'installazione e il PATH.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>L’installer rende disponibile <code>node</code>; npm è il gestore di pacchetti normalmente distribuito insieme a Node. Visual Studio Code serve a scrivere e salvare i file, mentre il terminale avvia il runtime. Scrivere codice nell’editor non lo esegue: occorre salvarlo e passare il file a <code>node</code>.</p><p>Le estensioni mostrate nella trascrizione propongono frammenti di codice, detti <strong>snippet</strong>. Sono facoltative e non installano né Node né Express. Tieni aperta nel terminale la cartella che contiene il tuo script: un file esistente in un’altra cartella può risultare “non trovato”.</p><h3>Un altro esempio guidato</h3><pre><code class="language-powershell"># PowerShell: un comando per riga
+node --version
+npm --version
+Get-Location
+node -e &quot;console.log(&#x27;Installazione riuscita&#x27;)&quot;
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>--version</code> chiede la versione; <code>Get-Location</code> mostra la cartella attuale; <code>-e</code> esegue il breve programma passato come testo e stampa <code>Installazione riuscita</code>. Per avviare un file con spazi nel nome usa <code>node "primo esempio.cjs"</code>.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Scegli una linea LTS ancora supportata dalla <a href="https://nodejs.org/en/about/previous-releases">tabella ufficiale delle release</a>. Le versioni 14 e 16 della registrazione sono fuori supporto. Non occorre installare pacchetti globali per iniziare.</aside><p class="exercise"><strong>Prova tu.</strong> Apri una nuova shell dopo l’installazione e ripeti i controlli. Se <code>node</code> funziona ma npm è bloccato da PowerShell, prova <code>npm.cmd --version</code> prima di modificare impostazioni del sistema.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-3" data-title="prime righe di codice fondamenti"><div class="eyebrow">LEZIONE 03 · Fondamenti</div><h2>Prime righe di codice</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Script e processo</dt><dd>Uno script è un file di istruzioni; un processo è l’istanza del programma avviata dal sistema operativo.</dd><dt>Funzione e argomento</dt><dd>Una funzione raggruppa istruzioni richiamabili. Un argomento è un valore passato quando la si invoca; il parametro è il nome che lo riceve.</dd><dt>const, let e confronto stretto</dt><dd><code>const</code> impedisce di riassegnare una variabile; <code>let</code> permette di riassegnarla. <code>===</code> confronta senza conversione automatica di tipo.</dd></dl></div>
+<p>Un programma Node.js è un normale file <code>.js</code> eseguito dal terminale. La sintassi JavaScript resta valida, salvo le API specifiche del browser.</p>
+<pre><code class="language-js">// index.js
+const numero = 3;
+if (numero &lt; 3) console.log('Minore di 3');
+else if (numero === 3) console.log('Uguale a 3');
+else console.log('Maggiore di 3');
+for (let i = 0; i &lt; 3; i++) console.log('Giro', i);
+</code></pre>
+<pre><code class="language-bash">node index.js
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>console.log(typeof document)</code> stampa <code>undefined</code> in un normale processo Node.js. Prima di avviare il programma ricordati di <strong>salvare</strong> il file.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il comando <code>node index.js</code> carica il file salvato sul disco e ne esegue il codice dall’alto verso il basso. Il nome <code>index</code> è una convenzione, non una parola speciale. Un programma senza server, timer attivi o altre attività in attesa normalmente termina quando finisce il lavoro.</p><p><code>console.log</code> scrive nel terminale del processo. Non aggiorna una pagina web. Un <strong>errore di sintassi</strong> impedisce di interpretare il codice; un errore durante l’esecuzione può avvenire dopo che alcune istruzioni sono già state eseguite. Leggi il file e il numero di riga indicati nel messaggio.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// argomenti.cjs — avvio: node argomenti.cjs Anna
+const nome = process.argv[2] ?? &#x27;visitatore&#x27;;
+function saluta(persona) {
+  return `Ciao, ${persona}!`;
+}
+console.log(saluta(nome));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>process.argv</code> è l’array degli argomenti del processo: le prime due posizioni riguardano eseguibile e script. La posizione <code>2</code> contiene <code>Anna</code>. L’operatore <code>??</code> usa il valore a destra se quello a sinistra è <code>null</code> o <code>undefined</code>. La funzione restituisce il saluto, poi <code>console.log</code> lo stampa.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Usa l’estensione completa nei comandi: rende chiaro quale file avvii. Nei prossimi esempi <code>.cjs</code> rende esplicito CommonJS, mentre <code>.mjs</code> rende espliciti gli ES Modules. La lezione 5 spiega i due sistemi.</aside><p class="exercise"><strong>Prova tu.</strong> Avvia lo script senza nome: deve stampare <code>Ciao, visitatore!</code>. Poi modifica il valore predefinito, salva e rilancialo.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-4" data-title="oggetti globali e process fondamenti"><div class="eyebrow">LEZIONE 04 · Fondamenti</div><h2>Oggetti globali e process</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Globale e ambito del modulo</dt><dd>Un globale è disponibile senza importazione. L’ambito del modulo contiene nomi validi solo in quel file: le variabili dichiarate con <code>const</code> non diventano automaticamente proprietà globali.</dd><dt>process e variabile d’ambiente</dt><dd><code>process</code> descrive il processo Node. Una variabile d’ambiente è un valore di configurazione esterno al codice, letto con <code>process.env</code>.</dd><dt>Callback e timer</dt><dd>Una callback è una funzione passata a un’altra funzione perché la richiami. Un timer pianifica una callback dopo un intervallo minimo, senza garantirne l’istante esatto.</dd></dl></div>
+<p>In Node.js trovi globali come <code>console</code>, <code>setTimeout</code>, <code>process</code> e <code>globalThis</code>. Il corso usa anche <code>__dirname</code>, <code>__filename</code>, <code>require</code> e <code>module</code>: <strong>sono disponibili nei moduli CommonJS</strong>, non allo stesso modo nei moduli ESM.</p>
+<pre><code class="language-js">// index.cjs (CommonJS)
+console.log(__dirname);
+console.log(__filename);
+console.log(process.cwd());
+console.log(process.env.NODE_ENV ?? 'non definito');
+setTimeout(() =&gt; console.log('Dopo 200 ms'), 200);
+</code></pre>
+<pre><code class="language-js">// index.mjs (ES modules): alternativa moderna
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+const filename = fileURLToPath(import.meta.url);
+const directory = dirname(filename);
+console.log(directory);
+</code></pre>
+<p><code>NODE_ENV</code> è una <strong>convenzione</strong>: non garantisce da sola che il codice sia sicuro o configurato correttamente. Evita di stampare in log l'intero <code>process.env</code>, perché può contenere segreti.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>__dirname</code> indica la cartella del modulo CommonJS che lo contiene; <code>__filename</code> ne indica il percorso completo. <code>process.cwd()</code> indica invece la cartella da cui hai avviato il processo. Se importi un file da una sottocartella, il suo <code>__dirname</code> cambia, ma <code>cwd()</code> resta quello del processo, salvo modifiche esplicite.</p><p><code>require</code> carica un modulo e <code>module</code> ne rappresenta il contesto CommonJS: non sono normali globali universali. <code>globalThis</code> è il nome standard dell’oggetto globale, ma condividere dati tramite globali rende più difficile capire chi li modifica.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// configurazione.cjs — node configurazione.cjs
+const porta = Number(process.env.PORT ?? 3000);
+if (!Number.isInteger(porta) || porta &lt; 1 || porta &gt; 65535) {
+  console.error(&#x27;PORT deve essere un intero tra 1 e 65535&#x27;);
+  process.exitCode = 1;
+} else {
+  console.log(&#x27;Porta configurata:&#x27;, porta);
+}
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Senza configurazione stampa <code>3000</code>. I valori di <code>process.env</code> sono normalmente stringhe: <code>Number</code> converte il testo, il controllo scarta valori non validi. <code>exitCode = 1</code> comunica un esito di errore quando il processo termina.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Negli ES Modules delle linee Node moderne sono disponibili <code>import.meta.dirname</code> e <code>import.meta.filename</code> per moduli locali. La conversione con <code>fileURLToPath(import.meta.url)</code> mostrata sopra resta utile per compatibilità. Riferimento: <a href="https://nodejs.org/api/esm.html#importmetadirname">documentazione ESM</a>.</aside><p class="exercise"><strong>Prova tu.</strong> In PowerShell esegui <code>$env:PORT = "4000"</code> e poi lo script: deve leggere 4000. Con <code>Remove-Item Env:PORT</code> rimuovi la variabile dalla shell corrente.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-5" data-title="creare moduli moduli e i/o"><div class="eyebrow">LEZIONE 05 · Moduli e I/O</div><h2>Creare moduli</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Modulo, importazione ed esportazione</dt><dd>Un modulo è un’unità di codice con un proprio ambito. Esportare significa rendere un valore utilizzabile da altri file; importare significa ottenere quel valore.</dd><dt>CommonJS ed ESM</dt><dd>CommonJS usa <code>require</code> e <code>module.exports</code>. ESM significa ECMAScript Modules: è il sistema standard JavaScript basato su <code>import</code> ed <code>export</code>.</dd><dt>Destructuring e cache</dt><dd>Il destructuring estrae proprietà da un oggetto. Una cache conserva un risultato per riutilizzarlo: i moduli caricati vengono normalmente riutilizzati nelle importazioni successive dello stesso processo.</dd></dl></div>
+<p>Dividere un programma in moduli rende il codice più leggibile, testabile e riutilizzabile. Nel corso si usa soprattutto <strong>CommonJS</strong> (<code>require</code>, <code>module.exports</code>).</p>
+<p><strong>Esempio CommonJS:</strong></p>
+<pre><code class="language-js">// saluti.cjs
+function saluta(nome) { return `Ciao, ${nome}!`; }
+module.exports = { saluta };
+</code></pre>
+<pre><code class="language-js">// main.cjs
+const { saluta } = require('./saluti.cjs');
+console.log(saluta('Anna'));
+</code></pre>
+<p><strong>Alternativa ES Modules:</strong></p>
+<pre><code class="language-js">// saluti.mjs
+export const saluta = nome =&gt; `Ciao, ${nome}!`;
+// main.mjs
+import { saluta } from './saluti.mjs';
+console.log(saluta('Marco'));
+</code></pre>
+<p><strong>Nota:</strong> l'importazione può eseguire il codice al livello superiore del modulo; evita effetti collaterali inattesi all'import.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Nel testo, separare nomi e funzioni dal file principale serve a dare a ogni file una responsabilità. Il modulo dei nomi contiene i dati; il modulo delle utilità contiene funzioni; il file principale li collega. Una variabile rimane privata finché non viene esportata.</p><p>In CommonJS <code>module.exports = saluta</code> esporta direttamente la funzione; <code>module.exports = { saluta }</code> esporta un oggetto che la contiene. Nel secondo caso <code>const { saluta } = require(...)</code> estrae quella proprietà. Scrivere solo <code>exports = qualcosa</code> non sostituisce <code>module.exports</code>. Inoltre importare un array non ne crea automaticamente una copia: lo stesso oggetto esportato può essere condiviso fra moduli.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// prezzi.mjs
+export function conIva(prezzo, aliquota = 0.22) {
+  return prezzo * (1 + aliquota);
+}
+
+// main.mjs — salva questa parte in un secondo file
+import { conIva } from &#x27;./prezzi.mjs&#x27;;
+console.log(conIva(100).toFixed(2));
+// Avvio: node main.mjs
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>prezzi.mjs</code> definisce il calcolo, <code>main.mjs</code> lo usa e stampa <code>122.00</code>. <code>./</code> significa “rispetto al file che importa”; <code>../</code> sale alla cartella superiore. <code>toFixed(2)</code> produce una stringa con due decimali.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per nuovi esempi puoi scegliere ESM; CommonJS resta supportato e non è automaticamente deprecato. Specifica <code>"type": "module"</code> per usare ESM nei file <code>.js</code>, oppure usa <code>.mjs</code>. Per le importazioni ESM relative indica l’estensione. Evita di cambiare sistema a metà esempio senza adattare il resto.</aside><p class="exercise"><strong>Prova tu.</strong> Esporta anche <code>senzaIva</code>, importala nel file principale e verifica che da 122 torni circa a 100. I numeri decimali JavaScript possono avere approssimazioni.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-6" data-title="moduli built-in: os e path moduli e i/o"><div class="eyebrow">LEZIONE 06 · Moduli e I/O</div><h2>Moduli built-in: OS e PATH</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Built-in, OS e architettura</dt><dd>Built-in significa integrato nel runtime. OS è il sistema operativo. L’architettura indica la famiglia di istruzioni dell’ambiente, per esempio x64 o arm64.</dd><dt>Percorso assoluto e relativo</dt><dd>Un percorso assoluto parte dalla radice o dall’unità; uno relativo dipende da una cartella di riferimento.</dd><dt>Byte e separatore</dt><dd>Un byte è un’unità di informazione di otto bit. Il separatore divide i segmenti di un percorso: Windows e sistemi Unix possono usarne di diversi.</dd></dl></div>
+<p>I moduli integrati sono già disponibili e <strong>non si installano con npm</strong>. <code>node:os</code> fornisce dati sul sistema; <code>node:path</code> gestisce percorsi in modo multipiattaforma.</p>
+<pre><code class="language-js">// os-path.cjs
+const os = require('node:os');
+const path = require('node:path');
+console.log(os.platform(), os.arch());
+console.log('RAM totale (GiB):', (os.totalmem() / 1024**3).toFixed(1));
+const file = path.join(__dirname, 'dati', 'utenti.json');
+console.log(file);
+console.log(path.basename(file)); // utenti.json
+console.log(path.extname(file));  // .json
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>path.resolve('dati', 'utenti.json')</code> crea un percorso assoluto a partire dalla directory di lavoro corrente; <code>path.join</code> combina segmenti e normalizza il percorso. Non concatenare a mano separatori per costruire percorsi.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>os.type()</code> descrive il sistema, <code>os.release()</code> la sua release, <code>os.freemem()</code> la memoria libera e <code>os.totalmem()</code> quella totale, in byte. Dividere per <code>1024 ** 3</code> dà gibibyte, abbreviati GiB, anche quando un esempio usa genericamente l’etichetta GB.</p><p><code>path.join</code> unisce segmenti e normalizza separatori e <code>..</code>; <code>path.resolve</code> costruisce un percorso assoluto; <code>basename</code> estrae il nome finale e <code>extname</code> l’estensione. Nessuna di queste funzioni crea cartelle o verifica che il file esista: manipolano percorsi come testo.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// percorsi.cjs — node percorsi.cjs
+const path = require(&#x27;node:path&#x27;);
+const os = require(&#x27;node:os&#x27;);
+const destinazione = path.join(os.tmpdir(), &#x27;corso-node&#x27;, &#x27;log.txt&#x27;);
+console.log(path.parse(destinazione));
+console.log(&#x27;Estensione:&#x27;, path.extname(destinazione));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>os.tmpdir()</code> restituisce la cartella temporanea del sistema. <code>path.parse</code> restituisce un oggetto con radice, cartella, nome completo, estensione e nome senza estensione. L’ultima riga stampa <code>.txt</code>; nessun file viene scritto.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Il prefisso <code>node:</code> rende esplicito che stai usando un modulo integrato. Normalizzare un percorso non autorizza l’accesso: un percorso costruito da input utente deve anche essere controllato rispetto alle cartelle consentite.</aside><p class="exercise"><strong>Prova tu.</strong> Confronta <code>path.resolve("dati")</code> con <code>path.join(__dirname, "dati")</code> avviando lo script da un’altra cartella.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-7" data-title="file system: sync e async moduli e i/o"><div class="eyebrow">LEZIONE 07 · Moduli e I/O</div><h2>File system: sync e async</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>File system, encoding e Buffer</dt><dd>Il file system organizza file e cartelle. L’encoding stabilisce come convertire byte in testo: UTF-8 è una scelta comune. Un Buffer contiene byte, non una stringa JavaScript.</dd><dt>Sincrono e asincrono</dt><dd>Una chiamata sincrona restituisce il risultato prima di proseguire e può bloccare il thread. Una chiamata asincrona avvia il lavoro e ne rende disponibile il risultato successivamente.</dd><dt>Promise, async e await</dt><dd>Una Promise rappresenta un esito futuro, riuscito o fallito. Una funzione <code>async</code> restituisce una Promise; <code>await</code> sospende quella funzione finché la Promise si risolve o fallisce.</dd><dt>try/catch</dt><dd><code>try</code> delimita operazioni che possono fallire; <code>catch</code> riceve l’errore e permette di gestirlo.</dd></dl></div>
+<p><code>fs</code> consente di leggere e scrivere file. Le operazioni <code>*Sync</code> <strong>bloccano</strong> il thread JavaScript fino al termine; per server e attività I/O frequenti preferisci le API asincrone.</p>
+<pre><code class="language-js">// file.cjs
+const fs = require('node:fs');
+fs.writeFileSync('nota.txt', 'Prima riga\n');
+fs.appendFileSync('nota.txt', 'Seconda riga\n');
+console.log(fs.readFileSync('nota.txt', 'utf8'));
+</code></pre>
+<p><strong>Stessa operazione con Promise:</strong></p>
+<pre><code class="language-js">// file-async.mjs
+import { readFile, writeFile, appendFile } from 'node:fs/promises';
+try {
+  await writeFile('nota.txt', 'Prima riga\n');
+  await appendFile('nota.txt', 'Seconda riga\n');
+  const testo = await readFile('nota.txt', 'utf8');
+  console.log(testo);
+} catch (errore) {
+  console.error('Errore file:', errore.message);
+}
+</code></pre>
+<p><strong>Precisazione:</strong> <code>writeFile</code> sovrascrive per impostazione predefinita; <code>appendFile</code> aggiunge in fondo. Non mischiare letture e scritture concorrenti dello stesso file senza coordinarle.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>La versione a callback del corso segue la convenzione <strong>error-first</strong>: il primo parametro contiene l’eventuale errore, il secondo il risultato. Senza <code>utf8</code>, una lettura restituisce normalmente un Buffer. Se devi leggere due file e poi scrivere il contenuto combinato, devi aspettare entrambe le letture: posizionare la scrittura sotto le chiamate asincrone non basta.</p><p>Le Promise evitano di annidare molte callback. Due <code>await</code> consecutivi mantengono l’ordine delle operazioni; <code>Promise.all</code> può attendere più letture indipendenti. Non rende sicure scritture concorrenti sullo stesso file. Le API sincrone possono andare bene per piccoli script o preparazione iniziale; dentro una route rallentano anche gli altri utenti.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// lettura.cjs — crea prima nota.txt nella cartella di avvio
+const fs = require(&#x27;node:fs&#x27;);
+console.log(&#x27;1. Avvio lettura&#x27;);
+fs.readFile(&#x27;nota.txt&#x27;, &#x27;utf8&#x27;, (errore, testo) =&gt; {
+  if (errore) {
+    console.error(&#x27;Lettura fallita:&#x27;, errore.code);
+    return;
+  }
+  console.log(&#x27;3. Contenuto:&#x27;, testo);
+});
+console.log(&#x27;2. Il programma può proseguire&#x27;);
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Le righe 1 e 2 vengono stampate prima della callback. Se il file manca, leggi tipicamente <code>ENOENT</code>, codice che segnala un percorso inesistente. <code>return</code> impedisce di usare <code>testo</code> dopo l’errore. Il percorso relativo viene risolto dalla directory di lavoro.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per nuovo codice asincrono l’interfaccia <code>node:fs/promises</code> con <code>await</code> è spesso più leggibile. Le callback restano valide. Usa stream, spiegati alla lezione 14, se non vuoi tenere in memoria un file intero.</aside><p class="exercise"><strong>Prova tu.</strong> Rinomina il file di input e osserva il ramo di errore; poi ripristinalo. Verifica che la scrittura con <code>writeFile</code> sostituisca davvero il contenuto precedente prima di usarla su dati importanti.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-8" data-title="creare un server http http e runtime"><div class="eyebrow">LEZIONE 08 · HTTP e runtime</div><h2>Creare un server HTTP</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>HTTP e server HTTP</dt><dd>HTTP è il protocollo con cui un client invia richieste e riceve risposte. Un server HTTP resta in ascolto e applica una funzione a ogni richiesta ricevuta.</dd><dt>Porta e localhost</dt><dd>Una porta identifica un punto di accesso di rete di un processo. <code>localhost</code> indica il computer locale; 3000 è una porta di sviluppo convenzionale.</dd><dt>req, res e route</dt><dd><code>req</code> è l’oggetto della richiesta; <code>res</code> costruisce la risposta. Una route è una regola che collega metodo e percorso a una funzione di gestione.</dd><dt>Header e status</dt><dd>Gli header sono metadati della richiesta o risposta. Lo status è il codice numerico che ne descrive l’esito; 200 indica successo, 404 risorsa non trovata.</dd></dl></div>
+<p>Node include <code>node:http</code>, utile per capire il funzionamento di un server senza librerie esterne.</p>
+<pre><code class="language-js">// server.cjs
+const http = require('node:http');
+const server = http.createServer((req, res) =&gt; {
+  if (req.url === '/' &amp;&amp; req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end('Benvenuto!');
+  }
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Non trovato');
+});
+server.listen(3000, () =&gt; console.log('http://localhost:3000'));
+</code></pre>
+<p>Avvia con <code>node server.cjs</code>, visita <code>http://localhost:3000</code> e prova <code>/manca</code> per il 404.</p>
+<p><strong>Concetto chiave:</strong> <code>req</code> contiene i dati della richiesta, <code>res</code> costruisce la risposta. Per il routing complesso, Express riduce il codice ripetitivo.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>http.createServer</code> crea il server e registra la callback, ma non apre da solo la porta. <code>listen</code> lo mette in ascolto. Il callback di <code>listen</code> viene eseguito all’avvio; quello di <code>createServer</code> viene richiamato per ogni richiesta.</p><p><code>res.writeHead</code> imposta status e header; <code>res.write</code> può inviare una parte del contenuto; <code>res.end</code> conclude la risposta, eventualmente con l’ultimo contenuto. Dopo aver risposto, un <code>return</code> evita di cadere nel ramo 404. Un server resta attivo perché ha risorse di rete in ascolto: fermalo con <strong>Ctrl+C</strong>.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// ora.cjs — node ora.cjs
+const http = require(&#x27;node:http&#x27;);
+const server = http.createServer((req, res) =&gt; {
+  const url = new URL(req.url, &#x27;http://localhost&#x27;);
+  if (req.method === &#x27;GET&#x27; &amp;&amp; url.pathname === &#x27;/ora&#x27;) {
+    res.writeHead(200, { &#x27;Content-Type&#x27;: &#x27;application/json; charset=utf-8&#x27; });
+    return res.end(JSON.stringify({ ora: new Date().toISOString() }));
+  }
+  res.writeHead(404, { &#x27;Content-Type&#x27;: &#x27;text/plain; charset=utf-8&#x27; });
+  res.end(&#x27;Percorso non trovato&#x27;);
+});
+server.listen(3000, &#x27;127.0.0.1&#x27;, () =&gt; console.log(&#x27;Apri http://127.0.0.1:3000/ora&#x27;));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>new URL</code> separa il percorso dalla query: anche <code>/ora?formato=iso</code> ha pathname <code>/ora</code>. La data è convertita in testo ISO; <code>JSON.stringify</code> produce il body JSON. Un’altra route riceve 404. Il server dell’esempio ascolta solo sull’interfaccia locale.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Nel modulo HTTP nativo <code>req.url</code> comprende la query string; un confronto diretto con <code>"/"</code> non riconosce <code>/?x=1</code>. <code>EADDRINUSE</code> indica spesso una porta già occupata: chiudi il processo precedente o scegli un’altra porta.</aside><p class="exercise"><strong>Prova tu.</strong> Apri <code>/ora</code> due volte e confronta i timestamp; prova poi un percorso inesistente e controlla lo status negli strumenti di rete del browser.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-9" data-title="npm: pacchetti e comandi progetto e tooling"><div class="eyebrow">LEZIONE 09 · Progetto e tooling</div><h2>npm: pacchetti e comandi</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Pacchetto, dipendenza e registry</dt><dd>Un pacchetto è codice distribuito con metadati; una dipendenza è un pacchetto richiesto dal progetto. Il registry è il servizio da cui npm scarica i pacchetti.</dd><dt>Installazione locale e globale</dt><dd>Locale significa nella struttura del progetto; globale significa nella posizione configurata per gli strumenti della macchina, selezionata con <code>-g</code>.</dd><dt>node_modules e dipendenze transitive</dt><dd><code>node_modules</code> contiene i pacchetti installati. Le dipendenze transitive sono quelle richieste dalle tue dipendenze.</dd><dt>CI</dt><dd>Continuous Integration: controlli automatici eseguiti sul progetto, per esempio installazione e test a ogni modifica.</dd></dl></div>
+<p><strong>npm</strong> è il gestore dei pacchetti usato normalmente con Node.js. Permette di installare librerie esterne e di eseguire script definiti nel progetto.</p>
+<pre><code class="language-bash">npm init -y
+npm install express@5
+npm install --save-dev nodemon
+npm uninstall nodemon
+npm ls --depth=0
+npm run dev
+</code></pre>
+<p><code>npm run dev</code> funziona solo se esiste uno script <code>dev</code> nel <code>package.json</code>. <strong>Esempio aggiuntivo:</strong> per riprodurre installazioni coerenti in progetti dotati di lockfile usa <code>npm ci</code> anziché <code>npm install</code> in CI. Non copiare casualmente dipendenze da tutorial datati.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il corso mostra librerie come Lodash e Bootstrap per rendere concreto il concetto di pacchetto: il primo offre funzioni di utilità, il secondo componenti e stili per il frontend. Installare un pacchetto non significa che sia tutto eseguibile nel browser o tutto utile a Node: dipende dal pacchetto.</p><p><code>npm init -y</code> crea il manifesto con valori iniziali. <code>npm install express</code> installa la dipendenza locale e aggiorna manifesto e lockfile. <code>npm uninstall</code> rimuove il pacchetto dalle dipendenze dichiarate e aggiorna l’installazione: evita di cancellare a mano cartelle casuali in <code>node_modules</code>.</p><h3>Un altro esempio guidato</h3><pre><code class="language-bash"># Dentro una cartella di esercizio
+npm init -y
+npm install express@5
+npm ls --depth=0
+npm explain express
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>npm ls --depth=0</code> mostra le dipendenze dirette, senza espandere tutto l’albero. <code>npm explain express</code> spiega perché il pacchetto è installato. <code>@5</code> richiede la major 5; il lockfile registra la versione precisa risolta.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per riprodurre un progetto già provvisto di lockfile usa <code>npm ci</code>: richiede coerenza con il manifesto, ricrea <code>node_modules</code> e non aggiorna il lockfile. Vedi <a href="https://docs.npmjs.com/cli/v11/commands/npm-ci/">npm ci</a>. <code>npx</code> può eseguire strumenti anche scaricandoli se assenti: controlla quale comando stai richiamando.</aside><p class="exercise"><strong>Prova tu.</strong> Spiega la differenza tra il comando npm che installa Express e il codice <code>require("express")</code> che lo carica durante l’esecuzione.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-10" data-title="package.json e versioni progetto e tooling"><div class="eyebrow">LEZIONE 10 · Progetto e tooling</div><h2>package.json e versioni</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Manifesto e lockfile</dt><dd>Il manifesto dichiara il progetto e gli intervalli di versioni accettati. Il lockfile registra l’albero risolto con versioni precise e informazioni di integrità.</dd><dt>SemVer</dt><dd>Semantic Versioning: schema <code>major.minor.patch</code>. La major segnala modifiche incompatibili dichiarate, la minor funzionalità compatibili, la patch correzioni compatibili.</dd><dt>Script npm</dt><dd>Comando con un nome definito nell’oggetto <code>scripts</code>, avviabile con <code>npm run nome</code>. <code>npm start</code> è la forma breve per lo script start.</dd></dl></div>
+<p><code>package.json</code> è il manifesto del progetto: metadati, script e dipendenze. <code>package-lock.json</code> registra le versioni risolte ed è normalmente da includere nel versionamento.</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;laboratorio-node&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;private&quot;: true,
+  &quot;type&quot;: &quot;module&quot;,
+  &quot;scripts&quot;: {
+    &quot;start&quot;: &quot;node server.js&quot;,
+    &quot;dev&quot;: &quot;node --watch server.js&quot;
+  },
+  &quot;dependencies&quot;: {
+    &quot;express&quot;: &quot;^5.0.0&quot;
+  }
+}
+</code></pre>
+<p><strong>Attenzione:</strong> la versione di Express qui è <strong>illustrativa</strong>, non un vincolo da incollare ciecamente. È meglio usare <code>npm install express</code>, lasciando che npm scriva la versione effettivamente installata.</p>
+<ul>
+<li><code>^1.2.3</code>: permette aggiornamenti compatibili secondo SemVer all'interno della major 1.</li>
+<li><code>~1.2.3</code>: permette generalmente aggiornamenti patch nella minor 2.</li>
+<li><code>dependencies</code>: necessarie all'esecuzione; <code>devDependencies</code>: strumenti di sviluppo.</li>
+</ul>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>name</code> identifica il pacchetto; <code>version</code> è la versione del tuo progetto, non quella di Node; <code>private: true</code> impedisce la pubblicazione accidentale con npm. <code>type</code> sceglie l’interpretazione dei file <code>.js</code>. <code>main</code>, quando presente, descrive un punto di ingresso del pacchetto per chi lo carica: non sostituisce lo script <code>start</code>.</p><p><code>dependencies</code> raccoglie ciò che serve in esecuzione; <code>devDependencies</code> gli strumenti usati nello sviluppo. Negli script, npm aggiunge al PATH i comandi dei pacchetti locali: per questo <code>nodemon</code> può funzionare senza installazione globale. Conserva nel controllo di versione manifesto e lockfile; normalmente escludi <code>node_modules</code>.</p><h3>Un altro esempio guidato</h3><pre><code class="language-json">{
+  &quot;name&quot;: &quot;prima-api&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;private&quot;: true,
+  &quot;scripts&quot;: {
+    &quot;start&quot;: &quot;node server.cjs&quot;,
+    &quot;dev&quot;: &quot;node --watch server.cjs&quot;,
+    &quot;check&quot;: &quot;node --check server.cjs&quot;
+  }
+}
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> È un manifesto iniziale valido: salvalo come <code>package.json</code> nella cartella dell’esercizio, crea <code>server.cjs</code> e installa Express per aggiungere la dipendenza. <code>npm run check</code> controlla la sintassi senza avviare il server. JSON richiede doppi apici e non accetta commenti o virgole finali.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> <code>^1.2.3</code> indica versioni da 1.2.3 fino a prima di 2.0.0; <code>~1.2.3</code> fino a prima di 1.3.0. Prima della major 1 le regole del caret sono più restrittive: <code>^0.2.3</code> non include 0.3.0. Un numero esatto come <code>1.2.3</code> non è un intervallo.</aside><p class="exercise"><strong>Prova tu.</strong> Crea <code>saluto.cjs</code> con una stampa e aggiungi <code>"saluto": "node saluto.cjs"</code> agli script; avvialo con <code>npm run saluto</code>.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-11" data-title="riavvio automatico: nodemon e watch progetto e tooling"><div class="eyebrow">LEZIONE 11 · Progetto e tooling</div><h2>Riavvio automatico: nodemon e watch</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Watcher e riavvio</dt><dd>Un watcher osserva modifiche ai file. Il riavvio termina il processo precedente e ne avvia uno nuovo, rieseguendo il programma dall’inizio.</dd><dt>Dipendenza di sviluppo</dt><dd>Strumento necessario per lavorare sul progetto, ma non per il normale funzionamento del server distribuito.</dd><dt>Hot reload</dt><dd>Aggiornamento del codice o dell’interfaccia senza un completo riavvio del contesto: non coincide con il semplice riavvio di Node.</dd></dl></div>
+<p>Il problema mostrato nelle prime lezioni è dover riavviare manualmente Node dopo ogni modifica. <code>nodemon</code> lo risolve; le versioni moderne di Node offrono anche <code>--watch</code>.</p>
+<pre><code class="language-bash"># soluzione senza pacchetto aggiuntivo
+node --watch server.js
+# alternativa con dipendenza di sviluppo
+npm install --save-dev nodemon
+npx nodemon server.js
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> nel <code>package.json</code> imposta <code>&quot;dev&quot;: &quot;node --watch server.js&quot;</code>, poi esegui <code>npm run dev</code>. Per la produzione usa normalmente uno script di avvio stabile e una gestione appropriata del processo, non un watcher di sviluppo.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Nel testo Nodemon risolve la sequenza “salva, Ctrl+C, rilancia”. Osserva i file e riavvia il processo. Non aggiorna automaticamente una scheda del browser: devi fare una nuova richiesta per vedere il comportamento del server aggiornato.</p><p>Il riavvio ricrea variabili, array e contatori. Se inserisci una persona nell’array RAM e poi salvi un file mentre il watcher è attivo, quella persona può sparire: il nuovo processo riparte dai dati iniziali. Non è un errore di POST, ma una conseguenza dell’assenza di persistenza.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// osserva.cjs — avvio: node --watch osserva.cjs
+console.log(&#x27;Nuovo processo:&#x27;, process.pid);
+console.log(&#x27;Avviato:&#x27;, new Date().toISOString());
+setInterval(() =&gt; console.log(&#x27;Ancora attivo&#x27;), 5000);
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Il timer ripetuto mantiene attivo il programma. Cambia il messaggio e salva: il watcher riavvia lo script, cambia il timestamp e normalmente cambia anche il PID, cioè l’identificatore del processo. Con Ctrl+C termini la sessione di osservazione.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Il watch integrato è stabile nelle versioni moderne di Node ed evita una dipendenza per il caso base; Nodemon resta utile per configurazioni più articolate. Consulta <a href="https://nodejs.org/api/cli.html#--watch">Node --watch</a>. Né l’uno né l’altro sostituisce un sistema di gestione del processo in produzione.</aside><p class="exercise"><strong>Prova tu.</strong> Aggiungi una variabile contatore e osserva che torna al valore iniziale a ogni riavvio. Distingui il riavvio del server dal refresh del browser.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-12" data-title="event loop e non-blocking http e runtime"><div class="eyebrow">LEZIONE 12 · HTTP e runtime</div><h2>Event loop e non-blocking</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Call stack ed event loop</dt><dd>Il call stack tiene traccia delle funzioni in esecuzione. L’event loop coordina quando eseguire callback di timer, rete e altre operazioni, quando lo stack permette di farlo.</dd><dt>Concorrenza e parallelismo</dt><dd>Concorrenza significa gestire più attività nello stesso periodo; parallelismo significa eseguirle davvero nello stesso istante su risorse distinte.</dd><dt>Thread pool e libuv</dt><dd>Un thread pool è un gruppo di thread riutilizzati per certi lavori. libuv è la libreria su cui Node basa parte della gestione di I/O, event loop e thread pool.</dd><dt>Microtask e CPU-bound</dt><dd>Le microtask includono reazioni alle Promise e vengono elaborate in specifici punti dell’esecuzione. CPU-bound indica lavoro dominato dal calcolo, anziché dall’attesa di dati.</dd></dl></div>
+<p>L'event loop orchestra l'esecuzione del codice e dei callback quando le operazioni asincrone terminano. Non confondere <strong>asincronia</strong>, <strong>parallelismo</strong> e <strong>multithreading</strong>: il codice JavaScript di un processo Node normalmente gira su un thread principale, mentre parte del lavoro I/O è delegata al sistema operativo o al thread pool.</p>
+<pre><code class="language-js">console.log('A');
+setTimeout(() =&gt; console.log('C (timer)'), 0);
+Promise.resolve().then(() =&gt; console.log('B (microtask)'));
+console.log('D');
+// A, D, B, C
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>await readFile(...)</code> lascia spazio ad altre operazioni durante l'attesa; un ciclo <code>while</code> che occupa la CPU per molti secondi <strong>blocca</strong> comunque l'event loop. Per calcoli pesanti valuta worker thread o processi separati.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Nella banca, lo sportellista non si moltiplica: coordina le pratiche. Allo stesso modo il JavaScript principale esegue un pezzo di codice alla volta; il sistema operativo può gestire attese di rete e il thread pool alcune operazioni, fra cui molte operazioni sui file. Dire “ogni richiesta ha un thread” oppure “Node usa un solo thread in assoluto” descrive male il funzionamento.</p><p>Nell’esempio A/D/B/C, le due stampe sincrone vengono prima della reazione della Promise; il timer non può interrompere il codice già in esecuzione. <code>setTimeout(fn, 0)</code> significa pianificare appena possibile dopo la soglia del timer, non chiamare subito <code>fn</code>. La parola <code>async</code> non sposta un ciclo pesante su un altro thread.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// attese.mjs — node attese.mjs
+import { setTimeout as pausa } from &#x27;node:timers/promises&#x27;;
+async function lavoro(nome, ms) {
+  await pausa(ms);
+  return nome;
+}
+const risultati = await Promise.all([
+  lavoro(&#x27;lento&#x27;, 80),
+  lavoro(&#x27;veloce&#x27;, 20)
+]);
+console.log(risultati);
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Le due attese vengono avviate prima di attenderne l’esito insieme. Il risultato è <code>["lento", "veloce"]</code>: <code>Promise.all</code> preserva l’ordine degli input, non quello di completamento. Se una Promise fallisce, l’attesa complessiva fallisce; le altre operazioni non sono cancellate automaticamente.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per calcoli pesanti considera <code>worker_threads</code>, cioè thread che eseguono altro JavaScript, oppure processi separati. L’ordine di casi più complessi con <code>setImmediate</code> e timer dipende dal contesto: evita regole assolute ricavate da una sola prova. Vedi <a href="https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick">event loop di Node</a>.</aside><p class="exercise"><strong>Prova tu.</strong> Sostituisci Promise.all con due await consecutivi e confronta il tempo complessivo: nel primo caso è vicino all’attesa maggiore, nel secondo alla somma, con variazioni dovute alla schedulazione.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-13" data-title="eventemitter e programmazione a eventi http e runtime"><div class="eyebrow">LEZIONE 13 · HTTP e runtime</div><h2>EventEmitter e programmazione a eventi</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Evento, emittente e listener</dt><dd>Un evento è una notifica con un nome ed eventuali dati. L’emittente la produce; un listener è la funzione registrata per reagire.</dd><dt>EventEmitter e istanza</dt><dd><code>EventEmitter</code> è la classe di Node per notifiche a eventi. Un’istanza, creata con <code>new</code>, è un oggetto con i propri listener.</dd><dt>on, once, emit e off</dt><dd><code>on</code> registra un listener; <code>once</code> lo registra per una sola esecuzione; <code>emit</code> emette; <code>off</code> rimuove un listener specifico.</dd></dl></div>
+<p><code>EventEmitter</code> fornisce un modello per emettere eventi e registrare ascoltatori. È utile per notifiche interne, strumenti e flussi applicativi.</p>
+<pre><code class="language-js">// eventi.cjs
+const { EventEmitter } = require('node:events');
+const bus = new EventEmitter();
+bus.on('utenteCreato', utente =&gt; console.log('Creato:', utente.nome));
+bus.once('primoAccesso', () =&gt; console.log('Solo una volta'));
+bus.emit('utenteCreato', { nome: 'Luca' });
+bus.emit('primoAccesso');
+bus.emit('primoAccesso'); // nessun secondo log
+</code></pre>
+<p><strong>Attenzione:</strong> <code>emit()</code> invoca <strong>sincronamente</strong> gli ascoltatori registrati. <code>EventEmitter</code> non crea automaticamente code persistenti né rende le funzioni asincrone. Gestisci con cura gli eventi <code>error</code>.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>L’ordine conta: registra gli ascoltatori prima di emettere l’evento. Un normale EventEmitter non conserva un evento per chi si iscrive dopo. Gli argomenti passati dopo il nome in <code>emit</code> vengono consegnati ai listener nello stesso ordine.</p><p>La registrazione non chiama subito la funzione; <code>emit</code> chiama invece in modo sincrono gli ascoltatori già registrati. Se un listener avvia lavoro asincrono, quel lavoro ha la propria durata: l’emittente non aspetta automaticamente tutte le Promise. Il modello serve per disaccoppiare una notifica dalle reazioni, ma non garantisce consegna persistente fra processi.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// ascoltatori.cjs — node ascoltatori.cjs
+const { EventEmitter } = require(&#x27;node:events&#x27;);
+const eventi = new EventEmitter();
+function registra(id, totale) {
+  console.log(`Ordine ${id}: ${totale} euro`);
+}
+eventi.on(&#x27;ordine&#x27;, registra);
+eventi.emit(&#x27;ordine&#x27;, 7, 25);
+eventi.off(&#x27;ordine&#x27;, registra);
+eventi.emit(&#x27;ordine&#x27;, 8, 30);
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Viene stampato solo l’ordine 7. Per rimuovere un listener serve il riferimento alla stessa funzione: una nuova arrow function, anche con lo stesso corpo, è un altro oggetto funzione. Nell’esempio iniziale il secondo <code>primoAccesso</code> non stampa nulla perché il listener era registrato con <code>once</code>.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> L’evento speciale <code>error</code> richiede attenzione: emetterlo senza listener può terminare il processo. Anche registrare listener senza rimuoverli quando non servono più può accumulare memoria. Le API a eventi restano attuali; Promise e async/await risolvono un problema diverso.</aside><p class="exercise"><strong>Prova tu.</strong> Aggiungi due listener allo stesso evento e verifica l’ordine delle stampe; poi emetti prima di registrarli per osservare che l’evento non viene riprodotto.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-14" data-title="stream: dati a pezzi http e runtime"><div class="eyebrow">LEZIONE 14 · HTTP e runtime</div><h2>Stream: dati a pezzi</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Chunk, stream e buffering</dt><dd>Un chunk è una porzione di dati. Uno stream permette di leggerne o scriverne una sequenza; il buffering conserva temporaneamente porzioni in memoria.</dd><dt>Readable, Writable, Duplex e Transform</dt><dd>Readable produce dati; Writable li riceve; Duplex può fare entrambe le cose; Transform è uno stream duplex che trasforma ciò che riceve, come una compressione.</dd><dt>Backpressure e pipeline</dt><dd>La backpressure rallenta il produttore quando il consumatore non tiene il passo. Una pipeline collega più stream e ne coordina completamento ed errori.</dd></dl></div>
+<p>Uno <strong>stream</strong> gestisce dati in modo incrementale, senza necessariamente caricare l'intero contenuto in memoria. È utile per file grandi, download e trasferimenti HTTP.</p>
+<pre><code class="language-js">// copia.cjs
+const fs = require('node:fs');
+const { pipeline } = require('node:stream/promises');
+(async () =&gt; {
+  try {
+    await pipeline(
+      fs.createReadStream('origine.txt'),
+      fs.createWriteStream('copia.txt')
+    );
+    console.log('Copia completata');
+  } catch (errore) { console.error(errore.message); }
+})();
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> con gli stream si può inviare al client un file di grandi dimensioni mentre lo si legge. <code>pipeline()</code> propaga in modo più affidabile errori e chiusura delle risorse rispetto a un semplice <code>pipe()</code> usato senza gestione degli errori.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>readFile</code> rende disponibile il file completo; <code>createReadStream</code> lo fornisce a porzioni. Nel corso gli eventi <code>data</code> mostrano i chunk: la loro dimensione non coincide necessariamente con una riga o con un messaggio applicativo. Un file può quindi essere letto senza tenerlo tutto in memoria contemporaneamente.</p><p><code>highWaterMark</code> controlla una soglia del buffer interno, non un limite rigido alla memoria totale. <code>pipe</code> collega una sorgente a una destinazione e gestisce il flusso; <code>pipeline</code> aiuta a coordinare anche errori e chiusura. Le richieste e risposte HTTP di Node sono a loro volta stream.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// dimensione.mjs — crea prima origine.txt; node dimensione.mjs
+import { createReadStream } from &#x27;node:fs&#x27;;
+let byte = 0;
+try {
+  for await (const chunk of createReadStream(&#x27;origine.txt&#x27;)) {
+    byte += chunk.length;
+  }
+  console.log(&#x27;Byte letti:&#x27;, byte);
+} catch (errore) {
+  console.error(&#x27;Lettura fallita:&#x27;, errore.message);
+}
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>for await...of</code> consuma le porzioni disponibili senza dover scrivere a mano i listener <code>data</code> ed <code>end</code>. Senza encoding i chunk sono Buffer e <code>length</code> conta byte: lettere accentate UTF-8 possono occupare più di un byte.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Usa <code>pipeline</code> per copie o trasformazioni fra stream; l’iterazione asincrona è utile quando devi elaborare ogni porzione. Sono approcci complementari. Riferimento: <a href="https://nodejs.org/api/stream.html">API Stream di Node</a>. Un errore durante uno streaming HTTP può arrivare quando parte della risposta è già stata inviata.</aside><p class="exercise"><strong>Prova tu.</strong> Crea un file con caratteri accentati e confronta il numero di byte con il numero di caratteri del testo. Non sommare <code>chunk.toString().length</code> come se fossero sempre la stessa misura.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-15" data-title="richieste http: struttura e metodi http e runtime"><div class="eyebrow">LEZIONE 15 · HTTP e runtime</div><h2>Richieste HTTP: struttura e metodi</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>URL, host e percorso</dt><dd>L’URL identifica una risorsa: schema, host, eventuale porta, percorso e query. L’host identifica il computer o servizio di destinazione; il percorso identifica la risorsa presso quel servizio.</dd><dt>Body, Content-Type e Accept</dt><dd>Il body è il contenuto del messaggio. <code>Content-Type</code> descrive il formato inviato; <code>Accept</code> indica i formati di risposta accettati dal client.</dd><dt>HTTPS e TLS</dt><dd>HTTPS è HTTP protetto da TLS, che cifra il trasporto e autentica normalmente il server tramite certificati.</dd><dt>Idempotenza</dt><dd>Un’operazione è idempotente se ripeterla produce lo stesso effetto finale sullo stato desiderato. Non implica risposte identiche a ogni chiamata.</dd></dl></div>
+<p>Una richiesta HTTP include <strong>metodo</strong>, <strong>percorso</strong>, <strong>header</strong> e opzionalmente un <strong>body</strong>. Una risposta include <strong>codice di stato</strong>, header e body. HTTP è un protocollo richiesta-risposta; HTTPS aggiunge la protezione TLS.</p>
+<table>
+<thead>
+<tr>
+  <th>Metodo</th>
+  <th>Uso tipico</th>
+  <th>Esempio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>GET</td>
+  <td>Leggere</td>
+  <td><code>GET /api/persone</code></td>
+</tr>
+<tr>
+  <td>POST</td>
+  <td>Creare</td>
+  <td><code>POST /api/persone</code></td>
+</tr>
+<tr>
+  <td>PUT</td>
+  <td>Sostituire/aggiornare completamente</td>
+  <td><code>PUT /api/persone/1</code></td>
+</tr>
+<tr>
+  <td>PATCH</td>
+  <td>Modificare parzialmente</td>
+  <td><code>PATCH /api/persone/1</code></td>
+</tr>
+<tr>
+  <td>DELETE</td>
+  <td>Eliminare</td>
+  <td><code>DELETE /api/persone/1</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Codici frequenti:</strong> <code>200</code> OK, <code>201</code> creato, <code>204</code> riuscito senza contenuto, <code>400</code> richiesta errata, <code>404</code> non trovato, <code>500</code> errore del server.</p>
+<pre><code class="language-bash">curl -i http://localhost:3000/
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> un browser che apre un URL invia normalmente una GET; per inviare JSON e scegliere altri metodi puoi usare <code>curl</code>, Postman o il <code>fetch()</code> del frontend.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il browser invia la richiesta, il server la interpreta e costruisce la risposta. Aprire una pagina può produrre diverse richieste: documento HTML, foglio di stile, JavaScript, immagini e favicon. Un errore sulla favicon non significa necessariamente che la route principale abbia fallito.</p><p>I metodi esprimono l’intenzione: GET legge, POST richiede un’elaborazione o una creazione, PUT sostituisce, PATCH modifica parzialmente, DELETE elimina. Una risposta <code>404</code> significa che il server ha risposto ma non ha trovato quella risorsa; una connessione rifiutata significa invece che non sei riuscito a contattarlo su quell’indirizzo e porta.</p><h3>Un altro esempio guidato</h3><pre><code class="language-http">GET /api/persone?limite=2 HTTP/1.1
+Host: localhost:3000
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{&quot;dati&quot;:[{&quot;id&quot;:1,&quot;nome&quot;:&quot;Anna&quot;}]}
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> È uno schema didattico di richiesta e risposta HTTP/1.1, non un file JavaScript da avviare. La riga iniziale identifica metodo e destinazione; la riga vuota separa header e body. Il codice 200 appartiene alla risposta, non alla richiesta.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> GET è definito come metodo sicuro, cioè con semantica di lettura; PUT e DELETE sono idempotenti. PATCH non è automaticamente idempotente. POST non rende segreto il body: per proteggere il trasporto serve HTTPS. Vedi i <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods">metodi HTTP</a>.</aside><p class="exercise"><strong>Prova tu.</strong> Apri gli strumenti sviluppatore del browser, scheda Rete/Network: identifica richiesta, status, Content-Type e contenuto della risposta. Non confondere il testo di un errore JSON con lo status HTTP.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-16" data-title="introduzione a express express e api"><div class="eyebrow">LEZIONE 16 · Express e API</div><h2>Introduzione a Express</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Express e app</dt><dd>Express è il framework che organizza la gestione HTTP sopra Node. <code>express()</code> crea un’applicazione, qui chiamata <code>app</code>.</dd><dt>Routing, handler ed endpoint</dt><dd>Il routing seleziona la funzione in base a metodo e percorso. L’handler gestisce la richiesta. Un endpoint è un punto di accesso dell’API, generalmente identificato da metodo e URL.</dd><dt>Middleware</dt><dd>Funzione nella catena di gestione di una richiesta: può eseguire controlli, preparare dati, rispondere o passare il controllo alla funzione successiva.</dd></dl></div>
+<p><strong>Express</strong> è un framework web che semplifica server, middleware e routing. Non sostituisce Node: vi gira sopra.</p>
+<pre><code class="language-bash">mkdir mini-express
+cd mini-express
+npm init -y
+npm install express@5
+</code></pre>
+<pre><code class="language-js">// server.cjs
+const express = require('express');
+const app = express();
+app.get('/', (req, res) =&gt; res.send('Home Express'));
+app.get('/saluti/:nome', (req, res) =&gt; {
+  res.json({ messaggio: `Ciao ${req.params.nome}` });
+});
+app.listen(3000, () =&gt; console.log('http://localhost:3000'));
+</code></pre>
+<p>Esegui <code>node server.cjs</code>. <strong>Esempio aggiuntivo:</strong> visita <code>/saluti/Anna</code>. Il callback della route riceve <code>req</code> (richiesta) e <code>res</code> (risposta).</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>require("express")</code> carica il pacchetto installato. <code>express()</code> costruisce l’app; <code>app.get</code> registra una route GET; <code>app.listen</code> crea e avvia il server HTTP. Express estende gli oggetti di Node con strumenti come <code>res.send</code>, <code>res.json</code> e <code>req.params</code>.</p><p><code>res.status(201)</code> imposta lo status ma non invia da solo la risposta. <code>res.send</code> e <code>res.json</code> la inviano e normalmente la concludono. La concatenazione <code>res.status(...).json(...)</code> funziona perché <code>status</code> restituisce lo stesso oggetto risposta. Invia una sola risposta per richiesta.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// mini.cjs — npm install express@5; poi node mini.cjs
+const express = require(&#x27;express&#x27;);
+const app = express();
+app.get(&#x27;/salute&#x27;, (req, res) =&gt; {
+  return res.status(200).json({ servizio: &#x27;attivo&#x27; });
+});
+app.use((req, res) =&gt; {
+  res.status(404).json({ errore: &#x27;Percorso non trovato&#x27; });
+});
+app.listen(3000, &#x27;127.0.0.1&#x27;, () =&gt; console.log(&#x27;Server pronto sulla porta 3000&#x27;));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>GET /salute</code> restituisce 200 e JSON. Una richiesta non gestita arriva al middleware finale e riceve 404. Il middleware senza percorso si applica a tutte le richieste che lo raggiungono. Deve stare dopo le route, altrimenti risponde prima di esse.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Questa guida usa Express 5 per i nuovi esempi. Alcune forme dei percorsi del vecchio Express 4 sono cambiate: per una 404 generale il middleware finale senza percorso evita il vecchio <code>app.all("*")</code>. Fonte: <a href="https://expressjs.com/en/guide/migrating-5/">migrazione a Express 5</a>.</aside><p class="exercise"><strong>Prova tu.</strong> Aggiungi <code>GET /versione</code> prima della 404 e restituisci <code>process.version</code>. Prova anche <code>POST /salute</code>: avere una route GET non registra automaticamente una POST.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-17" data-title="servire file statici express e api"><div class="eyebrow">LEZIONE 17 · Express e API</div><h2>Servire file statici</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>File statico e directory pubblica</dt><dd>Un file statico viene inviato senza generare il contenuto da un template a ogni richiesta. La directory pubblica contiene i file che scegli di rendere raggiungibili dai client.</dd><dt>Mount path e sendFile</dt><dd>Il mount path è il prefisso URL a cui colleghi un middleware. <code>res.sendFile</code> invia uno specifico file, normalmente indicato con percorso assoluto o con una directory root.</dd><dt>HTML, CSS e JavaScript client</dt><dd>HTML descrive la struttura della pagina; CSS il suo aspetto; il JavaScript client viene eseguito dal browser dopo il caricamento.</dd></dl></div>
+<p>I file statici (HTML, CSS, immagini e JavaScript client) possono essere serviti direttamente da una directory con <code>express.static</code>.</p>
+<pre><code class="language-js">// server.cjs
+const express = require('express');
+const path = require('node:path');
+const app = express();
+app.use(express.static(path.join(__dirname, 'public')));
+app.listen(3000);
+</code></pre>
+<pre><code class="language-html">&lt;!-- public/index.html --&gt;
+&lt;!doctype html&gt;&lt;html lang=&quot;it&quot;&gt;&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt;Demo&lt;/title&gt;&lt;h1&gt;Benvenuto nel sito statico&lt;/h1&gt;&lt;/html&gt;
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> creando <code>public/stile.css</code> il file diventa recuperabile con <code>/stile.css</code>. <strong>Nota:</strong> l'esempio usa CommonJS e quindi <code>__dirname</code>. Evita di mettere nella cartella pubblica credenziali o file sensibili.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>express.static</code> restituisce un middleware: Express lo esegue sulle richieste che arrivano a quel punto. Con <code>app.use(express.static(...))</code>, un file <code>public/stile.css</code> si richiede come <code>/stile.css</code>, senza scrivere public nell’URL. Un <code>index.html</code> può essere servito automaticamente per la directory.</p><p>Il corso usa anche <code>homepage.html</code>, <code>about.html</code>, <code>contatti.html</code> e una pagina 404 con <code>sendFile</code>. La cartella fisica e il percorso web non devono coincidere: puoi esporre i file sotto <code>/assets</code>. “Statico” riguarda come il server produce la risposta: un file JavaScript statico può comunque rendere interattiva la pagina.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Dentro l&#x27;app Express CommonJS, prima della 404 finale
+const path = require(&#x27;node:path&#x27;);
+const cartella = path.join(__dirname, &#x27;public&#x27;);
+app.use(&#x27;/assets&#x27;, express.static(cartella));
+app.get(&#x27;/about&#x27;, (req, res, next) =&gt; {
+  res.sendFile(path.join(cartella, &#x27;about.html&#x27;), errore =&gt; {
+    if (errore) next(errore);
+  });
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Crea <code>public/about.html</code> con un titolo e un paragrafo. <code>/about</code> invia quel file; un eventuale <code>public/stile.css</code> è raggiungibile a <code>/assets/stile.css</code>. <code>next(errore)</code> passa un errore di invio alla gestione degli errori.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Il solo invio di un HTML già scritto non è SSR dinamico: il rendering server viene approfondito nella prossima lezione. Usa un percorso legato al modulo per non dipendere dalla cartella di avvio; esponi solo file destinati al pubblico.</aside><p class="exercise"><strong>Prova tu.</strong> Collega un foglio CSS da about.html con <code>href="/assets/stile.css"</code>. Crea anche una 404 e inviala con <code>res.status(404).sendFile(...)</code>, gestendo gli errori di invio.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-18" data-title="api json e server-side rendering express e api"><div class="eyebrow">LEZIONE 18 · Express e API</div><h2>API JSON e server-side rendering</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>API web e rappresentazione</dt><dd>Un’API web offre operazioni tramite HTTP. Una rappresentazione è il formato con cui una risorsa viene descritta al client, per esempio JSON o HTML.</dd><dt>Rendering, SSR e CSR</dt><dd>Rendering significa costruire la vista. SSR, Server-Side Rendering, la costruisce sul server; CSR, Client-Side Rendering, la costruisce nel browser usando JavaScript.</dd><dt>Template engine ed escaping</dt><dd>Un template engine combina un modello di pagina con dati. L’escaping trasforma caratteri speciali per visualizzarli come testo anziché interpretarli come markup.</dd></dl></div>
+<p>Il corso distingue due modalità: <strong>API</strong>, che restituiscono normalmente dati come JSON, e <strong>SSR</strong>, in cui il server genera HTML per il browser. Sono approcci combinabili.</p>
+<pre><code class="language-js">app.get('/api/profilo', (req, res) =&gt; {
+  res.json({ id: 1, nome: 'Sara' });
+});
+app.get('/pagina', (req, res) =&gt; {
+  res.type('html').send('&lt;h1&gt;Pagina generata dal server&lt;/h1&gt;');
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> un frontend React può chiamare <code>/api/profilo</code> e costruire la vista nel browser; un'app SSR potrebbe invece renderizzare lato server un template con lo stesso profilo. In entrambi i casi serve gestire correttamente errori e dati in ingresso.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Con un’API JSON il backend recupera e controlla i dati; il frontend decide come mostrarli. Con SSR il backend recupera i dati e genera anche l’HTML della vista, spesso usando un template engine. La scelta riguarda dove si prepara la pagina, non se esista o meno un database.</p><p>Le due modalità possono convivere: un sito serve pagine HTML e offre endpoint JSON per aggiornare singole parti. Un array restituito come JSON non si trasforma da solo in una tabella: serve codice client o un template. Analogamente, servire un file HTML senza modificarlo rimane semplice distribuzione di contenuto statico.</p><h3>Un altro esempio guidato</h3><pre><code class="language-html">&lt;!-- demo-client.html: servilo dalla cartella public dell&#x27;app --&gt;
+&lt;p id=&quot;nome&quot;&gt;Caricamento...&lt;/p&gt;
+&lt;script&gt;
+async function carica() {
+  const risposta = await fetch(&#x27;/api/profilo&#x27;);
+  if (!risposta.ok) throw new Error(`HTTP ${risposta.status}`);
+  const profilo = await risposta.json();
+  document.querySelector(&#x27;#nome&#x27;).textContent = profilo.nome;
+}
+carica().catch(() =&gt; {
+  document.querySelector(&#x27;#nome&#x27;).textContent = &#x27;Impossibile caricare&#x27;;
+});
+&lt;/script&gt;
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Usa l’endpoint <code>/api/profilo</code> della lezione e servi questa pagina dalla stessa app. Il browser esegue fetch, riceve JSON e aggiorna il testo con <code>Sara</code>. <code>response.json()</code> interpreta il body; <code>textContent</code> visualizza il nome come testo, senza inserirlo come HTML.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Una API può restituire formati diversi da JSON: JSON è una scelta comune, non la definizione di API. Non concatenare direttamente input non attendibile dentro HTML: usa template con escaping o inserisci testo con API sicure del DOM.</aside><p class="exercise"><strong>Prova tu.</strong> Sostituisci il percorso fetch con uno inesistente e verifica il messaggio di errore. Il controllo <code>risposta.ok</code> è necessario perché fetch non rigetta automaticamente per una risposta 404.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-19" data-title="json come formato di scambio express e api"><div class="eyebrow">LEZIONE 19 · Express e API</div><h2>JSON come formato di scambio</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>JSON e oggetto JavaScript</dt><dd>JSON, JavaScript Object Notation, è un formato di testo per dati. Un oggetto JavaScript è invece un valore già presente in memoria: le due cose non sono identiche.</dd><dt>Serializzazione e parsing</dt><dd>Serializzare significa convertire un valore in testo trasmissibile. Fare parsing significa analizzare il testo e ricostruire una struttura di dati.</dd><dt>Schema e validazione</dt><dd>Uno schema descrive campi, tipi e vincoli attesi. La validazione verifica che i dati rispettino quelle regole, dopo che il testo è stato interpretato.</dd></dl></div>
+<p>JSON è un formato testuale con oggetti, array, stringhe, numeri, booleani e <code>null</code>. In Express <code>res.json()</code> serializza un oggetto JavaScript e imposta la risposta JSON.</p>
+<pre><code class="language-js">app.use(express.json()); // interpreta richieste con body JSON
+app.get('/api/prodotti', (req, res) =&gt; {
+  res.json([{ id: 1, nome: 'Tastiera', prezzo: 45 }]);
+});
+app.post('/api/eco', (req, res) =&gt; {
+  res.status(201).json({ ricevuto: req.body });
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> invia <code>{&quot;nome&quot;:&quot;Mouse&quot;}</code> con header <code>Content-Type: application/json</code>. <strong>Sicurezza:</strong> il fatto che <code>req.body</code> sia stato interpretato come JSON non significa che i dati siano validi: controlla tipi, lunghezze e valori.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>res.json(oggetto)</code> serializza il valore e imposta il formato della risposta. <code>express.json()</code> compie l’operazione opposta per le richieste con Content-Type JSON: legge il body e rende il valore disponibile come <code>req.body</code>. Non serve per poter inviare JSON con una GET; serve per leggere JSON in ingresso.</p><p>JSON usa doppi apici per chiavi e stringhe, non accetta commenti, funzioni o <code>undefined</code>. Una data JavaScript viene normalmente serializzata come stringa; un array può contenere oggetti, numeri e altri valori JSON. Il middleware non decide se un prezzo è positivo o se un nome è troppo lungo: sono regole applicative da verificare dopo.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// conversioni.cjs — node conversioni.cjs
+const persona = { nome: &#x27;Anna&#x27;, attiva: true, ruoli: [&#x27;editor&#x27;] };
+const testo = JSON.stringify(persona);
+const ricostruita = JSON.parse(testo);
+console.log(typeof testo);       // string
+console.log(ricostruita.nome);   // Anna
+console.log(persona === ricostruita); // false
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>JSON.stringify</code> crea testo; <code>JSON.parse</code> crea una nuova struttura dati. Il confronto finale è falso perché i due oggetti hanno identità diverse. Non passare a <code>res.json</code> una stringa già serializzata se vuoi trasmettere un oggetto: finiresti per inviare una stringa JSON.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Per un body JSON usa <code>express.json({ limit: "32kb" })</code> prima delle route interessate; per form HTML tradizionali può servire <code>express.urlencoded</code>. Sono parser diversi. Distingui sintassi JSON malformata (400), body troppo grande (413) e errore interno (500).</aside><p class="exercise"><strong>Prova tu.</strong> Prova JSON con una virgola finale e osserva il fallimento di JSON.parse. Poi invia un JSON valido ma con <code>nome: 123</code>: il parser riesce, la validazione del nome deve fallire.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-20" data-title="parametri della route express e api"><div class="eyebrow">LEZIONE 20 · Express e API</div><h2>Parametri della route</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Parametro di percorso e ID</dt><dd>Un parametro di percorso è un segmento variabile della route. Un ID è un identificatore della risorsa: può essere numerico oppure una stringa, secondo il modello dati.</dd><dt>find e valore assente</dt><dd><code>find</code> restituisce il primo elemento che soddisfa una condizione; se nessuno la soddisfa restituisce <code>undefined</code>.</dd><dt>Conversione e intero sicuro</dt><dd>La conversione cambia il tipo di un valore. Un intero sicuro è rappresentabile senza perdita di precisione nel formato Number di JavaScript.</dd></dl></div>
+<p>I parametri della route identificano una risorsa all'interno dell'URL. Nel percorso <code>/api/persone/:id</code>, il segmento <code>:id</code> è letto da <code>req.params.id</code>.</p>
+<pre><code class="language-js">const persone = [{ id: 1, nome: 'Anna' }, { id: 2, nome: 'Luca' }];
+app.get('/api/persone/:id', (req, res) =&gt; {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) return res.status(400).json({ errore: 'ID non valido' });
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: 'Non trovata' });
+  res.json(persona);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>/api/persone/2</code> restituisce Luca; <code>/api/persone/abc</code> restituisce <code>400</code>, mentre <code>/api/persone/999</code> restituisce <code>404</code>.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Express riempie <code>req.params</code> usando i nomi preceduti da due punti. In <code>/articoli/:categoria/:id</code> puoi leggere <code>req.params.categoria</code> e <code>req.params.id</code>. La forma <code>const { id } = req.params</code> è destructuring, non una richiesta al database.</p><p>Se gli ID dell’array sono numeri, confrontare <code>p.id === req.params.id</code> fallisce perché <code>"2"</code> è una stringa. Convertire e validare risolve il problema. Non convertire però un ID testuale, per esempio un UUID, come se fosse numerico. Distingui ID scritto male (400) e ID valido che non esiste (404).</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento da inserire in un&#x27;app Express
+app.get(&#x27;/articoli/:categoria/:id&#x27;, (req, res) =&gt; {
+  const { categoria, id: testoId } = req.params;
+  const id = Number(testoId);
+  if (!/^[1-9]\d*$/.test(testoId) || !Number.isSafeInteger(id)) {
+    return res.status(400).json({ errore: &#x27;ID numerico positivo richiesto&#x27; });
+  }
+  res.json({ categoria, id });
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>/articoli/node/12</code> restituisce categoria node e ID numerico 12. L’espressione regolare controlla che la stringa contenga solo cifre e inizi da 1 a 9; <code>isSafeInteger</code> controlla il numero. Questo endpoint dimostra il parsing e non verifica l’esistenza di un articolo.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Definisci una politica coerente: <code>Number("1e2")</code> vale 100, ma un ID composto solo da cifre può rifiutare quella notazione. Registra percorsi fissi come <code>/persone/statistiche</code> prima di <code>/persone/:id</code>, per non interpretare “statistiche” come ID.</aside><p class="exercise"><strong>Prova tu.</strong> Prova 12, abc, 0 e 1e2. Spiega perché il controllo numerico e la ricerca della risorsa rispondono a due domande diverse.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-21" data-title="query string e filtri express e api"><div class="eyebrow">LEZIONE 21 · Express e API</div><h2>Query string e filtri</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Query string e filtro</dt><dd>La query string è la parte dell’URL dopo <code>?</code>, composta da coppie chiave-valore separate da <code>&amp;</code>. Un filtro seleziona elementi secondo una condizione.</dd><dt>Paginazione, limite e offset</dt><dd>La paginazione divide un insieme in parti. Il limite indica quanti elementi restituire; l’offset quanti saltarne dall’inizio.</dd><dt>filter e slice</dt><dd><code>filter</code> crea un array con gli elementi che soddisfano una condizione. <code>slice</code> restituisce una porzione senza modificare l’array originale.</dd></dl></div>
+<p>I parametri <strong>query</strong> seguono <code>?</code> nell'URL: <code>/api/persone?cerca=an&amp;limite=5</code>. In Express sono in <code>req.query</code>, che contiene input da considerare <strong>non attendibile</strong>.</p>
+<pre><code class="language-js">app.get('/api/persone', (req, res) =&gt; {
+  const cerca = String(req.query.cerca ?? '').toLowerCase();
+  const limiteRaw = Number(req.query.limite ?? 10);
+  const limite = Number.isInteger(limiteRaw)
+    ? Math.min(Math.max(limiteRaw, 1), 100) : 10;
+  const risultato = persone
+    .filter(p =&gt; p.nome.toLowerCase().includes(cerca))
+    .slice(0, limite);
+  res.json(risultato);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> la ricerca <code>?cerca=lu&amp;limite=1</code> restituisce al massimo una persona il cui nome contiene <code>lu</code>. Per grandi dataset filtri e paginazione andrebbero applicati nel database, non all'array intero.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il parametro di percorso identifica tipicamente “quale persona”; la query descrive “quali persone, con quale filtro e limite”. <code>/persone/2</code> e <code>/persone?limite=2</code> hanno quindi significati diversi. <code>req.query</code> dipende dal parser configurato: non dare per scontato che ogni valore sia una stringa singola, soprattutto con parametri ripetuti.</p><p>La trascrizione usa una ricerca per prefisso: <code>startsWith("an")</code> trova Anna ma non Gianna. Nell’esempio del manuale <code>includes("an")</code> cerca invece in qualsiasi posizione. Documenta quale comportamento scegli. Con una collezione vuota o nessun risultato, una risposta 200 con elenco vuoto è normalmente corretta.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Costruire una query senza concatenare a mano i valori
+const query = new URLSearchParams({ cerca: &#x27;Anna Maria&#x27;, limite: &#x27;2&#x27; });
+console.log(`/api/persone?${query}`);
+// /api/persone?cerca=Anna+Maria&amp;limite=2
+
+// Esempio di paginazione su un array già filtrato
+const risultati = [&#x27;Anna&#x27;, &#x27;Luca&#x27;, &#x27;Sara&#x27;, &#x27;Marta&#x27;];
+const offset = 2;
+const limite = 2;
+console.log(risultati.slice(offset, offset + limite));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>URLSearchParams</code> codifica lo spazio nella query. L’ultima stampa contiene Sara e Marta: il secondo argomento di slice è l’indice finale escluso. Per una paginazione stabile serve un ordine definito dei risultati.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Valida i tipi e limita le quantità permesse. Un semplice <code>slice(0, limite)</code> applica un limite, ma non realizza da solo una paginazione navigabile. Con molti dati conviene filtrare e paginare nel database. Evita segreti nella query: gli URL possono finire in cronologia e log.</aside><p class="exercise"><strong>Prova tu.</strong> Prova limite assente, 0, testo e una chiave ripetuta. Decidi se correggere i valori fuori intervallo o rispondere 400, e mantieni la stessa regola nella tua API.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-22" data-title="middleware: ordine e next express e api"><div class="eyebrow">LEZIONE 22 · Express e API</div><h2>Middleware: ordine e next</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Catena di middleware e next</dt><dd>La catena è la sequenza registrata nell’app. <code>next()</code> passa il controllo alla funzione successiva compatibile; <code>next(err)</code> attiva il percorso di gestione errori.</dd><dt>Autenticazione e autorizzazione</dt><dd>L’autenticazione verifica chi è il chiamante; l’autorizzazione verifica se può compiere quella specifica operazione.</dd><dt>Logging e gestione errori</dt><dd>Il logging registra eventi utili a capire il comportamento del programma. Un gestore errori traduce un problema in una risposta controllata.</dd></dl></div>
+<p>Un <strong>middleware</strong> è una funzione che opera tra richiesta e risposta. Può leggere/modificare <code>req</code>, rispondere o passare il controllo con <code>next()</code>; l'<strong>ordine</strong> di registrazione conta.</p>
+<pre><code class="language-js">app.use((req, res, next) =&gt; {
+  console.log(req.method, req.path);
+  next();
+});
+app.use(express.json());
+app.get('/salute', (req, res) =&gt; res.json({ ok: true }));
+app.use((req, res) =&gt; res.status(404).json({ errore: 'Route inesistente' }));
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> un middleware di autenticazione può controllare una sessione prima delle route private. <strong>Attenzione:</strong> se non invii una risposta e non chiami <code>next()</code>, la richiesta resta in sospeso. Un middleware di errore ha firma <code>(err, req, res, next)</code>.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Nel testo il middleware viene prima scritto nel file principale, poi esportato in un modulo e infine applicato solo a un prefisso. <code>app.use("/api", fn)</code> limita la funzione a quel gruppo; <code>app.get("/profilo", controllo, handler)</code> la lega a una route. Puoi passare più middleware o un array di funzioni.</p><p>Un middleware ha tre possibilità: risponde e si ferma, chiama next, oppure segnala un errore. <code>next()</code> non equivale a <code>return</code>: il codice dopo può ancora eseguire. Usa <code>return next()</code> quando vuoi terminare subito il ramo. Un middleware che stampa “accesso effettuato” non autentica realmente nessuno.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento: middleware specifico per una route
+function richiediFormatoJson(req, res, next) {
+  if (!req.is(&#x27;application/json&#x27;)) {
+    return res.status(415).json({ errore: &#x27;Invia application/json&#x27; });
+  }
+  return next();
+}
+app.post(&#x27;/api/eco&#x27;, richiediFormatoJson, express.json(), (req, res) =&gt; {
+  res.json({ ricevuto: req.body });
+});
+// Evita di registrare anche un&#x27;altra POST /api/eco prima di questa.
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Il controllo legge il Content-Type e può rispondere 415, formato non supportato. Se passa, il parser interpreta JSON e l’handler risponde. L’ordine è controllo del formato → parser → handler; l’esempio assume che un parser globale precedente non abbia già letto il body.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Con Express 5 una Promise rigettata da un handler async restituito viene inoltrata alla gestione errori. Gli errori in callback scollegate richiedono ancora gestione esplicita. L’error handler va dopo le route e mantiene la firma a quattro parametri. Vedi <a href="https://expressjs.com/en/guide/migrating-5/#rejected-promises">Promise in Express 5</a>.</aside><p class="exercise"><strong>Prova tu.</strong> Aggiungi log prima e dopo next e osserva l’ordine. Scrivi poi una 404 prima della route: vedrai perché quella route non viene più raggiunta.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-23" data-title="testare le api con postman express e api"><div class="eyebrow">LEZIONE 23 · Express e API</div><h2>Testare le API con Postman</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Client HTTP e collection</dt><dd>Un client HTTP invia richieste a un server. Una collection raccoglie richieste salvate e riutilizzabili per uno stesso progetto.</dd><dt>Body raw ed environment</dt><dd>Raw indica un body scritto direttamente come testo. Un environment contiene variabili, come la base URL, da riutilizzare nelle richieste.</dd><dt>Asserzione e regressione</dt><dd>Un’asserzione confronta un risultato con un’aspettativa. Un test di regressione controlla che una modifica non rompa comportamenti che funzionavano.</dd></dl></div>
+<p><strong>Postman</strong> è un client HTTP grafico, comodo per provare GET/POST/PUT/DELETE, header e JSON. Non è obbligatorio: puoi ottenere test riproducibili anche con <code>curl</code>.</p>
+<pre><code class="language-bash"># recuperare tutte le persone
+curl -i http://localhost:3000/api/persone
+# inviare dati JSON
+curl -i -X POST http://localhost:3000/api/persone \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;nome&quot;:&quot;Giulia&quot;}'
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> verifica non solo il contenuto ma anche lo <strong>status HTTP</strong>. Se la creazione riesce, il server dovrebbe restituire <code>201</code>; se manca <code>nome</code>, <code>400</code>. Nota: su Windows PowerShell <code>curl</code> può avere comportamenti diversi in base alla versione e agli alias; usa <code>curl.exe</code> se necessario.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>In Postman scegli metodo e URL completo, poi Body → raw → JSON per scrivere il contenuto. Controlla che sia inviato <code>Content-Type: application/json</code>. Premi Send con il server già attivo: Postman non avvia il backend. Nella risposta osserva status, header, body e tempo impiegato.</p><p>Per il laboratorio crea richieste separate per elenco, dettaglio, creazione, sostituzione e cancellazione. Salva il nuovo ID restituito dalla POST: i passaggi successivi devono riferirsi a quella risorsa, non presumere che abbia sempre ID 3. Un JSON con <code>success: false</code> e status 200 non equivale a un errore HTTP correttamente descritto.</p><h3>Un altro esempio guidato</h3><pre><code class="language-powershell"># PowerShell: dopo aver avviato l&#x27;API del laboratorio
+$base = &#x27;http://localhost:3000/api/persone&#x27;
+$body = @{ nome = &#x27;Giulia&#x27;; ruolo = &#x27;analista&#x27; } | ConvertTo-Json
+$creata = Invoke-RestMethod -Method Post -Uri $base -ContentType &#x27;application/json&#x27; -Body $body
+$creata.id
+Invoke-RestMethod -Method Get -Uri &quot;$base/$($creata.id)&quot;
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> La prima richiesta crea una persona; il risultato viene deserializzato da PowerShell in <code>$creata</code>. La seconda usa il suo ID per recuperarla. Questi comandi funzionano come alternativa ai comandi curl con continuazioni di riga tipiche di Bash.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Una verifica manuale utile comprende casi validi e invalidi: nome assente, ID inesistente, JSON malformato e DELETE ripetuta. Puoi usare Postman, curl o client equivalenti: lo standard da capire è HTTP. Le prove manuali non sostituiscono test ripetibili quando il progetto cresce.</aside><p class="exercise"><strong>Prova tu.</strong> Salva una richiesta con nome vuoto e controlla che lo status sia 400. Poi prova a server spento e confronta l’errore di connessione con una risposta 404.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-24" data-title="api get: elenco e dettaglio crud e architettura"><div class="eyebrow">LEZIONE 24 · CRUD e architettura</div><h2>API GET: elenco e dettaglio</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Risorsa e collezione</dt><dd>Una risorsa è un’entità esposta dall’API, per esempio una persona. Una collezione è un insieme di risorse.</dd><dt>Proiezione e contratto</dt><dd>Una proiezione sceglie quali campi restituire. Il contratto dell’API descrive URL, input, formato di risposta ed errori attesi.</dd><dt>RAM e persistenza</dt><dd>La RAM conserva i dati del processo in memoria. La persistenza li salva in modo da ritrovarli dopo un riavvio, per esempio in un database.</dd></dl></div>
+<p><strong>GET</strong> recupera risorse e non dovrebbe modificarle. Spesso un'API espone due route: elenco e dettaglio.</p>
+<pre><code class="language-js">const persone = [{ id: 1, nome: 'Anna' }, { id: 2, nome: 'Luca' }];
+app.get('/api/persone', (req, res) =&gt; res.json(persone));
+app.get('/api/persone/:id', (req, res) =&gt; {
+  const persona = persone.find(p =&gt; p.id === Number(req.params.id));
+  if (!persona) return res.status(404).json({ errore: 'Non trovata' });
+  res.json(persona);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>GET /api/persone</code> restituisce un array; <code>GET /api/persone/1</code> un singolo oggetto. Gli esempi usano un array <strong>in memoria</strong>, quindi i dati scompaiono al riavvio.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>La GET dell’elenco restituisce più persone; quella del dettaglio ne cerca una. Una lista vuota è un risultato diverso da un singolo ID non trovato: nella prima situazione puoi rispondere 200 con <code>[]</code>, nella seconda 404. La ricerca con <code>find</code> è lineare: su un array deve esaminare elementi fino a trovare quello giusto.</p><p>Importare <code>persone.cjs</code> non collega automaticamente una lettura al file sorgente a ogni richiesta. I dati caricati vivono nel processo: modificarli non riscrive il file JavaScript. Inoltre il contratto deve essere coerente: questa lezione restituisce un array nell’elenco, mentre il laboratorio aggiunge un oggetto con metadati <code>totale</code> e <code>dati</code>.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento: app Express e array persone già definiti
+app.get(&#x27;/api/rubrica&#x27;, (req, res) =&gt; {
+  const dati = persone.map(({ id, nome }) =&gt; ({ id, nome }));
+  res.json({ totale: dati.length, dati });
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>map</code> costruisce un nuovo array; il destructuring legge solo id e nome; l’oggetto finale espone quei campi. Se internamente aggiungi altri dati alla persona, questa risposta non li include automaticamente. Il totale qui è la lunghezza dell’elenco restituito.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Non esporre oggetti interni senza decidere i campi pubblici. In un sistema con database la query recupera i dati persistenti; il controller prepara la risposta. Una GET deve mantenere una semantica di lettura, anche se il server registra log o metriche.</aside><p class="exercise"><strong>Prova tu.</strong> Aggiungi un campo interno all’array e verifica che non compaia nella rubrica. Poi verifica elenco vuoto, ID valido e ID inesistente.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-25" data-title="api post: creare risorse crud e architettura"><div class="eyebrow">LEZIONE 25 · CRUD e architettura</div><h2>API POST: creare risorse</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Creazione e validazione</dt><dd>Creare significa aggiungere una risorsa con una propria identità. Validare significa controllare i dati prima che modifichino lo stato.</dd><dt>Normalizzazione e whitelist</dt><dd>Normalizzare significa portare dati in una forma coerente, per esempio togliere spazi esterni. Una whitelist è l’elenco dei campi esplicitamente accettati.</dd><dt>Location</dt><dd>Header di risposta che può indicare l’URL della risorsa appena creata.</dd></dl></div>
+<p><strong>POST</strong> inserisce una nuova risorsa. I dati arrivano spesso nel body JSON, da validare prima dell'inserimento.</p>
+<pre><code class="language-js">app.use(express.json());
+let prossimoId = 3;
+app.post('/api/persone', (req, res) =&gt; {
+  const nome = req.body?.nome;
+  if (typeof nome !== 'string' || !nome.trim()) {
+    return res.status(400).json({ errore: 'Nome obbligatorio' });
+  }
+  const persona = { id: prossimoId++, nome: nome.trim() };
+  persone.push(persona);
+  res.status(201).json(persona);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> due POST con lo stesso nome generano due record con ID distinti. In un'app reale occorrono regole di unicità e un database se sono richiesti.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il client invia il nome; il server controlla tipo e contenuto, assegna l’ID e aggiunge il record. Il client non deve scegliere l’ID per questa POST. <code>trim()</code> rimuove gli spazi iniziali e finali; va chiamato dopo aver verificato che il valore sia una stringa.</p><p><code>prossimoId++</code> usa il valore corrente e poi incrementa il contatore. È sufficiente per l’esempio con un singolo processo e dati in RAM. Non usare <code>persone.length + 1</code>: dopo una cancellazione potresti riutilizzare un ID già presente. In un sistema persistente la generazione degli ID va coordinata con l’archivio.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento per l&#x27;API: persone e prossimoId già definiti
+app.post(&#x27;/api/iscritti&#x27;, (req, res) =&gt; {
+  const nome = req.body?.nome;
+  if (typeof nome !== &#x27;string&#x27; || nome.trim().length &lt; 2) {
+    return res.status(400).json({ errore: &#x27;Nome di almeno 2 caratteri&#x27; });
+  }
+  const persona = { id: prossimoId++, nome: nome.trim() };
+  persone.push(persona);
+  return res.status(201).location(`/api/persone/${persona.id}`).json(persona);
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Il parser JSON deve essere registrato prima della route. <code>?.</code> legge nome senza errore se il body manca. <code>push</code> modifica l’array; la risposta 201 restituisce la nuova persona. Location rimanda alla route di dettaglio già esistente per la stessa collezione.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Nel corso il successo viene talvolta restituito con 200: per questa creazione 201 comunica meglio il risultato. Costruisci il record con i campi ammessi invece di copiare indiscriminatamente tutto <code>req.body</code>. L’array rimane volatile e non viene scritto sul disco.</aside><p class="exercise"><strong>Prova tu.</strong> Invia un ID nel body e verifica che il server usi quello generato da lui. Invia poi due POST uguali: senza una regola di unicità o idempotenza creano due persone diverse.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-26" data-title="api put: aggiornare crud e architettura"><div class="eyebrow">LEZIONE 26 · CRUD e architettura</div><h2>API PUT: aggiornare</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>PUT e PATCH</dt><dd>PUT esprime la sostituzione della rappresentazione della risorsa all’URL indicato. PATCH esprime una modifica parziale descritta dal body.</dd><dt>Campi modificabili e identità</dt><dd>I campi modificabili costituiscono i dati che l’API permette al client di cambiare. L’identità della risorsa resta quella selezionata dall’URL.</dd><dt>Indice dell’array</dt><dd>Posizione numerica di un elemento, a partire da zero: non è l’ID dell’elemento e può cambiare dopo una cancellazione.</dd></dl></div>
+<p><strong>PUT</strong> serve convenzionalmente a sostituire la rappresentazione della risorsa; il corso lo usa per aggiornare un elemento di un array. Per modifiche parziali si usa spesso <strong>PATCH</strong>.</p>
+<pre><code class="language-js">app.put('/api/persone/:id', (req, res) =&gt; {
+  const id = Number(req.params.id);
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: 'Non trovata' });
+  const nome = req.body?.nome;
+  if (typeof nome !== 'string' || !nome.trim())
+    return res.status(400).json({ errore: 'Nome non valido' });
+  persona.nome = nome.trim();
+  res.json(persona);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> con <code>PUT /api/persone/2</code> e body <code>{&quot;nome&quot;:&quot;Marco&quot;}</code>, l'oggetto con ID 2 viene aggiornato senza cambiare ID.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>La trascrizione parte da un aggiornamento diretto nell’array. Per renderlo affidabile, prima cerca la persona per ID, poi valida tutto ciò che vuoi modificare. Non usare l’ID direttamente come indice: la persona 5 potrebbe trovarsi in posizione 2 oppure non esserci.</p><p>Nel modello ridotto con il solo campo nome, l’esempio PUT sopra sostituisce tutti i dati modificabili. Nel laboratorio i campi sono nome e ruolo: una PUT richiede entrambi. Se vuoi cambiare solo ruolo conservando nome, usa un contratto PATCH. Anche una PATCH può essere idempotente quando assegna valori, ma non lo è necessariamente quando esprime operazioni come “incrementa”.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento: aggiunta all&#x27;API persone con campo ruolo
+app.patch(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = Number(req.params.id);
+  if (!Number.isSafeInteger(id) || id &lt;= 0)
+    return res.status(400).json({ errore: &#x27;ID non valido&#x27; });
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  const ruolo = req.body?.ruolo;
+  if (typeof ruolo !== &#x27;string&#x27; || !ruolo.trim() || ruolo.trim().length &gt; 80)
+    return res.status(400).json({ errore: &#x27;Ruolo non valido&#x27; });
+  persona.ruolo = ruolo.trim();
+  res.json(persona);
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Inviando <code>{"ruolo":"editor"}</code> modifichi il ruolo senza toccare nome e ID. Questa PATCH accetta il solo campo ruolo come modifica; un body senza ruolo non è valido. È una scelta del contratto, non un formato universale per tutte le PATCH.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Una PUT può anche creare una risorsa secondo il contratto dell’API; qui restituiamo 404 se manca. Non obbligare il client a rispedire un ID nel body e non permettere che un ID diverso sovrascriva quello selezionato dal percorso.</aside><p class="exercise"><strong>Prova tu.</strong> Invia la stessa PUT due volte: lo stato finale deve restare uguale. Confronta poi una PUT senza ruolo nel laboratorio con la PATCH qui sopra.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-27" data-title="api delete: eliminare crud e architettura"><div class="eyebrow">LEZIONE 27 · CRUD e architettura</div><h2>API DELETE: eliminare</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>findIndex e splice</dt><dd><code>findIndex</code> trova la posizione di un elemento e restituisce -1 se manca. <code>splice</code> modifica l’array eliminando o inserendo elementi a partire da una posizione.</dd><dt>204 No Content</dt><dd>Risposta di successo senza body. Il client non deve tentare di leggerla come JSON.</dd><dt>Cancellazione logica</dt><dd>Alternativa alla rimozione fisica: si marca un record come eliminato e lo si esclude dalle normali letture, secondo le regole applicative.</dd></dl></div>
+<p><strong>DELETE</strong> rimuove una risorsa individuata normalmente da un ID. Evita di confondere l'ID pubblico con l'indice dell'array: possono essere diversi.</p>
+<pre><code class="language-js">app.delete('/api/persone/:id', (req, res) =&gt; {
+  const id = Number(req.params.id);
+  const posizione = persone.findIndex(p =&gt; p.id === id);
+  if (posizione === -1)
+    return res.status(404).json({ errore: 'Non trovata' });
+  persone.splice(posizione, 1);
+  res.status(204).end();
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> dopo aver eliminato l'ID 1, gli altri ID non dovrebbero essere ricalcolati. <code>204</code> non ha body; <code>200</code> con una conferma JSON è un'alternativa.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>findIndex</code> collega l’ID pubblico alla posizione corrente nell’array. Verifica sempre -1: chiamare <code>splice(-1, 1)</code> elimina l’ultimo elemento, anche se quello richiesto non esiste. Dopo la rimozione non ricalcolare gli ID dei sopravvissuti: i loro URL devono continuare a identificare le stesse persone.</p><p>Una seconda DELETE può ricevere 404 dopo che la prima ha ricevuto 204. Questo non contraddice l’idempotenza: in entrambi i casi lo stato finale desiderato è che la risorsa non esista. Alcune API scelgono 204 anche se il record è già assente: documenta la politica.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// elimina.mjs — client Node per l&#x27;API del laboratorio attiva
+const risposta = await fetch(&#x27;http://localhost:3000/api/persone/1&#x27;, {
+  method: &#x27;DELETE&#x27;
+});
+if (risposta.status === 204) {
+  console.log(&#x27;Eliminazione riuscita, nessun body da leggere&#x27;);
+} else {
+  console.log(&#x27;Status:&#x27;, risposta.status, &#x27;Risposta:&#x27;, await risposta.text());
+}
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Alla prima esecuzione ottieni normalmente 204. La seconda restituisce 404 e il messaggio dell’API, se il server non è stato riavviato. <code>response.json()</code> su una risposta 204 fallirebbe perché non c’è testo JSON da interpretare.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> La rimozione in RAM non equivale a una cancellazione persistente. In sistemi reali vanno definite anche dipendenze fra record, permessi e possibilità di recupero; la cancellazione logica è una scelta di modello, non una proprietà automatica del metodo DELETE.</aside><p class="exercise"><strong>Prova tu.</strong> Elimina un ID intermedio e recupera gli altri. Verifica che un ID inesistente non causi la cancellazione accidentale dell’ultimo elemento.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson" id="lezione-28" data-title="express router e organizzazione crud e architettura"><div class="eyebrow">LEZIONE 28 · CRUD e architettura</div><h2>Express Router e organizzazione</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Router e prefisso</dt><dd>Un Router è un insieme componibile di route e middleware. Il prefisso di montaggio collega quel gruppo a una parte dell’URL dell’app.</dd><dt>Controller, service e repository</dt><dd>Il controller gestisce ingresso e risposta HTTP; il service applica regole del dominio; il repository legge e scrive i dati. Sono ruoli organizzativi, non oggetti creati automaticamente da Express.</dd><dt>MVC</dt><dd>Model–View–Controller: separa modello e dati, presentazione e gestione dell’interazione. In un’API JSON la presentazione non è necessariamente una pagina HTML.</dd></dl></div>
+<p>Con l'aumentare delle route conviene separarle dal file principale. <code>express.Router()</code> consente di raggruppare endpoint e middleware.</p>
+<pre><code class="language-js">// routes/persone.cjs
+const express = require('express');
+const router = express.Router();
+router.get('/', (req, res) =&gt; res.json([{ id: 1, nome: 'Anna' }]));
+router.get('/:id', (req, res) =&gt; res.json({ id: Number(req.params.id) }));
+module.exports = router;
+</code></pre>
+<pre><code class="language-js">// server.cjs
+const express = require('express');
+const personeRouter = require('./routes/persone.cjs');
+const app = express();
+app.use('/api/persone', personeRouter);
+app.listen(3000);
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> un futuro progetto può dividere codice in <code>routes/</code>, <code>controllers/</code>, <code>services/</code> e <code>repositories/</code>. Il video finale accenna a sviluppi successivi (MVC e database), ma queste parti <strong>non sono spiegate</strong> nel materiale introduttivo fornito.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>app.use("/api/persone", personeRouter)</code> affida al router le richieste sotto quel prefisso. All’interno scrivi <code>router.get("/")</code> e <code>router.get("/:id")</code>. Ripetere <code>/api/persone</code> dentro il router produrrebbe un percorso duplicato. Per una richiesta al router, <code>req.originalUrl</code> conserva l’URL originale, mentre Express gestisce il percorso relativo al montaggio.</p><p>La catena completa può essere: server → parser e middleware → router → controller → service → repository → risposta. Il router sceglie chi gestisce la richiesta; non è lui, da solo, a rendere persistenti i dati. Parti da pochi file con responsabilità chiare e separali quando questo rende il flusso più comprensibile.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// controllers/salute.cjs
+function leggiSalute(req, res) {
+  res.json({ ok: true });
+}
+module.exports = { leggiSalute };
+
+// routes/salute.cjs — secondo file
+const router = require(&#x27;express&#x27;).Router();
+const { leggiSalute } = require(&#x27;../controllers/salute.cjs&#x27;);
+router.get(&#x27;/&#x27;, leggiSalute);
+module.exports = router;
+
+// server.cjs — aggiunta prima di listen e della 404
+// app.use(&#x27;/api/salute&#x27;, require(&#x27;./routes/salute.cjs&#x27;));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> Crea le due cartelle e i due file separati. Nel server già configurato aggiungi la riga app.use togliendo <code>//</code>. <code>GET /api/salute</code> viene selezionata dal router e la risposta è costruita dal controller. Non chiamare <code>leggiSalute()</code> mentre registri la route: passa il riferimento alla funzione.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Express non impone MVC né una struttura unica. Separare il modulo che costruisce l’app da quello che chiama listen aiuta i test; separare accesso dati e regole aiuta a sostituire l’array con un database. Questi sono approfondimenti aggiunti al percorso introduttivo.</aside><p class="exercise"><strong>Prova tu.</strong> Sposta le route CRUD nel router persone e controlla che gli URL pubblici restino identici. Poi indica in quale file metteresti una regola “nome non vuoto” e in quale una query di lettura.</p></div>
+<a class="top" href="#inizio">Torna all’indice ↑</a></section><section class="lesson extra" id="progetto"><div class="eyebrow">LABORATORIO FINALE</div><h1>Progetto completo — API persone con Express</h1>
+<p>Questo esercizio unisce <strong>Express, JSON, parametri della route, query string, middleware, GET, POST, PUT, PATCH, DELETE e gestione errori</strong>. È un'estensione didattica sviluppata per questa guida: il corso originale affronta questi pezzi in lezioni separate. L'archivio è volutamente <strong>in memoria</strong>.</p>
+<h2>1. Preparazione</h2>
+<pre><code class="language-bash">mkdir api-persone
+cd api-persone
+npm init -y
+npm install express@5
+</code></pre>
+<p>Crea un file <code>server.cjs</code> con il contenuto seguente.</p>
+<h2>2. Server completo (un solo file)</h2>
+<pre><code class="language-js">const express = require(&#x27;express&#x27;);
+const app = express();
+const PORT = 3000;
+
+let persone = [
+  { id: 1, nome: &#x27;Anna&#x27;, ruolo: &#x27;designer&#x27; },
+  { id: 2, nome: &#x27;Luca&#x27;, ruolo: &#x27;developer&#x27; }
+];
+let prossimoId = 3;
+
+// Middleware: registra metodo, percorso e tempo impiegato.
+app.use((req, res, next) =&gt; {
+  const inizio = Date.now();
+  res.on(&#x27;finish&#x27;, () =&gt; {
+    console.log(req.method, req.originalUrl, res.statusCode,
+      `${Date.now() - inizio}ms`);
+  });
+  next();
+});
+
+// Il parser viene dopo il logger e prima delle route.
+app.use(express.json({ limit: &#x27;32kb&#x27; }));
+
+function nomeValido(nome) {
+  return typeof nome === &#x27;string&#x27; &amp;&amp;
+    nome.trim().length &gt;= 2 &amp;&amp; nome.trim().length &lt;= 80;
+}
+function idRichiesto(req, res) {
+  const testo = req.params.id;
+  const id = Number(testo);
+  if (!/^[1-9]\d*$/.test(testo) || !Number.isSafeInteger(id)) {
+    res.status(400).json({ errore: &#x27;ID non valido&#x27; });
+    return null;
+  }
+  return id;
+}
+
+// GET /api/persone?cerca=an&amp;limite=10
+app.get(&#x27;/api/persone&#x27;, (req, res) =&gt; {
+  const { cerca = &#x27;&#x27;, limite: testoLimite = &#x27;20&#x27; } = req.query;
+  if (typeof cerca !== &#x27;string&#x27; || typeof testoLimite !== &#x27;string&#x27; ||
+      !/^[1-9]\d*$/.test(testoLimite)) {
+    return res.status(400).json({ errore: &#x27;Query non valida&#x27; });
+  }
+  const limite = Number(testoLimite);
+  if (!Number.isSafeInteger(limite) || limite &gt; 100)
+    return res.status(400).json({ errore: &#x27;Limite da 1 a 100&#x27; });
+  const risultati = persone.filter(p =&gt;
+    p.nome.toLowerCase().includes(cerca.toLowerCase())
+  ).slice(0, limite);
+  res.json({ totale: risultati.length, dati: risultati });
+});
+
+// GET /api/persone/:id
+app.get(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = idRichiesto(req, res);
+  if (id === null) return;
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  res.json(persona);
+});
+
+// POST /api/persone
+app.post(&#x27;/api/persone&#x27;, (req, res) =&gt; {
+  const { nome, ruolo = &#x27;utente&#x27; } = req.body ?? {};
+  if (!nomeValido(nome) || typeof ruolo !== &#x27;string&#x27; || !ruolo.trim() || ruolo.trim().length &gt; 80)
+    return res.status(400).json({ errore: &#x27;Dati non validi&#x27; });
+  const persona = { id: prossimoId++, nome: nome.trim(), ruolo: ruolo.trim() };
+  persone.push(persona);
+  res.status(201).location(`/api/persone/${persona.id}`).json(persona);
+});
+
+// PUT /api/persone/:id
+app.put(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = idRichiesto(req, res);
+  if (id === null) return;
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  const { nome, ruolo } = req.body ?? {};
+  if (!nomeValido(nome) || typeof ruolo !== &#x27;string&#x27; || !ruolo.trim() || ruolo.trim().length &gt; 80)
+    return res.status(400).json({ errore: &#x27;Dati non validi&#x27; });
+  persona.nome = nome.trim();
+  persona.ruolo = ruolo.trim();
+  res.json(persona);
+});
+
+// PATCH /api/persone/:id — modifica soltanto il ruolo
+app.patch(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = idRichiesto(req, res);
+  if (id === null) return;
+  const persona = persone.find(p =&gt; p.id === id);
+  if (!persona) return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  const ruolo = req.body?.ruolo;
+  if (typeof ruolo !== &#x27;string&#x27; || !ruolo.trim() || ruolo.trim().length &gt; 80)
+    return res.status(400).json({ errore: &#x27;Ruolo non valido&#x27; });
+  persona.ruolo = ruolo.trim();
+  res.json(persona);
+});
+
+// DELETE /api/persone/:id
+app.delete(&#x27;/api/persone/:id&#x27;, (req, res) =&gt; {
+  const id = idRichiesto(req, res);
+  if (id === null) return;
+  const prima = persone.length;
+  persone = persone.filter(p =&gt; p.id !== id);
+  if (persone.length === prima)
+    return res.status(404).json({ errore: &#x27;Non trovata&#x27; });
+  res.status(204).end();
+});
+
+app.use((req, res) =&gt; res.status(404).json({ errore: &#x27;Endpoint non trovato&#x27; }));
+app.use((err, req, res, next) =&gt; {
+  if (res.headersSent) return next(err);
+  if (err.type === &#x27;entity.parse.failed&#x27;)
+    return res.status(400).json({ errore: &#x27;JSON malformato&#x27; });
+  if (err.type === &#x27;entity.too.large&#x27;)
+    return res.status(413).json({ errore: &#x27;Body oltre 32kb&#x27; });
+  if (Number.isInteger(err.status) &amp;&amp; err.status &gt;= 400 &amp;&amp; err.status &lt; 500)
+    return res.status(err.status).json({ errore: &#x27;Richiesta non valida&#x27; });
+  console.error(err);
+  res.status(500).json({ errore: &#x27;Errore interno&#x27; });
+});
+app.listen(PORT, &#x27;127.0.0.1&#x27;, () =&gt; console.log(`API: http://localhost:${PORT}`));
+</code></pre>
+<h2>3. Provalo con il terminale</h2><p>I comandi <code>curl</code> multilinea seguenti usano la sintassi Bash. Per PowerShell trovi subito dopo una sequenza equivalente. Apri una cartella dedicata all’esercizio e tieni attivo un solo server sulla porta 3000. Per chiuderlo usa Ctrl+C nel suo terminale.</p>
+<pre><code class="language-bash">node server.cjs
+</code></pre>
+<p>In un <strong>secondo terminale</strong>:</p>
+<pre><code class="language-bash">curl -i http://localhost:3000/api/persone
+curl -i 'http://localhost:3000/api/persone?cerca=an&amp;limite=1'
+curl -i http://localhost:3000/api/persone/1
+curl -i -X POST http://localhost:3000/api/persone \
+  -H 'Content-Type: application/json' \
+  -d '{&quot;nome&quot;:&quot;Giulia&quot;,&quot;ruolo&quot;:&quot;analista&quot;}'
+curl -i -X PUT http://localhost:3000/api/persone/3 \
+  -H 'Content-Type: application/json' \
+  -d '{&quot;nome&quot;:&quot;Giulia&quot;,&quot;ruolo&quot;:&quot;senior analyst&quot;}'
+curl -i -X DELETE http://localhost:3000/api/persone/3
+</code></pre>
+<h3>La stessa sequenza in PowerShell</h3><pre><code class="language-powershell"># Secondo terminale PowerShell; il server deve essere già attivo
+$base = &#x27;http://127.0.0.1:3000/api/persone&#x27;
+Invoke-RestMethod -Uri $base
+$json = @{ nome = &#x27;Giulia&#x27;; ruolo = &#x27;analista&#x27; } | ConvertTo-Json
+$persona = Invoke-RestMethod -Method Post -Uri $base -ContentType &#x27;application/json&#x27; -Body $json
+$uri = &quot;$base/$($persona.id)&quot;
+Invoke-RestMethod -Uri $uri
+$json = @{ nome = &#x27;Giulia Rossi&#x27;; ruolo = &#x27;analista senior&#x27; } | ConvertTo-Json
+Invoke-RestMethod -Method Put -Uri $uri -ContentType &#x27;application/json&#x27; -Body $json
+$json = @{ ruolo = &#x27;responsabile&#x27; } | ConvertTo-Json
+Invoke-RestMethod -Method Patch -Uri $uri -ContentType &#x27;application/json&#x27; -Body $json
+Invoke-RestMethod -Method Delete -Uri $uri
+Invoke-RestMethod -Uri $base
+</code></pre><p>La DELETE riuscita non produce contenuto. L’ID viene ricavato dalla POST: la sequenza funziona anche se hai già creato altre persone. In Windows PowerShell gli errori HTTP di Invoke-RestMethod possono essere mostrati come eccezioni, mentre Postman rende status e body direttamente ispezionabili.</p><h2>4. Risultati e limiti</h2>
+<table>
+<thead>
+<tr>
+  <th>Richiesta</th>
+  <th>Risultato atteso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>GET elenco</td>
+  <td><code>200</code>, oggetto con <code>totale</code> e <code>dati</code></td>
+</tr>
+<tr>
+  <td>GET ID inesistente</td>
+  <td><code>404</code></td>
+</tr>
+<tr>
+  <td>POST valido</td>
+  <td><code>201</code>, nuova persona con ID</td>
+</tr>
+<tr>
+  <td>POST con nome vuoto</td>
+  <td><code>400</code></td>
+</tr>
+<tr>
+  <td>PUT valido</td>
+  <td><code>200</code>, persona aggiornata</td>
+</tr>
+<tr>
+  <td>DELETE valido</td>
+  <td><code>204</code>, nessun corpo</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Non è una API pronta per la produzione:</strong> mancano database persistente, autenticazione/autorizzazione, rate limiting, test automatici, logging strutturato e validazione completa degli input. L'obiettivo è esercitarsi sui concetti del corso.</p>
+<h2>5. Il viaggio di una richiesta, passo per passo</h2>
+<div class="flow" aria-label="Flusso di una richiesta"><span>Client</span><span>→ Logger</span><span>→ Parser JSON</span><span>→ Route</span><span>→ Validazione</span><span>→ Array in RAM</span><span>→ Risposta</span></div>
+<p>Per una POST, il client invia un testo JSON. Il logger registra una funzione sull’evento <code>finish</code> della risposta, poi chiama next. Il parser interpreta il testo. La route legge i campi ammessi, li valida e costruisce una nuova persona; push aggiorna l’array. Infine status, Location e json preparano e inviano la risposta. A quel punto il listener finish registra status e durata: questa misura la conclusione dell’invio dal server, non dimostra che l’utente abbia già letto il contenuto.</p>
+<table><thead><tr><th>Parte</th><th>Responsabilità</th><th>Cosa controllare</th></tr></thead><tbody>
+<tr><td>nomeValido</td><td>Verifica nome testuale di 2–80 caratteri dopo trim</td><td>Non accetta numeri o soli spazi</td></tr>
+<tr><td>idRichiesto</td><td>Legge e valida l’ID numerico nel percorso</td><td>Restituisce null dopo una risposta 400</td></tr>
+<tr><td>GET elenco</td><td>Filtra e limita i risultati</td><td>Query ripetute o limite fuori da 1–100 danno 400</td></tr>
+<tr><td>POST</td><td>Crea e assegna l’identità</td><td>Nome richiesto; ruolo predefinito utente se assente</td></tr>
+<tr><td>PUT</td><td>Sostituisce i campi modificabili</td><td>Nome e ruolo obbligatori</td></tr>
+<tr><td>PATCH</td><td>Modifica il solo ruolo</td><td>Nome resta invariato; gli altri campi sono ignorati</td></tr>
+<tr><td>DELETE</td><td>Rimuove la persona mantenendo gli altri ID</td><td>204 senza body, oppure 404</td></tr>
+<tr><td>Error handler</td><td>Traduce errori del parser e del server</td><td>400 per JSON malformato; 413 per body troppo grande; 500 per errore interno</td></tr>
+</tbody></table>
+<p><code>totale</code> è qui il numero di risultati restituiti dopo il limite, non il numero di tutte le corrispondenze possibili. Non sono implementati offset o cursori di paginazione. <code>res.headersSent</code> indica che gli header sono già partiti: in quel caso il gestore passa l’errore alla gestione successiva, evitando una seconda risposta. Per approfondire: <a href="https://expressjs.com/en/guide/error-handling/">gestione errori Express</a> e <a href="https://expressjs.com/en/resources/middleware/body-parser/">errori dei parser</a>.</p>
+<h3>Controlli negativi con risultati attesi</h3>
+<ul><li><code>GET /api/persone/abc</code> → 400; <code>GET /api/persone/999</code> → 404.</li><li><code>GET /api/persone?limite=0</code> o <code>?limite=2&amp;limite=3</code> → 400.</li><li>POST con <code>{"nome":" "}</code> → 400 e nessun inserimento.</li><li>POST con JSON troncato, per esempio <code>{"nome":</code> → 400, non 500.</li><li>PUT senza ruolo → 400; PATCH con ruolo valido → 200 senza cambiare nome.</li><li>DELETE ripetuta sullo stesso ID → prima 204, poi 404.</li><li>Riavvio del server → dati iniziali ripristinati: l’array non è persistente.</li></ul>
+<p>Il contatore e l’array sono condivisi soltanto nel singolo processo. Per dati durevoli e più istanze serve un archivio coordinato. Gli esempi non implementano utenti autenticati: il campo ruolo è un semplice dato descrittivo della persona e non conferisce permessi all’applicazione.</p>
+</section><section class="lesson extra" id="ripasso"><div class="eyebrow">CONSOLIDAMENTO</div><h1>Ripasso e percorso di studio</h1>
+<h2>Come affrontare il materiale</h2>
+<ol>
+<li><strong>Fondamenti (01–04):</strong> esegui script, distingui Node dal browser, conosci <code>process</code>.</li>
+<li><strong>Moduli e I/O (05–07):</strong> importa moduli e confronta letture sincrone/asincrone.</li>
+<li><strong>HTTP e runtime (08, 12–15):</strong> crea un server, osserva event loop, eventi e stream.</li>
+<li><strong>Progetto e tooling (09–11):</strong> usa npm, <code>package.json</code> e riavvio automatico.</li>
+<li><strong>Express e API (16–23):</strong> crea route, JSON, filtri, middleware e testa le richieste.</li>
+<li><strong>CRUD (24–28):</strong> completa il progetto finale, poi separa le route.</li>
+</ol>
+<h2>Errori frequenti da evitare</h2>
+<ul>
+<li>Scambiare <code>req.params.id</code> (una stringa) con un numero senza conversione e validazione.</li>
+<li>Credere che <code>async</code> renda non bloccante un calcolo CPU impegnativo.</li>
+<li>Restituire <code>200</code> quando la risorsa non esiste invece di <code>404</code>.</li>
+<li>Dimenticare <code>express.json()</code> prima delle route che leggono il body JSON.</li>
+<li>Pensare che <code>require</code> e <code>import</code> siano intercambiabili senza configurazione.</li>
+<li>Usare percorsi di file relativi senza sapere da quale cartella si avvia il processo.</li>
+<li>Trattare i dati in RAM come se fossero persistenti.</li>
+</ul>
+<h2>Cinque esercizi progressivi</h2>
+<ol>
+<li><strong>Base:</strong> modifica il primo script affinché stampi pari o dispari per i numeri da 1 a 20.</li>
+<li><strong>Moduli:</strong> crea <code>calcoli.cjs</code> con <code>somma()</code> e <code>media()</code>, importale in <code>main.cjs</code>.</li>
+<li><strong>File:</strong> salva un array di appunti in <code>appunti.json</code>, poi rileggilo tramite <code>node:fs/promises</code>.</li>
+<li><strong>HTTP:</strong> aggiungi <code>/ora</code> al server HTTP e restituisci un timestamp ISO in JSON.</li>
+<li><strong>CRUD:</strong> aggiungi all’API completa una ricerca per <code>ruolo</code> ed estendi la PATCH perché accetti anche il nome, validando almeno un campo modificabile.</li>
+</ol>
+<h2>Domande di ripasso con risposta</h2><dl><dt>Chi esegue il codice della route?</dt><dd>Node esegue la funzione JavaScript che Express ha selezionato in base a metodo, percorso e ordine dei middleware.</dd><dt>Perché req.body può essere assente?</dt><dd>Il parser può mancare, essere registrato troppo tardi, non riconoscere il Content-Type o non avere un body da interpretare.</dd><dt>Perché una POST scompare dopo un salvataggio?</dt><dd>Se il watcher riavvia il processo, l’array in RAM viene ricreato. La persistenza richiede un salvataggio esplicito.</dd><dt>Un await rende il calcolo parallelo?</dt><dd>No: permette di attendere una Promise senza bloccare la funzione chiamante nello stesso modo di una chiamata sincrona, ma un calcolo pesante sul thread principale resta bloccante.</dd><dt>Qual è la differenza fra 400 e 404?</dt><dd>400 descrive input non valido; 404 una risorsa o route non trovata, secondo il contratto dell’API.</dd></dl><h2>Cosa studiare dopo</h2>
+<p>Il corso introduttivo termina sostanzialmente con Express Router. Per sviluppare backend reali approfondisci <strong>database e SQL</strong>, autenticazione, autorizzazione, convalida degli input, test, sicurezza delle API, gestione errori, TypeScript e deploy. Il filmato conclusivo del testo fornito presenta un <strong>corso separato a pagamento</strong>: non è una lezione tecnica da riassumere come parte delle 28.</p>
+</section><section class="lesson extra" id="riferimenti"><div class="eyebrow">CONSULTAZIONE</div><h2>Materiale di partenza e pratiche attuali</h2><p>Il manuale rielabora il testo incollato e i 28 documenti delle lezioni presenti nella cartella del corso, correggendo i termini deformati dalla trascrizione automatica. Le spiegazioni guidate e gli esempi supplementari sono integrazioni didattiche. Il video 29 è una presentazione commerciale: non aggiunge una ventinovesima lezione tecnica.</p>
+<table><thead><tr><th>Nel materiale</th><th>Come leggerlo oggi</th></tr></thead><tbody>
+<tr><td>Node 14/16</td><td>Usa una linea LTS ancora supportata; verifica lo stato nella <a href="https://nodejs.org/en/about/previous-releases">tabella ufficiale</a>.</td></tr>
+<tr><td>require e module.exports</td><td>CommonJS è ancora supportato. ESM offre import/export standard; scegli il formato in modo esplicito.</td></tr>
+<tr><td>Nodemon</td><td>Resta valido; per il riavvio di base esiste anche il watch integrato in Node.</td></tr>
+<tr><td>Callback di fs</td><td>Restano valide; Promise e await semplificano molti flussi asincroni.</td></tr>
+<tr><td>Vecchie route Express</td><td>Gli esempi nuovi si riferiscono a Express 5; controlla le differenze prima di copiare percorsi da Express 4.</td></tr>
+<tr><td>Array importato = copia</td><td>L’importazione non copia automaticamente l’array e modificare l’oggetto non riscrive il file sorgente.</td></tr>
+<tr><td>Statico = SSR</td><td>Servire HTML già scritto è statico; SSR genera la vista lato server usando dati.</td></tr>
+<tr><td>Risposta 200 per ogni esito</td><td>Usa gli status secondo il risultato: creazione 201, assenza 404, input errato 400.</td></tr>
+</tbody></table>
+<p>La documentazione online può evolvere. Il testo del manuale è consultabile offline; i collegamenti richiedono una connessione. Per i dettagli normativi fai riferimento alle pagine ufficiali collegate vicino alle relative spiegazioni.</p></section><div class="footer">Guida rielaborata a partire dalle trascrizioni fornite · esempi aggiuntivi originali · file consultabile offline</div></main></div><script>const search=document.getElementById('search');search.addEventListener('input',()=>{const q=search.value.toLowerCase().trim();document.querySelectorAll('.navlink[data-title]').forEach(a=>{a.classList.toggle('hidden',!(a.dataset.title+' '+(document.querySelector(a.getAttribute('href'))?.textContent??'').toLowerCase()).includes(q))})});document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.parentNode.insertBefore(wrap,pre);wrap.appendChild(pre);const b=document.createElement('button');b.className='copy';b.textContent='Copia';b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(pre.innerText);b.textContent='Copiato';setTimeout(()=>b.textContent='Copia',1300)}catch(e){b.textContent='Seleziona il codice'}});wrap.appendChild(b)});const side=document.getElementById('sidebar');document.getElementById('toggle').onclick=()=>{side.classList.toggle('open');document.body.classList.toggle('nav-open')};side.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{side.classList.remove('open');document.body.classList.remove('nav-open')}));</script></body></html>

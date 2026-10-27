@@ -1,0 +1,22 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Prime righe di codice</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 03 · Fondamenti</div><h2>Prime righe di codice</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Script e processo</dt><dd>Uno script è un file di istruzioni; un processo è l’istanza del programma avviata dal sistema operativo.</dd><dt>Funzione e argomento</dt><dd>Una funzione raggruppa istruzioni richiamabili. Un argomento è un valore passato quando la si invoca; il parametro è il nome che lo riceve.</dd><dt>const, let e confronto stretto</dt><dd><code>const</code> impedisce di riassegnare una variabile; <code>let</code> permette di riassegnarla. <code>===</code> confronta senza conversione automatica di tipo.</dd></dl></div>
+<p>Un programma Node.js è un normale file <code>.js</code> eseguito dal terminale. La sintassi JavaScript resta valida, salvo le API specifiche del browser.</p>
+<pre><code class="language-js">// index.js
+const numero = 3;
+if (numero &lt; 3) console.log('Minore di 3');
+else if (numero === 3) console.log('Uguale a 3');
+else console.log('Maggiore di 3');
+for (let i = 0; i &lt; 3; i++) console.log('Giro', i);
+</code></pre>
+<pre><code class="language-bash">node index.js
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>console.log(typeof document)</code> stampa <code>undefined</code> in un normale processo Node.js. Prima di avviare il programma ricordati di <strong>salvare</strong> il file.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il comando <code>node index.js</code> carica il file salvato sul disco e ne esegue il codice dall’alto verso il basso. Il nome <code>index</code> è una convenzione, non una parola speciale. Un programma senza server, timer attivi o altre attività in attesa normalmente termina quando finisce il lavoro.</p><p><code>console.log</code> scrive nel terminale del processo. Non aggiorna una pagina web. Un <strong>errore di sintassi</strong> impedisce di interpretare il codice; un errore durante l’esecuzione può avvenire dopo che alcune istruzioni sono già state eseguite. Leggi il file e il numero di riga indicati nel messaggio.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// argomenti.cjs — avvio: node argomenti.cjs Anna
+const nome = process.argv[2] ?? &#x27;visitatore&#x27;;
+function saluta(persona) {
+  return `Ciao, ${persona}!`;
+}
+console.log(saluta(nome));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>process.argv</code> è l’array degli argomenti del processo: le prime due posizioni riguardano eseguibile e script. La posizione <code>2</code> contiene <code>Anna</code>. L’operatore <code>??</code> usa il valore a destra se quello a sinistra è <code>null</code> o <code>undefined</code>. La funzione restituisce il saluto, poi <code>console.log</code> lo stampa.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Usa l’estensione completa nei comandi: rende chiaro quale file avvii. Nei prossimi esempi <code>.cjs</code> rende esplicito CommonJS, mentre <code>.mjs</code> rende espliciti gli ES Modules. La lezione 5 spiega i due sistemi.</aside><p class="exercise"><strong>Prova tu.</strong> Avvia lo script senza nome: deve stampare <code>Ciao, visitatore!</code>. Poi modifica il valore predefinito, salva e rilancialo.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

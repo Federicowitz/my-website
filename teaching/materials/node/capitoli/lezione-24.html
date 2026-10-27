@@ -1,0 +1,20 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>API GET: elenco e dettaglio</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 24 · CRUD e architettura</div><h2>API GET: elenco e dettaglio</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Risorsa e collezione</dt><dd>Una risorsa è un’entità esposta dall’API, per esempio una persona. Una collezione è un insieme di risorse.</dd><dt>Proiezione e contratto</dt><dd>Una proiezione sceglie quali campi restituire. Il contratto dell’API descrive URL, input, formato di risposta ed errori attesi.</dd><dt>RAM e persistenza</dt><dd>La RAM conserva i dati del processo in memoria. La persistenza li salva in modo da ritrovarli dopo un riavvio, per esempio in un database.</dd></dl></div>
+<p><strong>GET</strong> recupera risorse e non dovrebbe modificarle. Spesso un'API espone due route: elenco e dettaglio.</p>
+<pre><code class="language-js">const persone = [{ id: 1, nome: 'Anna' }, { id: 2, nome: 'Luca' }];
+app.get('/api/persone', (req, res) =&gt; res.json(persone));
+app.get('/api/persone/:id', (req, res) =&gt; {
+  const persona = persone.find(p =&gt; p.id === Number(req.params.id));
+  if (!persona) return res.status(404).json({ errore: 'Non trovata' });
+  res.json(persona);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> <code>GET /api/persone</code> restituisce un array; <code>GET /api/persone/1</code> un singolo oggetto. Gli esempi usano un array <strong>in memoria</strong>, quindi i dati scompaiono al riavvio.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>La GET dell’elenco restituisce più persone; quella del dettaglio ne cerca una. Una lista vuota è un risultato diverso da un singolo ID non trovato: nella prima situazione puoi rispondere 200 con <code>[]</code>, nella seconda 404. La ricerca con <code>find</code> è lineare: su un array deve esaminare elementi fino a trovare quello giusto.</p><p>Importare <code>persone.cjs</code> non collega automaticamente una lettura al file sorgente a ogni richiesta. I dati caricati vivono nel processo: modificarli non riscrive il file JavaScript. Inoltre il contratto deve essere coerente: questa lezione restituisce un array nell’elenco, mentre il laboratorio aggiunge un oggetto con metadati <code>totale</code> e <code>dati</code>.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Frammento: app Express e array persone già definiti
+app.get(&#x27;/api/rubrica&#x27;, (req, res) =&gt; {
+  const dati = persone.map(({ id, nome }) =&gt; ({ id, nome }));
+  res.json({ totale: dati.length, dati });
+});
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>map</code> costruisce un nuovo array; il destructuring legge solo id e nome; l’oggetto finale espone quei campi. Se internamente aggiungi altri dati alla persona, questa risposta non li include automaticamente. Il totale qui è la lunghezza dell’elenco restituito.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Non esporre oggetti interni senza decidere i campi pubblici. In un sistema con database la query recupera i dati persistenti; il controller prepara la risposta. Una GET deve mantenere una semantica di lettura, anche se il server registra log o metriche.</aside><p class="exercise"><strong>Prova tu.</strong> Aggiungi un campo interno all’array e verifica che non compaia nella rubrica. Poi verifica elenco vuoto, ID valido e ID inesistente.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>

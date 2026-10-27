@@ -1,0 +1,12 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Materiale di partenza e pratiche attuali</title></head><body><article class="reading"><div class="eyebrow">CONSULTAZIONE</div><h2>Materiale di partenza e pratiche attuali</h2><p>Il manuale rielabora il testo incollato e i 28 documenti delle lezioni presenti nella cartella del corso, correggendo i termini deformati dalla trascrizione automatica. Le spiegazioni guidate e gli esempi supplementari sono integrazioni didattiche. Il video 29 è una presentazione commerciale: non aggiunge una ventinovesima lezione tecnica.</p>
+<table><thead><tr><th>Nel materiale</th><th>Come leggerlo oggi</th></tr></thead><tbody>
+<tr><td>Node 14/16</td><td>Usa una linea LTS ancora supportata; verifica lo stato nella <a href="https://nodejs.org/en/about/previous-releases">tabella ufficiale</a>.</td></tr>
+<tr><td>require e module.exports</td><td>CommonJS è ancora supportato. ESM offre import/export standard; scegli il formato in modo esplicito.</td></tr>
+<tr><td>Nodemon</td><td>Resta valido; per il riavvio di base esiste anche il watch integrato in Node.</td></tr>
+<tr><td>Callback di fs</td><td>Restano valide; Promise e await semplificano molti flussi asincroni.</td></tr>
+<tr><td>Vecchie route Express</td><td>Gli esempi nuovi si riferiscono a Express 5; controlla le differenze prima di copiare percorsi da Express 4.</td></tr>
+<tr><td>Array importato = copia</td><td>L’importazione non copia automaticamente l’array e modificare l’oggetto non riscrive il file sorgente.</td></tr>
+<tr><td>Statico = SSR</td><td>Servire HTML già scritto è statico; SSR genera la vista lato server usando dati.</td></tr>
+<tr><td>Risposta 200 per ogni esito</td><td>Usa gli status secondo il risultato: creazione 201, assenza 404, input errato 400.</td></tr>
+</tbody></table>
+<p>La documentazione online può evolvere. Il testo del manuale è consultabile offline; i collegamenti richiedono una connessione. Per i dettagli normativi fai riferimento alle pagine ufficiali collegate vicino alle relative spiegazioni.</p></article><script src="../../../reader.js"></script></body></html>

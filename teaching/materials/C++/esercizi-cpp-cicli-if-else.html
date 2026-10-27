@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi C++ cicli e if else</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Esercizi C++ su cicli e if else</h1>
+      <p>Esercizi per combinare ripetizione, condizioni, conteggi, filtri e validazioni.</p>
+    </div>
+  </header>
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+    <section class="note"><h2>Indicazioni generali</h2><ul id="rulesList"></ul></section>
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+  <script>
+    window.exercisePageConfig = {
+      storageKey: "cpp-loops-if-else-exercises-progress-v1",
+      rules: [
+        "Scegli il ciclo piu adatto: while, do while oppure for.",
+        "Usa if, else if ed else per distinguere i casi.",
+        "Aggiorna contatori e accumulatori nel punto corretto.",
+        "Gestisci gli input non validi quando la traccia lo richiede.",
+        "Non usare array o funzioni: l'obiettivo e consolidare cicli e condizioni."
+      ],
+      exercises: [
+        ["1. Pari e dispari in intervallo", "Filtri", "Leggi due estremi e stampa quali numeri sono pari e quali dispari.", ["Leggi inizio e fine.", "Scorri l'intervallo.", "Per ogni numero stampa pari o dispari."], ["Usa % 2 dentro il ciclo."]],
+        ["2. Somma positivi e negativi", "Accumulatori", "Leggi N numeri e somma separatamente positivi e negativi.", ["Usa due accumulatori.", "Ignora lo zero oppure contalo a parte.", "Stampa i risultati."], ["if per positivi, else if per negativi."]],
+        ["3. Conta fasce di voto", "Conteggi", "Leggi N voti e conta insufficienti, sufficienti, buoni e ottimi.", ["0-5.99 insufficiente.", "6-6.99 sufficiente.", "7-8.99 buono.", "9-10 ottimo.", "Gestisci voti non validi."], ["Puoi validare ogni voto prima di classificarlo."]],
+        ["4. Biglietti cinema", "Condizioni", "Per N clienti leggi eta e calcola prezzo ridotto o intero.", ["Bambini sotto 12 pagano ridotto.", "Over 65 pagano ridotto.", "Gli altri prezzo intero.", "Calcola incasso totale."], ["Usa || per le due condizioni di riduzione."]],
+        ["5. Temperatura media e allarmi", "Conteggi", "Leggi temperature di N giorni e conta quanti sono sotto 0 e sopra 30.", ["Calcola media.", "Conta gelate.", "Conta giornate calde.", "Stampa un riepilogo."], ["Servono somma e due contatori."]],
+        ["6. Numeri divisibili", "Filtri", "Leggi N numeri e conta quanti sono divisibili per 3, per 5 e per entrambi.", ["Usa tre contatori.", "Controlla divisibilita con %.", "Stampa i tre risultati."], ["Per entrambi usa &&."]],
+        ["7. Minimo positivo", "Confronti", "Leggi N numeri e trova il piu piccolo tra quelli positivi.", ["Ignora zero e negativi.", "Gestisci il caso nessun positivo.", "Stampa il minimo positivo."], ["Usa un booleano trovato."]],
+        ["8. Massimo pari", "Confronti", "Leggi N numeri e trova il massimo tra quelli pari.", ["Considera solo numeri pari.", "Gestisci il caso nessun pari.", "Stampa risultato o messaggio."], ["Non inizializzare massimo a 0."]],
+        ["9. Gara punteggi", "Confronti", "Leggi i punteggi di N giocatori e stabilisci il vincitore.", ["Per ogni giocatore leggi nome e punteggio.", "Memorizza il punteggio massimo.", "Memorizza il nome del vincitore."], ["Serve string per il nome."]],
+        ["10. Login con blocco", "Validazione", "Chiedi password al massimo 3 volte.", ["Ripeti finche corretta o tentativi finiti.", "Stampa accesso riuscito o bloccato.", "Conta i tentativi."], ["Combina ciclo e if finale."]],
+        ["11. Carrello sconti", "Condizioni", "Leggi prezzi finche l'utente inserisce 0. Applica uno sconto se il totale supera 100.", ["Somma i prezzi.", "0 termina.", "Se totale > 100 applica 10%.", "Stampa totale finale."], ["Lo sconto si calcola dopo il ciclo."]],
+        ["12. Menu operazioni", "Menu", "Menu ripetuto con somma, prodotto, pari/dispari e uscita.", ["Mostra menu.", "Leggi scelta.", "Esegui operazione richiesta.", "Gestisci opzioni non valide."], ["do while e una buona scelta."]],
+        ["13. Classifica eta", "Conteggi", "Leggi eta di N persone e conta minorenni, adulti e anziani.", ["Minorenni < 18.", "Adulti 18-64.", "Anziani >= 65.", "Stampa i conteggi."], ["Usa if else if else."]],
+        ["14. Bancomat con errori", "Menu", "Simula saldo con versamento e prelievo, contando operazioni non valide.", ["Non accettare importi negativi.", "Non permettere saldo negativo.", "Conta errori.", "Mostra riepilogo finale."], ["Controlla ogni importo."]],
+        ["15. Serie con segno", "Sequenze", "Calcola la somma dei numeri da 1 a N, aggiungendo i pari e sottraendo i dispari.", ["Leggi N.", "Usa ciclo.", "if su pari/dispari.", "Stampa risultato."], ["Inverti il criterio rispetto alla somma alternata classica."]],
+        ["16. Cerca multiplo", "Ricerca", "Leggi N numeri e segnala se almeno uno e multiplo di 7.", ["Usa un booleano.", "Aggiorna quando trovi un multiplo.", "Alla fine stampa trovato/non trovato."], ["Puoi continuare a leggere tutti i numeri anche dopo averlo trovato."]],
+        ["17. Primo numero negativo", "Ricerca", "Leggi numeri finche arriva 0. Indica se prima dello 0 e comparso un negativo.", ["0 termina.", "Usa booleano.", "Stampa risultato finale."], ["Il negativo non deve necessariamente terminare il ciclo."]],
+        ["18. Voti validi e non validi", "Validazione", "Leggi N voti e conta quanti sono validi e quanti non validi.", ["Valido se tra 0 e 10.", "Conta validi e invalidi.", "Calcola media solo dei validi."], ["Attenzione alla divisione se non ci sono voti validi."]],
+        ["19. Numero perfetto semplice", "Ricerca", "Leggi N e verifica se e perfetto, cioe uguale alla somma dei suoi divisori propri.", ["Somma i divisori minori di N.", "Confronta somma e N.", "Stampa perfetto/non perfetto."], ["6 e perfetto: 1 + 2 + 3 = 6."]],
+        ["20. Intervallo primi", "Ricerca", "Leggi due estremi e stampa i numeri primi nell'intervallo.", ["Scorri ogni numero.", "Per ciascuno cerca divisori.", "Stampa solo i primi."], ["Usa cicli annidati."]],
+        ["21. Triangolo con pari", "Cicli annidati", "Stampa un triangolo di numeri, ma sostituisci i pari con *.", ["Leggi N.", "Usa righe e colonne.", "Se il numero e pari stampa * altrimenti il numero."], ["Combina ciclo annidato e if."]],
+        ["22. Rettangolo bordo", "Cicli annidati", "Stampa un rettangolo vuoto con bordo di asterischi.", ["Leggi righe e colonne.", "Stampa * su bordo.", "Stampa spazio all'interno."], ["Condizione: prima/ultima riga o prima/ultima colonna."]],
+        ["23. Media fino a obiettivo", "Sentinella", "Leggi numeri finche la media non supera un obiettivo oppure l'utente inserisce 0.", ["Leggi obiettivo.", "Aggiorna somma e conteggio.", "0 termina.", "Stampa media finale."], ["Calcola la media solo se conteggio > 0."]],
+        ["24. Negozio con categorie", "Riepilogo", "Leggi N prodotti con categoria A/B/C e prezzo. Calcola totale per categoria.", ["Valida categoria.", "Somma i prezzi in tre accumulatori.", "Conta categorie non valide.", "Stampa riepilogo."], ["Usa char per la categoria."]],
+        ["25. Riepilogo cicli e if", "Riepilogo", "Leggi numeri finche 0 e stampa: somma, media, massimo, minimo, pari, dispari, positivi e negativi.", ["0 termina.", "Aggiorna tutti gli indicatori.", "Gestisci nessun numero valido.", "Stampa riepilogo completo."], ["Esercizio utile come verifica."]]
+      ]
+    };
+  </script>
+  <script src="../js/exercise-page.js"></script>
+</body>
+</html>

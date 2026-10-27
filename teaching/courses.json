@@ -1,0 +1,8 @@
+{
+  "courses": [
+    {"id":"node","folder":"node","title":"Node.js & Express","symbol":"N↑","description":"Dal primo script alle API.","order":[]},
+    {"id":"cpp","folder":"C++","title":"C++","symbol":"C++","description":"Le basi, un esercizio alla volta.","order":["esercizi-cpp-base-0.html","esercizi-cpp-tipi-char-ascii.html","esercizi-cpp-if-else-condizioni.html","esercizi-cpp-while-base.html","esercizi-cpp-do-while-base.html","esercizi-cpp-for-base.html","esercizi-cpp-cicli-if-else.html","esercizi-cpp-riepilogo-prima-parte.html","esercizi-puntatori-base-0.html"]},
+    {"id":"web","folder":"web","title":"Web development","symbol":"</>","description":"HTML, JavaScript, DOM e BOM.","order":["esercizi-html-js-dom-bom.html","soluzioni.html"]},
+    {"id":"fondamenti","folder":"lezioni","title":"Informatica","symbol":"01","description":"Capire cosa c’è sotto il codice.","order":["rappresentazione-interi.html"]}
+  ]
+}

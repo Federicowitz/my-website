@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>10. Contatore con due pulsanti</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"></head>
+<body>
+  <h1>Contatore</h1>
+
+  <button id="minusButton" type="button">-</button>
+  <span id="counterValue">0</span>
+  <button id="plusButton" type="button">+</button>
+
+  <script>
+    const minusButton = document.getElementById("minusButton");
+    const plusButton = document.getElementById("plusButton");
+    const counterValue = document.getElementById("counterValue");
+
+    let counter = 0;
+
+    const render = () => {
+      counterValue.innerText = counter;
+    };
+
+    plusButton.onclick = () => {
+      counter++;
+      render();
+    };
+
+    minusButton.onclick = () => {
+      counter--;
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>

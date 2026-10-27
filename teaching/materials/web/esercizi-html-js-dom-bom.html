@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esercizi html+js manipolazione DOM e BOM</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+<link rel="stylesheet" href="../../reader.css"></head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Tracce esercizi HTML e JavaScript</h1>
+      <p>
+        Completa gli esercizi in ordine. Ogni esercizio deve essere svolto creando una pagina locale con HTML e JavaScript.
+        Per ora il CSS non è richiesto: concentrati su struttura, eventi, form, DOM, BOM, array e dati.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <div class="progress-area">
+        <div class="progress-text" id="progressText">Esercizi completati: 0 / 0</div>
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="secondary" id="markAllButton" type="button">Segna tutti come completati</button>
+        <button id="resetButton" type="button">Reset completamento</button>
+      </div>
+    </section>
+
+    <section class="note">
+      <h2>Regole generali</h2>
+      <ul id="rulesList"></ul>
+    </section>
+
+    <section id="exerciseList" class="exercise-grid"></section>
+  </main>
+
+  <script>
+    const storageKey = "js-exercises-progress-v2";
+
+    const rules = [
+      "Usa file separati quando richiesto: index.html e script.js.",
+      "Non scrivere codice JavaScript dentro gli attributi HTML, tranne quando esplicitamente richiesto.",
+      "Usa let e const, non var.",
+      "Dai nomi chiari a variabili, funzioni e id HTML.",
+      "Quando modifichi la pagina, usa il DOM.",
+      "Quando hai una lista di dati, conserva i dati in un array e aggiorna la pagina con una funzione render()."
+    ];
+
+    const exercises = [
+      {
+        title: "1. Pagina HTML con elementi identificabili",
+        level: "Base",
+        text: "Crea una pagina HTML con un titolo principale, tre sezioni e un footer. Ogni sezione deve avere un titolo e un paragrafo.",
+        requirements: [
+          "Usa almeno tre elementi div.",
+          "Assegna almeno un id a un elemento.",
+          "Assegna almeno due classi a elementi diversi.",
+          "Non usare JavaScript in questo esercizio."
+        ],
+        hints: [
+          "Usa id per elementi unici, per esempio title o mainContainer.",
+          "Usa class per elementi che potrebbero ripetersi, per esempio sectionBox."
+        ]
+      },
+      {
+        title: "2. Mini sito con link interni",
+        level: "Base",
+        text: "Crea un mini sito composto da tre pagine: home, informazioni e contatti. Ogni pagina deve contenere un menu con link alle altre pagine.",
+        requirements: [
+          "Crea i file index.html, info.html e contatti.html.",
+          "In ogni pagina inserisci link alle altre due pagine.",
+          "Usa percorsi relativi.",
+          "Ogni pagina deve avere un titolo diverso."
+        ],
+        hints: [
+          "Per un link interno puoi usare: <a href=\"contatti.html\">Contatti</a>.",
+          "Tieni tutti i file nella stessa cartella per semplificare i percorsi."
+        ]
+      },
+      {
+        title: "3. Link esterni e navigazione interna",
+        level: "Base",
+        text: "Aggiungi a una pagina una sezione con link a siti esterni e una sezione con link interni alla pagina.",
+        requirements: [
+          "Inserisci almeno tre link esterni.",
+          "I link esterni devono aprirsi in una nuova scheda.",
+          "Inserisci almeno due link che portano a sezioni della stessa pagina.",
+          "Usa gli id per raggiungere le sezioni interne."
+        ],
+        hints: [
+          "Per aprire in una nuova scheda usa target=\"_blank\".",
+          "Per andare a una sezione puoi usare href=\"#nomeSezione\"."
+        ]
+      },
+      {
+        title: "4. Collegare JavaScript alla pagina",
+        level: "Base JS",
+        text: "Crea una pagina HTML e collega un file script.js. Quando la pagina viene caricata, deve apparire un messaggio nella console.",
+        requirements: [
+          "Crea index.html e script.js.",
+          "Collega script.js alla fine del body.",
+          "Nel file JS usa console.log.",
+          "Apri la console del browser per verificare il risultato."
+        ],
+        hints: [
+          "Il tag script va prima della chiusura di body.",
+          "Esempio: console.log(\"Pagina caricata\");"
+        ]
+      },
+      {
+        title: "5. Variabili, costanti e template string",
+        level: "Base JS",
+        text: "Crea alcune variabili con dati personali inventati e stampa nella console una frase completa.",
+        requirements: [
+          "Crea almeno quattro costanti: nome, cognome, eta, citta.",
+          "Crea una frase usando una template string.",
+          "Stampa la frase in console.",
+          "Non concatenare con + in questo esercizio."
+        ],
+        hints: [
+          "Una template string si scrive con il carattere backtick.",
+          "Per inserire una variabile usa ${nomeVariabile}."
+        ]
+      },
+      {
+        title: "6. Funzioni matematiche",
+        level: "Base JS",
+        text: "Scrivi alcune funzioni che ricevono numeri come parametri e restituiscono un risultato.",
+        requirements: [
+          "Crea una funzione somma.",
+          "Crea una funzione sottrazione.",
+          "Crea una funzione moltiplicazione.",
+          "Crea una funzione divisione che gestisca il caso di divisione per zero.",
+          "Stampa alcuni risultati in console."
+        ],
+        hints: [
+          "Una funzione dovrebbe fare una sola cosa.",
+          "Nel caso di divisione per zero puoi restituire una stringa di errore."
+        ]
+      },
+      {
+        title: "7. Modificare un testo con il DOM",
+        level: "DOM base",
+        text: "Crea una pagina con un titolo e modifica il suo contenuto usando JavaScript.",
+        requirements: [
+          "Nel file HTML crea un h1 con id title.",
+          "Nel file JS seleziona l'elemento con document.getElementById.",
+          "Modifica il testo usando innerText.",
+          "Il testo iniziale e quello finale devono essere diversi."
+        ],
+        hints: [
+          "Salva l'elemento in una costante.",
+          "Esempio: const title = document.getElementById(\"title\");"
+        ]
+      },
+      {
+        title: "8. Modificare più elementi della pagina",
+        level: "DOM base",
+        text: "Crea una pagina con un titolo, un paragrafo e un div vuoto. Con JavaScript modifica tutti e tre gli elementi.",
+        requirements: [
+          "Ogni elemento deve avere un id.",
+          "Il titolo deve essere modificato da JS.",
+          "Il paragrafo deve essere modificato da JS.",
+          "Il div vuoto deve ricevere un testo da JS."
+        ],
+        hints: [
+          "Ripeti il binding per ogni elemento.",
+          "Usa innerText quando devi inserire solo testo."
+        ]
+      },
+      {
+        title: "9. Primo evento click",
+        level: "Eventi",
+        text: "Crea una pagina con un pulsante e un paragrafo. Quando l'utente clicca sul pulsante, il testo del paragrafo deve cambiare.",
+        requirements: [
+          "Crea un button con id button.",
+          "Crea un p con id result.",
+          "Associa una funzione all'evento click del bottone.",
+          "Modifica il paragrafo solo dopo il click."
+        ],
+        hints: [
+          "Puoi usare button.onclick = () => { ... }.",
+          "Prima fai il binding del bottone e del paragrafo."
+        ]
+      },
+      {
+        title: "10. Contatore con due pulsanti",
+        level: "Eventi",
+        text: "Crea un contatore con un numero visualizzato nella pagina, un pulsante + e un pulsante -.",
+        requirements: [
+          "Il valore iniziale deve essere 0.",
+          "Il pulsante + aumenta il valore di 1.",
+          "Il pulsante - diminuisce il valore di 1.",
+          "Dopo ogni click la pagina deve essere aggiornata."
+        ],
+        hints: [
+          "Usa una variabile let counter = 0.",
+          "Crea una funzione render() che aggiorna il testo mostrato."
+        ]
+      },
+      {
+        title: "11. Leggere un input",
+        level: "Form",
+        text: "Crea una pagina con un input di testo, un bottone e un div risultato. Quando l'utente clicca sul bottone, mostra un saluto personalizzato.",
+        requirements: [
+          "Leggi il valore dell'input con .value.",
+          "Se l'input è vuoto, mostra un messaggio di errore.",
+          "Se l'input contiene un nome, mostra Ciao, nome.",
+          "Il messaggio deve apparire nella pagina, non solo in console."
+        ],
+        hints: [
+          "Controlla se value === \"\".",
+          "Puoi usare trim() per ignorare gli spazi iniziali e finali."
+        ]
+      },
+      {
+        title: "12. Somma di due numeri da form",
+        level: "Form",
+        text: "Crea una piccola pagina che legge due numeri da due input e mostra la loro somma.",
+        requirements: [
+          "Crea due input.",
+          "Crea un bottone Calcola.",
+          "Converti i valori con parseFloat.",
+          "Se uno dei due valori non è valido, mostra un errore.",
+          "Mostra il risultato nella pagina."
+        ],
+        hints: [
+          "Ricorda che il value di un input è sempre una stringa.",
+          "Per controllare un numero non valido puoi usare Number.isNaN(numero)."
+        ]
+      },
+      {
+        title: "13. Calcolatrice con select",
+        level: "Form",
+        text: "Crea una calcolatrice con due input numerici, una select per scegliere l'operazione e un pulsante Calcola.",
+        requirements: [
+          "La select deve avere somma, sottrazione, moltiplicazione e divisione.",
+          "Ogni operazione deve essere gestita correttamente.",
+          "Gestisci la divisione per zero.",
+          "Mostra il risultato in un div."
+        ],
+        hints: [
+          "Leggi l'operazione scelta con select.value.",
+          "Puoi usare switch oppure if/else."
+        ]
+      },
+      {
+        title: "14. Timer con setTimeout",
+        level: "BOM",
+        text: "Crea una pagina con un bottone. Quando viene cliccato, dopo tre secondi deve comparire un messaggio nella pagina.",
+        requirements: [
+          "Usa setTimeout.",
+          "Il messaggio non deve comparire subito.",
+          "Non usare alert.",
+          "Mostra il messaggio dentro un elemento HTML."
+        ],
+        hints: [
+          "setTimeout riceve una funzione e un numero di millisecondi.",
+          "Tre secondi corrispondono a 3000 millisecondi."
+        ]
+      },
+      {
+        title: "15. Orologio digitale",
+        level: "BOM",
+        text: "Crea una pagina che mostra l'orario corrente e lo aggiorna ogni secondo.",
+        requirements: [
+          "Usa new Date().",
+          "Usa setInterval.",
+          "Mostra ore, minuti e secondi.",
+          "Aggiorna il DOM ogni secondo."
+        ],
+        hints: [
+          "getHours(), getMinutes() e getSeconds() ti permettono di leggere l'orario.",
+          "Per valori sotto 10 puoi aggiungere uno 0 davanti."
+        ]
+      },
+      {
+        title: "16. Lista dinamica",
+        level: "Array e DOM",
+        text: "Crea una pagina con un input, un bottone e una lista. Ogni valore inserito deve essere aggiunto a un array e visualizzato nella lista.",
+        requirements: [
+          "Usa un array per salvare gli elementi.",
+          "Usa push per aggiungere un elemento.",
+          "Crea una funzione render().",
+          "Genera gli li usando map e join.",
+          "Non aggiungere elementi vuoti."
+        ],
+        hints: [
+          "Non modificare la lista a mano ogni volta: rigenerala partendo dall'array.",
+          "La funzione render dovrebbe leggere l'array e aggiornare innerHTML."
+        ]
+      },
+      {
+        title: "17. Lista con rimozione elementi",
+        level: "Array e DOM",
+        text: "Estendi l'esercizio precedente aggiungendo un pulsante Rimuovi accanto a ogni elemento della lista.",
+        requirements: [
+          "Ogni elemento visualizzato deve avere un pulsante Rimuovi.",
+          "Il click deve eliminare l'elemento corretto dall'array.",
+          "Dopo la rimozione richiama render().",
+          "Puoi usare splice."
+        ],
+        hints: [
+          "Quando generi la lista puoi usare anche l'indice dell'elemento.",
+          "map può ricevere due parametri: element e index."
+        ]
+      },
+      {
+        title: "18. Tabella studenti",
+        level: "Array di oggetti",
+        text: "Crea una form per inserire studenti e una tabella che mostra tutti gli studenti inseriti.",
+        requirements: [
+          "Ogni studente deve avere nome, cognome e voto.",
+          "Salva gli studenti in un array di oggetti.",
+          "Il voto deve essere numerico e compreso tra 1 e 10.",
+          "Mostra gli studenti in una tabella generata da JavaScript.",
+          "Usa una funzione render()."
+        ],
+        hints: [
+          "Ogni studente può essere un oggetto: { nome, cognome, voto }.",
+          "La tabella può essere generata con template string, map e join."
+        ]
+      },
+      {
+        title: "19. Ricerca e filtro studenti",
+        level: "Array di oggetti",
+        text: "Partendo dalla tabella studenti, aggiungi una ricerca per nome o cognome e un filtro per mostrare solo gli studenti sufficienti.",
+        requirements: [
+          "Aggiungi un input di ricerca.",
+          "Mentre l'utente scrive, aggiorna la tabella.",
+          "Aggiungi un controllo per mostrare solo voti >= 6.",
+          "Non cancellare i dati originali dall'array.",
+          "Usa filter."
+        ],
+        hints: [
+          "Usa oninput per reagire mentre l'utente scrive.",
+          "Usa toLowerCase() e includes() per la ricerca testuale."
+        ]
+      },
+      {
+        title: "20. Mini applicazione finale: registro locale",
+        level: "Progetto",
+        text: "Crea una piccola applicazione locale per gestire un registro studenti.",
+        requirements: [
+          "La pagina deve avere una form con nome, cognome, classe e media.",
+          "I dati devono essere salvati in un array di oggetti.",
+          "La pagina deve mostrare una tabella generata dinamicamente.",
+          "Deve essere possibile eliminare uno studente.",
+          "Deve essere possibile cercare per nome o cognome.",
+          "Deve essere possibile ordinare per media.",
+          "Deve essere mostrato il numero totale di studenti.",
+          "Deve essere mostrata la media generale.",
+          "Alla fine aggiungi il salvataggio in localStorage."
+        ],
+        hints: [
+          "Prima fai funzionare tutto senza localStorage.",
+          "Poi salva l'array con JSON.stringify.",
+          "All'avvio della pagina recupera i dati con JSON.parse.",
+          "Usa sempre render() dopo ogni modifica dei dati."
+        ]
+      }
+    ];
+
+    const rulesList = document.getElementById("rulesList");
+    const exerciseList = document.getElementById("exerciseList");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    const resetButton = document.getElementById("resetButton");
+    const markAllButton = document.getElementById("markAllButton");
+
+    const createElement = (tagName, className, text) => {
+      const element = document.createElement(tagName);
+      if (className) {
+        element.className = className;
+      }
+      if (text !== undefined) {
+        element.innerText = text;
+      }
+      return element;
+    };
+
+    const appendListItems = (parent, items) => {
+      items.forEach((item) => {
+        const li = document.createElement("li");
+        li.innerText = item;
+        parent.appendChild(li);
+      });
+    };
+
+    const loadProgress = () => {
+      const saved = localStorage.getItem(storageKey);
+      if (!saved) {
+        return {};
+      }
+
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        return {};
+      }
+    };
+
+    const saveProgress = (progress) => {
+      localStorage.setItem(storageKey, JSON.stringify(progress));
+    };
+
+    let progress = loadProgress();
+
+    const updateProgressText = () => {
+      const completed = exercises.filter((exercise, index) => progress[index] === true).length;
+      const percentage = exercises.length === 0 ? 0 : Math.round((completed / exercises.length) * 100);
+      progressText.innerText = `Esercizi completati: ${completed} / ${exercises.length}`;
+      progressFill.style.width = `${percentage}%`;
+    };
+
+    const renderRules = () => {
+      rulesList.innerHTML = "";
+      appendListItems(rulesList, rules);
+    };
+
+    const renderExercises = () => {
+      exerciseList.innerHTML = "";
+
+      exercises.forEach((exercise, index) => {
+        const article = createElement("article", "exercise");
+        article.id = `exercise-${index}`;
+        if (progress[index] === true) {
+          article.classList.add("done");
+        }
+
+        const header = createElement("div", "exercise-header");
+        const titleGroup = document.createElement("div");
+
+        const level = createElement("span", "level", exercise.level);
+        const title = createElement("h2", "", exercise.title);
+        titleGroup.appendChild(level);
+        titleGroup.appendChild(title);
+
+        const label = createElement("label", "check-label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = progress[index] === true;
+        checkbox.dataset.index = index;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode("Fatto"));
+
+        header.appendChild(titleGroup);
+        header.appendChild(label);
+
+        const paragraph = createElement("p", "", exercise.text);
+
+        const requirementsTitle = createElement("h3", "", "Richieste");
+        const requirementsList = document.createElement("ul");
+        appendListItems(requirementsList, exercise.requirements);
+
+        const hintsTitle = createElement("h3", "", "Suggerimenti");
+        const hintsList = document.createElement("ul");
+        appendListItems(hintsList, exercise.hints);
+
+        article.appendChild(header);
+        article.appendChild(paragraph);
+        article.appendChild(requirementsTitle);
+        article.appendChild(requirementsList);
+        article.appendChild(hintsTitle);
+        article.appendChild(hintsList);
+
+        exerciseList.appendChild(article);
+      });
+
+      const checkboxes = document.querySelectorAll("input[type='checkbox'][data-index]");
+      checkboxes.forEach((checkbox) => {
+        checkbox.onchange = () => {
+          const index = checkbox.dataset.index;
+          progress[index] = checkbox.checked;
+          saveProgress(progress);
+          renderExercises();
+          updateProgressText();
+        };
+      });
+    };
+
+    resetButton.onclick = () => {
+      const confirmed = confirm("Vuoi cancellare il completamento di tutti gli esercizi?");
+      if (!confirmed) {
+        return;
+      }
+
+      progress = {};
+      saveProgress(progress);
+      renderExercises();
+      updateProgressText();
+    };
+
+    markAllButton.onclick = () => {
+      exercises.forEach((exercise, index) => {
+        progress[index] = true;
+      });
+      saveProgress(progress);
+      renderExercises();
+      updateProgressText();
+    };
+
+    renderRules();
+    renderExercises();
+    updateProgressText();
+  </script>
+</body>
+</html>

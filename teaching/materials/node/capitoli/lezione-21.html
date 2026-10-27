@@ -1,0 +1,28 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../reader.css"><title>Query string e filtri</title></head><body><article class="reading"><div class="eyebrow">LEZIONE 21 · Express e API</div><h2>Query string e filtri</h2>
+<div class="definitions"><h3>Prima di iniziare: le parole della lezione</h3><dl><dt>Query string e filtro</dt><dd>La query string è la parte dell’URL dopo <code>?</code>, composta da coppie chiave-valore separate da <code>&amp;</code>. Un filtro seleziona elementi secondo una condizione.</dd><dt>Paginazione, limite e offset</dt><dd>La paginazione divide un insieme in parti. Il limite indica quanti elementi restituire; l’offset quanti saltarne dall’inizio.</dd><dt>filter e slice</dt><dd><code>filter</code> crea un array con gli elementi che soddisfano una condizione. <code>slice</code> restituisce una porzione senza modificare l’array originale.</dd></dl></div>
+<p>I parametri <strong>query</strong> seguono <code>?</code> nell'URL: <code>/api/persone?cerca=an&amp;limite=5</code>. In Express sono in <code>req.query</code>, che contiene input da considerare <strong>non attendibile</strong>.</p>
+<pre><code class="language-js">app.get('/api/persone', (req, res) =&gt; {
+  const cerca = String(req.query.cerca ?? '').toLowerCase();
+  const limiteRaw = Number(req.query.limite ?? 10);
+  const limite = Number.isInteger(limiteRaw)
+    ? Math.min(Math.max(limiteRaw, 1), 100) : 10;
+  const risultato = persone
+    .filter(p =&gt; p.nome.toLowerCase().includes(cerca))
+    .slice(0, limite);
+  res.json(risultato);
+});
+</code></pre>
+<p><strong>Esempio aggiuntivo:</strong> la ricerca <code>?cerca=lu&amp;limite=1</code> restituisce al massimo una persona il cui nome contiene <code>lu</code>. Per grandi dataset filtri e paginazione andrebbero applicati nel database, non all'array intero.</p>
+
+<div class="deepening"><h3>Chi fa cosa, e perché</h3><p>Il parametro di percorso identifica tipicamente “quale persona”; la query descrive “quali persone, con quale filtro e limite”. <code>/persone/2</code> e <code>/persone?limite=2</code> hanno quindi significati diversi. <code>req.query</code> dipende dal parser configurato: non dare per scontato che ogni valore sia una stringa singola, soprattutto con parametri ripetuti.</p><p>La trascrizione usa una ricerca per prefisso: <code>startsWith("an")</code> trova Anna ma non Gianna. Nell’esempio del manuale <code>includes("an")</code> cerca invece in qualsiasi posizione. Documenta quale comportamento scegli. Con una collezione vuota o nessun risultato, una risposta 200 con elenco vuoto è normalmente corretta.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// Costruire una query senza concatenare a mano i valori
+const query = new URLSearchParams({ cerca: &#x27;Anna Maria&#x27;, limite: &#x27;2&#x27; });
+console.log(`/api/persone?${query}`);
+// /api/persone?cerca=Anna+Maria&amp;limite=2
+
+// Esempio di paginazione su un array già filtrato
+const risultati = [&#x27;Anna&#x27;, &#x27;Luca&#x27;, &#x27;Sara&#x27;, &#x27;Marta&#x27;];
+const offset = 2;
+const limite = 2;
+console.log(risultati.slice(offset, offset + limite));
+</code></pre><p class="expected"><strong>Come leggerlo e risultato atteso.</strong> <code>URLSearchParams</code> codifica lo spazio nella query. L’ultima stampa contiene Sara e Marta: il secondo argomento di slice è l’indice finale escluso. Per una paginazione stabile serve un ordine definito dei risultati.</p><aside class="modern"><strong>Pratica attuale e precisazioni.</strong> Valida i tipi e limita le quantità permesse. Un semplice <code>slice(0, limite)</code> applica un limite, ma non realizza da solo una paginazione navigabile. Con molti dati conviene filtrare e paginare nel database. Evita segreti nella query: gli URL possono finire in cronologia e log.</aside><p class="exercise"><strong>Prova tu.</strong> Prova limite assente, 0, testo e una chiave ripetuta. Decidi se correggere i valori fuori intervallo o rispondere 400, e mantieni la stessa regola nella tua API.</p></div>
+<a class="top" href="../manuale.html#inizio">Torna all’indice ↑</a></article><script src="../../../reader.js"></script></body></html>
