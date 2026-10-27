@@ -464,11 +464,11 @@
         <p class="desc plain fun">Un programma che controlla prezzi e volumi dalle fatture al posto tuo: le legge, le controlla e ti dice dove guadagni e perdi.</p>
       </div>
 
-      <div class="row" data-url="https://github.com/Federicowitz">
+      <div class="row" data-url="https://simpleshare.federicolelli.com/">
         <div class="row-head">
           <span class="dot dot-live"></span>
-          <span class="title">UltraShare</span>
-          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri UltraShare su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="title">SimpleShare</span>
+          <a class="open-btn" href="https://simpleshare.federicolelli.com/" data-url="https://simpleshare.federicolelli.com/" target="_blank" rel="noopener noreferrer" aria-label="Apri SimpleShare"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
           <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <p class="desc short normal">Trasferimento file peer-to-peer, senza server intermedio.</p>
@@ -476,11 +476,11 @@
         <p class="desc plain fun">Manda file enormi da un computer all'altro, senza passare da internet o da un server di mezzo.</p>
       </div>
 
-      <div class="row" data-url="https://github.com/Federicowitz">
+      <div class="row" data-url="https://remandio.federicolelli.com/">
         <div class="row-head">
           <span class="dot dot-live"></span>
           <span class="title">Remandio</span>
-          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri Remandio su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <a class="open-btn" href="https://remandio.federicolelli.com/" data-url="https://remandio.federicolelli.com/" target="_blank" rel="noopener noreferrer" aria-label="Apri Remandio"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
           <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <p class="desc short normal">Base di conoscenza personale, locale e a schema libero.</p>
@@ -488,11 +488,11 @@
         <p class="desc plain fun">Un'agenda personale che si adatta a come vuoi organizzare le tue cose, non il contrario.</p>
       </div>
 
-      <div class="row" data-url="https://github.com/Federicowitz">
+      <div class="row" data-url="https://scribyx.federicolelli.com/">
         <div class="row-head">
           <span class="dot dot-live"></span>
-          <span class="title">WriteX / Scrybix</span>
-          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri WriteX / Scrybix su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <span class="title">Scribyx</span>
+          <a class="open-btn" href="https://scribyx.federicolelli.com/" data-url="https://scribyx.federicolelli.com/" target="_blank" rel="noopener noreferrer" aria-label="Apri Scribyx"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
           <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <p class="desc short normal">Pagina locale per il versioning della scrittura, con opzione cloud.</p>
@@ -500,11 +500,11 @@
         <p class="desc plain fun">Un posto per scrivere storie dove puoi creare personaggi e collegamenti come una mappa, e tornare indietro nel tempo a qualsiasi versione.</p>
       </div>
 
-      <div class="row" data-url="https://github.com/Federicowitz">
+      <div class="row" data-url="https://marketplace.visualstudio.com/items?itemName=Federicowitz.file-stager">
         <div class="row-head">
           <span class="dot dot-live"></span>
           <span class="title">File Stager</span>
-          <button class="open-btn" data-url="https://github.com/Federicowitz" aria-label="Apri File Stager su GitHub"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></button>
+          <a class="open-btn" href="https://marketplace.visualstudio.com/items?itemName=Federicowitz.file-stager" data-url="https://marketplace.visualstudio.com/items?itemName=Federicowitz.file-stager" target="_blank" rel="noopener noreferrer" aria-label="Apri File Stager sul Visual Studio Marketplace"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
           <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <p class="desc short normal">Estensione VS Code, ponte tra l'albero file e la clipboard di sistema.</p>
@@ -867,6 +867,7 @@
   document.querySelectorAll('.open-btn').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
+      if (btn.tagName === 'A') return;
       window.open(btn.dataset.url, '_blank', 'noopener');
     });
   });
