@@ -7,9 +7,9 @@ function walk(folder,course){for(const entry of fs.readdirSync(folder,{withFileT
  const absolute=path.join(folder,entry.name);
  if(entry.isDirectory()){if(!['soluzioni_html_js_dom_bom','css','js'].includes(entry.name))walk(absolute,course);continue}
  if(!entry.name.endsWith('.html'))continue;
- const html=fs.readFileSync(absolute,'utf8');
+ const html=fs.readFileSync(absolute,'utf8').replace(/<!-- SCHOOL:HEAD:START -->[\s\S]*?<!-- SCHOOL:HEAD:END -->/g,'');
  const relative=path.relative(school,absolute).split(path.sep).join('/');
- const title=strip((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]||entry.name.replace(/\.html$/,''));
+ const title=strip((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]||entry.name.replace(/\.html$/,'')).replace(/ — Federico Lelli$/,'');
  const kind=(html.match(/name="school-kind" content="(lesson|exercise|test)"/)||[])[1]||(/test|quiz/i.test(entry.name)?'test':/esercizi|soluzioni/i.test(entry.name)?'exercise':'lesson');
  const chapter=/lezione-(\d+)\.html$/.exec(entry.name);
  const desc=strip((html.match(/name="description" content="([^"]*)"/)||[])[1]||'');
