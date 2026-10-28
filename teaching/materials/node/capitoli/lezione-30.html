@@ -1,0 +1,36 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Validazione e gestione degli errori — Federico Lelli</title><meta name="description" content="Prerequisiti: lezioni 19–22 e 25. Definisci un contratto verificabile anche quando il client sbaglia."><link rel="stylesheet" href="../../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/node/capitoli/lezione-30.html"><meta property="og:title" content="Validazione e gestione degli errori — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/node/capitoli/lezione-30.html"><meta property="og:description" content="Validazione e gestione degli errori. Node.js &amp; Express: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="node-capitoli-lezione-30"><div class="lesson-identity"><a href="../../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../../index.html?course=node" data-school-catalog="node">Node.js &amp; Express</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="node-capitoli-lezione-29" rel="prev" href="lezione-29.html"><small>← Precedente</small><span>29 · Promise, async/await e concorrenza controllata</span></a><a class="lesson-catalog" href="../../../index.html?course=node" data-school-catalog="node">Tutte le lezioni<span>32 / 40</span></a><a class="lesson-neighbor" data-school-link="node-capitoli-lezione-31" rel="next" href="lezione-31.html"><small>Successiva →</small><span>31 · Test automatici e casi limite</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading"><div class="eyebrow">LEZIONE 30 · Affidabilità</div><h1>Validazione e gestione degli errori</h1><p>Prerequisiti: lezioni 19–22 e 25. Definisci un contratto verificabile anche quando il client sbaglia.</p><h2>Dal formato al significato</h2><dl><dt>Parsing</dt><dd>Trasforma il testo JSON in valori JavaScript; può fallire prima della route se il testo è malformato.</dd><dt>Validazione</dt><dd>Verifica forma, tipi, intervalli e regole del dato. La stringa vuota e un array sono JSON validi ma possono essere input non ammessi.</dd><dt>Normalizzazione</dt><dd>Converte input accettati in una forma uniforme, come un nome senza spazi esterni. Va documentata: non deve nascondere errori o trasformare qualunque valore in una stringa.</dd><dt>Errore atteso e inatteso</dt><dd>Un errore atteso, come un campo assente, può essere spiegato al client. Un errore inatteso richiede un log interno e una risposta che non esponga stack, credenziali o dettagli del filesystem.</dd></dl><h2>Una funzione indipendente da Express</h2><p>Salva come persona.mjs. È riutilizzata nella prossima lezione.</p><pre><code>export function validaPersona(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return { ok: false, error: 'È richiesto un oggetto' };
+  }
+  if (typeof body.nome !== 'string' ||
+      body.nome.trim().length === 0 || body.nome.trim().length &gt; 80) {
+    return { ok: false, error: 'nome: da 1 a 80 caratteri' };
+  }
+  if (!Number.isInteger(body.eta) || body.eta &lt; 0 || body.eta &gt; 130) {
+    return { ok: false, error: 'eta: intero da 0 a 130' };
+  }
+  return { ok: true, value: { nome: body.nome.trim(), eta: body.eta } };
+}</code></pre><p>La funzione non modifica il body e seleziona esplicitamente i campi ammessi. <code>eta: "18"</code> viene rifiutato: il contratto richiede un numero JSON. La lunghezza delle stringhe JavaScript misura unità UTF-16, non sempre caratteri percepiti dall’utente; chiarisci il requisito se gestisci nomi internazionali.</p><h2>Collegarla a Express 5</h2><p>In una cartella di esercizio esegui <code>npm init -y</code> e <code>npm install express@5</code>. Salva questo file come server.mjs accanto a persona.mjs; avvia con <code>node server.mjs</code>.</p><pre><code>import express from 'express';
+import { randomUUID } from 'node:crypto';
+import { validaPersona } from './persona.mjs';
+const app = express();
+app.use(express.json({ limit: '16kb' }));
+app.post('/persone', (req, res) =&gt; {
+  const esito = validaPersona(req.body);
+  if (!esito.ok) return res.status(400).json({ error: esito.error });
+  // Dimostrazione del contratto: non salva ancora la persona.
+  return res.status(201).json({ id: randomUUID(), ...esito.value });
+});
+app.use((req, res) =&gt; res.status(404).json({ error: 'Route assente' }));
+app.use((err, req, res, next) =&gt; {
+  if (res.headersSent) return next(err);
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'JSON malformato' });
+  }
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Body troppo grande' });
+  }
+  console.error(err);
+  return res.status(500).json({ error: 'Errore interno' });
+});
+app.listen(3000, '127.0.0.1');</code></pre><h2>Matrice di verifica</h2><table><tr><th>Body di POST /persone</th><th>Risposta attesa</th></tr><tr><td>{"nome":" Ada ","eta":20}</td><td>201, nome normalizzato Ada e ID presente</td></tr><tr><td>{"nome":" ","eta":20}</td><td>400</td></tr><tr><td>null oppure []</td><td>400</td></tr><tr><td>{"nome":"Ada","eta":"20"}</td><td>400</td></tr><tr><td>JSON incompleto</td><td>400, JSON malformato</td></tr></table><p>Invia <code>Content-Type: application/json</code>. Interrompi il server con Ctrl+C dopo le prove. La validazione non sostituisce autenticazione e autorizzazione.</p><p>Per i gestori asincroni, Express 5 propaga il rifiuto delle Promise restituite; callback esterne richiedono inoltro esplicito. <a href="https://expressjs.com/en/5x/guide/error-handling/">Documentazione Express sugli errori</a>.</p></article><script src="../../../reader.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="node-capitoli-lezione-29" rel="prev" href="lezione-29.html"><small>← Precedente</small><span>29 · Promise, async/await e concorrenza controllata</span></a><a class="lesson-catalog" href="../../../index.html?course=node" data-school-catalog="node">Tutte le lezioni<span>32 / 40</span></a><a class="lesson-neighbor" data-school-link="node-capitoli-lezione-31" rel="next" href="lezione-31.html"><small>Successiva →</small><span>31 · Test automatici e casi limite</span></a></nav><p class="lesson-credits">Materiali didattici curati e rielaborati da Federico Lelli. Le fonti e i riferimenti specifici sono indicati nei materiali disponibili.</p></div><script src="../../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

@@ -5,6 +5,6 @@
     "catalog": "node scripts/catalog.cjs && node scripts/lesson-pages.cjs",
     "check": "node scripts/check.cjs",
     "preview": "node scripts/preview.cjs",
-    "test": "node scripts/test-navigation.cjs && node scripts/test-landing.cjs"
+    "test": "node scripts/test-navigation.cjs && node scripts/test-landing.cjs && node scripts/test-curriculum.cjs"
   }
 }

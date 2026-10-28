@@ -1,8 +1,252 @@
 {
   "courses": [
-    {"id":"node","folder":"node","title":"Node.js & Express","symbol":"N↑","description":"Dal primo script alle API.","order":[]},
-    {"id":"cpp","folder":"C++","title":"C++","symbol":"C++","description":"Le basi, un esercizio alla volta.","order":["esercizi-cpp-base-0.html","esercizi-cpp-tipi-char-ascii.html","esercizi-cpp-if-else-condizioni.html","esercizi-cpp-while-base.html","esercizi-cpp-do-while-base.html","esercizi-cpp-for-base.html","esercizi-cpp-cicli-if-else.html","esercizi-cpp-riepilogo-prima-parte.html","esercizi-puntatori-base-0.html"]},
-    {"id":"web","folder":"web","title":"Web development","symbol":"</>","description":"HTML, JavaScript, DOM e BOM.","order":["esercizi-html-js-dom-bom.html","soluzioni.html"]},
-    {"id":"fondamenti","folder":"lezioni","title":"Informatica","symbol":"01","description":"Capire cosa c’è sotto il codice.","order":["rappresentazione-interi.html"]}
+    {
+      "id": "node",
+      "folder": "node",
+      "title": "Node.js & Express",
+      "symbol": "N↑",
+      "description": "Definizioni, esempi e laboratori: dal runtime alle API verificate.",
+      "order": [],
+      "chapters": [
+        {
+          "id": "node-01",
+          "title": "01 · Runtime e linguaggio",
+          "description": "Comprendi ambiente, valori, processi e moduli.",
+          "files": [
+            "lezione-1.html",
+            "lezione-2.html",
+            "lezione-3.html",
+            "lezione-4.html",
+            "lezione-5.html",
+            "lezione-6.html"
+          ]
+        },
+        {
+          "id": "node-02",
+          "title": "02 · I/O e strumenti",
+          "description": "Gestisci file, server, pacchetti e ambiente di sviluppo.",
+          "files": [
+            "lezione-7.html",
+            "lezione-8.html",
+            "lezione-9.html",
+            "lezione-10.html",
+            "lezione-11.html"
+          ]
+        },
+        {
+          "id": "node-03",
+          "title": "03 · Asincronia e HTTP",
+          "description": "Collega event loop, eventi, stream e protocollo.",
+          "files": [
+            "lezione-12.html",
+            "lezione-13.html",
+            "lezione-14.html",
+            "lezione-15.html"
+          ]
+        },
+        {
+          "id": "node-04",
+          "title": "04 · Express e richieste",
+          "description": "Dai significato a route, dati, parametri e middleware.",
+          "files": [
+            "lezione-16.html",
+            "lezione-17.html",
+            "lezione-18.html",
+            "lezione-19.html",
+            "lezione-20.html",
+            "lezione-21.html",
+            "lezione-22.html",
+            "lezione-23.html"
+          ]
+        },
+        {
+          "id": "node-05",
+          "title": "05 · API e architettura",
+          "description": "Costruisci operazioni CRUD e separa le responsabilità.",
+          "files": [
+            "lezione-24.html",
+            "lezione-25.html",
+            "lezione-26.html",
+            "lezione-27.html",
+            "lezione-28.html"
+          ]
+        },
+        {
+          "id": "node-06",
+          "title": "06 · Affidabilità e laboratorio",
+          "description": "Passa dai casi felici a errori, test e dati persistenti.",
+          "files": [
+            "lezione-29.html",
+            "lezione-30.html",
+            "lezione-31.html",
+            "lezione-32.html"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cpp",
+      "folder": "C++",
+      "title": "C++",
+      "symbol": "C++",
+      "description": "12 capitoli: teoria, esempi e pratica progressiva.",
+      "order": [
+        "01-lezione.html",
+        "esercizi-cpp-base-0.html",
+        "02-lezione.html",
+        "esercizi-cpp-tipi-char-ascii.html",
+        "03-lezione.html",
+        "esercizi-cpp-if-else-condizioni.html",
+        "04-lezione.html",
+        "esercizi-cpp-while-base.html",
+        "05-lezione.html",
+        "esercizi-cpp-do-while-base.html",
+        "06-lezione.html",
+        "esercizi-cpp-for-base.html",
+        "07-lezione.html",
+        "esercizi-cpp-cicli-if-else.html",
+        "08-lezione.html",
+        "esercizi-cpp-riepilogo-prima-parte.html",
+        "09-lezione.html",
+        "09-esercizi-funzioni.html",
+        "10-lezione.html",
+        "10-esercizi-vector.html",
+        "11-lezione.html",
+        "11-esercizi-stringhe.html",
+        "12-lezione.html",
+        "esercizi-puntatori-base-0.html"
+      ],
+      "chapters": [
+        {
+          "id": "cpp-01",
+          "title": "01 · Il primo programma",
+          "description": "Inizia qui: scrivi, compila ed esegui.",
+          "files": [
+            "01-lezione.html",
+            "esercizi-cpp-base-0.html"
+          ]
+        },
+        {
+          "id": "cpp-02",
+          "title": "02 · Tipi, conversioni e caratteri",
+          "description": "Si basa sul capitolo 01. Dalla spiegazione alla pratica.",
+          "files": [
+            "02-lezione.html",
+            "esercizi-cpp-tipi-char-ascii.html"
+          ]
+        },
+        {
+          "id": "cpp-03",
+          "title": "03 · Decisioni e condizioni",
+          "description": "Si basa sul capitolo 02. Dalla spiegazione alla pratica.",
+          "files": [
+            "03-lezione.html",
+            "esercizi-cpp-if-else-condizioni.html"
+          ]
+        },
+        {
+          "id": "cpp-04",
+          "title": "04 · Ripetere con while",
+          "description": "Si basa sul capitolo 03. Dalla spiegazione alla pratica.",
+          "files": [
+            "04-lezione.html",
+            "esercizi-cpp-while-base.html"
+          ]
+        },
+        {
+          "id": "cpp-05",
+          "title": "05 · Menu con do while",
+          "description": "Si basa sul capitolo 04. Dalla spiegazione alla pratica.",
+          "files": [
+            "05-lezione.html",
+            "esercizi-cpp-do-while-base.html"
+          ]
+        },
+        {
+          "id": "cpp-06",
+          "title": "06 · Contare con for",
+          "description": "Si basa sul capitolo 05. Dalla spiegazione alla pratica.",
+          "files": [
+            "06-lezione.html",
+            "esercizi-cpp-for-base.html"
+          ]
+        },
+        {
+          "id": "cpp-07",
+          "title": "07 · Cicli annidati e filtri",
+          "description": "Si basa sul capitolo 06. Dalla spiegazione alla pratica.",
+          "files": [
+            "07-lezione.html",
+            "esercizi-cpp-cicli-if-else.html"
+          ]
+        },
+        {
+          "id": "cpp-08",
+          "title": "08 · Progettare un algoritmo",
+          "description": "Si basa sul capitolo 07. Dalla spiegazione alla pratica.",
+          "files": [
+            "08-lezione.html",
+            "esercizi-cpp-riepilogo-prima-parte.html"
+          ]
+        },
+        {
+          "id": "cpp-09",
+          "title": "09 · Funzioni e parametri",
+          "description": "Si basa sul capitolo 08. Dalla spiegazione alla pratica.",
+          "files": [
+            "09-lezione.html",
+            "09-esercizi-funzioni.html"
+          ]
+        },
+        {
+          "id": "cpp-10",
+          "title": "10 · Sequenze con vector",
+          "description": "Si basa sul capitolo 09. Dalla spiegazione alla pratica.",
+          "files": [
+            "10-lezione.html",
+            "10-esercizi-vector.html"
+          ]
+        },
+        {
+          "id": "cpp-11",
+          "title": "11 · Stringhe e testo",
+          "description": "Si basa sul capitolo 10. Dalla spiegazione alla pratica.",
+          "files": [
+            "11-lezione.html",
+            "11-esercizi-stringhe.html"
+          ]
+        },
+        {
+          "id": "cpp-12",
+          "title": "12 · Indirizzi, riferimenti e puntatori",
+          "description": "Si basa sul capitolo 11. Dalla spiegazione alla pratica.",
+          "files": [
+            "12-lezione.html",
+            "esercizi-puntatori-base-0.html"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "web",
+      "folder": "web",
+      "title": "Web development",
+      "symbol": "</>",
+      "description": "HTML, JavaScript, DOM e BOM.",
+      "order": [
+        "esercizi-html-js-dom-bom.html",
+        "soluzioni.html"
+      ]
+    },
+    {
+      "id": "fondamenti",
+      "folder": "lezioni",
+      "title": "Informatica",
+      "symbol": "01",
+      "description": "Capire cosa c’è sotto il codice.",
+      "order": [
+        "rappresentazione-interi.html"
+      ]
+    }
   ]
 }
