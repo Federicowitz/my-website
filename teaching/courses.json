@@ -239,6 +239,73 @@
       ]
     },
     {
+      "id": "crittografia",
+      "folder": "crittografia",
+      "title": "Crittografia",
+      "symbol": "K↔",
+      "description": "Dai cifrari storici a TLS, firme e PEC: definizioni, casi concreti e laboratori.",
+      "order": [
+        "mappa.html",
+        "01-principi.html",
+        "02-storia.html",
+        "03-cesare.html",
+        "04-vigenere-otp.html",
+        "05-enigma.html",
+        "06-simmetrica.html",
+        "07-hash-mac-password.html",
+        "08-asimmetrica-rsa.html",
+        "09-diffie-hellman-tls.html",
+        "10-firme.html",
+        "11-certificati.html",
+        "12-pec.html",
+        "13-chiavi-attacchi.html",
+        "14-casi-reali.html",
+        "laboratorio.html",
+        "esercizi.html",
+        "glossario.html",
+        "fonti.html",
+        "test.html"
+      ],
+      "chapters": [
+        {
+          "id": "crypto-01",
+          "title": "01 · Linguaggio e contesto",
+          "description": "Parti dai bisogni: minacce, garanzie e storia dei metodi.",
+          "files": ["mappa.html", "01-principi.html", "02-storia.html"]
+        },
+        {
+          "id": "crypto-02",
+          "title": "02 · Cifrari e crittoanalisi",
+          "description": "Sperimenta Cesare e comprendi Vigenère, pad ed Enigma.",
+          "files": ["03-cesare.html", "04-vigenere-otp.html", "05-enigma.html"]
+        },
+        {
+          "id": "crypto-03",
+          "title": "03 · Dati, integrità e password",
+          "description": "Distingui cifratura, AEAD, hash, MAC e derivazione delle password.",
+          "files": ["06-simmetrica.html", "07-hash-mac-password.html"]
+        },
+        {
+          "id": "crypto-04",
+          "title": "04 · Chiavi pubbliche e canali",
+          "description": "Segui i numeri di RSA e Diffie–Hellman, poi collegali a TLS.",
+          "files": ["08-asimmetrica-rsa.html", "09-diffie-hellman-tls.html"]
+        },
+        {
+          "id": "crypto-05",
+          "title": "05 · Firme, fiducia e consegna",
+          "description": "Separa firma, certificato e ricevuta PEC con esempi di documenti.",
+          "files": ["10-firme.html", "11-certificati.html", "12-pec.html"]
+        },
+        {
+          "id": "crypto-06",
+          "title": "06 · Progettazione e pratica",
+          "description": "Gestisci chiavi, valuta scenari ed esegui prove di alterazione.",
+          "files": ["13-chiavi-attacchi.html", "14-casi-reali.html", "laboratorio.html", "esercizi.html"]
+        }
+      ]
+    },
+    {
       "id": "fondamenti",
       "folder": "lezioni",
       "title": "Informatica",

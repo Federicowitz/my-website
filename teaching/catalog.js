@@ -205,6 +205,73 @@ window.schoolCatalog = {
       "description": "HTML, JavaScript, DOM e BOM."
     },
     {
+      "id": "crittografia",
+      "title": "Crittografia",
+      "symbol": "K↔",
+      "description": "Dai cifrari storici a TLS, firme e PEC: definizioni, casi concreti e laboratori.",
+      "chapters": [
+        {
+          "id": "crypto-01",
+          "title": "01 · Linguaggio e contesto",
+          "description": "Parti dai bisogni: minacce, garanzie e storia dei metodi.",
+          "files": [
+            "mappa.html",
+            "01-principi.html",
+            "02-storia.html"
+          ]
+        },
+        {
+          "id": "crypto-02",
+          "title": "02 · Cifrari e crittoanalisi",
+          "description": "Sperimenta Cesare e comprendi Vigenère, pad ed Enigma.",
+          "files": [
+            "03-cesare.html",
+            "04-vigenere-otp.html",
+            "05-enigma.html"
+          ]
+        },
+        {
+          "id": "crypto-03",
+          "title": "03 · Dati, integrità e password",
+          "description": "Distingui cifratura, AEAD, hash, MAC e derivazione delle password.",
+          "files": [
+            "06-simmetrica.html",
+            "07-hash-mac-password.html"
+          ]
+        },
+        {
+          "id": "crypto-04",
+          "title": "04 · Chiavi pubbliche e canali",
+          "description": "Segui i numeri di RSA e Diffie–Hellman, poi collegali a TLS.",
+          "files": [
+            "08-asimmetrica-rsa.html",
+            "09-diffie-hellman-tls.html"
+          ]
+        },
+        {
+          "id": "crypto-05",
+          "title": "05 · Firme, fiducia e consegna",
+          "description": "Separa firma, certificato e ricevuta PEC con esempi di documenti.",
+          "files": [
+            "10-firme.html",
+            "11-certificati.html",
+            "12-pec.html"
+          ]
+        },
+        {
+          "id": "crypto-06",
+          "title": "06 · Progettazione e pratica",
+          "description": "Gestisci chiavi, valuta scenari ed esegui prove di alterazione.",
+          "files": [
+            "13-chiavi-attacchi.html",
+            "14-casi-reali.html",
+            "laboratorio.html",
+            "esercizi.html"
+          ]
+        }
+      ]
+    },
+    {
       "id": "fondamenti",
       "title": "Informatica",
       "symbol": "01",
@@ -810,6 +877,183 @@ window.schoolCatalog = {
       "title": "HTML e JavaScript · Verifica",
       "kind": "test",
       "path": "materials/web/test.html",
+      "description": "Domande con correzione e spiegazione"
+    },
+    {
+      "id": "crittografia-mappa",
+      "course": "crittografia",
+      "title": "Crittografia · La mappa del percorso",
+      "kind": "lesson",
+      "path": "materials/crittografia/mappa.html",
+      "description": "Un percorso dai cifrari storici a TLS, firme e PEC: 14 lezioni, laboratori, esercizi, glossario e verifica.",
+      "chapter": "crypto-01"
+    },
+    {
+      "id": "crittografia-01-principi",
+      "course": "crittografia",
+      "title": "01 · Principi, minacce e parole fondamentali",
+      "kind": "lesson",
+      "path": "materials/crittografia/01-principi.html",
+      "description": "Crittografia, cifratura, chiavi, confidenzialità, integrità, autenticazione e autorizzazione, spiegate con un contratto da proteggere.",
+      "chapter": "crypto-01"
+    },
+    {
+      "id": "crittografia-02-storia",
+      "course": "crittografia",
+      "title": "02 · Storia, codifica e steganografia",
+      "kind": "lesson",
+      "path": "materials/crittografia/02-storia.html",
+      "description": "Dalla scitala alla crittografia moderna: sostituzione, trasposizione, codifica e steganografia non sono la stessa cosa.",
+      "chapter": "crypto-01"
+    },
+    {
+      "id": "crittografia-03-cesare",
+      "course": "crittografia",
+      "title": "03 · Cesare e l’analisi delle frequenze",
+      "kind": "lesson",
+      "path": "materials/crittografia/03-cesare.html",
+      "description": "Un simulatore di Cesare, formule spiegate, codice JavaScript e attacco a tutte le 26 chiavi. Perché la sostituzione monoalfabetica è debole.",
+      "chapter": "crypto-02"
+    },
+    {
+      "id": "crittografia-04-vigenere-otp",
+      "course": "crittografia",
+      "title": "04 · Vigenère, periodicità e one-time pad",
+      "kind": "lesson",
+      "path": "materials/crittografia/04-vigenere-otp.html",
+      "description": "Sostituzione polialfabetica con esempio completo, attacco alla chiave ripetuta e condizioni rigorose della segretezza perfetta.",
+      "chapter": "crypto-02"
+    },
+    {
+      "id": "crittografia-05-enigma",
+      "course": "crittografia",
+      "title": "05 · Enigma: macchina, procedure e crittoanalisi",
+      "kind": "lesson",
+      "path": "materials/crittografia/05-enigma.html",
+      "description": "Come funzionano rotori, riflettore e pannello di Enigma; il contributo polacco e il lavoro di Turing e Welchman, oltre la narrazione cinematografica.",
+      "chapter": "crypto-02"
+    },
+    {
+      "id": "crittografia-06-simmetrica",
+      "course": "crittografia",
+      "title": "06 · Crittografia simmetrica e cifratura autenticata",
+      "kind": "lesson",
+      "path": "materials/crittografia/06-simmetrica.html",
+      "description": "AES, DES e 3DES; blocchi e flussi, modalità ECB e GCM, nonce e tag. Un esempio concreto di protezione dei backup.",
+      "chapter": "crypto-03"
+    },
+    {
+      "id": "crittografia-07-hash-mac-password",
+      "course": "crittografia",
+      "title": "07 · Hash, HMAC e protezione delle password",
+      "kind": "lesson",
+      "path": "materials/crittografia/07-hash-mac-password.html",
+      "description": "Impronte, collisioni, preimmagini e autenticazione con HMAC. Perché SHA-256 non basta per memorizzare password e a cosa servono salt e Argon2id.",
+      "chapter": "crypto-03"
+    },
+    {
+      "id": "crittografia-08-asimmetrica-rsa",
+      "course": "crittografia",
+      "title": "08 · Chiavi pubbliche e RSA, passo per passo",
+      "kind": "lesson",
+      "path": "materials/crittografia/08-asimmetrica-rsa.html",
+      "description": "Cifratura asimmetrica, chiave pubblica e privata, esempio RSA con numeri verificabili, padding e sistemi ibridi.",
+      "chapter": "crypto-04"
+    },
+    {
+      "id": "crittografia-09-diffie-hellman-tls",
+      "course": "crittografia",
+      "title": "09 · Diffie–Hellman, sistemi ibridi e TLS",
+      "kind": "lesson",
+      "path": "materials/crittografia/09-diffie-hellman-tls.html",
+      "description": "Un accordo di chiave numerico verificabile, attacco man-in-the-middle, forward secrecy e spiegazione dell’handshake TLS 1.3.",
+      "chapter": "crypto-04"
+    },
+    {
+      "id": "crittografia-10-firme",
+      "course": "crittografia",
+      "title": "10 · Firme crittografiche e firma digitale",
+      "kind": "lesson",
+      "path": "materials/crittografia/10-firme.html",
+      "description": "Che cosa prova una firma, come si verifica e perché non cifra il documento. Firma elettronica, qualificata e digitale nel contesto italiano ed europeo.",
+      "chapter": "crypto-05"
+    },
+    {
+      "id": "crittografia-11-certificati",
+      "course": "crittografia",
+      "title": "11 · Certificati, CA e catene di fiducia",
+      "kind": "lesson",
+      "path": "materials/crittografia/11-certificati.html",
+      "description": "Come X.509 collega una chiave a un’identità, che cosa fa una Certification Authority e quali verifiche deve fare un browser.",
+      "chapter": "crypto-05"
+    },
+    {
+      "id": "crittografia-12-pec",
+      "course": "crittografia",
+      "title": "12 · PEC: percorso, ricevute e limiti",
+      "kind": "lesson",
+      "path": "materials/crittografia/12-pec.html",
+      "description": "Mittente, gestori e destinatario: accettazione, presa in carico e consegna PEC. Errori, conservazione e differenza dalla firma digitale.",
+      "chapter": "crypto-05"
+    },
+    {
+      "id": "crittografia-13-chiavi-attacchi",
+      "course": "crittografia",
+      "title": "13 · Chiavi, attacchi e sicurezza concreta",
+      "kind": "lesson",
+      "path": "materials/crittografia/13-chiavi-attacchi.html",
+      "description": "Entropia, forza bruta, gestione delle chiavi, rotazione, recupero e attacchi ai dispositivi. Un calcolo dei tempi con ipotesi esplicite.",
+      "chapter": "crypto-06"
+    },
+    {
+      "id": "crittografia-14-casi-reali",
+      "course": "crittografia",
+      "title": "14 · Casi reali e scelte di progettazione",
+      "kind": "lesson",
+      "path": "materials/crittografia/14-casi-reali.html",
+      "description": "HTTPS, messaggistica end-to-end, backup, software firmato e crittografia post-quantistica: scegli gli strumenti in base alle garanzie richieste.",
+      "chapter": "crypto-06"
+    },
+    {
+      "id": "crittografia-laboratorio",
+      "course": "crittografia",
+      "title": "Laboratorio · Hash, AES-GCM e firme nel browser",
+      "kind": "exercise",
+      "path": "materials/crittografia/laboratorio.html",
+      "description": "Tre esperimenti locali con Web Crypto: hash SHA-256, cifratura autenticata AES-GCM e firme ECDSA. Modifica i dati e interpreta gli esiti.",
+      "chapter": "crypto-06"
+    },
+    {
+      "id": "crittografia-esercizi",
+      "course": "crittografia",
+      "title": "Esercizi · Dalla formula alla progettazione",
+      "kind": "exercise",
+      "path": "materials/crittografia/esercizi.html",
+      "description": "Dodici esercizi progressivi con soluzioni ragionate: Cesare, OTP, RSA, Diffie–Hellman, password, certificati, PEC e gestione degli incidenti.",
+      "chapter": "crypto-06"
+    },
+    {
+      "id": "crittografia-glossario",
+      "course": "crittografia",
+      "title": "Glossario · Il lessico della crittografia",
+      "kind": "lesson",
+      "path": "materials/crittografia/glossario.html",
+      "description": "Definizioni consultabili di concetti, operazioni, chiavi, protocolli e strumenti: ogni sigla ha un significato e un contesto."
+    },
+    {
+      "id": "crittografia-fonti",
+      "course": "crittografia",
+      "title": "Fonti · Standard, trascrizioni e correzioni",
+      "kind": "lesson",
+      "path": "materials/crittografia/fonti.html",
+      "description": "Riferimenti primari commentati, corrispondenza con le trascrizioni e correzioni tecniche esplicite su Enigma, AES, RSA, firme, TLS e PEC."
+    },
+    {
+      "id": "crittografia-test",
+      "course": "crittografia",
+      "title": "Crittografia · Verifica finale ragionata",
+      "kind": "test",
+      "path": "materials/crittografia/test.html",
       "description": "Domande con correzione e spiegazione"
     },
     {

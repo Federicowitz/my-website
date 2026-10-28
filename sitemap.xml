@@ -70,5 +70,25 @@
   <url><loc>https://federicolelli.com/teaching/materials/web/esercizi-html-js-dom-bom.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/web/soluzioni.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/web/test.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/mappa.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/01-principi.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/02-storia.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/03-cesare.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/04-vigenere-otp.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/05-enigma.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/06-simmetrica.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/07-hash-mac-password.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/08-asimmetrica-rsa.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/09-diffie-hellman-tls.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/10-firme.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/11-certificati.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/12-pec.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/13-chiavi-attacchi.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/14-casi-reali.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/laboratorio.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/esercizi.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/glossario.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/fonti.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/crittografia/test.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/lezioni/rappresentazione-interi.html</loc></url>
 </urlset>

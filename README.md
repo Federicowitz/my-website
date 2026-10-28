@@ -24,6 +24,10 @@ Per un nuovo argomento aggiungi una cartella in `teaching/materials/` e una voce
 
 ## Struttura
 
+Il percorso **Crittografia** è in `teaching/materials/crittografia/`: 14 lezioni progressive, una mappa iniziale, un glossario, fonti commentate, 12 esercizi risolti, un laboratorio e una verifica di 20 domande. È integrato nel catalogo, nei capitoli della mappa concettuale, nella navigazione autonoma e nella sitemap. Le lezioni rielaborano le trascrizioni fornite, correggendone le semplificazioni e aggiungendo esempi su AES-GCM, password, TLS e gestione delle chiavi.
+
+Il simulatore di Cesare funziona senza rete. Il laboratorio usa Web Crypto per SHA-256, AES-GCM ed ECDSA P-256: richiede un browser con API disponibili in un contesto sicuro (HTTPS o localhost). Le chiavi rimangono in memoria e si perdono uscendo dalla pagina; i dati non vengono inviati a un backend né salvati dal laboratorio. `npm test` esegue anche verifiche delle operazioni crittografiche effettivamente usate, dei casi di alterazione e dei calcoli RSA/Diffie–Hellman presentati negli esercizi.
+
 - `teaching/school.css`: interfaccia del catalogo e lettore.
 - `teaching/reader.css`: tema condiviso di lezioni, esercizi e test.
 - `teaching/catalog.js`: catalogo generato, da includere nel commit.

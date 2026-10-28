@@ -9,7 +9,7 @@ const site='https://federicolelli.com/';
 for(const item of items){
  const file=path.join(school,decodeURIComponent(item.path));let html=fs.readFileSync(file,'utf8');
  html=html.replace(/<!-- SCHOOL:(?:HEAD|TOP|BOTTOM):START -->[\s\S]*?<!-- SCHOOL:(?:HEAD|TOP|BOTTOM):END -->/g,'');
- const title=item.title.replace(/^\d+ · /,'').replace(/ — Federico Lelli$/,'');
+ const title=(item.course==='crittografia'?item.title:item.title.replace(/^\d+ · /,'')).replace(/ — Federico Lelli$/,'');
  const course=courses.find(c=>c.id===item.course),peers=items.filter(i=>i.course===item.course),index=peers.indexOf(item);
  const url=new URL('teaching/'+item.path,site).href;
  const desc=`${title}. ${course.title}: materiale didattico nella raccolta School curata da Federico Lelli.`;
