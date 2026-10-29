@@ -1,0 +1,484 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Laboratorio 02 · Form, metodi e primi fetch — Federico Lelli</title><meta name="description" content="Prima POST con un form, poi PUT e DELETE separati, una nota in memoria e soltanto alla fine due frontend fetch minimali senza CSS."><meta name="school-kind" content="lab"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="laboratorio-http.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/node/laboratorio-metodi.html"><meta property="og:title" content="Laboratorio 02 · Form, metodi e primi fetch — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/node/laboratorio-metodi.html"><meta property="og:description" content="Laboratorio 02 · Form, metodi e primi fetch. Node.js &amp; Express: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="node-laboratorio-metodi"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=node&amp;kind=lab" data-school-catalog="node">Node.js &amp; Express</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="node-laboratorio-http" rel="prev" href="laboratorio-http.html"><small>← Precedente</small><span>Laboratorio 01 · HTTP, pagine e immagini</span></a><a class="lesson-catalog" href="../../index.html?course=node&amp;kind=lab" data-school-catalog="node">Tutti i laboratori<span>2 / 3</span></a><a class="lesson-neighbor" data-school-link="node-laboratorio-express" rel="next" href="laboratorio-express.html"><small>Successiva →</small><span>Laboratorio 03 · Express essenziale</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading lab-reading"><p class="eyebrow">NODE.JS · LABORATORIO 02 · UN PASSO ALLA VOLTA</p><h1>Form, metodi e primi fetch</h1><p class="lab-lead">Prima proviamo ogni metodo da solo. Poi uniamo le operazioni su una nota e introduciamo fetch soltanto nelle ultime due tappe.</p><div class="lab-facts"><span>Dopo il laboratorio 01</span><span>7 tappe in più incontri</span><span>Form senza script all’inizio</span><span>Fetch solo alla fine</span></div><nav class="lab-toc" aria-label="Tappe del laboratorio"><h2>Il percorso di lavoro</h2><ol><li><a href="#tappa-1">POST: un form che invia una richiesta</a></li><li><a href="#tappa-2">POST: leggere un campo del form</a></li><li><a href="#tappa-3">PUT semplice: sostituire tutta la nota</a></li><li><a href="#tappa-4">DELETE semplice: eliminare la nota</a></li><li><a href="#tappa-5">Un piccolo passo in più: unire i quattro metodi</a></li><li><a href="#tappa-6">Fetch, primo esempio: leggere testo e JSON</a></li><li><a href="#tappa-7">Fetch, secondo esempio: quattro pulsanti essenziali</a></li></ol></nav><section><h2>Prima di iniziare</h2><p>Completa <a href="laboratorio-http.html">HTTP, pagine e immagini</a>, compresa la pausa sugli status code. Crea una cartella nuova <code>lab-metodi</code> e un file <code>server.cjs</code>. Ogni tappa fornisce il server completo; quando è indicato di mantenere il server precedente, cambia solo l’HTML. Ferma con Ctrl+C e riavvia dopo le modifiche a Node.</p><p>Le tappe 3 e 4 sono esperimenti separati: ognuno riparte dalla propria nota iniziale. Non combinare i frammenti. Solo la tappa 5 li riunisce. Le prove curl si eseguono in un secondo terminale; su macOS/Linux usa curl al posto di curl.exe.</p></section><section id="tappa-1" class="lab-step"><p class="eyebrow">TAPPA 1</p><h2>POST: un form che invia una richiesta</h2><p><strong>Ripartiamo da un caso minuscolo.</strong> Il form ha soltanto un pulsante. <code>action</code> sceglie l’URL, <code>method="post"</code> sceglie il metodo. Per ora non inviamo campi e non memorizziamo dati: il server conferma soltanto la ricezione.</p><h3>server.cjs · POST senza dati</h3><pre><code data-lab-file="post-basic">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method === 'GET' &amp;&amp; req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(`&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Laboratorio Node.js&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Invia una richiesta POST&lt;/h1&gt;
+  &lt;form action="/messaggi" method="post"&gt;
+    &lt;button type="submit"&gt;Invia un messaggio&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;`);
+    return;
+  }
+
+  if (req.method === 'POST' &amp;&amp; req.url === '/messaggi') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Richiesta POST ricevuta!');
+    return;
+  }
+
+  if (req.url === '/messaggi') {
+    res.writeHead(405, { 'Allow': 'POST' });
+    res.end('Per questa rotta usa POST.');
+    return;
+  }
+
+  if (req.url === '/') {
+    res.writeHead(405, { 'Allow': 'GET' });
+    res.end('Usa GET per la home.');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log('Server attivo su http://' + IP + ':' + PORT);
+});</code></pre><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i -X POST http://127.0.0.1:3000/messaggi
+curl.exe -i http://127.0.0.1:3000/messaggi</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Apri / e premi il pulsante: il browser naviga alla risposta “Richiesta POST ricevuta!” con stato 200. Scrivere /messaggi nella barra invia GET e restituisce 405. Usiamo 200 perché non abbiamo creato una risorsa.</p><p><strong>Tocca a te.</strong> Cambia il testo del pulsante e della risposta. Con Network confronta il metodo della home con quello del form.</p></section>
+<section id="tappa-2" class="lab-step"><p class="eyebrow">TAPPA 2</p><h2>POST: leggere un campo del form</h2><p><strong>Aggiungiamo un solo dato:</strong> il nome. Un form normale invia campi nel formato <code>application/x-www-form-urlencoded</code>, per esempio <code>nome=Ada+Lovelace</code>. L’attributo <code>name="nome"</code> stabilisce il nome del campo trasmesso.</p><h3>server.cjs · POST con il nome</h3><pre><code data-lab-file="post-form">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method === 'GET' &amp;&amp; req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(`&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Laboratorio Node.js&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Come ti chiami?&lt;/h1&gt;
+  &lt;form action="/saluto" method="post"&gt;
+    &lt;label&gt;Nome: &lt;input name="nome" required&gt;&lt;/label&gt;
+    &lt;button type="submit"&gt;Invia&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;`);
+    return;
+  }
+
+  if (req.method === 'POST' &amp;&amp; req.url === '/saluto') {
+    const type = (req.headers['content-type'] || '').split(';')[0];
+    if (type !== 'application/x-www-form-urlencoded') {
+      res.writeHead(415, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('Invia i dati con un normale form HTML.');
+      return;
+    }
+
+    let body = '';
+    req.setEncoding('utf8');
+    req.on('data', (chunk) =&gt; {
+      body += chunk;
+    });
+    req.on('end', () =&gt; {
+      const dati = new URLSearchParams(body);
+      const nome = (dati.get('nome') || '').trim();
+      if (nome === '') {
+        res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Scrivi un nome.');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('Ciao, ' + nome + '!');
+    });
+    return;
+  }
+
+  if (req.url === '/saluto') {
+    res.writeHead(405, { 'Allow': 'POST' });
+    res.end('Usa POST per inviare il nome.');
+    return;
+  }
+
+  if (req.url === '/') {
+    res.writeHead(405, { 'Allow': 'GET' });
+    res.end('Usa GET per la home.');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log('Server attivo su http://' + IP + ':' + PORT);
+});</code></pre><p>Il corpo può arrivare in più pezzi: l’evento <code>data</code> porta un pezzo, <code>end</code> dice che è arrivato tutto. Per questo non leggiamo il nome subito fuori da end. <code>URLSearchParams</code> interpreta i campi e decodifica +, accenti e caratteri speciali. La risposta è testo semplice, quindi il nome non viene interpretato come HTML.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i --data-urlencode "nome=Ada Lovelace" http://127.0.0.1:3000/saluto
+curl.exe -i -d "nome=" http://127.0.0.1:3000/saluto</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Il form e il primo comando rispondono 200 con “Ciao, Ada Lovelace!”. Il campo vuoto dà 400. required aiuta il browser, ma il server deve comunque controllare i dati: curl può inviare un campo vuoto. Un formato diverso dal form dà 415.</p><p><strong>Tocca a te.</strong> Aggiungi al form un input name="classe" e leggilo con dati.get. Prima controlla nel terminale quale corpo viene inviato, poi modifica la risposta.</p></section>
+<section id="tappa-3" class="lab-step"><p class="eyebrow">TAPPA 3</p><h2>PUT semplice: sostituire tutta la nota</h2><p><strong>Un esempio indipendente, senza POST.</strong> Il server parte con una nota in memoria. GET la legge, PUT ne sostituisce l’intero testo. Non aggiunge un pezzo e non crea una seconda nota. Ripetere lo stesso PUT lascia lo stesso contenuto.</p><h3>server.cjs · soltanto GET e PUT sulla nota</h3><pre><code data-lab-file="put-basic">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+let nota = 'Prima nota';
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method === 'GET' &amp;&amp; req.url === '/nota') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(nota);
+    return;
+  }
+
+  if (req.method === 'PUT' &amp;&amp; req.url === '/nota') {
+    if ((req.headers['content-type'] || '').split(';')[0] !== 'text/plain') {
+      res.writeHead(415);
+      res.end('Invia testo semplice.');
+      return;
+    }
+    let body = '';
+    req.setEncoding('utf8');
+    req.on('data', (chunk) =&gt; { body += chunk; });
+    req.on('end', () =&gt; {
+      if (body.trim() === '') {
+        res.writeHead(400);
+        res.end('La nota non puo essere vuota.');
+        return;
+      }
+      nota = body;
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end(nota);
+    });
+    return;
+  }
+
+  if (req.url === '/nota') {
+    res.writeHead(405, { 'Allow': 'GET, PUT' });
+    res.end('Usa GET oppure PUT.');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i http://127.0.0.1:3000/nota
+curl.exe -i -X PUT -H "Content-Type: text/plain" --data "Seconda nota" http://127.0.0.1:3000/nota
+curl.exe -i http://127.0.0.1:3000/nota</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Leggi “Prima nota”, sostituiscila, poi GET restituisce “Seconda nota”. Riavviando Node torna “Prima nota”: qui non stiamo salvando su disco.</p><p class="lab-note">I normali form HTML inviano GET o POST, non PUT o DELETE. Non usiamo una rotta GET /elimina per fingere una cancellazione. Ora proviamo questi metodi con curl; il frontend con fetch arriva solo nelle ultime tappe.</p><p><strong>Tocca a te.</strong> Invia lo stesso PUT due volte, poi leggi. Prova un corpo vuoto: il server restituisce 400 e conserva la nota precedente.</p></section>
+<section id="tappa-4" class="lab-step"><p class="eyebrow">TAPPA 4</p><h2>DELETE semplice: eliminare la nota</h2><p><strong>Altro esempio indipendente.</strong> Partiamo di nuovo da “Prima nota”. DELETE imposta la variabile a null; GET risponde 404 quando non esiste più. Non occorre un corpo nella richiesta DELETE di questo esempio.</p><h3>server.cjs · soltanto GET e DELETE</h3><pre><code data-lab-file="delete-basic">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+let nota = 'Prima nota';
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method === 'GET' &amp;&amp; req.url === '/nota') {
+    if (nota === null) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('La nota non esiste.');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(nota);
+    return;
+  }
+
+  if (req.method === 'DELETE' &amp;&amp; req.url === '/nota') {
+    nota = null;
+    res.writeHead(204);
+    res.end(); // Una risposta 204 non deve avere un corpo.
+    return;
+  }
+
+  if (req.url === '/nota') {
+    res.writeHead(405, { 'Allow': 'GET, DELETE' });
+    res.end('Usa GET oppure DELETE.');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i http://127.0.0.1:3000/nota
+curl.exe -i -X DELETE http://127.0.0.1:3000/nota
+curl.exe -i http://127.0.0.1:3000/nota
+curl.exe -i -X DELETE http://127.0.0.1:3000/nota</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Nell’ordine: 200 con la nota; 204 senza corpo; 404; ancora 204. Abbiamo scelto che eliminare una nota già assente sia comunque un successo senza corpo. Ripetere DELETE lascia lo stesso stato finale: la nota è assente.</p><p><strong>Tocca a te.</strong> Controlla con -i che dopo 204 non venga inviato un messaggio. Poi riavvia: la nota iniziale ricompare perché lo stato era soltanto in memoria.</p></section>
+<section id="tappa-5" class="lab-step"><p class="eyebrow">TAPPA 5</p><h2>Un piccolo passo in più: unire i quattro metodi</h2><p><strong>Solo dopo le prove separate, uniamo i pezzi.</strong> Ora la nota inizialmente non esiste. POST /note la crea, GET /nota la legge, PUT /nota la sostituisce e DELETE /nota la elimina. Il corpo di POST e PUT qui è testo semplice, non il formato del form della tappa 2.</p><table><thead><tr><th>Richiesta</th><th>Effetto</th><th>Risposta</th></tr></thead><tbody><tr><td>POST /note</td><td>Crea la nota se manca</td><td>201 e Location: /nota; 409 se esiste</td></tr><tr><td>GET /nota</td><td>Legge la nota</td><td>200 oppure 404</td></tr><tr><td>PUT /nota</td><td>Sostituisce tutta la nota esistente</td><td>200 oppure 404</td></tr><tr><td>DELETE /nota</td><td>Rende la nota assente</td><td>204 senza corpo</td></tr><tr><td>GET /api/info</td><td>Legge informazioni sul laboratorio</td><td>200 JSON</td></tr></tbody></table><h3>server.cjs · metodi riuniti</h3><pre><code data-lab-file="crud">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+let nota = null;
+
+// La callback riceve il testo completo soltanto dopo l'evento end.
+function leggiCorpo(req, callback) {
+  let body = '';
+  req.setEncoding('utf8');
+  req.on('data', (chunk) =&gt; { body += chunk; });
+  req.on('end', () =&gt; { callback(body); });
+}
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method === 'GET' &amp;&amp; req.url === '/nota') {
+    if (nota === null) {
+      res.writeHead(404);
+      res.end('La nota non esiste.');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(nota);
+    return;
+  }
+
+  if (req.method === 'GET' &amp;&amp; req.url === '/api/info') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ corso: 'Node.js', laboratorio: 2 }));
+    return;
+  }
+
+  if ((req.method === 'POST' &amp;&amp; req.url === '/note') ||
+      (req.method === 'PUT' &amp;&amp; req.url === '/nota')) {
+    if ((req.headers['content-type'] || '').split(';')[0] !== 'text/plain') {
+      res.writeHead(415);
+      res.end('Invia Content-Type: text/plain.');
+      return;
+    }
+    leggiCorpo(req, (body) =&gt; {
+      if (body.trim() === '') {
+        res.writeHead(400);
+        res.end('Scrivi il testo della nota.');
+        return;
+      }
+      if (req.method === 'POST' &amp;&amp; nota !== null) {
+        res.writeHead(409);
+        res.end('La nota esiste gia. Usa PUT per sostituirla.');
+        return;
+      }
+      if (req.method === 'PUT' &amp;&amp; nota === null) {
+        res.writeHead(404);
+        res.end('Prima crea la nota con POST.');
+        return;
+      }
+      nota = body;
+      if (req.method === 'POST') {
+        res.writeHead(201, { 'Content-Type': 'text/plain; charset=utf-8', 'Location': '/nota' });
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      }
+      res.end(nota);
+    });
+    return;
+  }
+
+  if (req.method === 'DELETE' &amp;&amp; req.url === '/nota') {
+    nota = null;
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  if (req.url === '/nota' || req.url === '/note' || req.url === '/api/info') {
+    const allowed = req.url === '/nota' ? 'GET, PUT, DELETE' : req.url === '/note' ? 'POST' : 'GET';
+    res.writeHead(405, { 'Allow': allowed });
+    res.end('Metodo non consentito per questa rotta.');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre><p><code>leggiCorpo</code> raccoglie la logica data/end in una funzione: la callback riceve il testo quando è completo. Lo stato <code>nota</code> è condiviso tra le richieste di questo server, fino al riavvio. È un esempio locale con piccoli testi, senza database o utenti.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i http://127.0.0.1:3000/nota
+curl.exe -i -H "Content-Type: text/plain" --data "Prima nota" http://127.0.0.1:3000/note
+curl.exe -i -H "Content-Type: text/plain" --data "Duplicata" http://127.0.0.1:3000/note
+curl.exe -i -X PUT -H "Content-Type: text/plain" --data "Nota aggiornata" http://127.0.0.1:3000/nota
+curl.exe -i -X DELETE http://127.0.0.1:3000/nota
+curl.exe -i http://127.0.0.1:3000/nota</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Nell’ordine: 404, 201, 409, 200, 204, 404. Se PUT arriva prima della creazione risponde 404; un testo vuoto dà 400; un Content-Type diverso da text/plain dà 415.</p><p><strong>Tocca a te.</strong> Prepara una tabella con stato della nota prima e dopo ogni comando. Spiega perché POST e PUT non sono intercambiabili in questo progetto.</p></section>
+<section id="tappa-6" class="lab-step"><p class="eyebrow">TAPPA 6</p><h2>Fetch, primo esempio: leggere testo e JSON</h2><p><strong>Da qui introduciamo JavaScript nel browser.</strong> Una richiesta fetch legge una risposta e permette di aggiornare la pagina senza navigare. Il server continua a fare le operazioni provate con curl.</p><p>Crea public/index.html con questo HTML senza CSS. Il server completo qui sotto aggiunge solo la rotta GET / per leggere quel file; gli altri metodi restano quelli della tappa 5.</p><h3>server.cjs · serve anche il frontend</h3><pre><code data-lab-file="fetch-server">const http = require('node:http');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+let nota = null;
+
+// La callback riceve il testo completo soltanto dopo l'evento end.
+function leggiCorpo(req, callback) {
+  let body = '';
+  req.setEncoding('utf8');
+  req.on('data', (chunk) =&gt; { body += chunk; });
+  req.on('end', () =&gt; { callback(body); });
+}
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method === 'GET' &amp;&amp; req.url === '/') {
+    fs.readFile(path.join(__dirname, 'public', 'index.html'), (error, content) =&gt; {
+      if (error) {
+        res.writeHead(500);
+        res.end('Non riesco a leggere public/index.html.');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(content);
+    });
+    return;
+  }
+
+  if (req.url === '/') {
+    res.writeHead(405, { 'Allow': 'GET' });
+    res.end('Usa GET per la home.');
+    return;
+  }
+
+  if (req.method === 'GET' &amp;&amp; req.url === '/nota') {
+    if (nota === null) {
+      res.writeHead(404);
+      res.end('La nota non esiste.');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(nota);
+    return;
+  }
+
+  if (req.method === 'GET' &amp;&amp; req.url === '/api/info') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ corso: 'Node.js', laboratorio: 2 }));
+    return;
+  }
+
+  if ((req.method === 'POST' &amp;&amp; req.url === '/note') ||
+      (req.method === 'PUT' &amp;&amp; req.url === '/nota')) {
+    if ((req.headers['content-type'] || '').split(';')[0] !== 'text/plain') {
+      res.writeHead(415);
+      res.end('Invia Content-Type: text/plain.');
+      return;
+    }
+    leggiCorpo(req, (body) =&gt; {
+      if (body.trim() === '') {
+        res.writeHead(400);
+        res.end('Scrivi il testo della nota.');
+        return;
+      }
+      if (req.method === 'POST' &amp;&amp; nota !== null) {
+        res.writeHead(409);
+        res.end('La nota esiste gia. Usa PUT per sostituirla.');
+        return;
+      }
+      if (req.method === 'PUT' &amp;&amp; nota === null) {
+        res.writeHead(404);
+        res.end('Prima crea la nota con POST.');
+        return;
+      }
+      nota = body;
+      if (req.method === 'POST') {
+        res.writeHead(201, { 'Content-Type': 'text/plain; charset=utf-8', 'Location': '/nota' });
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      }
+      res.end(nota);
+    });
+    return;
+  }
+
+  if (req.method === 'DELETE' &amp;&amp; req.url === '/nota') {
+    nota = null;
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  if (req.url === '/nota' || req.url === '/note' || req.url === '/api/info') {
+    const allowed = req.url === '/nota' ? 'GET, PUT, DELETE' : req.url === '/note' ? 'POST' : 'GET';
+    res.writeHead(405, { 'Allow': allowed });
+    res.end('Metodo non consentito per questa rotta.');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre><h3>public/index.html · due letture minime</h3><pre><code data-lab-file="fetch-read">&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Laboratorio Node.js&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Leggi dal server senza cambiare pagina&lt;/h1&gt;
+  &lt;button onclick="leggiNota()"&gt;Leggi la nota&lt;/button&gt;
+  &lt;button onclick="leggiInfo()"&gt;Leggi il JSON&lt;/button&gt;
+  &lt;pre id="risultato"&gt;Premi un pulsante.&lt;/pre&gt;
+  &lt;script&gt;
+    const risultato = document.getElementById('risultato');
+
+    function leggiNota() {
+      fetch('/nota')
+        .then((risposta) =&gt; risposta.text())
+        .then((testo) =&gt; { risultato.textContent = testo; })
+        .catch(() =&gt; { risultato.textContent = 'Errore di rete'; });
+    }
+
+    function leggiInfo() {
+      fetch('/api/info')
+        .then((risposta) =&gt; risposta.json())
+        .then((dati) =&gt; { risultato.textContent = dati.corso; })
+        .catch(() =&gt; { risultato.textContent = 'Errore di rete'; });
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre><p><code>.then</code> esegue il passo successivo quando l’operazione è pronta: prima arriva la risposta, poi ne leggiamo il corpo. Per il testo usiamo <code>text()</code>, per il JSON <code>json()</code>. Il catch gestisce errori di rete o lettura; un HTTP 404 da solo non fa fallire fetch.</p><p class="lab-check"><strong>Risultato atteso.</strong> Apri /: “Leggi la nota” mostra inizialmente il messaggio di assenza, mentre “Leggi il JSON” mostra Node.js. Crea una nota con il comando POST della tappa 5 e ripremi “Leggi la nota”: il testo appare senza cambiare URL. Una risposta 404 viene letta come testo; controlleremo lo status nella prossima tappa.</p><p><strong>Tocca a te.</strong> Confronta il link del primo laboratorio con questi pulsanti: in quale caso cambia pagina? Quale codice viene eseguito nel browser e quale in Node?</p></section>
+<section id="tappa-7" class="lab-step"><p class="eyebrow">TAPPA 7</p><h2>Fetch, secondo esempio: quattro pulsanti essenziali</h2><p><strong>Mantieni server.cjs della tappa 6.</strong> Sostituisci solo public/index.html con questo frontend: un campo, quattro pulsanti e un risultato. Nessun CSS, nessuna libreria.</p><h3>public/index.html · GET, POST, PUT e DELETE</h3><pre><code data-lab-file="fetch-crud">&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Laboratorio Node.js&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Una nota&lt;/h1&gt;
+  &lt;label&gt;Testo: &lt;input id="testo"&gt;&lt;/label&gt;
+  &lt;p&gt;
+    &lt;button onclick="invia('GET')"&gt;Leggi&lt;/button&gt;
+    &lt;button onclick="invia('POST')"&gt;Crea&lt;/button&gt;
+    &lt;button onclick="invia('PUT')"&gt;Sostituisci&lt;/button&gt;
+    &lt;button onclick="invia('DELETE')"&gt;Elimina&lt;/button&gt;
+  &lt;/p&gt;
+  &lt;pre id="risultato"&gt;Premi un pulsante.&lt;/pre&gt;
+  &lt;script&gt;
+    async function invia(metodo) {
+      const risultato = document.getElementById('risultato');
+      const rotta = metodo === 'POST' ? '/note' : '/nota';
+      const opzioni = { method: metodo };
+
+      if (metodo === 'POST' || metodo === 'PUT') {
+        opzioni.headers = { 'Content-Type': 'text/plain' };
+        opzioni.body = document.getElementById('testo').value;
+      }
+
+      try {
+        const risposta = await fetch(rotta, opzioni);
+        const testo = await risposta.text();
+        risultato.textContent = 'Stato ' + risposta.status + ': ' + testo;
+      } catch (error) {
+        risultato.textContent = 'Errore di rete: ' + error.message;
+      }
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre><p>Qui usiamo <code>async/await</code> come un secondo modo di attendere la risposta. <code>async</code> abilita await nella funzione; <code>await fetch</code> aspetta la risposta e <code>await risposta.text()</code> aspetta il corpo. Per GET e DELETE non impostiamo body. Lo status viene mostrato anche quando è 400 o 404: non lo confondiamo con un errore di rete.</p><p class="lab-check"><strong>Risultato atteso.</strong> Dopo un riavvio: Leggi → 404; scrivi un testo e premi Crea → 201; Crea di nuovo → 409; cambia testo e premi Sostituisci → 200; Leggi mostra il nuovo testo; Elimina → 204 senza corpo; Leggi → 404. Se premi Crea con campo vuoto ottieni 400. Ripeti i clic uno alla volta, aspettando il risultato.</p><p><strong>Tocca a te.</strong> Ferma Node mantenendo la pagina già aperta: il successivo clic mostra un errore di rete. Riavvia e ripeti la sequenza. In Network confronta i quattro metodi e i corpi inviati.</p></section><section><h2>Prima di continuare</h2><p>Ripeti una creazione, una lettura, una sostituzione e una cancellazione. Devi saper distinguere un form che naviga, una richiesta fetch che aggiorna un elemento e lo stato che rimane soltanto nella memoria di Node.</p><p>Passa poi a <a href="laboratorio-express.html">Laboratorio 03 · Express essenziale</a>, dove riscriviamo pochi esempi già conosciuti.</p><p>Al termine ferma il server con <kbd>Ctrl</kbd> + <kbd>C</kbd>. Se vedi EADDRINUSE, la porta è già occupata: ferma la tua versione precedente prima di avviarne un’altra. Salva il lavoro prima di sostituire i file con la versione della tappa successiva.</p><p class="lab-sources">Riferimenti: <a href="https://nodejs.org/api/http.html">Node HTTP e corpo della richiesta</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form">form HTML</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/PUT">PUT</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/DELETE">DELETE</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch">Fetch</a>.</p></section></main><script src="../../reader.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="node-laboratorio-http" rel="prev" href="laboratorio-http.html"><small>← Precedente</small><span>Laboratorio 01 · HTTP, pagine e immagini</span></a><a class="lesson-catalog" href="../../index.html?course=node&amp;kind=lab" data-school-catalog="node">Tutti i laboratori<span>2 / 3</span></a><a class="lesson-neighbor" data-school-link="node-laboratorio-express" rel="next" href="laboratorio-express.html"><small>Successiva →</small><span>Laboratorio 03 · Express essenziale</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

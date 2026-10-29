@@ -1,0 +1,200 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Laboratorio 13 | Struct e dati dei personaggi — Federico Lelli</title><meta name="description" content="7 programmi C++ completi e graduali con personaggi, eroi e nemici, risultati attesi e modifiche guidate."><meta name="school-kind" content="lab"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="cpp-labs.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-13-struct.html"><meta property="og:title" content="Laboratorio 13 | Struct e dati dei personaggi — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-13-struct.html"><meta property="og:description" content="Laboratorio 13 | Struct e dati dei personaggi. C++: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="cpp-laboratorio-13-struct"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">C++</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><span class="lesson-neighbor lesson-boundary"><small>Inizio del percorso</small><span>C++</span></span><a class="lesson-catalog" href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">Tutti i laboratori<span>1 / 4</span></a><a class="lesson-neighbor" data-school-link="cpp-laboratorio-14-classi" rel="next" href="laboratorio-14-classi.html"><small>Successiva →</small><span>Laboratorio 14 | Classi, oggetti e incapsulamento</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading cpp-reading"><p class="eyebrow">C++ · LABORATORIO 13 · 7 PASSI GUIDATI</p><h1>Struct e dati dei personaggi</h1><p class="cpp-lead">Dalle variabili separate a un tipo che raggruppa i dati. Prima i dati, poi le operazioni: è il ponte verso classi e oggetti.</p><p>Parti dalla <a href="13-lezione.html">spiegazione del capitolo 13</a>. Ogni esempio qui aggiunge un concetto: puoi distribuire il laboratorio su più incontri. Gli ultimi passi riprendono il ciclo di gioco, con regole visibili e risultati riproducibili.</p><div class="cpp-note"><strong>Ogni esempio è indipendente.</strong> Crea un file <code>main.cpp</code> e copia un programma completo alla volta: non incollare più main nello stesso file. Compila con <code>g++ -std=c++17 -Wall -Wextra -pedantic main.cpp -o gioco</code>. Avvia <code>.\gioco.exe</code> in PowerShell oppure <code>./gioco</code> su macOS/Linux. Salva e ricompila dopo ogni modifica.</div><p>Negli esempi brevi usiamo <code>using namespace std;</code> per scrivere cout, string e vector senza ripetere std::. Non sostituisce gli include. Nei progetti più grandi e negli header è preferibile limitare questa direttiva, per evitare nomi ambigui.</p><nav class="cpp-toc" aria-label="Esempi del laboratorio"><h2>Il percorso di lavoro</h2><ol><li><a href="#struct-1">Un personaggio, due dati</a></li><li><a href="#struct-2">Mago, Arciere e Goblin</a></li><li><a href="#struct-3">Creare un personaggio da tastiera</a></li><li><a href="#struct-4">Passare una copia o l’originale</a></li><li><a href="#struct-5">Una funzione applica le regole del danno</a></li><li><a href="#struct-6">Un gruppo di eroi in un vector</a></li><li><a href="#struct-7">Primo ciclo di gioco: squadra contro Orco</a></li></ol></nav><section class="cpp-step" id="struct-1"><p class="eyebrow">ESEMPIO 1</p><h2>Un personaggio, due dati</h2><p>Prima tenevamo nome e vita in variabili separate. Una struct definisce un nuovo tipo che raggruppa quei dati. La definizione finisce con un punto e virgola; il punto seleziona un campo.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="struct-1">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+struct Personaggio {
+  string nome;
+  int vita;
+};
+
+int main() {
+  Personaggio eroe;
+  eroe.nome = "Brina";
+  eroe.vita = 100;
+  cout &lt;&lt; eroe.nome &lt;&lt; ": " &lt;&lt; eroe.vita &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="struct-1">Brina: 100
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi il campo livello e stampalo. Non aggiungere ancora metodi o altre struct.</p></section>
+<section class="cpp-step" id="struct-2"><p class="eyebrow">ESEMPIO 2</p><h2>Mago, Arciere e Goblin</h2><p>Creiamo tre variabili dello stesso tipo. I valori iniziali tra graffe seguono l’ordine dei campi. Il ruolo è per ora soltanto un testo: non stiamo ancora creando classi diverse per ciascuna professione.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="struct-2">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+struct Personaggio {
+  string nome;
+  string ruolo;
+  int vita;
+};
+
+int main() {
+  Personaggio mago{"Aria", "Mago", 80};
+  Personaggio arciere{"Lio", "Arciere", 90};
+  Personaggio nemico{"Gruk", "Goblin", 40};
+  cout &lt;&lt; mago.nome &lt;&lt; " - " &lt;&lt; mago.ruolo &lt;&lt; ": " &lt;&lt; mago.vita &lt;&lt; '\n';
+  cout &lt;&lt; arciere.nome &lt;&lt; " - " &lt;&lt; arciere.ruolo &lt;&lt; ": " &lt;&lt; arciere.vita &lt;&lt; '\n';
+  cout &lt;&lt; nemico.nome &lt;&lt; " - " &lt;&lt; nemico.ruolo &lt;&lt; ": " &lt;&lt; nemico.vita &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="struct-2">Aria - Mago: 80
+Lio - Arciere: 90
+Gruk - Goblin: 40
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi una Guerriera e un Orco. Mantieni lo stesso tipo Personaggio e scegli valori diversi.</p></section>
+<section class="cpp-step" id="struct-3"><p class="eyebrow">ESEMPIO 3</p><h2>Creare un personaggio da tastiera</h2><p>Ora i valori arrivano da input. getline legge anche un nome con spazi; cin legge il numero successivo. In questa prova assumiamo una vita intera non negativa.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="struct-3">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+struct Personaggio {
+  string nome;
+  int vita;
+};
+
+int main() {
+  Personaggio eroe;
+  getline(cin, eroe.nome);
+  cin &gt;&gt; eroe.vita;
+  cout &lt;&lt; eroe.nome &lt;&lt; ": " &lt;&lt; eroe.vita &lt;&lt; '\n';
+}
+</code></pre><h3>Dati da inserire nel terminale</h3><pre data-cpp-input="struct-3">Nora la guaritrice
+70
+</pre><h3>Risultato atteso</h3><pre data-cpp-output="struct-3">Nora la guaritrice: 70
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Inserisci un altro nome e un’altra vita. Poi aggiungi un controllo che rifiuti una vita negativa.</p></section>
+<section class="cpp-step" id="struct-4"><p class="eyebrow">ESEMPIO 4</p><h2>Passare una copia o l’originale</h2><p>Una funzione con Personaggio p riceve una copia; con Personaggio& p modifica l’oggetto originale. Riprendiamo i riferimenti del capitolo 12. Non è necessario un puntatore per modificare la vita.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="struct-4">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+struct Personaggio {
+  string nome;
+  int vita;
+  int attacco;
+};
+
+void dannoAllaCopia(Personaggio p) { p.vita -= 10; }
+void dannoAllOriginale(Personaggio&amp; p) { p.vita -= 10; }
+
+int main() {
+  Personaggio eroe{"Brina", 100, 12};
+  dannoAllaCopia(eroe);
+  cout &lt;&lt; "Dopo la copia: " &lt;&lt; eroe.vita &lt;&lt; '\n';
+  dannoAllOriginale(eroe);
+  cout &lt;&lt; "Dopo il riferimento: " &lt;&lt; eroe.vita &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="struct-4">Dopo la copia: 100
+Dopo il riferimento: 90
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Cambia entrambe le sottrazioni in 20. Prima di eseguire, prevedi i due risultati.</p></section>
+<section class="cpp-step" id="struct-5"><p class="eyebrow">ESEMPIO 5</p><h2>Una funzione applica le regole del danno</h2><p>Aggiungiamo due regole: un danno negativo non cura e la vita non deve scendere sotto zero. Una struct con campi pubblici non impone da sola queste regole: dobbiamo rispettarle nel codice.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="struct-5">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+struct Personaggio {
+  string nome;
+  int vita;
+  int attacco;
+};
+
+void subisciDanno(Personaggio&amp; p, int danno) {
+  if (danno &lt;= 0) return;
+  p.vita -= danno;
+  if (p.vita &lt; 0) p.vita = 0;
+}
+
+int main() {
+  Personaggio goblin{"Gruk", 30, 6};
+  subisciDanno(goblin, -10);
+  cout &lt;&lt; goblin.vita &lt;&lt; '\n';
+  subisciDanno(goblin, 12);
+  cout &lt;&lt; goblin.vita &lt;&lt; '\n';
+  subisciDanno(goblin, 50);
+  cout &lt;&lt; goblin.vita &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="struct-5">30
+18
+0
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Prova danno 0, un danno esattamente uguale alla vita e un danno maggiore della vita. Spiega perché il controllo serve.</p></section>
+<section class="cpp-step" id="struct-6"><p class="eyebrow">ESEMPIO 6</p><h2>Un gruppo di eroi in un vector</h2><p>Ora raccogliamo più struct. const Personaggio& permette di leggere ogni elemento senza copiarlo o modificarlo. Il tipo dell’elemento resta lo stesso, anche se i personaggi hanno nomi e valori diversi.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="struct-6">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+struct Personaggio {
+  string nome;
+  int vita;
+  int attacco;
+};
+
+int main() {
+  vector&lt;Personaggio&gt; squadra{
+    {"Aria", 80, 10}, {"Lio", 90, 8}, {"Brina", 100, 12}
+  };
+  for (const Personaggio&amp; eroe : squadra) {
+    cout &lt;&lt; eroe.nome &lt;&lt; ": " &lt;&lt; eroe.vita &lt;&lt; " vita, " &lt;&lt; eroe.attacco &lt;&lt; " attacco" &lt;&lt; '\n';
+  }
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="struct-6">Aria: 80 vita, 10 attacco
+Lio: 90 vita, 8 attacco
+Brina: 100 vita, 12 attacco
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi Nora la Guaritrice al gruppo. Per ora anche lei ha soltanto dati: il comportamento di cura arriverà con i metodi.</p></section>
+<section class="cpp-step" id="struct-7"><p class="eyebrow">ESEMPIO 7</p><h2>Primo ciclo di gioco: squadra contro Orco</h2><p>Riuniamo soltanto ciò che abbiamo già provato: struct, vector, funzioni, riferimenti, if e cicli. Ogni turno gli eroi vivi attaccano; se il nemico sopravvive, contrattacca un eroe vivo. I danni iniziali sono positivi, quindi lo scontro può concludersi. Non ci sono casualità: possiamo prevedere l’uscita.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="struct-7">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+struct Personaggio {
+  string nome;
+  int vita;
+  int attacco;
+};
+
+void subisciDanno(Personaggio&amp; p, int danno) {
+  if (danno &lt;= 0) return;
+  p.vita -= danno;
+  if (p.vita &lt; 0) p.vita = 0;
+}
+
+bool squadraViva(const vector&lt;Personaggio&gt;&amp; squadra) {
+  for (const Personaggio&amp; eroe : squadra) {
+    if (eroe.vita &gt; 0) return true;
+  }
+  return false;
+}
+
+int main() {
+  vector&lt;Personaggio&gt; squadra{
+    {"Aria", 80, 10}, {"Lio", 90, 8}, {"Brina", 100, 12}
+  };
+  Personaggio nemico{"Orco", 60, 8};
+  int turno = 1;
+
+  while (nemico.vita &gt; 0 &amp;&amp; squadraViva(squadra)) {
+    cout &lt;&lt; "Turno " &lt;&lt; turno &lt;&lt; '\n';
+    for (const Personaggio&amp; eroe : squadra) {
+      if (eroe.vita &gt; 0 &amp;&amp; nemico.vita &gt; 0) {
+        subisciDanno(nemico, eroe.attacco);
+        cout &lt;&lt; eroe.nome &lt;&lt; " colpisce " &lt;&lt; nemico.nome
+             &lt;&lt; ": " &lt;&lt; nemico.vita &lt;&lt; " vita" &lt;&lt; '\n';
+      }
+    }
+    // Il nemico contrattacca il primo eroe ancora vivo.
+    if (nemico.vita &gt; 0) {
+      for (Personaggio&amp; eroe : squadra) {
+        if (eroe.vita &gt; 0) {
+          subisciDanno(eroe, nemico.attacco);
+          cout &lt;&lt; nemico.nome &lt;&lt; " colpisce " &lt;&lt; eroe.nome
+               &lt;&lt; ": " &lt;&lt; eroe.vita &lt;&lt; " vita" &lt;&lt; '\n';
+          break;
+        }
+      }
+    }
+    turno++;
+  }
+  if (nemico.vita == 0) cout &lt;&lt; "Vittoria!" &lt;&lt; '\n';
+  else cout &lt;&lt; "Sconfitta!" &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="struct-7">Turno 1
+Aria colpisce Orco: 50 vita
+Lio colpisce Orco: 42 vita
+Brina colpisce Orco: 30 vita
+Orco colpisce Aria: 72 vita
+Turno 2
+Aria colpisce Orco: 20 vita
+Lio colpisce Orco: 12 vita
+Brina colpisce Orco: 0 vita
+Vittoria!
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Sostituisci l’Orco con un Goblin più debole, poi con un Drago con 300 vita e 100 attacco. Verifica anche la sconfitta. Imposta un eroe a vita 0: non deve attaccare. Se aggiungi la possibilità di attacco 0 per tutti, introduci anche un limite di turni e un esito di pareggio.</p></section><h2>Prima di continuare</h2><p>Spiega quali parti sono dati, quali operazioni e quali regole del gioco. Non basta ottenere l’uscita: cambia un valore iniziale, prevedi cosa succede e controlla anche un caso limite.</p><p>Quando sai spiegare i risultati, passa a <a href="14-lezione.html">Classi, oggetti e incapsulamento</a>.</p></main><script src="../../reader.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><span class="lesson-neighbor lesson-boundary"><small>Inizio del percorso</small><span>C++</span></span><a class="lesson-catalog" href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">Tutti i laboratori<span>1 / 4</span></a><a class="lesson-neighbor" data-school-link="cpp-laboratorio-14-classi" rel="next" href="laboratorio-14-classi.html"><small>Successiva →</small><span>Laboratorio 14 | Classi, oggetti e incapsulamento</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

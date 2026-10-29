@@ -81,15 +81,26 @@
             "lezione-31.html",
             "lezione-32.html"
           ]
+        },
+        {
+          "id": "node-labs",
+          "title": "Laboratori · Costruisci e verifica",
+          "description": "Progetti guidati con file completi da copiare, modifiche progressive e risultati da controllare.",
+          "files": [
+            "laboratorio-http.html",
+            "laboratorio-metodi.html",
+            "laboratorio-express.html"
+          ]
         }
-      ]
+      ],
+      "credits": "materials/node/capitoli/riferimenti.html#crediti"
     },
     {
       "id": "cpp",
       "folder": "C++",
       "title": "C++",
       "symbol": "C++",
-      "description": "12 capitoli: teoria, esempi e pratica progressiva.",
+      "description": "16 capitoli: dalle basi a struct, classi, ereditarietà e polimorfismo, con laboratori progressivi.",
       "order": [
         "01-lezione.html",
         "esercizi-cpp-base-0.html",
@@ -114,7 +125,15 @@
         "11-lezione.html",
         "11-esercizi-stringhe.html",
         "12-lezione.html",
-        "esercizi-puntatori-base-0.html"
+        "esercizi-puntatori-base-0.html",
+        "13-lezione.html",
+        "laboratorio-13-struct.html",
+        "14-lezione.html",
+        "laboratorio-14-classi.html",
+        "15-lezione.html",
+        "laboratorio-15-ereditarieta.html",
+        "16-lezione.html",
+        "laboratorio-16-polimorfismo.html"
       ],
       "chapters": [
         {
@@ -224,6 +243,42 @@
             "12-lezione.html",
             "esercizi-puntatori-base-0.html"
           ]
+        },
+        {
+          "id": "cpp-13",
+          "title": "13 · Struct e dati dei personaggi",
+          "description": "Spiegazione e laboratorio a piccoli passi, con programmi completi e risultati attesi.",
+          "files": [
+            "13-lezione.html",
+            "laboratorio-13-struct.html"
+          ]
+        },
+        {
+          "id": "cpp-14",
+          "title": "14 · Classi, oggetti e incapsulamento",
+          "description": "Spiegazione e laboratorio a piccoli passi, con programmi completi e risultati attesi.",
+          "files": [
+            "14-lezione.html",
+            "laboratorio-14-classi.html"
+          ]
+        },
+        {
+          "id": "cpp-15",
+          "title": "15 · Ereditarietà: Mago e Arciere",
+          "description": "Spiegazione e laboratorio a piccoli passi, con programmi completi e risultati attesi.",
+          "files": [
+            "15-lezione.html",
+            "laboratorio-15-ereditarieta.html"
+          ]
+        },
+        {
+          "id": "cpp-16",
+          "title": "16 · Polimorfismo: un gruppo di personaggi",
+          "description": "Spiegazione e laboratorio a piccoli passi, con programmi completi e risultati attesi.",
+          "files": [
+            "16-lezione.html",
+            "laboratorio-16-polimorfismo.html"
+          ]
         }
       ]
     },
@@ -303,7 +358,8 @@
           "description": "Gestisci chiavi, valuta scenari ed esegui prove di alterazione.",
           "files": ["13-chiavi-attacchi.html", "14-casi-reali.html", "laboratorio.html", "esercizi.html"]
         }
-      ]
+      ],
+      "credits": "materials/crittografia/fonti.html#crediti"
     },
     {
       "id": "fondamenti",

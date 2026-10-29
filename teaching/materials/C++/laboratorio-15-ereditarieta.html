@@ -1,0 +1,251 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Laboratorio 15 | Ereditarietà: eroi e nemici — Federico Lelli</title><meta name="description" content="6 programmi C++ completi e graduali con personaggi, eroi e nemici, risultati attesi e modifiche guidate."><meta name="school-kind" content="lab"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="cpp-labs.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-15-ereditarieta.html"><meta property="og:title" content="Laboratorio 15 | Ereditarietà: eroi e nemici — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-15-ereditarieta.html"><meta property="og:description" content="Laboratorio 15 | Ereditarietà: eroi e nemici. C++: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="cpp-laboratorio-15-ereditarieta"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">C++</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="cpp-laboratorio-14-classi" rel="prev" href="laboratorio-14-classi.html"><small>← Precedente</small><span>Laboratorio 14 | Classi, oggetti e incapsulamento</span></a><a class="lesson-catalog" href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">Tutti i laboratori<span>3 / 4</span></a><a class="lesson-neighbor" data-school-link="cpp-laboratorio-16-polimorfismo" rel="next" href="laboratorio-16-polimorfismo.html"><small>Successiva →</small><span>Laboratorio 16 | Polimorfismo: un gruppo di personaggi</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading cpp-reading"><p class="eyebrow">C++ · LABORATORIO 15 · 6 PASSI GUIDATI</p><h1>Ereditarietà: eroi e nemici</h1><p class="cpp-lead">Quando più tipi condividono una parte del comportamento, una classe base può raccogliere ciò che hanno in comune. Le derivate aggiungono le proprie caratteristiche.</p><p>Parti dalla <a href="15-lezione.html">spiegazione del capitolo 15</a>. Ogni esempio qui aggiunge un concetto: puoi distribuire il laboratorio su più incontri. Gli ultimi passi riprendono il ciclo di gioco, con regole visibili e risultati riproducibili.</p><div class="cpp-note"><strong>Ogni esempio è indipendente.</strong> Crea un file <code>main.cpp</code> e copia un programma completo alla volta: non incollare più main nello stesso file. Compila con <code>g++ -std=c++17 -Wall -Wextra -pedantic main.cpp -o gioco</code>. Avvia <code>.\gioco.exe</code> in PowerShell oppure <code>./gioco</code> su macOS/Linux. Salva e ricompila dopo ogni modifica.</div><p>Negli esempi brevi usiamo <code>using namespace std;</code> per scrivere cout, string e vector senza ripetere std::. Non sostituisce gli include. Nei progetti più grandi e negli header è preferibile limitare questa direttiva, per evitare nomi ambigui.</p><nav class="cpp-toc" aria-label="Esempi del laboratorio"><h2>Il percorso di lavoro</h2><ol><li><a href="#ereditarieta-1">Una base comune e una specializzazione</a></li><li><a href="#ereditarieta-2">Costruire prima la base, poi il Mago</a></li><li><a href="#ereditarieta-3">Due derivate: risorse diverse</a></li><li><a href="#ereditarieta-4">Eroi e nemici condividono la vita</a></li><li><a href="#ereditarieta-5">È un personaggio, ma ha un equipaggiamento</a></li><li><a href="#ereditarieta-6">Il duello tra tipi diversi</a></li></ol></nav><section class="cpp-step" id="ereditarieta-1"><p class="eyebrow">ESEMPIO 1</p><h2>Una base comune e una specializzazione</h2><p>Mago è un Personaggio. La scrittura : public Personaggio dichiara l’ereditarietà pubblica. In questo primo esempio la base espone un nome; il Mago usa il metodo ereditato e ne aggiunge uno proprio.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="ereditarieta-1">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+public:
+  string nome;
+  void presentati() const { cout &lt;&lt; "Sono " &lt;&lt; nome &lt;&lt; '\n'; }
+};
+
+class Mago : public Personaggio {
+public:
+  void saluta() const { cout &lt;&lt; "Studio la magia." &lt;&lt; '\n'; }
+};
+
+int main() {
+  Mago mago;
+  mago.nome = "Aria";
+  mago.presentati();
+  mago.saluta();
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="ereditarieta-1">Sono Aria
+Studio la magia.
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi una classe Guerriero con un metodo proprio. Non copiare nome e presentati nella derivata.</p></section>
+<section class="cpp-step" id="ereditarieta-2"><p class="eyebrow">ESEMPIO 2</p><h2>Costruire prima la base, poi il Mago</h2><p>Ripristiniamo i campi privati. La derivata inizializza la parte Personaggio con Personaggio(n). Il suo mana è un dato aggiuntivo. Un membro privato della base non diventa direttamente accessibile nella derivata.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="ereditarieta-2">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita = 100;
+public:
+  Personaggio(string n) : nome(n) {}
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+  bool vivo() const { return vita &gt; 0; }
+  void subisciDanno(int n) {
+    if (n &lt;= 0) return;
+    vita -= n;
+    if (vita &lt; 0) vita = 0;
+  }
+};
+
+class Mago : public Personaggio {
+private:
+  int mana = 30;
+public:
+  Mago(string n) : Personaggio(n) {}
+  int getMana() const { return mana; }
+};
+
+int main() {
+  Mago mago("Aria");
+  cout &lt;&lt; mago.getNome() &lt;&lt; ": " &lt;&lt; mago.getVita() &lt;&lt; " vita, "
+       &lt;&lt; mago.getMana() &lt;&lt; " mana" &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="ereditarieta-2">Aria: 100 vita, 30 mana
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi alla base un livello letto tramite un metodo. Osserva quali dati appartengono a tutti i personaggi e quali solo al Mago.</p></section>
+<section class="cpp-step" id="ereditarieta-3"><p class="eyebrow">ESEMPIO 3</p><h2>Due derivate: risorse diverse</h2><p>Mago e Arciere condividono la base, ma mana e frecce appartengono alle rispettive classi. Per ora chiamiamo esplicitamente lancia e tira: non stiamo ancora scegliendo un comportamento tramite una funzione virtuale.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="ereditarieta-3">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita = 100;
+public:
+  Personaggio(string n) : nome(n) {}
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+  bool vivo() const { return vita &gt; 0; }
+  void subisciDanno(int n) {
+    if (n &lt;= 0) return;
+    vita -= n;
+    if (vita &lt; 0) vita = 0;
+  }
+};
+
+class Mago : public Personaggio {
+private:
+  int mana = 30;
+public:
+  Mago(string n) : Personaggio(n) {}
+  void lancia() {
+    if (mana &lt; 10) return;
+    mana -= 10;
+    cout &lt;&lt; getNome() &lt;&lt; " lancia. Mana: " &lt;&lt; mana &lt;&lt; '\n';
+  }
+};
+
+class Arciere : public Personaggio {
+private:
+  int frecce = 3;
+public:
+  Arciere(string n) : Personaggio(n) {}
+  void tira() {
+    if (frecce == 0) return;
+    frecce--;
+    cout &lt;&lt; getNome() &lt;&lt; " tira. Frecce: " &lt;&lt; frecce &lt;&lt; '\n';
+  }
+};
+
+int main() {
+  Mago mago("Aria");
+  Arciere arciere("Lio");
+  mago.lancia();
+  arciere.tira();
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="ereditarieta-3">Aria lancia. Mana: 20
+Lio tira. Frecce: 2
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi un Guerriero con stamina e un metodo colpisci. Prova a esaurire ogni risorsa.</p></section>
+<section class="cpp-step" id="ereditarieta-4"><p class="eyebrow">ESEMPIO 4</p><h2>Eroi e nemici condividono la vita</h2><p>Anche Goblin e Orco sono personaggi del gioco. Ereditano le stesse regole della vita. Il fatto di essere un nemico è una scelta del gioco, non una regola speciale del linguaggio.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="ereditarieta-4">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita = 100;
+public:
+  Personaggio(string n) : nome(n) {}
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+  bool vivo() const { return vita &gt; 0; }
+  void subisciDanno(int n) {
+    if (n &lt;= 0) return;
+    vita -= n;
+    if (vita &lt; 0) vita = 0;
+  }
+};
+
+class Guerriero : public Personaggio {
+public:
+  Guerriero(string n) : Personaggio(n) {}
+  void colpisci(Personaggio&amp; bersaglio) const {
+    if (vivo() &amp;&amp; bersaglio.vivo()) bersaglio.subisciDanno(20);
+  }
+};
+
+class Goblin : public Personaggio {
+public:
+  Goblin(string n) : Personaggio(n) {}
+};
+
+int main() {
+  Guerriero guerriero("Brina");
+  Goblin goblin("Gruk");
+  guerriero.colpisci(goblin);
+  cout &lt;&lt; goblin.getNome() &lt;&lt; ": " &lt;&lt; goblin.getVita() &lt;&lt; '\n';
+  goblin.subisciDanno(500);
+  cout &lt;&lt; goblin.getVita() &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="ereditarieta-4">Gruk: 80
+0
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi un metodo mordi al Goblin e fai danneggiare Brina. Nessuna derivata deve scrivere direttamente la vita della base.</p></section>
+<section class="cpp-step" id="ereditarieta-5"><p class="eyebrow">ESEMPIO 5</p><h2>È un personaggio, ma ha un equipaggiamento</h2><p>Non tutto richiede ereditarietà. Un Arciere è un Personaggio e ha un Equipaggiamento: quest’ultimo è un membro, cioè composizione. L’arco non è un tipo di personaggio.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="ereditarieta-5">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita = 100;
+public:
+  Personaggio(string n) : nome(n) {}
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+  bool vivo() const { return vita &gt; 0; }
+  void subisciDanno(int n) {
+    if (n &lt;= 0) return;
+    vita -= n;
+    if (vita &lt; 0) vita = 0;
+  }
+};
+
+struct Equipaggiamento { string arma; int bonus; };
+
+class Arciere : public Personaggio {
+private:
+  Equipaggiamento equip;
+public:
+  Arciere(string n) : Personaggio(n), equip{"Arco", 3} {}
+  void mostraArma() const {
+    cout &lt;&lt; getNome() &lt;&lt; " usa " &lt;&lt; equip.arma &lt;&lt; ", bonus " &lt;&lt; equip.bonus &lt;&lt; '\n';
+  }
+};
+
+int main() {
+  Arciere arciere("Lio");
+  arciere.mostraArma();
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="ereditarieta-5">Lio usa Arco, bonus 3
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Dai un equipaggiamento anche al Guerriero. Spiega perché non scriveresti class Arco : public Personaggio.</p></section>
+<section class="cpp-step" id="ereditarieta-6"><p class="eyebrow">ESEMPIO 6</p><h2>Il duello tra tipi diversi</h2><p>Le regole comuni rimangono nella base, i due attacchi sono nelle derivate. Il main conosce i tipi concreti e chiama metodi diversi: nel prossimo laboratorio vedremo come un ciclo possa chiamare la stessa operazione su personaggi diversi.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="ereditarieta-6">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita = 100;
+public:
+  Personaggio(string n) : nome(n) {}
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+  bool vivo() const { return vita &gt; 0; }
+  void subisciDanno(int n) {
+    if (n &lt;= 0) return;
+    vita -= n;
+    if (vita &lt; 0) vita = 0;
+  }
+};
+
+class Guerriero : public Personaggio {
+public:
+  Guerriero(string n) : Personaggio(n) {}
+  void colpisci(Personaggio&amp; bersaglio) const {
+    if (vivo() &amp;&amp; bersaglio.vivo()) bersaglio.subisciDanno(20);
+  }
+};
+
+class Orco : public Personaggio {
+public:
+  Orco(string n) : Personaggio(n) {}
+  void contrattacca(Personaggio&amp; bersaglio) const {
+    if (vivo() &amp;&amp; bersaglio.vivo()) bersaglio.subisciDanno(15);
+  }
+};
+
+int main() {
+  Guerriero eroe("Brina");
+  Orco nemico("Borg");
+  int turno = 1;
+  while (eroe.vivo() &amp;&amp; nemico.vivo()) {
+    eroe.colpisci(nemico);
+    if (nemico.vivo()) nemico.contrattacca(eroe);
+    cout &lt;&lt; "Turno " &lt;&lt; turno &lt;&lt; ": Brina " &lt;&lt; eroe.getVita()
+         &lt;&lt; ", Borg " &lt;&lt; nemico.getVita() &lt;&lt; '\n';
+    turno++;
+  }
+  if (eroe.vivo()) cout &lt;&lt; "Vittoria!" &lt;&lt; '\n';
+  else cout &lt;&lt; "Sconfitta!" &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="ereditarieta-6">Turno 1: Brina 85, Borg 80
+Turno 2: Brina 70, Borg 60
+Turno 3: Brina 55, Borg 40
+Turno 4: Brina 40, Borg 20
+Turno 5: Brina 40, Borg 0
+Vittoria!
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi un Mago alleato con lancia e un Goblin come secondo nemico. Prima usa chiamate esplicite; annota le ripetizioni che vorresti eliminare con un’unica interfaccia.</p></section><h2>Prima di continuare</h2><p>Spiega quali parti sono dati, quali operazioni e quali regole del gioco. Non basta ottenere l’uscita: cambia un valore iniziale, prevedi cosa succede e controlla anche un caso limite.</p><p>Quando sai spiegare i risultati, passa a <a href="16-lezione.html">Polimorfismo: un gruppo di personaggi</a>.</p></main><script src="../../reader.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="cpp-laboratorio-14-classi" rel="prev" href="laboratorio-14-classi.html"><small>← Precedente</small><span>Laboratorio 14 | Classi, oggetti e incapsulamento</span></a><a class="lesson-catalog" href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">Tutti i laboratori<span>3 / 4</span></a><a class="lesson-neighbor" data-school-link="cpp-laboratorio-16-polimorfismo" rel="next" href="laboratorio-16-polimorfismo.html"><small>Successiva →</small><span>Laboratorio 16 | Polimorfismo: un gruppo di personaggi</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

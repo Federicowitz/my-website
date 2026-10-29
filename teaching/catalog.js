@@ -79,14 +79,25 @@ window.schoolCatalog = {
             "lezione-31.html",
             "lezione-32.html"
           ]
+        },
+        {
+          "id": "node-labs",
+          "title": "Laboratori · Costruisci e verifica",
+          "description": "Progetti guidati con file completi da copiare, modifiche progressive e risultati da controllare.",
+          "files": [
+            "laboratorio-http.html",
+            "laboratorio-metodi.html",
+            "laboratorio-express.html"
+          ]
         }
-      ]
+      ],
+      "credits": "materials/node/capitoli/riferimenti.html#crediti"
     },
     {
       "id": "cpp",
       "title": "C++",
       "symbol": "C++",
-      "description": "12 capitoli: teoria, esempi e pratica progressiva.",
+      "description": "16 capitoli: dalle basi a struct, classi, ereditarietà e polimorfismo, con laboratori progressivi.",
       "chapters": [
         {
           "id": "cpp-01",
@@ -195,6 +206,42 @@ window.schoolCatalog = {
             "12-lezione.html",
             "esercizi-puntatori-base-0.html"
           ]
+        },
+        {
+          "id": "cpp-13",
+          "title": "13 · Struct e dati dei personaggi",
+          "description": "Spiegazione e laboratorio a piccoli passi, con programmi completi e risultati attesi.",
+          "files": [
+            "13-lezione.html",
+            "laboratorio-13-struct.html"
+          ]
+        },
+        {
+          "id": "cpp-14",
+          "title": "14 · Classi, oggetti e incapsulamento",
+          "description": "Spiegazione e laboratorio a piccoli passi, con programmi completi e risultati attesi.",
+          "files": [
+            "14-lezione.html",
+            "laboratorio-14-classi.html"
+          ]
+        },
+        {
+          "id": "cpp-15",
+          "title": "15 · Ereditarietà: Mago e Arciere",
+          "description": "Spiegazione e laboratorio a piccoli passi, con programmi completi e risultati attesi.",
+          "files": [
+            "15-lezione.html",
+            "laboratorio-15-ereditarieta.html"
+          ]
+        },
+        {
+          "id": "cpp-16",
+          "title": "16 · Polimorfismo: un gruppo di personaggi",
+          "description": "Spiegazione e laboratorio a piccoli passi, con programmi completi e risultati attesi.",
+          "files": [
+            "16-lezione.html",
+            "laboratorio-16-polimorfismo.html"
+          ]
         }
       ]
     },
@@ -269,7 +316,8 @@ window.schoolCatalog = {
             "esercizi.html"
           ]
         }
-      ]
+      ],
+      "credits": "materials/crittografia/fonti.html#crediti"
     },
     {
       "id": "fondamenti",
@@ -602,7 +650,7 @@ window.schoolCatalog = {
     {
       "id": "node-capitoli-riferimenti",
       "course": "node",
-      "title": "Materiale di partenza e pratiche attuali",
+      "title": "Fonti e crediti · Node.js ed Express",
       "kind": "lesson",
       "path": "materials/node/capitoli/riferimenti.html",
       "description": "Lezione di approfondimento"
@@ -614,6 +662,33 @@ window.schoolCatalog = {
       "kind": "lesson",
       "path": "materials/node/debug-richieste.html",
       "description": "Approfondimento · Un metodo per trovare gli errori"
+    },
+    {
+      "id": "node-laboratorio-http",
+      "course": "node",
+      "title": "Laboratorio 01 · HTTP, pagine e immagini",
+      "kind": "lab",
+      "path": "materials/node/laboratorio-http.html",
+      "description": "Nove tappe lente e guidate: GET e URL con if, status code, HTML incorporato, link e pulsanti senza script, file HTML e immagini PNG/JPEG.",
+      "chapter": "node-labs"
+    },
+    {
+      "id": "node-laboratorio-metodi",
+      "course": "node",
+      "title": "Laboratorio 02 · Form, metodi e primi fetch",
+      "kind": "lab",
+      "path": "materials/node/laboratorio-metodi.html",
+      "description": "Prima POST con un form, poi PUT e DELETE separati, una nota in memoria e soltanto alla fine due frontend fetch minimali senza CSS.",
+      "chapter": "node-labs"
+    },
+    {
+      "id": "node-laboratorio-express",
+      "course": "node",
+      "title": "Laboratorio 03 · Express essenziale",
+      "kind": "lab",
+      "path": "materials/node/laboratorio-express.html",
+      "description": "Tre piccoli esempi completi con Express: una GET, HTML/testo/JSON e un form POST. IP e PORT espliciti, frontend senza CSS e senza fetch.",
+      "chapter": "node-labs"
     },
     {
       "id": "node-contratto-api",
@@ -848,6 +923,78 @@ window.schoolCatalog = {
       "chapter": "cpp-12"
     },
     {
+      "id": "cpp-13-lezione",
+      "course": "cpp",
+      "title": "13 | Struct e dati dei personaggi",
+      "kind": "lesson",
+      "path": "materials/C%2B%2B/13-lezione.html",
+      "description": "Capitolo 13 · Spiegazione, programma completo e laboratorio progressivo su struct.",
+      "chapter": "cpp-13"
+    },
+    {
+      "id": "cpp-laboratorio-13-struct",
+      "course": "cpp",
+      "title": "Laboratorio 13 | Struct e dati dei personaggi",
+      "kind": "lab",
+      "path": "materials/C%2B%2B/laboratorio-13-struct.html",
+      "description": "7 programmi C++ completi e graduali con personaggi, eroi e nemici, risultati attesi e modifiche guidate.",
+      "chapter": "cpp-13"
+    },
+    {
+      "id": "cpp-14-lezione",
+      "course": "cpp",
+      "title": "14 | Classi, oggetti e incapsulamento",
+      "kind": "lesson",
+      "path": "materials/C%2B%2B/14-lezione.html",
+      "description": "Capitolo 14 · Spiegazione, programma completo e laboratorio progressivo su classi.",
+      "chapter": "cpp-14"
+    },
+    {
+      "id": "cpp-laboratorio-14-classi",
+      "course": "cpp",
+      "title": "Laboratorio 14 | Classi, oggetti e incapsulamento",
+      "kind": "lab",
+      "path": "materials/C%2B%2B/laboratorio-14-classi.html",
+      "description": "7 programmi C++ completi e graduali con personaggi, eroi e nemici, risultati attesi e modifiche guidate.",
+      "chapter": "cpp-14"
+    },
+    {
+      "id": "cpp-15-lezione",
+      "course": "cpp",
+      "title": "15 | Ereditarietà: eroi e nemici",
+      "kind": "lesson",
+      "path": "materials/C%2B%2B/15-lezione.html",
+      "description": "Capitolo 15 · Spiegazione, programma completo e laboratorio progressivo su ereditarieta.",
+      "chapter": "cpp-15"
+    },
+    {
+      "id": "cpp-laboratorio-15-ereditarieta",
+      "course": "cpp",
+      "title": "Laboratorio 15 | Ereditarietà: eroi e nemici",
+      "kind": "lab",
+      "path": "materials/C%2B%2B/laboratorio-15-ereditarieta.html",
+      "description": "6 programmi C++ completi e graduali con personaggi, eroi e nemici, risultati attesi e modifiche guidate.",
+      "chapter": "cpp-15"
+    },
+    {
+      "id": "cpp-16-lezione",
+      "course": "cpp",
+      "title": "16 | Polimorfismo: un gruppo di personaggi",
+      "kind": "lesson",
+      "path": "materials/C%2B%2B/16-lezione.html",
+      "description": "Capitolo 16 · Spiegazione, programma completo e laboratorio progressivo su polimorfismo.",
+      "chapter": "cpp-16"
+    },
+    {
+      "id": "cpp-laboratorio-16-polimorfismo",
+      "course": "cpp",
+      "title": "Laboratorio 16 | Polimorfismo: un gruppo di personaggi",
+      "kind": "lab",
+      "path": "materials/C%2B%2B/laboratorio-16-polimorfismo.html",
+      "description": "7 programmi C++ completi e graduali con personaggi, eroi e nemici, risultati attesi e modifiche guidate.",
+      "chapter": "cpp-16"
+    },
+    {
       "id": "cpp-test",
       "course": "cpp",
       "title": "C++ · Verifica dei fondamentali",
@@ -1018,7 +1165,7 @@ window.schoolCatalog = {
       "id": "crittografia-laboratorio",
       "course": "crittografia",
       "title": "Laboratorio · Hash, AES-GCM e firme nel browser",
-      "kind": "exercise",
+      "kind": "lab",
       "path": "materials/crittografia/laboratorio.html",
       "description": "Tre esperimenti locali con Web Crypto: hash SHA-256, cifratura autenticata AES-GCM e firme ECDSA. Modifica i dati e interpreta gli esiti.",
       "chapter": "crypto-06"
@@ -1043,7 +1190,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-fonti",
       "course": "crittografia",
-      "title": "Fonti · Standard, trascrizioni e correzioni",
+      "title": "Fonti e crediti · Crittografia",
       "kind": "lesson",
       "path": "materials/crittografia/fonti.html",
       "description": "Riferimenti primari commentati, corrispondenza con le trascrizioni e correzioni tecniche esplicite su Enigma, AES, RSA, firme, TLS e PEC."

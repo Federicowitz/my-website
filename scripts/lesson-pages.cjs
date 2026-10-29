@@ -10,13 +10,13 @@ for(const item of items){
  const file=path.join(school,decodeURIComponent(item.path));let html=fs.readFileSync(file,'utf8');
  html=html.replace(/<!-- SCHOOL:(?:HEAD|TOP|BOTTOM):START -->[\s\S]*?<!-- SCHOOL:(?:HEAD|TOP|BOTTOM):END -->/g,'');
  const title=(item.course==='crittografia'?item.title:item.title.replace(/^\d+ · /,'')).replace(/ — Federico Lelli$/,'');
- const course=courses.find(c=>c.id===item.course),peers=items.filter(i=>i.course===item.course),index=peers.indexOf(item);
+ const course=courses.find(c=>c.id===item.course),peers=items.filter(i=>i.course===item.course&&(i.kind==='lab')===(item.kind==='lab')),index=peers.indexOf(item);
  const url=new URL('teaching/'+item.path,site).href;
  const desc=`${title}. ${course.title}: materiale didattico nella raccolta School curata da Federico Lelli.`;
  const linkTo=other=>relative(file,path.join(school,decodeURIComponent(other.path)));
  const neighbor=(other,rel)=>other?`<a class="lesson-neighbor" data-school-link="${escape(other.id)}" rel="${rel}" href="${linkTo(other)}"><small>${rel==='prev'?'← Precedente':'Successiva →'}</small><span>${escape(other.title)}</span></a>`:`<span class="lesson-neighbor lesson-boundary"><small>${rel==='prev'?'Inizio del percorso':'Fine del percorso'}</small><span>${escape(course.title)}</span></span>`;
- const catalog=relative(file,path.join(school,'index.html'))+'?course='+encodeURIComponent(course.id);
- const nav=`<nav class="lesson-pagination" aria-label="Navigazione nel percorso">${neighbor(peers[index-1],'prev')}<a class="lesson-catalog" href="${catalog}" data-school-catalog="${course.id}">Tutte le lezioni<span>${index+1} / ${peers.length}</span></a>${neighbor(peers[index+1],'next')}</nav>`;
+ const catalog=relative(file,path.join(school,'index.html'))+'?course='+encodeURIComponent(course.id)+(item.kind==='lab'?'&amp;kind=lab':'');
+ const nav=`<nav class="lesson-pagination" aria-label="Navigazione nel percorso">${neighbor(peers[index-1],'prev')}<a class="lesson-catalog" href="${catalog}" data-school-catalog="${course.id}">${item.kind==='lab'?'Tutti i laboratori':'Tutte le lezioni'}<span>${index+1} / ${peers.length}</span></a>${neighbor(peers[index+1],'next')}</nav>`;
  html=html.replace(/<title[^>]*>[\s\S]*?<\/title>/i,`<title>${escape(title)} — Federico Lelli</title>`);
  // Existing descriptions remain the source of truth for catalog generation.
  const description=/<meta\b[^>]*name="description"/i.test(html)?'':`<meta name="description" content="${escape(desc)}">`;
@@ -30,7 +30,7 @@ for(const item of items){
   const classes='lesson-page'+(slide?' school-slides':'');
   return '<body'+(/class="/.test(attrs)?attrs.replace(/class="([^"]*)"/,`class="$1 ${classes}"`):attrs+` class="${classes}"`)+'>'+top;
  });
- const bottom=`<!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom">${nav}<p class="lesson-credits">Materiali didattici curati e rielaborati da Federico Lelli. Le fonti e i riferimenti specifici sono indicati nei materiali disponibili.</p></div><script src="${relative(file,path.join(school,'lesson-page.js'))}"></script><!-- SCHOOL:BOTTOM:END -->`;
+ const bottom=`<!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom">${nav}<p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="${relative(file,path.join(school,'lesson-page.js'))}"></script><!-- SCHOOL:BOTTOM:END -->`;
  html=html.replace('</body>',bottom+'</body>');
  // Make the first heading a proper page heading for extracted Node chapters.
  if(!/<h1\b/i.test(html)&&/<h2\b/i.test(html))html=html.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/i,'<h1$1>$2</h1>');
@@ -38,7 +38,7 @@ for(const item of items){
 }
 // Publish all lesson links as real HTML, even before JavaScript runs.
 const indexFile=path.join(school,'index.html');let indexHTML=fs.readFileSync(indexFile,'utf8');
-const labels={lesson:'Lezione',exercise:'Esercizi',test:'Test'};
+const labels={lesson:'Lezione',exercise:'Esercizi',lab:'Laboratorio',test:'Test'};
 const list=items.map(item=>`<article class="material"><span class="material-icon" aria-hidden="true">↗</span><div><h3 class="material-title"><a href="${item.path}" data-lesson="${escape(item.id)}">${escape(item.title)}</a></h3><div class="material-meta">${escape(courses.find(c=>c.id===item.course).title)} · ${escape(item.description)}</div></div><span class="badge ${item.kind}">${labels[item.kind]}</span><span class="material-arrow" aria-hidden="true">↗</span></article>`).join('');
 indexHTML=indexHTML.replace(/<div id="materials">[\s\S]*?<\/div><!-- SCHOOL:CATALOG:END -->/,'<div id="materials"></div>');
 indexHTML=indexHTML.replace('<div id="materials"></div>',`<div id="materials">${list}</div><!-- SCHOOL:CATALOG:END -->`);

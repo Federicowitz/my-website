@@ -1,0 +1,278 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Laboratorio 16 | Polimorfismo: un gruppo di personaggi — Federico Lelli</title><meta name="description" content="7 programmi C++ completi e graduali con personaggi, eroi e nemici, risultati attesi e modifiche guidate."><meta name="school-kind" content="lab"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="cpp-labs.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-16-polimorfismo.html"><meta property="og:title" content="Laboratorio 16 | Polimorfismo: un gruppo di personaggi — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-16-polimorfismo.html"><meta property="og:description" content="Laboratorio 16 | Polimorfismo: un gruppo di personaggi. C++: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="cpp-laboratorio-16-polimorfismo"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">C++</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="cpp-laboratorio-15-ereditarieta" rel="prev" href="laboratorio-15-ereditarieta.html"><small>← Precedente</small><span>Laboratorio 15 | Ereditarietà: eroi e nemici</span></a><a class="lesson-catalog" href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">Tutti i laboratori<span>4 / 4</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>C++</span></span></nav></div><!-- SCHOOL:TOP:END --><main class="reading cpp-reading"><p class="eyebrow">C++ · LABORATORIO 16 · 7 PASSI GUIDATI</p><h1>Polimorfismo: un gruppo di personaggi</h1><p class="cpp-lead">Un unico punto di chiamata può produrre comportamenti diversi, scelti in base al tipo effettivo dell’oggetto: un Mago lancia un incantesimo, un Arciere scocca una freccia.</p><p>Parti dalla <a href="16-lezione.html">spiegazione del capitolo 16</a>. Ogni esempio qui aggiunge un concetto: puoi distribuire il laboratorio su più incontri. Gli ultimi passi riprendono il ciclo di gioco, con regole visibili e risultati riproducibili.</p><div class="cpp-note"><strong>Ogni esempio è indipendente.</strong> Crea un file <code>main.cpp</code> e copia un programma completo alla volta: non incollare più main nello stesso file. Compila con <code>g++ -std=c++17 -Wall -Wextra -pedantic main.cpp -o gioco</code>. Avvia <code>.\gioco.exe</code> in PowerShell oppure <code>./gioco</code> su macOS/Linux. Salva e ricompila dopo ogni modifica.</div><p>Negli esempi brevi usiamo <code>using namespace std;</code> per scrivere cout, string e vector senza ripetere std::. Non sostituisce gli include. Nei progetti più grandi e negli header è preferibile limitare questa direttiva, per evitare nomi ambigui.</p><nav class="cpp-toc" aria-label="Esempi del laboratorio"><h2>Il percorso di lavoro</h2><ol><li><a href="#polimorfismo-1">Prima di virtual: conta il tipo del riferimento</a></li><li><a href="#polimorfismo-2">Virtual e override: cambia una regola</a></li><li><a href="#polimorfismo-3">Una funzione, due comportamenti</a></li><li><a href="#polimorfismo-4">La trappola della copia: object slicing</a></li><li><a href="#polimorfismo-5">Un gruppo con riferimenti tramite puntatori</a></li><li><a href="#polimorfismo-6">Una classe astratta e un attacco comune</a></li><li><a href="#polimorfismo-7">Gioco finale: squadra contro il boss Drago</a></li></ol></nav><section class="cpp-step" id="polimorfismo-1"><p class="eyebrow">ESEMPIO 1</p><h2>Prima di virtual: conta il tipo del riferimento</h2><p>Partiamo da un controesempio compilabile. Il metodo non è virtuale: attraverso un riferimento Personaggio la chiamata usa il metodo di Personaggio, anche quando l’oggetto originale è un Mago.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="polimorfismo-1">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+public:
+  string azione() const { return "Colpo normale"; }
+};
+class Mago : public Personaggio {
+public:
+  string azione() const { return "Incantesimo"; }
+};
+
+int main() {
+  Mago mago;
+  const Personaggio&amp; riferimento = mago;
+  cout &lt;&lt; mago.azione() &lt;&lt; '\n';
+  cout &lt;&lt; riferimento.azione() &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="polimorfismo-1">Incantesimo
+Colpo normale
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Prevedi l’uscita prima di eseguire. Non dire ancora che avere due metodi con lo stesso nome produce automaticamente polimorfismo dinamico.</p></section>
+<section class="cpp-step" id="polimorfismo-2"><p class="eyebrow">ESEMPIO 2</p><h2>Virtual e override: cambia una regola</h2><p>virtual nella base permette di scegliere il metodo in base al tipo effettivo dell’oggetto. override nella derivata chiede al compilatore di verificare la corrispondenza. Il const deve corrispondere. Il distruttore virtuale rende corretta anche un’eventuale distruzione attraverso un puntatore alla base; qui non usiamo new o delete.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="polimorfismo-2">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+public:
+  virtual string azione() const { return "Colpo normale"; }
+  virtual ~Personaggio() = default;
+};
+class Mago : public Personaggio {
+public:
+  string azione() const override { return "Incantesimo"; }
+};
+class Arciere : public Personaggio {
+public:
+  string azione() const override { return "Freccia"; }
+};
+
+int main() {
+  Mago mago;
+  const Personaggio&amp; riferimento = mago;
+  cout &lt;&lt; mago.azione() &lt;&lt; '\n';
+  cout &lt;&lt; riferimento.azione() &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="polimorfismo-2">Incantesimo
+Incantesimo
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Togli const soltanto dal metodo della derivata mantenendo override: il compilatore deve segnalare l’errore. Poi ripristinalo.</p></section>
+<section class="cpp-step" id="polimorfismo-3"><p class="eyebrow">ESEMPIO 3</p><h2>Una funzione, due comportamenti</h2><p>La funzione turno conosce l’interfaccia Personaggio e riceve un riferimento. Non deve chiedere se l’oggetto è un Mago o un Arciere: la chiamata virtuale seleziona il comportamento.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="polimorfismo-3">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+public:
+  virtual string azione() const { return "Colpo normale"; }
+  virtual ~Personaggio() = default;
+};
+class Mago : public Personaggio {
+public:
+  string azione() const override { return "Incantesimo"; }
+};
+class Arciere : public Personaggio {
+public:
+  string azione() const override { return "Freccia"; }
+};
+
+void turno(const Personaggio&amp; p) { cout &lt;&lt; p.azione() &lt;&lt; '\n'; }
+
+int main() {
+  Mago mago;
+  Arciere arciere;
+  turno(mago);
+  turno(arciere);
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="polimorfismo-3">Incantesimo
+Freccia
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi Guerriero con azione Scudo e Goblin con azione Morso. La funzione turno deve rimanere identica.</p></section>
+<section class="cpp-step" id="polimorfismo-4"><p class="eyebrow">ESEMPIO 4</p><h2>La trappola della copia: object slicing</h2><p>Se copiamo il Mago in un parametro Personaggio passato per valore, creiamo un nuovo oggetto che contiene soltanto la parte base. È object slicing: virtual non può recuperare una parte derivata che nella copia non esiste.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="polimorfismo-4">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+public:
+  virtual string azione() const { return "Colpo normale"; }
+  virtual ~Personaggio() = default;
+};
+class Mago : public Personaggio {
+public:
+  string azione() const override { return "Incantesimo"; }
+};
+class Arciere : public Personaggio {
+public:
+  string azione() const override { return "Freccia"; }
+};
+
+void perValore(Personaggio p) { cout &lt;&lt; p.azione() &lt;&lt; '\n'; }
+void perRiferimento(const Personaggio&amp; p) { cout &lt;&lt; p.azione() &lt;&lt; '\n'; }
+
+int main() {
+  Mago mago;
+  perValore(mago);
+  perRiferimento(mago);
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="polimorfismo-4">Colpo normale
+Incantesimo
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Spiega perché un vector<Personaggio> contenente copie di Mago e Arciere perderebbe le loro specializzazioni. Non sostituire i riferimenti con copie nel prossimo esempio.</p></section>
+<section class="cpp-step" id="polimorfismo-5"><p class="eyebrow">ESEMPIO 5</p><h2>Un gruppo con riferimenti tramite puntatori</h2><p>Il vector contiene indirizzi di oggetti locali già esistenti. Il puntatore non possiede né crea l’oggetto. Con p->azione() chiamiamo il metodo dell’oggetto puntato; tutti gli oggetti restano vivi durante il ciclo.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="polimorfismo-5">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+class Personaggio {
+public:
+  virtual string azione() const { return "Colpo normale"; }
+  virtual ~Personaggio() = default;
+};
+class Mago : public Personaggio {
+public:
+  string azione() const override { return "Incantesimo"; }
+};
+class Arciere : public Personaggio {
+public:
+  string azione() const override { return "Freccia"; }
+};
+
+int main() {
+  Mago mago;
+  Arciere arciere;
+  vector&lt;Personaggio*&gt; gruppo{&amp;mago, &amp;arciere};
+  for (const Personaggio* p : gruppo) {
+    cout &lt;&lt; p-&gt;azione() &lt;&lt; '\n';
+  }
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="polimorfismo-5">Incantesimo
+Freccia
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi Guerriero, Guaritrice e Goblin con comportamenti diversi. Non cambiare il ciclo. Non restituire gli indirizzi di questi oggetti da una funzione che li distrugge.</p></section>
+<section class="cpp-step" id="polimorfismo-6"><p class="eyebrow">ESEMPIO 6</p><h2>Una classe astratta e un attacco comune</h2><p>= 0 dichiara un metodo virtuale puro. Non possiamo creare un Personaggio generico: ogni tipo concreto deve fornire il danno. attacca è una regola comune, ma dentro chiama danno e ottiene il valore della derivata.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="polimorfismo-6">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita;
+public:
+  Personaggio(string n, int v) : nome(n), vita(v) {}
+  virtual ~Personaggio() = default;
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+  bool vivo() const { return vita &gt; 0; }
+  void subisciDanno(int n) {
+    if (n &lt;= 0) return;
+    vita -= n;
+    if (vita &lt; 0) vita = 0;
+  }
+  virtual int danno() const = 0;
+  void attacca(Personaggio&amp; bersaglio) const {
+    if (vivo() &amp;&amp; bersaglio.vivo()) bersaglio.subisciDanno(danno());
+  }
+};
+class Mago : public Personaggio {
+public:
+  Mago(string n) : Personaggio(n, 80) {}
+  int danno() const override { return 20; }
+};
+class Arciere : public Personaggio {
+public:
+  Arciere(string n) : Personaggio(n, 90) {}
+  int danno() const override { return 12; }
+};
+
+int main() {
+  Mago mago("Aria");
+  Arciere arciere("Lio");
+  mago.attacca(arciere);
+  arciere.attacca(mago);
+  cout &lt;&lt; mago.getNome() &lt;&lt; ": " &lt;&lt; mago.getVita() &lt;&lt; '\n';
+  cout &lt;&lt; arciere.getNome() &lt;&lt; ": " &lt;&lt; arciere.getVita() &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="polimorfismo-6">Aria: 68
+Lio: 70
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi un Guerriero con 120 vita e danno 15. Prova a creare direttamente Personaggio: il compilatore deve rifiutarlo perché è astratta.</p></section>
+<section class="cpp-step" id="polimorfismo-7"><p class="eyebrow">ESEMPIO 7</p><h2>Gioco finale: squadra contro il boss Drago</h2><p>Ora il ciclo usa sempre attacca, anche per classi diverse. Il controllo di vittoria arriva dopo gli attacchi degli eroi: un boss sconfitto non contrattacca. Il boss colpisce il primo eroe vivo. Nessun puntatore possiede gli oggetti: sono tutti locali al main.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="polimorfismo-7">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita;
+public:
+  Personaggio(string n, int v) : nome(n), vita(v) {}
+  virtual ~Personaggio() = default;
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+  bool vivo() const { return vita &gt; 0; }
+  void subisciDanno(int n) {
+    if (n &lt;= 0) return;
+    vita -= n;
+    if (vita &lt; 0) vita = 0;
+  }
+  virtual int danno() const = 0;
+  void attacca(Personaggio&amp; bersaglio) const {
+    if (vivo() &amp;&amp; bersaglio.vivo()) bersaglio.subisciDanno(danno());
+  }
+};
+class Mago : public Personaggio {
+public:
+  Mago(string n) : Personaggio(n, 80) {}
+  int danno() const override { return 20; }
+};
+class Arciere : public Personaggio {
+public:
+  Arciere(string n) : Personaggio(n, 90) {}
+  int danno() const override { return 12; }
+};
+class Guerriero : public Personaggio {
+public:
+  Guerriero(string n) : Personaggio(n, 120) {}
+  int danno() const override { return 15; }
+};
+class Drago : public Personaggio {
+public:
+  Drago(string n) : Personaggio(n, 110) {}
+  int danno() const override { return 25; }
+};
+
+bool squadraViva(const vector&lt;Personaggio*&gt;&amp; squadra) {
+  for (const Personaggio* p : squadra) if (p-&gt;vivo()) return true;
+  return false;
+}
+
+int main() {
+  Mago mago("Aria");
+  Arciere arciere("Lio");
+  Guerriero guerriero("Brina");
+  Drago boss("Fiamma");
+  vector&lt;Personaggio*&gt; squadra{&amp;mago, &amp;arciere, &amp;guerriero};
+  int turno = 1;
+
+  while (boss.vivo() &amp;&amp; squadraViva(squadra)) {
+    cout &lt;&lt; "Turno " &lt;&lt; turno &lt;&lt; '\n';
+    for (const Personaggio* p : squadra) {
+      if (p-&gt;vivo() &amp;&amp; boss.vivo()) {
+        p-&gt;attacca(boss);
+        cout &lt;&lt; p-&gt;getNome() &lt;&lt; " attacca: boss " &lt;&lt; boss.getVita() &lt;&lt; '\n';
+      }
+    }
+    if (boss.vivo()) {
+      for (Personaggio* p : squadra) {
+        if (p-&gt;vivo()) {
+          boss.attacca(*p);
+          cout &lt;&lt; "Boss attacca " &lt;&lt; p-&gt;getNome() &lt;&lt; ": " &lt;&lt; p-&gt;getVita() &lt;&lt; '\n';
+          break;
+        }
+      }
+    }
+    turno++;
+  }
+  if (!boss.vivo()) cout &lt;&lt; "Vittoria!" &lt;&lt; '\n';
+  else cout &lt;&lt; "Sconfitta!" &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="polimorfismo-7">Turno 1
+Aria attacca: boss 90
+Lio attacca: boss 78
+Brina attacca: boss 63
+Boss attacca Aria: 55
+Turno 2
+Aria attacca: boss 43
+Lio attacca: boss 31
+Brina attacca: boss 16
+Boss attacca Aria: 30
+Turno 3
+Aria attacca: boss 0
+Vittoria!
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi Goblin e Orco come altri tipi concreti e scegli un avversario diverso mantenendo il ciclo. Poi aumenta la vita del Drago a 500 e il danno a 100: deve comparire Sconfitta. Solo dopo aggiungi una Guaritrice e un metodo virtuale eseguiTurno(Personaggio& nemico, Personaggio& alleato): i combattenti attaccano, lei cura l’alleato vivo senza superare la sua vita massima. Questa estensione richiede di progettare un’interfaccia adatta anche alla cura.</p></section><h2>Prima di continuare</h2><p>Spiega quali parti sono dati, quali operazioni e quali regole del gioco. Non basta ottenere l’uscita: cambia un valore iniziale, prevedi cosa succede e controlla anche un caso limite.</p><p>Estensioni successive: più nemici in sequenza, inventario, un menu per scegliere l’azione e personaggi con risorse. Introduci una sola regola per volta e verifica sia la vittoria sia la sconfitta.</p></main><script src="../../reader.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="cpp-laboratorio-15-ereditarieta" rel="prev" href="laboratorio-15-ereditarieta.html"><small>← Precedente</small><span>Laboratorio 15 | Ereditarietà: eroi e nemici</span></a><a class="lesson-catalog" href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">Tutti i laboratori<span>4 / 4</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>C++</span></span></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

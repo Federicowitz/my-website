@@ -1,0 +1,86 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Laboratorio 03 · Express essenziale — Federico Lelli</title><meta name="description" content="Tre piccoli esempi completi con Express: una GET, HTML/testo/JSON e un form POST. IP e PORT espliciti, frontend senza CSS e senza fetch."><meta name="school-kind" content="lab"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="laboratorio-http.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/node/laboratorio-express.html"><meta property="og:title" content="Laboratorio 03 · Express essenziale — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/node/laboratorio-express.html"><meta property="og:description" content="Laboratorio 03 · Express essenziale. Node.js &amp; Express: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="node-laboratorio-express"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=node&amp;kind=lab" data-school-catalog="node">Node.js &amp; Express</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="node-laboratorio-metodi" rel="prev" href="laboratorio-metodi.html"><small>← Precedente</small><span>Laboratorio 02 · Form, metodi e primi fetch</span></a><a class="lesson-catalog" href="../../index.html?course=node&amp;kind=lab" data-school-catalog="node">Tutti i laboratori<span>3 / 3</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>Node.js &amp; Express</span></span></nav></div><!-- SCHOOL:TOP:END --><main class="reading lab-reading"><p class="eyebrow">NODE.JS · LABORATORIO 03 · UN PASSO ALLA VOLTA</p><h1>Express essenziale</h1><p class="lab-lead">Stessi concetti HTTP, meno codice per dichiarare le rotte. Ripartiamo da una sola GET e arriviamo a un form POST, senza aggiungere altre funzionalità.</p><div class="lab-facts"><span>Dopo HTTP e metodi</span><span>3 tappe brevi</span><span>Primo pacchetto esterno</span><span>Frontend minimale</span></div><nav class="lab-toc" aria-label="Tappe del laboratorio"><h2>Il percorso di lavoro</h2><ol><li><a href="#tappa-1">Express: una sola rotta GET</a></li><li><a href="#tappa-2">Express: HTML, testo e JSON</a></li><li><a href="#tappa-3">Express: riprendere il form POST</a></li></ol></nav><section><h2>Il punto di partenza</h2><p>Qui assumiamo chiari metodo, URL, status e corpo della richiesta dai <a href="laboratorio-http.html">primi esempi HTTP</a> e dai <a href="laboratorio-metodi.html">form e metodi</a>. L’installazione appartiene alla nuova cartella lab-express: non occorre cambiare i progetti precedenti. Usa una versione recente di Node.js compatibile con Express 5; verifica con node --version. Dopo ogni sostituzione di server.cjs ferma con Ctrl+C e riavvia.</p></section><section id="tappa-1" class="lab-step"><p class="eyebrow">TAPPA 1</p><h2>Express: una sola rotta GET</h2><p><strong>Obiettivo:</strong> riconoscere ciò che già sappiamo. Express è un pacchetto che gira sopra Node e ci permette di dichiarare le rotte. L’HTTP non cambia: restano metodo, percorso, status, header e corpo.</p><p>Crea una cartella nuova <code>lab-express</code>. Qui, per la prima volta, installiamo un pacchetto:</p><pre><code>npm init -y
+npm install express@5</code></pre><h3>server.cjs · primo server Express</h3><pre><code data-lab-file="express-1">const express = require('express');
+const app = express();
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+app.get('/', (req, res) =&gt; {
+  res.send('Ciao da Express!');
+});
+
+app.listen(PORT, IP, () =&gt; {
+  console.log(`Server Express su http://${IP}:${PORT}`);
+});</code></pre><pre><code>node server.cjs</code></pre><p><code>app.get</code> registra la coppia GET + /. <code>res.send</code> conclude la risposta; il normale stato di successo è 200. IP e PORT conservano il significato dei laboratori precedenti.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i http://127.0.0.1:3000/
+curl.exe -i http://127.0.0.1:3000/altra</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> La home risponde 200; /altra risponde 404. Le richieste non gestite ricevono per impostazione predefinita un 404. Express non genera automaticamente un 405 solo perché lo stesso percorso esiste con un altro metodo.</p><p><strong>Tocca a te.</strong> Cambia PORT, riavvia e visita l’indirizzo stampato. Poi ripristina 3000. Individua la parte del vecchio if che ora viene espressa con app.get.</p></section>
+<section id="tappa-2" class="lab-step"><p class="eyebrow">TAPPA 2</p><h2>Express: HTML, testo e JSON</h2><p><strong>Stesse tre risposte, sintassi più breve.</strong> Il frontend resta HTML con due link: nessuno script e nessun CSS.</p><h3>server.cjs · tre rotte</h3><pre><code data-lab-file="express-2">const express = require('express');
+const app = express();
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+app.get('/', (req, res) =&gt; {
+  res.send('&lt;h1&gt;Home&lt;/h1&gt;&lt;p&gt;&lt;a href="/saluto"&gt;Saluto&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="/info"&gt;JSON&lt;/a&gt;&lt;/p&gt;');
+});
+
+app.get('/saluto', (req, res) =&gt; {
+  res.type('text/plain').send('Ciao dalla rotta /saluto!');
+});
+
+app.get('/info', (req, res) =&gt; {
+  res.json({ corso: 'Node.js', framework: 'Express' });
+});
+
+app.use((req, res) =&gt; {
+  res.status(404).type('text/plain').send('Pagina non trovata.');
+});
+
+app.listen(PORT, IP, () =&gt; {
+  console.log(`Server Express su http://${IP}:${PORT}`);
+});</code></pre><p><code>res.send</code> con una stringa usa normalmente text/html; per il testo semplice impostiamo il tipo con <code>res.type</code>. <code>res.json</code> converte l’oggetto e imposta il tipo JSON. La funzione finale con <code>app.use</code> risponde 404 alle richieste che non hanno trovato una rotta: per questo sta in fondo.</p><p class="lab-check"><strong>Risultato atteso.</strong> I link della home navigano a /saluto e /info. Network mostra rispettivamente text/plain e application/json. /sconosciuta mostra il nostro 404.</p><p><strong>Tocca a te.</strong> Aggiungi app.get per /classe con un oggetto JSON. Inseriscila prima della funzione finale che risponde 404.</p></section>
+<section id="tappa-3" class="lab-step"><p class="eyebrow">TAPPA 3</p><h2>Express: riprendere il form POST</h2><p><strong>Ripetiamo il form del laboratorio 2.</strong> Prima dovevamo raccogliere data/end e interpretare il corpo. Qui <code>express.urlencoded</code> prepara i campi e li rende disponibili in req.body.</p><h3>server.cjs · form completo</h3><pre><code data-lab-file="express-3">const express = require('express');
+const app = express();
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+// Interpreta i campi inviati dai normali form HTML.
+app.use(express.urlencoded({ extended: false }));
+
+app.get('/', (req, res) =&gt; {
+  res.send(`&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Laboratorio Node.js&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Come ti chiami?&lt;/h1&gt;
+  &lt;form action="/saluto" method="post"&gt;
+    &lt;label&gt;Nome: &lt;input name="nome" required&gt;&lt;/label&gt;
+    &lt;button type="submit"&gt;Invia&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;`);
+});
+
+app.post('/saluto', (req, res) =&gt; {
+  let nome = '';
+  if (req.body &amp;&amp; typeof req.body.nome === 'string') {
+    nome = req.body.nome.trim();
+  }
+  if (nome === '') {
+    res.status(400).type('text/plain').send('Scrivi un nome.');
+    return;
+  }
+  res.type('text/plain').send('Ciao, ' + nome + '!');
+});
+
+app.use((req, res) =&gt; {
+  res.status(404).type('text/plain').send('Pagina non trovata.');
+});
+
+app.listen(PORT, IP, () =&gt; {
+  console.log(`Server Express su http://${IP}:${PORT}`);
+});</code></pre><p>Una funzione inserita con app.use che prepara la richiesta prima della rotta è chiamata <strong>middleware</strong>. In questo esempio il parser deve stare prima di app.post. Il controllo sul tipo stringa evita di chiamare trim su un dato inatteso; se req.body manca, il nome risulta vuoto e rispondiamo 400. Anche qui rispondiamo in text/plain, così il nome è mostrato come testo.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i --data-urlencode "nome=Ada Lovelace" http://127.0.0.1:3000/saluto
+curl.exe -i -d "nome=" http://127.0.0.1:3000/saluto</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Nome valido → 200 e saluto; nome vuoto → 400. GET /saluto riceve 404 in questo esempio perché abbiamo dichiarato soltanto POST /saluto; non abbiamo scritto un gestore 405.</p><p><strong>Tocca a te.</strong> Aggiungi un campo classe e restituiscilo come testo. Confronta il codice con la raccolta del body nel laboratorio precedente e indica quale lavoro è stato affidato al middleware.</p></section><section><h2>Prima di continuare</h2><p>Riscrivi una piccola rotta prima con http.createServer, poi con app.get: per entrambe indica metodo, percorso, stato e tipo del corpo. I concetti restano gli stessi, anche se il framework si occupa di parte del lavoro.</p><p>Al termine ferma il server con <kbd>Ctrl</kbd> + <kbd>C</kbd>. Se vedi EADDRINUSE, la porta è già occupata: ferma la tua versione precedente prima di avviarne un’altra. Salva il lavoro prima di sostituire i file con la versione della tappa successiva.</p><p class="lab-sources">Riferimenti: <a href="https://expressjs.com/en/starter/hello-world/">primo server Express</a>, <a href="https://expressjs.com/en/5x/api/">API Express 5</a>.</p></section></main><script src="../../reader.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="node-laboratorio-metodi" rel="prev" href="laboratorio-metodi.html"><small>← Precedente</small><span>Laboratorio 02 · Form, metodi e primi fetch</span></a><a class="lesson-catalog" href="../../index.html?course=node&amp;kind=lab" data-school-catalog="node">Tutti i laboratori<span>3 / 3</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>Node.js &amp; Express</span></span></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

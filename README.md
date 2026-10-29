@@ -17,7 +17,7 @@ Apri http://127.0.0.1:4173/teaching/ oppure la home. Ferma il server con Ctrl+C.
 1. Inserisci un HTML completo nella cartella del percorso sotto `teaching/materials/`.
 2. Usa un `<title>` descrittivo e, se utile, `<meta name="description" content="Breve descrizione">`.
 3. Collega il tema condiviso `reader.css` con un percorso relativo corretto (da `materials/node/`: `../../reader.css`). Per rendere copiabili i blocchi di codice, aggiungi anche `../../reader.js`.
-4. Indica il tipo con `<meta name="school-kind" content="lesson">`, `exercise` oppure `test`. Senza metadati, i nomi che contengono `esercizi`, `soluzioni`, `quiz` o `test` vengono classificati automaticamente.
+4. Indica il tipo con `<meta name="school-kind" content="lesson">`, `exercise`, `lab` oppure `test`. Senza metadati, i nomi che contengono `esercizi`, `soluzioni`, `quiz` o `test` vengono classificati automaticamente.
 5. Esegui `npm run catalog`, poi `npm run check` e `npm test`. Il comando catalog aggiorna anche navigazione precedente/successiva, link HTML statici e sitemap.
 
 Per un nuovo argomento aggiungi una cartella in `teaching/materials/` e una voce in `teaching/courses.json`: `id`, `folder`, `title`, `symbol`, `description`, `order` (array dei nomi file in ordine didattico, può essere vuoto). Non occorre modificare il frontend. I capitoli Node sono file indipendenti: eventuali modifiche al manuale completo vanno riportate anche nel capitolo corrispondente.
@@ -47,3 +47,23 @@ Questa cartella può essere versionata e inviata su GitHub. È presente una repo
 Il catalogo contiene link diretti già nell’HTML. I capitoli Node hanno testo statico; slide, quiz ed esercizi conservano gli script necessari alle loro interazioni. I materiali sono indicati come curati e rielaborati, mantenendo i riferimenti presenti.
 
 `npm test` verifica tutte le pagine: ordine didattico, link reciproci, confini dei percorsi, ritorno al catalogo in sottocartelle e da file, metadati unici e stabilità della rigenerazione.
+
+## Laboratori
+
+Laboratori è una categoria trasversale ai percorsi, accanto a Lezioni, Esercizi e Test. Usa `<meta name="school-kind" content="lab">` per aggiungerne uno. Il filtro rimane attivo passando da un percorso all’altro e si può condividere con `teaching/index.html?course=node&kind=lab`. Il laboratorio di crittografia esistente è classificato nella stessa categoria.
+
+I laboratori Node sono tre, da affrontare in più incontri:
+
+- `laboratorio-http.html`: nove tappe con GET e URL, una pausa sugli status code, HTML incorporato, link e form GET, lettura di HTML dal disco e immagini PNG/JPEG. Il frontend non usa CSS né JavaScript; è disponibile una PNG locale pronta da scaricare.
+- `laboratorio-metodi.html`: POST senza dati, lettura di un form, PUT e DELETE separati, una nota in memoria e infine due frontend fetch essenziali (prima con then, poi con async/await).
+- `laboratorio-express.html`: tre piccoli esempi con Express 5, dalla prima GET alle risposte HTML/testo/JSON e a un form POST.
+
+Ogni versione di `server.cjs` è completa e usa `IP` e `PORT` anche nel log di `listen`. I laboratori restano separati dalla sequenza delle lezioni. Ogni tappa include obiettivo, comandi, risultati attesi e una piccola estensione. `npm test` esegue gli esempi Node estratti dalle pagine su porte temporanee e chiude sempre i server. Per verificare anche Express installalo in una cartella di test esterna e imposta `NODE_LAB_EXPRESS_DIR` al suo percorso: il sito statico non dipende da Express.
+
+## C++: dalle struct al gioco a turni
+
+Il percorso comprende 16 capitoli. Dopo i 12 capitoli di base, i capitoli 13–16 introducono struct, classi e oggetti, ereditarietà e polimorfismo. Ciascuno ha un laboratorio separato, per un totale di 31 programmi completi tra spiegazioni e pratica. Gli esempi usano `using namespace std;` nei piccoli file didattici e includono input, riferimenti, regole della vita, mana, cure, composizione, dispatch virtuale e cicli di gioco con eroi, nemici e boss. Le vittorie e le sconfitte sono deterministiche, senza dipendenze o motori di gioco.
+
+`scripts/test-cpp-labs.cjs` estrae i programmi e le uscite attese dalle pagine. Con `g++` o `clang++` nel PATH, oppure `CPP_COMPILER` configurato (supporta anche `zig c++`), compila in C++17, esegue i programmi e verifica anche due scenari di sconfitta e tre errori di compilazione intenzionali. Senza compilatore controlla struttura e presenza degli esempi, dichiarando esplicitamente che la compilazione non è stata eseguita. I file di prova sono temporanei.
+
+Le pagine Fonti dei percorsi Node.js e crittografia contengono una sezione Crediti che cita rispettivamente i corsi YouTube di Edoardo Midali e Roberto Rossi come riferimenti degli appunti teorici, distinguendoli dai laboratori e dalle integrazioni originali. Introduzioni e catalogo rimandano alla sezione, senza attribuzioni generali ai corsi video.

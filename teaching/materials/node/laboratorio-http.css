@@ -1,0 +1,11 @@
+.lab-lead{font-size:18px;color:var(--ink-soft)}
+.lab-facts{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0;font-size:12px;color:var(--muted)}
+.lab-facts span{background:var(--surface-soft);padding:5px 10px;border-radius:6px}
+.lab-toc{border:1px solid var(--line);border-radius:12px;padding:8px 24px 18px;margin:28px 0 36px}
+.lab-toc h2{font-size:19px}.lab-toc li{padding:4px 0}
+.lab-step{border-top:1px solid var(--line);padding-top:30px;margin-top:40px;scroll-margin-top:24px}
+.lab-step h2{margin-top:6px}.lab-note,.lab-check{background:var(--surface-soft);border-left:3px solid var(--accent);padding:16px 20px;border-radius:0 8px 8px 0}
+.lab-check{background:#f0f7f1;border-color:var(--success)}
+.lab-final li{padding:4px 0}.lab-sources{font-size:13px;color:var(--muted)}
+.lab-reading dd{margin:6px 0 18px}.lab-reading kbd{border:1px solid var(--line);border-radius:4px;padding:1px 4px;font-size:12px}
+@media(max-width:600px){.lab-toc{padding:8px 16px 16px}.lab-lead{font-size:16px}.lab-note,.lab-check{padding:12px 14px}}

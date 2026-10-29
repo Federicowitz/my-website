@@ -40,6 +40,9 @@
   <url><loc>https://federicolelli.com/teaching/materials/node/capitoli/ripasso.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/node/capitoli/riferimenti.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/node/debug-richieste.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/node/laboratorio-http.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/node/laboratorio-metodi.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/node/laboratorio-express.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/node/contratto-api.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/node/test.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/01-lezione.html</loc></url>
@@ -66,6 +69,14 @@
   <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/11-esercizi-stringhe.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/12-lezione.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/esercizi-puntatori-base-0.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/13-lezione.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-13-struct.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/14-lezione.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-14-classi.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/15-lezione.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-15-ereditarieta.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/16-lezione.html</loc></url>
+  <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-16-polimorfismo.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/C%2B%2B/test.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/web/esercizi-html-js-dom-bom.html</loc></url>
   <url><loc>https://federicolelli.com/teaching/materials/web/soluzioni.html</loc></url>

@@ -1,0 +1,476 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Laboratorio 01 · HTTP, pagine e immagini — Federico Lelli</title><meta name="description" content="Nove tappe lente e guidate: GET e URL con if, status code, HTML incorporato, link e pulsanti senza script, file HTML e immagini PNG/JPEG."><meta name="school-kind" content="lab"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="laboratorio-http.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/node/laboratorio-http.html"><meta property="og:title" content="Laboratorio 01 · HTTP, pagine e immagini — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/node/laboratorio-http.html"><meta property="og:description" content="Laboratorio 01 · HTTP, pagine e immagini. Node.js &amp; Express: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="node-laboratorio-http"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=node&amp;kind=lab" data-school-catalog="node">Node.js &amp; Express</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><span class="lesson-neighbor lesson-boundary"><small>Inizio del percorso</small><span>Node.js &amp; Express</span></span><a class="lesson-catalog" href="../../index.html?course=node&amp;kind=lab" data-school-catalog="node">Tutti i laboratori<span>1 / 3</span></a><a class="lesson-neighbor" data-school-link="node-laboratorio-metodi" rel="next" href="laboratorio-metodi.html"><small>Successiva →</small><span>Laboratorio 02 · Form, metodi e primi fetch</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading lab-reading"><p class="eyebrow">NODE.JS · LABORATORIO 01 · UN PASSO ALLA VOLTA</p><h1>HTTP, pagine e immagini</h1><p class="lab-lead">Prima una risposta, poi una condizione, poi una pagina. Costruiamo un sito minimale senza fetch, senza async/await e senza CSS nel frontend.</p><div class="lab-facts"><span>Livello iniziale</span><span>9 tappe in più incontri</span><span>Codice completo</span><span>Solo moduli Node</span></div><nav class="lab-toc" aria-label="Tappe del laboratorio"><h2>Il percorso di lavoro</h2><ol><li><a href="#tappa-1">Un server che risponde a tutto</a></li><li><a href="#tappa-2">Accettare soltanto GET</a></li><li><a href="#tappa-3">GET e URL insieme: soltanto la home HTML</a></li><li><a href="#tappa-4">Fermiamoci sugli status code HTTP</a></li><li><a href="#tappa-5">Tre rotte: HTML, JSON e testo</a></li><li><a href="#tappa-6">HTML incorporato: navigare con i link</a></li><li><a href="#tappa-7">HTML incorporato: un pulsante GET</a></li><li><a href="#tappa-8">La stessa pagina, ora in un file HTML</a></li><li><a href="#tappa-9">Un’immagine normale: PNG, poi JPEG</a></li></ol></nav><section id="preparazione"><h2>Come lavoriamo</h2><p>Servono Node.js, un editor e un terminale. Le prime tappe richiedono soltanto variabili, funzioni e <code>if</code>. Procedi una tappa alla volta: la successiva ha senso quando sai spiegare e riprodurre il risultato della precedente.</p><ol><li>Crea una cartella <code>lab-http</code> e aprila nel terminale.</li><li>Crea <code>server.cjs</code>: l’estensione permette di usare <code>require</code>.</li><li>Copia il blocco completo della tappa, poi esegui <code>node server.cjs</code>.</li><li>Apri l’indirizzo stampato nel terminale.</li></ol><p class="lab-note"><strong>A ogni nuova versione:</strong> ferma Node con Ctrl+C, sostituisci tutto <code>server.cjs</code>, salva e riavvia. Non incollare un server sotto l’altro. Per provare i comandi usa un secondo terminale mentre il primo tiene acceso Node. Su Windows usa <code>curl.exe</code>; su macOS/Linux usa <code>curl</code>.</p><p><code>IP</code> è l’indirizzo su cui il server ascolta; <code>127.0.0.1</code> indica questo computer. <code>PORT</code> è la porta scelta per il laboratorio. Usiamo entrambi in <code>listen(PORT, IP, ...)</code> e nel messaggio di avvio, così l’indirizzo stampato corrisponde alla configurazione.</p><p>Non servono pacchetti esterni nei primi due laboratori. Puoi distribuire queste tappe su più incontri: non sono una corsa da completare in un’unica ora.</p></section><section id="tappa-1" class="lab-step"><p class="eyebrow">TAPPA 1</p><h2>Un server che risponde a tutto</h2><p><strong>Obiettivo:</strong> inviare una prima risposta. <code>createServer</code> riceve una funzione che Node esegue a ogni richiesta: <code>req</code> descrive ciò che arriva, <code>res</code> permette di rispondere. Per ora non controlliamo metodo e URL.</p><h3>server.cjs · versione 1</h3><pre><code data-lab-file="step-1">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Ciao! Il server risponde.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log('Server attivo su http://' + IP + ':' + PORT);
+});</code></pre><p><code>writeHead</code> imposta lo stato e gli header. <code>text/plain</code> dice “testo semplice”; <code>charset=utf-8</code> permette di interpretare anche gli accenti. <code>end</code> invia il contenuto e conclude la risposta.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i http://127.0.0.1:3000/
+curl.exe -i http://127.0.0.1:3000/qualsiasi
+curl.exe -i -X POST http://127.0.0.1:3000/prova</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Tutte e tre le richieste restituiscono <code>200</code> e “Ciao! Il server risponde.”. Il browser mostra lo stesso saluto su qualsiasi percorso. HEAD è un caso particolare del protocollo: riceve gli header senza il corpo.</p><p><strong>Tocca a te.</strong> Modifica il saluto. Poi cambia PORT in 3001: riavvia e controlla che anche il messaggio stampato contenga 3001. Ripristina 3000 per le prossime prove. Avvia una richiesta e indica quale parte riguarda req e quale res.</p></section>
+<section id="tappa-2" class="lab-step"><p class="eyebrow">TAPPA 2</p><h2>Accettare soltanto GET</h2><p><strong>Aggiungiamo una sola regola:</strong> controlliamo <code>req.method</code>. Scrivere un indirizzo nel browser invia normalmente GET. Per provare POST usiamo il terminale.</p><h3>server.cjs · versione 2</h3><pre><code data-lab-file="step-2">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method !== 'GET') {
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', 'Allow': 'GET' });
+    res.end('Metodo non consentito. Usa GET.');
+    return;
+  }
+
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Hai usato GET.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log('Server attivo su http://' + IP + ':' + PORT);
+});</code></pre><p>Se il metodo non è GET rispondiamo con 405. L’header <code>Allow: GET</code> indica il metodo accettato. Il <code>return</code> termina questa esecuzione della funzione: senza di esso proseguiremmo tentando di rispondere una seconda volta.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i http://127.0.0.1:3000/qualsiasi
+curl.exe -i -X POST http://127.0.0.1:3000/</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> GET restituisce 200 anche su /qualsiasi; POST restituisce 405. Non abbiamo ancora limitato il percorso.</p><p><strong>Tocca a te.</strong> Prova PUT e DELETE al posto di POST: devono essere rifiutati. Prima di cambiare codice, spiega perché GET /qualsiasi è ancora accettato.</p></section>
+<section id="tappa-3" class="lab-step"><p class="eyebrow">TAPPA 3</p><h2>GET e URL insieme: soltanto la home HTML</h2><p><strong>Ora aggiungiamo il percorso.</strong> La condizione <code>req.method === 'GET' &amp;&amp; req.url === '/'</code> significa: il metodo deve essere GET <em>e</em> l’URL deve essere esattamente /. Solo questa combinazione riceve la home.</p><h3>server.cjs · versione 3</h3><pre><code data-lab-file="step-3">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  // &amp;&amp; significa: devono essere vere entrambe le condizioni.
+  if (req.method === 'GET' &amp;&amp; req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end('&lt;h1&gt;Ciao da Node.js!&lt;/h1&gt;&lt;p&gt;Questa risposta contiene HTML.&lt;/p&gt;');
+    return;
+  }
+
+  if (req.method !== 'GET') {
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', 'Allow': 'GET' });
+    res.end('Metodo non consentito. Usa GET.');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log('Server attivo su http://' + IP + ':' + PORT);
+});</code></pre><p>Il corpo è ora una stringa HTML e il tipo è <code>text/html</code>: il browser interpreta h1 e p. Non leggiamo ancora un file dal disco. Il confronto dell’URL è esatto: anche <code>/?nome=Ada</code> per ora non coincide con <code>/</code>.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i http://127.0.0.1:3000/
+curl.exe -i http://127.0.0.1:3000/altra
+curl.exe -i -X POST http://127.0.0.1:3000/</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> GET / → 200 HTML; GET /altra → 404; POST / → 405. Apri la home nel browser: vedi il titolo formattato, non i tag scritti come testo.</p><p><strong>Tocca a te.</strong> Cambia il testo dell’h1. Poi prova a chiedere /home: prevedi la risposta e spiega quale confronto fallisce.</p></section>
+<section id="tappa-4" class="lab-step"><p class="eyebrow">TAPPA 4 · PAUSA DI COMPRENSIONE</p><h2>Fermiamoci sugli status code HTTP</h2><p><strong>Questa tappa non aggiunge una versione di server.cjs.</strong> Mantieni la versione 3 e impara a leggere la risposta. Uno status è un numero nella prima riga HTTP: non dipende dalle parole scritte nel corpo. Scrivere “Errore” con stato 200 resta una risposta 200.</p><table><thead><tr><th>Codice</th><th>Significato qui</th><th>Quando lo incontriamo</th></tr></thead><tbody><tr><td>200 OK</td><td>Richiesta completata</td><td>La home esiste</td></tr><tr><td>201 Created</td><td>Risorsa creata</td><td>Più avanti: POST crea una nota</td></tr><tr><td>204 No Content</td><td>Operazione riuscita, senza corpo</td><td>Più avanti: cancellazione</td></tr><tr><td>400 Bad Request</td><td>Dati della richiesta non validi</td><td>Più avanti: un campo vuoto</td></tr><tr><td>404 Not Found</td><td>Risorsa o percorso non trovato</td><td>GET /altra</td></tr><tr><td>405 Method Not Allowed</td><td>Metodo non ammesso per quella risorsa</td><td>POST sulla home; aggiungiamo Allow</td></tr><tr><td>409 Conflict</td><td>Operazione in conflitto con lo stato attuale</td><td>Più avanti: seconda creazione della stessa nota</td></tr><tr><td>415 Unsupported Media Type</td><td>Formato del corpo non supportato</td><td>Più avanti: JSON dove aspettiamo testo</td></tr><tr><td>500 Internal Server Error</td><td>Il server incontra un errore</td><td>Più avanti: file previsto ma illeggibile</td></tr></tbody></table><p>Le famiglie aiutano a orientarsi: 2xx successo, 3xx reindirizzamento, 4xx richiesta non soddisfatta per un problema lato client, 5xx errore lato server. Studiamo 200, 404 e 405 adesso; riprenderemo gli altri quando servono.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i http://127.0.0.1:3000/
+curl.exe -i http://127.0.0.1:3000/altra
+curl.exe -i -X POST http://127.0.0.1:3000/</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Leggi la prima riga, poi Content-Type, poi il corpo separato dagli header da una riga vuota. Nel browser puoi vedere gli stessi dati nella scheda Rete/Network.</p><p><strong>Tocca a te.</strong> Annota prima di eseguire i comandi: metodo, URL, status atteso e motivo. Cambia temporaneamente il 404 nel codice in 200 lasciando il testo uguale: verifica che il testo non determini lo status, poi ripristina 404.</p></section>
+<section id="tappa-5" class="lab-step"><p class="eyebrow">TAPPA 5</p><h2>Tre rotte: HTML, JSON e testo</h2><p><strong>Solo ora allarghiamo il server.</strong> La home resta HTML; /info restituisce un oggetto trasformato in JSON; /saluto restituisce testo. Continuiamo con confronti diretti su req.url, senza introdurre ancora un analizzatore di URL.</p><h3>server.cjs · versione 4</h3><pre><code data-lab-file="step-5">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method !== 'GET') {
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', 'Allow': 'GET' });
+    res.end('Metodo non consentito. Usa GET.');
+    return;
+  }
+
+  if (req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end('&lt;h1&gt;Home&lt;/h1&gt;&lt;p&gt;Benvenuto nel laboratorio.&lt;/p&gt;');
+    return;
+  }
+
+  if (req.url === '/info') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ corso: 'Node.js', aula: 3 }));
+    return;
+  }
+
+  if (req.url === '/saluto') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Ciao dalla rotta /saluto!');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre><p><code>JSON.stringify</code> converte l’oggetto JavaScript in una stringa JSON da inviare. Il Content-Type descrive ciò che stiamo realmente spedendo.</p><p class="lab-note">Nel messaggio di avvio compaiono per la prima volta i <strong>backtick</strong>: <code>`http://${IP}:${PORT}`</code> inserisce i valori dentro la stringa. È un altro modo di scrivere la concatenazione delle prime versioni; la funzione di listen non cambia. I backtick sono il carattere `, diverso dall’apostrofo.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i http://127.0.0.1:3000/
+curl.exe -i http://127.0.0.1:3000/info
+curl.exe -i http://127.0.0.1:3000/saluto
+curl.exe -i http://127.0.0.1:3000/inesistente</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Nell’ordine: 200 text/html, 200 application/json, 200 text/plain, 404. /info?classe=4A dà ancora 404, perché il confronto è esatto.</p><p><strong>Tocca a te.</strong> Aggiungi GET /classe con un oggetto JSON che contenga nome e aula, prima della 404. Ripeti la prova e controlla anche Content-Type.</p></section>
+<section id="tappa-6" class="lab-step"><p class="eyebrow">TAPPA 6</p><h2>HTML incorporato: navigare con i link</h2><p><strong>Costruiamo la prima piccola interfaccia.</strong> L’HTML è ancora scritto dentro server.cjs. I backtick permettono anche una stringa su più righe. La nuova pagina ha due link; /contatti è un’altra pagina HTML con il ritorno alla home.</p><h3>server.cjs · versione 5</h3><pre><code data-lab-file="step-6">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method !== 'GET') {
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', 'Allow': 'GET' });
+    res.end('Metodo non consentito. Usa GET.');
+    return;
+  }
+
+  const pathname = req.url;
+
+  if (pathname === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(`&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Laboratorio Node.js&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Il mio piccolo sito&lt;/h1&gt;
+  &lt;p&gt;&lt;a href="/saluto"&gt;Leggi il saluto&lt;/a&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;a href="/contatti"&gt;Apri i contatti&lt;/a&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;`);
+    return;
+  }
+
+  if (pathname === '/saluto') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Ciao dalla rotta /saluto!');
+    return;
+  }
+
+  if (pathname === '/contatti') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end('&lt;h1&gt;Contatti&lt;/h1&gt;&lt;p&gt;Scrivi al docente.&lt;/p&gt;&lt;a href="/"&gt;Torna alla home&lt;/a&gt;');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre><p>Apri <code>http://127.0.0.1:3000/</code> e segui i link. Ogni clic fa una nuova richiesta GET e il browser mostra la risposta al posto della pagina precedente. Non c’è JavaScript nel frontend.</p><p class="lab-note"><code>href="/saluto"</code> è un percorso relativo alla radice del sito: usa lo stesso host e la stessa porta della pagina. Anche un URL completo come <code>http://127.0.0.1:3000/saluto</code> funziona, ma il percorso con / continua a funzionare se cambiamo PORT. Qui facciamo navigazione di pagine; un’API dati è pensata per un programma che legge una risposta, come il JSON della tappa precedente. Tutte queste richieste usano comunque HTTP.</p><p class="lab-check"><strong>Risultato atteso.</strong> Il link al saluto mostra testo; il link ai contatti apre una seconda pagina HTML; “Torna alla home” riapre /. Nessun fetch, nessun async/await.</p><p><strong>Tocca a te.</strong> Aggiungi un link /orari e una rotta che restituisce una pagina con l’orario del laboratorio e un link per tornare indietro.</p></section>
+<section id="tappa-7" class="lab-step"><p class="eyebrow">TAPPA 7</p><h2>HTML incorporato: un pulsante GET</h2><p><strong>Facciamo un secondo esempio minimale.</strong> Un pulsante dentro un form GET può chiedere un’altra rotta senza script. Il form non ha campi: serve soltanto per navigare.</p><h3>server.cjs · versione 6</h3><pre><code data-lab-file="step-7">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method !== 'GET') {
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', 'Allow': 'GET' });
+    res.end('Metodo non consentito. Usa GET.');
+    return;
+  }
+
+  const pathname = new URL(req.url, 'http://localhost').pathname;
+
+  if (pathname === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(`&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Laboratorio Node.js&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Il mio piccolo sito&lt;/h1&gt;
+  &lt;p&gt;&lt;a href="/contatti"&gt;Apri i contatti&lt;/a&gt;&lt;/p&gt;
+  &lt;form action="/saluto" method="get"&gt;
+    &lt;button type="submit"&gt;Leggi il saluto&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;`);
+    return;
+  }
+
+  if (pathname === '/saluto') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Ciao dalla rotta /saluto!');
+    return;
+  }
+
+  if (pathname === '/contatti') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end('&lt;h1&gt;Contatti&lt;/h1&gt;&lt;p&gt;Scrivi al docente.&lt;/p&gt;&lt;a href="/"&gt;Torna alla home&lt;/a&gt;');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre><p>Un form GET può costruire un URL con parametri: <code>pathname</code> riconosce il percorso indipendentemente dalla query. Prima di passare ai file, fermiamoci a capire dove viaggiano questi dati.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -i "http://127.0.0.1:3000/saluto?nome=Ada"</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Il pulsante apre /saluto e mostra il testo. Anche la richiesta con ?nome=Ada funziona: stiamo ignorando i parametri, non li stiamo ancora usando.</p><p><strong>Tocca a te.</strong> Aggiungi un secondo form GET con un pulsante che apre /contatti. Osserva metodo e URL in Network. Spiega perché questo clic naviga, invece di cambiare una parte della pagina.</p>
+<div id="dati-get">
+<h3>Una GET può trasmettere dati senza un body</h3>
+<p>Nelle richieste GET di questo laboratorio <strong>non inviamo un corpo</strong>. Possiamo comunque mandare informazioni al server scrivendole nell’URL. Per esempio, chiediamo un saluto per una certa persona e una certa classe:</p>
+<pre><code>http://127.0.0.1:3000/saluto?nome=Ada&amp;classe=4A</code></pre>
+<p>Il percorso <code>/saluto</code> sceglie la rotta. La parte <code>nome=Ada&amp;classe=4A</code>, chiamata <strong>query string</strong>, fornisce due parametri per quella richiesta. I nomi nome e classe sono una scelta del nostro programma: il server deve leggerli e decidere come usarli. Il punto interrogativo da solo non esegue alcuna ricerca.</p>
+<h3>Tre caratteri da imparare per primi: ?, = e &amp;</h3>
+<table><thead><tr><th>Carattere</th><th>Funzione nella query di questo esempio</th><th>Esempio</th></tr></thead><tbody>
+<tr><td><code>?</code></td><td>Segna l’inizio della query, dopo il percorso.</td><td><code>/saluto?nome=Ada</code></td></tr>
+<tr><td><code>=</code></td><td>Separa il nome del parametro dal suo valore.</td><td><code>nome=Ada</code></td></tr>
+<tr><td><code>&amp;</code></td><td>Separa una coppia nome=valore dalla successiva.</td><td><code>nome=Ada&amp;classe=4A</code></td></tr>
+</tbody></table>
+<p>La lettura è: «Richiedo /saluto, passando nome uguale ad Ada <em>e</em> classe uguale a 4A». Dopo il primo parametro aggiungiamo gli altri con <code>&amp;</code>, non con un altro <code>?</code>. Nella convenzione dei parametri non stiamo facendo un’operazione matematica o una condizione JavaScript: separiamo nomi e valori.</p>
+<h3>Come parte quella richiesta? Anche senza form</h3>
+<p>Puoi scrivere l’indirizzo completo nella barra del browser oppure seguire un normale link. Il server riceve gli stessi parametri. In un attributo HTML scriviamo il separatore &amp; come <code>&amp;amp;</code>; il browser lo interpreta come un normale &amp; nell’URL:</p>
+<pre><code>&lt;a href="/saluto?nome=Ada&amp;amp;classe=4A"&gt;Saluta Ada della 4A&lt;/a&gt;</code></pre>
+<p>Il form GET è un terzo modo: il browser costruisce la query usando il <code>name</code> e il valore di ciascun campo. Un campo senza name non viene incluso come parametro. Il nome del parametro non viene preso dall’etichetta visibile né dall’attributo id.</p>
+<p>In una rappresentazione HTTP/1.1 semplificata, la richiesta è questa. I dati sono già nella prima riga; non c’è un body contenente nome e classe:</p>
+<pre><code>GET /saluto?nome=Ada&amp;classe=4A HTTP/1.1
+Host: 127.0.0.1:3000
+
+</code></pre>
+<p>GET significa chiedere una risorsa; i parametri possono specificare filtri, pagina dei risultati o un identificatore. Un URL come <code>/watch?v=abc123</code> usa v per scegliere un video: non occorre un form. La presenza della query non dice se la risposta sia statica o dinamica. Anche richieste con altri metodi, per esempio POST, possono avere parametri nell’URL: query e body sono parti distinte.</p>
+<h3>Perché separiamo req.url e pathname?</h3>
+<pre><code>// Da leggere dentro la funzione del server:
+const url = new URL(req.url, `http://${IP}:${PORT}`);
+
+// Con la richiesta /saluto?nome=Ada&amp;classe=4A:
+// req.url                         -&gt; '/saluto?nome=Ada&amp;classe=4A'
+// url.pathname                    -&gt; '/saluto'
+// url.search                      -&gt; '?nome=Ada&amp;classe=4A'
+// url.searchParams.get('nome')     -&gt; 'Ada'
+// url.searchParams.get('classe')   -&gt; '4A'</code></pre>
+<p>Confrontare <code>req.url === '/saluto'</code> fallirebbe quando sono presenti parametri. Confrontare <code>url.pathname === '/saluto'</code> permette di riconoscere la rotta; <code>url.searchParams</code> permette poi di leggere i dati separatamente. <code>get</code> restituisce una stringa oppure null se il parametro manca: anche <code>?pagina=2</code> fornisce il testo “2”, non un numero JavaScript.</p>
+<p class="lab-note"><strong>La base di new URL.</strong> Node riceve normalmente un percorso come /saluto?nome=Ada, che da solo non è un indirizzo completo. Il secondo argomento fornisce schema e host per interpretarlo. Il precedente <code>'http://localhost'</code> era soltanto una base di analisi: new URL non apre una connessione e non avvia un altro server. Qui usiamo <code>`http://${IP}:${PORT}`</code> per renderla coerente con gli esempi. È sempre <code>listen(PORT, IP, ...)</code> a stabilire dove ascolta il server.</p>
+<h3>Spazi, accenti e simboli dentro un valore</h3>
+<p>Se il nome è “Ada Lovelace”, il browser deve rappresentare anche lo spazio. I form GET usano la codifica dei form: gli spazi diventano <code>+</code>. Uno spazio può anche essere rappresentato con <code>%20</code>. Il simbolo <code>%</code> introduce una sequenza di codifica; non significa “percentuale”:</p>
+<pre><code>/saluto?nome=Ada+Lovelace&amp;classe=4A
+/saluto?nome=Ada%20Lovelace&amp;classe=4A</code></pre>
+<p>In entrambi i casi <code>url.searchParams.get('nome')</code> restituisce “Ada Lovelace”. Per distinguere un carattere contenuto nel dato da un separatore, usiamo la sua forma codificata:</p>
+<table><thead><tr><th>Dato da trasmettere</th><th>Nel valore dell’URL</th><th>Perché</th></tr></thead><tbody>
+<tr><td><code>Ada &amp; Grace</code></td><td><code>nome=Ada+%26+Grace</code></td><td>%26 è una &amp; contenuta nel nome, non un nuovo parametro.</td></tr>
+<tr><td><code>C++</code></td><td><code>corso=C%2B%2B</code></td><td>%2B rappresenta un + letterale, senza scambiarlo per uno spazio.</td></tr>
+<tr><td><code>C#</code></td><td><code>corso=C%23</code></td><td>%23 rappresenta il carattere # come dato.</td></tr>
+<tr><td><code>50%</code></td><td><code>sconto=50%25</code></td><td>%25 rappresenta il simbolo % stesso.</td></tr>
+<tr><td><code>caffè</code></td><td><code>testo=caff%C3%A8</code></td><td>Gli accenti vengono codificati usando i byte UTF-8.</td></tr>
+</tbody></table>
+<p>Non serve comporre queste sequenze a memoria. Il browser codifica i campi del form; in JavaScript puoi far costruire i parametri a URLSearchParams:</p>
+<pre><code>const parametri = new URLSearchParams({ nome: 'Ada &amp; Grace', corso: 'C++' });
+console.log(parametri.toString());
+// nome=Ada+%26+Grace&amp;corso=C%2B%2B</code></pre>
+<p>Il + non significa spazio in ogni punto di qualsiasi URL: questa interpretazione riguarda i parametri nella codifica dei form e la loro lettura con URLSearchParams. La codifica rende rappresentabili i caratteri: non nasconde e non cifra i dati. I parametri restano nell’indirizzo e possono finire nella cronologia o nei log, quindi qui usiamo soltanto dati di esempio.</p>
+<h3>Altri caratteri da riconoscere: /, : e #</h3>
+<pre><code>http://127.0.0.1:3000/saluto?nome=Ada&amp;classe=4A#risultato</code></pre>
+<table><thead><tr><th>Parte</th><th>Significato</th></tr></thead><tbody>
+<tr><td><code>http:</code> e <code>//</code></td><td>Lo schema e l’inizio della parte che contiene l’host.</td></tr>
+<tr><td><code>:3000</code></td><td>I due punti dopo l’host introducono la porta.</td></tr>
+<tr><td><code>/saluto</code></td><td>Il percorso. Gli slash separano i suoi segmenti, per esempio /corsi/node.</td></tr>
+<tr><td><code>?nome=Ada&amp;classe=4A</code></td><td>La query viene inviata al server insieme al percorso.</td></tr>
+<tr><td><code>#risultato</code></td><td>Il frammento resta nel browser: può indicare un elemento della pagina a cui scorrere. Non viene inviato nella richiesta HTTP.</td></tr>
+</tbody></table>
+<p>Con quell’indirizzo il server riceve <code>/saluto?nome=Ada&amp;classe=4A</code>: in req.url non compare #risultato. Se invece # deve far parte del dato, va codificato come %23, come nell’esempio del corso C#.</p>
+<h3>Prova guidata: un form GET con due campi</h3>
+<p>È una piccola variante indipendente della tappa 7. <strong>Sostituisci tutto server.cjs</strong> con questo esempio completo e riavvia. Qui gestiamo solo la home e /saluto; i contatti torneranno nel progetto della tappa 8. Non servono script nel frontend.</p>
+<h3>server.cjs · variante GET con dati nell’URL</h3><pre><code data-lab-file="get-query">const http = require('node:http');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method !== 'GET') {
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', 'Allow': 'GET' });
+    res.end('Usa GET.');
+    return;
+  }
+
+  const url = new URL(req.url, `http://${IP}:${PORT}`);
+
+  if (url.pathname === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(`&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;Un form GET&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Un saluto personalizzato&lt;/h1&gt;
+  &lt;form action="/saluto" method="get"&gt;
+    &lt;p&gt;&lt;label&gt;Nome: &lt;input name="nome" value="Ada"&gt;&lt;/label&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;label&gt;Classe: &lt;input name="classe" value="4A"&gt;&lt;/label&gt;&lt;/p&gt;
+    &lt;button type="submit"&gt;Chiedi il saluto&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;`);
+    return;
+  }
+
+  if (url.pathname === '/saluto') {
+    const nome = url.searchParams.get('nome') || 'ospite';
+    const classe = url.searchParams.get('classe') || 'non indicata';
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Ciao, ' + nome + '! Classe: ' + classe);
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre>
+<p>Apri la home e invia il form. Poi confronta queste prove, senza modificare il server:</p>
+<pre><code>curl.exe -i "http://127.0.0.1:3000/saluto?nome=Ada&amp;classe=4A"
+curl.exe -i "http://127.0.0.1:3000/saluto?nome=Ada%20Lovelace&amp;classe=4A"
+curl.exe -i "http://127.0.0.1:3000/saluto?nome=Ada%20%26%20Grace&amp;classe=4A"
+curl.exe -i http://127.0.0.1:3000/saluto</code></pre>
+<p class="lab-check"><strong>Risultato atteso.</strong> Nell’ordine ricevi “Ciao, Ada! Classe: 4A”, “Ciao, Ada Lovelace! Classe: 4A”, “Ciao, Ada &amp; Grace! Classe: 4A” e “Ciao, ospite! Classe: non indicata”. Tutte sono GET sulla stessa rotta /saluto; cambiano i parametri e quindi il testo prodotto dal nostro programma. Usa le virgolette nei comandi per evitare che la shell interpreti &amp; come un proprio simbolo.</p>
+<p><strong>Tocca a te.</strong> Inserisci nel form “Ada &amp; Grace”: osserva l’URL generato e il nome ricostruito nella risposta. Poi inverti l’ordine di nome e classe nell’URL: il programma continua a leggerli per nome. Aggiungi #prova nella barra del browser e controlla in Network che il frammento non sia stato inviato. Per approfondire: se scrivi <code>?nome=Ada&amp;nome=Grace</code>, get restituisce il primo valore; getAll permette di leggerli entrambi.</p>
+<p class="lab-sources">Approfondimenti: <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_URL">le parti di un URL</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams">URLSearchParams e codifica dei valori</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/GET">il metodo GET</a>.</p>
+</div>
+</section>
+<section id="tappa-8" class="lab-step"><p class="eyebrow">TAPPA 8</p><h2>La stessa pagina, ora in un file HTML</h2><p><strong>Cambiamo soltanto dove conserviamo l’HTML.</strong> Crea public/index.html con lo stesso frontend della tappa 7. Il server legge il file con fs.readFile e lo invia. I link e il pulsante restano uguali.</p><pre><code>lab-http/
+  server.cjs
+  public/
+    index.html</code></pre><h3>public/index.html</h3><pre><code data-lab-file="page-8">&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Laboratorio Node.js&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Il mio piccolo sito&lt;/h1&gt;
+  &lt;p&gt;&lt;a href="/contatti"&gt;Apri i contatti&lt;/a&gt;&lt;/p&gt;
+  &lt;form action="/saluto" method="get"&gt;
+    &lt;button type="submit"&gt;Leggi il saluto&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre><h3>server.cjs · versione 7</h3><pre><code data-lab-file="step-8">const http = require('node:http');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method !== 'GET') {
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', 'Allow': 'GET' });
+    res.end('Metodo non consentito. Usa GET.');
+    return;
+  }
+
+  const pathname = new URL(req.url, 'http://localhost').pathname;
+
+  if (pathname === '/') {
+    const filename = path.join(__dirname, 'public', 'index.html');
+    fs.readFile(filename, (error, content) =&gt; {
+      if (error) {
+        console.error(error);
+        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Il server non riesce a leggere il file.');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(content);
+    });
+    return;
+  }
+
+  if (pathname === '/saluto') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Ciao dalla rotta /saluto!');
+    return;
+  }
+
+  if (pathname === '/contatti') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end('&lt;h1&gt;Contatti&lt;/h1&gt;&lt;p&gt;Scrivi al docente.&lt;/p&gt;&lt;a href="/"&gt;Torna alla home&lt;/a&gt;');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre><p><code>__dirname</code> è la cartella del file server.cjs; <code>path.join</code> costruisce il percorso sul disco anche su Windows. La funzione <code>(error, content) =&gt; { ... }</code> è una callback: Node la esegue quando la lettura termina. Prima controlliamo error; se non c’è, inviamo content. Non occorre async/await.</p><p class="lab-check"><strong>Risultato atteso.</strong> Il sito si comporta come prima. Cambia l’h1 in public/index.html e ricarica: vedrai la nuova scritta perché il server rilegge il file. Se cambi server.cjs, invece, devi riavviare Node. Rinomina temporaneamente index.html: GET / restituisce 500; poi ripristinalo.</p><p><strong>Tocca a te.</strong> Sposta anche la pagina dei contatti in public/contatti.html e servila con lo stesso schema. Non usare req.url come percorso libero del disco: scegli esplicitamente quali file esporre.</p></section>
+<section id="tappa-9" class="lab-step"><p class="eyebrow">TAPPA 9</p><h2>Un’immagine normale: PNG, poi JPEG</h2><p><strong>Usiamo lo stesso schema di lettura per un’immagine.</strong> Crea o scegli una vera immagine PNG e salvala come public/foto.png. Puoi usare il piccolo file pronto qui: <a href="../../assets/lab-http/foto.png" download="foto.png">scarica foto.png</a>. Non serve creare né capire SVG.</p><pre><code>lab-http/
+  server.cjs
+  public/
+    index.html
+    foto.png</code></pre><h3>public/index.html · ancora senza CSS e senza script</h3><pre><code data-lab-file="page-9">&lt;!doctype html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Laboratorio Node.js&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Il mio piccolo sito&lt;/h1&gt;
+  &lt;img src="/immagine" alt="Immagine del laboratorio" width="240"&gt;
+  &lt;p&gt;&lt;a href="/contatti"&gt;Apri i contatti&lt;/a&gt;&lt;/p&gt;
+  &lt;form action="/saluto" method="get"&gt;
+    &lt;button type="submit"&gt;Leggi il saluto&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre><h3>server.cjs · versione 8</h3><pre><code data-lab-file="step-9">const http = require('node:http');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const IP = '127.0.0.1';
+const PORT = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  if (req.method !== 'GET') {
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', 'Allow': 'GET' });
+    res.end('Metodo non consentito. Usa GET.');
+    return;
+  }
+
+  const pathname = new URL(req.url, 'http://localhost').pathname;
+
+  if (pathname === '/') {
+    const filename = path.join(__dirname, 'public', 'index.html');
+    fs.readFile(filename, (error, content) =&gt; {
+      if (error) {
+        console.error(error);
+        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Il server non riesce a leggere il file.');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(content);
+    });
+    return;
+  }
+
+  if (pathname === '/immagine') {
+    const filename = path.join(__dirname, 'public', 'foto.png');
+    fs.readFile(filename, (error, content) =&gt; {
+      if (error) {
+        console.error(error);
+        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Il server non riesce a leggere il file.');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'image/png' });
+      res.end(content);
+    });
+    return;
+  }
+
+  if (pathname === '/saluto') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Ciao dalla rotta /saluto!');
+    return;
+  }
+
+  if (pathname === '/contatti') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end('&lt;h1&gt;Contatti&lt;/h1&gt;&lt;p&gt;Scrivi al docente.&lt;/p&gt;&lt;a href="/"&gt;Torna alla home&lt;/a&gt;');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Pagina non trovata.');
+});
+
+server.listen(PORT, IP, () =&gt; {
+  console.log(`Server attivo su http://${IP}:${PORT}`);
+});</code></pre><p>Il browser chiede prima GET / per l’HTML, poi GET /immagine perché incontra il tag img. Il server legge foto.png come byte e li invia con <code>Content-Type: image/png</code>. Non convertire i byte in una stringa UTF-8.</p><table><thead><tr><th>File reale</th><th>Content-Type</th></tr></thead><tbody><tr><td>foto.png</td><td>image/png</td></tr><tr><td>foto.jpg oppure foto.jpeg</td><td>image/jpeg</td></tr><tr><td>foto.gif</td><td>image/gif</td></tr><tr><td>foto.webp</td><td>image/webp</td></tr></tbody></table><p class="lab-note">L’immagine può essere di un altro tipo: sostituisci il file e cambia sia il nome nel path.join sia il Content-Type. Rinominare una PNG in .jpg non la converte. Il precedente <code>image/svg+xml</code> era il tipo specifico di SVG, un formato descritto con XML: lo lasciamo come curiosità, non come requisito di questo laboratorio.</p><h3>Prova nel secondo terminale</h3><pre><code>curl.exe -o foto-ricevuta.png http://127.0.0.1:3000/immagine</code></pre><p class="lab-check"><strong>Risultato atteso.</strong> Nella home vedi immagine, link e pulsante. Aprendo /immagine vedi la sola immagine. In Network la risposta dell’immagine è 200 image/png. Il comando salva una copia dell’immagine in foto-ricevuta.png: aprila per controllarla. Gli header si leggono nella scheda Network. Se manca foto.png ottieni 500; /sconosciuta dà 404.</p><p><strong>Tocca a te.</strong> Usa una vera foto JPEG e cambia il MIME in image/jpeg. Il percorso pubblico può restare /immagine. Spiega la differenza tra quel percorso e public/foto.jpg sul disco.</p></section><section><h2>Prima di continuare</h2><p>Sai prevedere metodo, percorso e status di una richiesta? Sai spiegare perché un clic su un link cambia pagina e come lo stesso HTML può arrivare da una stringa o da un file?</p><p>Quando questi passaggi sono chiari, continua con <a href="laboratorio-metodi.html">Laboratorio 02 · Form, metodi e primi fetch</a>. Non servono ancora Express o un database.</p><p>Al termine ferma il server con <kbd>Ctrl</kbd> + <kbd>C</kbd>. Se vedi EADDRINUSE, la porta è già occupata: ferma la tua versione precedente prima di avviarne un’altra. Salva il lavoro prima di sostituire i file con la versione della tappa successiva.</p><p class="lab-sources">Riferimenti: <a href="https://nodejs.org/api/http.html">Node HTTP</a>, <a href="https://nodejs.org/api/fs.html">Node file system</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status">status HTTP</a>.</p></section></main><script src="../../reader.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><span class="lesson-neighbor lesson-boundary"><small>Inizio del percorso</small><span>Node.js &amp; Express</span></span><a class="lesson-catalog" href="../../index.html?course=node&amp;kind=lab" data-school-catalog="node">Tutti i laboratori<span>1 / 3</span></a><a class="lesson-neighbor" data-school-link="node-laboratorio-metodi" rel="next" href="laboratorio-metodi.html"><small>Successiva →</small><span>Laboratorio 02 · Form, metodi e primi fetch</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

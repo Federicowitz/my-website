@@ -1,0 +1,217 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Laboratorio 14 | Classi, oggetti e incapsulamento — Federico Lelli</title><meta name="description" content="7 programmi C++ completi e graduali con personaggi, eroi e nemici, risultati attesi e modifiche guidate."><meta name="school-kind" content="lab"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="cpp-labs.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-14-classi.html"><meta property="og:title" content="Laboratorio 14 | Classi, oggetti e incapsulamento — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/C%2B%2B/laboratorio-14-classi.html"><meta property="og:description" content="Laboratorio 14 | Classi, oggetti e incapsulamento. C++: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="cpp-laboratorio-14-classi"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">C++</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="cpp-laboratorio-13-struct" rel="prev" href="laboratorio-13-struct.html"><small>← Precedente</small><span>Laboratorio 13 | Struct e dati dei personaggi</span></a><a class="lesson-catalog" href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">Tutti i laboratori<span>2 / 4</span></a><a class="lesson-neighbor" data-school-link="cpp-laboratorio-15-ereditarieta" rel="next" href="laboratorio-15-ereditarieta.html"><small>Successiva →</small><span>Laboratorio 15 | Ereditarietà: eroi e nemici</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading cpp-reading"><p class="eyebrow">C++ · LABORATORIO 14 · 7 PASSI GUIDATI</p><h1>Classi, oggetti e incapsulamento</h1><p class="cpp-lead">Raggruppare i dati non basta quando vogliamo imporre regole. Una classe può esporre operazioni e controllare come cambia il proprio stato.</p><p>Parti dalla <a href="14-lezione.html">spiegazione del capitolo 14</a>. Ogni esempio qui aggiunge un concetto: puoi distribuire il laboratorio su più incontri. Gli ultimi passi riprendono il ciclo di gioco, con regole visibili e risultati riproducibili.</p><div class="cpp-note"><strong>Ogni esempio è indipendente.</strong> Crea un file <code>main.cpp</code> e copia un programma completo alla volta: non incollare più main nello stesso file. Compila con <code>g++ -std=c++17 -Wall -Wextra -pedantic main.cpp -o gioco</code>. Avvia <code>.\gioco.exe</code> in PowerShell oppure <code>./gioco</code> su macOS/Linux. Salva e ricompila dopo ogni modifica.</div><p>Negli esempi brevi usiamo <code>using namespace std;</code> per scrivere cout, string e vector senza ripetere std::. Non sostituisce gli include. Nei progetti più grandi e negli header è preferibile limitare questa direttiva, per evitare nomi ambigui.</p><nav class="cpp-toc" aria-label="Esempi del laboratorio"><h2>Il percorso di lavoro</h2><ol><li><a href="#classi-1">Dalla struct a una classe con dati pubblici</a></li><li><a href="#classi-2">Vita privata e metodi pubblici</a></li><li><a href="#classi-3">Il costruttore e due oggetti indipendenti</a></li><li><a href="#classi-4">Scegliere la vita iniziale</a></li><li><a href="#classi-5">Un Mago con una risorsa: il mana</a></li><li><a href="#classi-6">Due oggetti collaborano: la Guaritrice</a></li><li><a href="#classi-7">Il ciclo di gioco con gli oggetti</a></li></ol></nav><section class="cpp-step" id="classi-1"><p class="eyebrow">ESEMPIO 1</p><h2>Dalla struct a una classe con dati pubblici</h2><p>Facciamo il cambio più piccolo: usiamo class, ma scriviamo public per mantenere l’accesso ai campi. In C++ struct e class possono entrambe avere dati e metodi; cambia l’accesso predefinito, non il fatto di poter creare oggetti.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="classi-1">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+public:
+  string nome;
+  int vita;
+};
+
+int main() {
+  Personaggio eroe;
+  eroe.nome = "Brina";
+  eroe.vita = 100;
+  cout &lt;&lt; eroe.nome &lt;&lt; ": " &lt;&lt; eroe.vita &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="classi-1">Brina: 100
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Togli public e prova a compilare: l’accesso ai campi dal main deve essere rifiutato. Poi ripristinalo.</p></section>
+<section class="cpp-step" id="classi-2"><p class="eyebrow">ESEMPIO 2</p><h2>Vita privata e metodi pubblici</h2><p>Ora la vita è privata e il metodo subisciDanno protegge le regole. getVita legge lo stato; const dopo le parentesi indica che quel metodo non modifica i normali dati dell’oggetto.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="classi-2">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  int vita = 100;
+public:
+  int getVita() const { return vita; }
+  void subisciDanno(int danno) {
+    if (danno &lt;= 0) return;
+    vita -= danno;
+    if (vita &lt; 0) vita = 0;
+  }
+};
+
+int main() {
+  Personaggio eroe;
+  eroe.subisciDanno(-5);
+  cout &lt;&lt; eroe.getVita() &lt;&lt; '\n';
+  eroe.subisciDanno(20);
+  cout &lt;&lt; eroe.getVita() &lt;&lt; '\n';
+  eroe.subisciDanno(500);
+  cout &lt;&lt; eroe.getVita() &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="classi-2">100
+80
+0
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Prova eroe.vita = -10: il compilatore deve impedirlo. Rimuovi quella riga e ripeti i casi limite del danno.</p></section>
+<section class="cpp-step" id="classi-3"><p class="eyebrow">ESEMPIO 3</p><h2>Il costruttore e due oggetti indipendenti</h2><p>Il costruttore ha lo stesso nome della classe e non ha un tipo di ritorno. Viene eseguito durante la creazione dell’oggetto. In questa prima versione assegniamo il nome nel suo corpo; la vita parte da 100 grazie al valore iniziale del campo.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="classi-3">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita = 100;
+public:
+  Personaggio(string nuovoNome) { nome = nuovoNome; }
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+  bool vivo() const { return vita &gt; 0; }
+  void subisciDanno(int danno) {
+    if (danno &lt;= 0) return;
+    vita -= danno;
+    if (vita &lt; 0) vita = 0;
+  }
+};
+
+int main() {
+  Personaggio prima("Aria");
+  Personaggio seconda("Brina");
+  prima.subisciDanno(20);
+  cout &lt;&lt; prima.getNome() &lt;&lt; ": " &lt;&lt; prima.getVita() &lt;&lt; '\n';
+  cout &lt;&lt; seconda.getNome() &lt;&lt; ": " &lt;&lt; seconda.getVita() &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="classi-3">Aria: 80
+Brina: 100
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Danneggia anche il secondo oggetto. Spiega perché chiamare un metodo su prima non modifica seconda.</p></section>
+<section class="cpp-step" id="classi-4"><p class="eyebrow">ESEMPIO 4</p><h2>Scegliere la vita iniziale</h2><p>Aggiungiamo un parametro al costruttore. La lista dopo i due punti inizializza i membri prima del corpo: non è ereditarietà. Nel corpo correggiamo un valore negativo.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="classi-4">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita;
+public:
+  Personaggio(string n, int v) : nome(n), vita(v) {
+    if (vita &lt; 0) vita = 0;
+  }
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+};
+
+int main() {
+  Personaggio goblin("Gruk", 40);
+  Personaggio errato("Ombra", -10);
+  cout &lt;&lt; goblin.getNome() &lt;&lt; ": " &lt;&lt; goblin.getVita() &lt;&lt; '\n';
+  cout &lt;&lt; errato.getNome() &lt;&lt; ": " &lt;&lt; errato.getVita() &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="classi-4">Gruk: 40
+Ombra: 0
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Crea un Orco con vita 150 e un Drago con vita 300. Aggiungi un livello iniziale e un metodo per leggerlo.</p></section>
+<section class="cpp-step" id="classi-5"><p class="eyebrow">ESEMPIO 5</p><h2>Un Mago con una risorsa: il mana</h2><p>La classe Mago qui è autonoma: non eredita ancora da Personaggio. Un metodo riesce soltanto se il mana basta e restituisce bool. Stampiamo l’esito per vedere sia il successo sia il fallimento.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="classi-5">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Mago {
+private:
+  int mana = 30;
+public:
+  int getMana() const { return mana; }
+  bool lanciaIncantesimo() {
+    if (mana &lt; 20) return false;
+    mana -= 20;
+    return true;
+  }
+};
+
+int main() {
+  Mago mago;
+  cout &lt;&lt; boolalpha;
+  cout &lt;&lt; mago.lanciaIncantesimo() &lt;&lt; ": " &lt;&lt; mago.getMana() &lt;&lt; '\n';
+  cout &lt;&lt; mago.lanciaIncantesimo() &lt;&lt; ": " &lt;&lt; mago.getMana() &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="classi-5">true: 10
+false: 10
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Cambia costo e mana iniziale. Se il mana è esattamente uguale al costo, il lancio deve riuscire e lasciare 0.</p></section>
+<section class="cpp-step" id="classi-6"><p class="eyebrow">ESEMPIO 6</p><h2>Due oggetti collaborano: la Guaritrice</h2><p>Una classe può ricevere un riferimento a un oggetto di un’altra classe. La Guaritrice non tocca direttamente la vita privata: chiama riceviCura, che impedisce di superare il massimo di 100.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="classi-6">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  int vita = 100;
+public:
+  int getVita() const { return vita; }
+  void subisciDanno(int n) {
+    if (n &gt; 0) vita -= n;
+    if (vita &lt; 0) vita = 0;
+  }
+  void riceviCura(int n) {
+    if (n &gt; 0) vita += n;
+    if (vita &gt; 100) vita = 100;
+  }
+};
+
+class Guaritrice {
+private:
+  int energia = 2;
+public:
+  void cura(Personaggio&amp; alleato) {
+    if (energia == 0) return;
+    alleato.riceviCura(30);
+    energia--;
+  }
+};
+
+int main() {
+  Personaggio guerriero;
+  Guaritrice nora;
+  guerriero.subisciDanno(50);
+  cout &lt;&lt; guerriero.getVita() &lt;&lt; '\n';
+  nora.cura(guerriero);
+  cout &lt;&lt; guerriero.getVita() &lt;&lt; '\n';
+  nora.cura(guerriero);
+  cout &lt;&lt; guerriero.getVita() &lt;&lt; '\n';
+  nora.cura(guerriero);
+  cout &lt;&lt; guerriero.getVita() &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="classi-6">50
+80
+100
+100
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Aggiungi getEnergia e stampalo dopo ogni cura. Qui la cura può riportare in vita anche un oggetto con vita 0: scegli se mantenere questa regola o rifiutare la cura a un personaggio sconfitto.</p></section>
+<section class="cpp-step" id="classi-7"><p class="eyebrow">ESEMPIO 7</p><h2>Il ciclo di gioco con gli oggetti</h2><p>Riprendiamo il duello, spostando l’attacco e le regole della vita nei metodi. Usiamo solo valori iniziali positivi, scelti nel programma. Gli oggetti sono ancora dello stesso tipo: i ruoli dipendono dai loro dati.</p><h3>main.cpp · programma completo</h3><pre><code data-cpp-id="classi-7">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Personaggio {
+private:
+  string nome;
+  int vita;
+  int attacco;
+public:
+  Personaggio(string n, int v, int a) : nome(n), vita(v), attacco(a) {}
+  string getNome() const { return nome; }
+  int getVita() const { return vita; }
+  bool vivo() const { return vita &gt; 0; }
+  void subisciDanno(int danno) {
+    if (danno &lt;= 0) return;
+    vita -= danno;
+    if (vita &lt; 0) vita = 0;
+  }
+  void attacca(Personaggio&amp; bersaglio) const {
+    if (vivo() &amp;&amp; bersaglio.vivo()) bersaglio.subisciDanno(attacco);
+  }
+};
+
+int main() {
+  Personaggio eroe("Brina", 60, 15);
+  Personaggio nemico("Goblin", 40, 8);
+  int turno = 1;
+  while (eroe.vivo() &amp;&amp; nemico.vivo()) {
+    eroe.attacca(nemico);
+    if (nemico.vivo()) nemico.attacca(eroe);
+    cout &lt;&lt; "Turno " &lt;&lt; turno &lt;&lt; ": " &lt;&lt; eroe.getNome() &lt;&lt; " " &lt;&lt; eroe.getVita()
+         &lt;&lt; ", " &lt;&lt; nemico.getNome() &lt;&lt; " " &lt;&lt; nemico.getVita() &lt;&lt; '\n';
+    turno++;
+  }
+  if (eroe.vivo()) cout &lt;&lt; "Vittoria!" &lt;&lt; '\n';
+  else cout &lt;&lt; "Sconfitta!" &lt;&lt; '\n';
+}
+</code></pre><h3>Risultato atteso</h3><pre data-cpp-output="classi-7">Turno 1: Brina 52, Goblin 25
+Turno 2: Brina 44, Goblin 10
+Turno 3: Brina 44, Goblin 0
+Vittoria!
+</pre><p class="cpp-task"><strong>Modifica tu.</strong> Sostituisci il Goblin con un Orco più resistente. Verifica che un nemico appena sconfitto non contrattacchi. Poi aggiungi una cura ogni due turni usando le regole dell’esempio precedente.</p></section><h2>Prima di continuare</h2><p>Spiega quali parti sono dati, quali operazioni e quali regole del gioco. Non basta ottenere l’uscita: cambia un valore iniziale, prevedi cosa succede e controlla anche un caso limite.</p><p>Quando sai spiegare i risultati, passa a <a href="15-lezione.html">Ereditarietà: eroi e nemici</a>.</p></main><script src="../../reader.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="cpp-laboratorio-13-struct" rel="prev" href="laboratorio-13-struct.html"><small>← Precedente</small><span>Laboratorio 13 | Struct e dati dei personaggi</span></a><a class="lesson-catalog" href="../../index.html?course=cpp&amp;kind=lab" data-school-catalog="cpp">Tutti i laboratori<span>2 / 4</span></a><a class="lesson-neighbor" data-school-link="cpp-laboratorio-15-ereditarieta" rel="next" href="laboratorio-15-ereditarieta.html"><small>Successiva →</small><span>Laboratorio 15 | Ereditarietà: eroi e nemici</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>
