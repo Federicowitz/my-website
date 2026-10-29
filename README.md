@@ -66,4 +66,4 @@ Il percorso comprende 16 capitoli. Dopo i 12 capitoli di base, i capitoli 13–1
 
 `scripts/test-cpp-labs.cjs` estrae i programmi e le uscite attese dalle pagine. Con `g++` o `clang++` nel PATH, oppure `CPP_COMPILER` configurato (supporta anche `zig c++`), compila in C++17, esegue i programmi e verifica anche due scenari di sconfitta e tre errori di compilazione intenzionali. Senza compilatore controlla struttura e presenza degli esempi, dichiarando esplicitamente che la compilazione non è stata eseguita. I file di prova sono temporanei.
 
-Le pagine Fonti dei percorsi Node.js e crittografia contengono una sezione Crediti che cita rispettivamente i corsi YouTube di Edoardo Midali e Roberto Rossi come riferimenti degli appunti teorici, distinguendoli dai laboratori e dalle integrazioni originali. Introduzioni e catalogo rimandano alla sezione, senza attribuzioni generali ai corsi video.
+Le introduzioni di Node.js e crittografia iniziano con una breve sezione Fonti: nome del corso, autore e collegamento YouTube con stile neutro. Le pagine dei riferimenti conservano la documentazione tecnica; non sono presenti descrizioni del processo di redazione o trascrizione.

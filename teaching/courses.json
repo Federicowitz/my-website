@@ -92,8 +92,7 @@
             "laboratorio-express.html"
           ]
         }
-      ],
-      "credits": "materials/node/capitoli/riferimenti.html#crediti"
+      ]
     },
     {
       "id": "cpp",
@@ -358,8 +357,7 @@
           "description": "Gestisci chiavi, valuta scenari ed esegui prove di alterazione.",
           "files": ["13-chiavi-attacchi.html", "14-casi-reali.html", "laboratorio.html", "esercizi.html"]
         }
-      ],
-      "credits": "materials/crittografia/fonti.html#crediti"
+      ]
     },
     {
       "id": "fondamenti",

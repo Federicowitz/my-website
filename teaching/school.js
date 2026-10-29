@@ -39,7 +39,6 @@
  function render(){
   const filtered=items.filter(i=>(course==='all'||i.course===course)&&(kind==='all'||i.kind===kind)&&normalize(i.title+' '+i.description+' '+courses.find(c=>c.id===i.course).title).includes(normalize(query)));
   $('#library-title').textContent=course==='all'?'Tutti i materiali':courses.find(c=>c.id===course).title;$('#library-eyebrow').textContent=course==='all'?'LA LIBRERIA':'IL PERCORSO';$('#result-count').textContent=`${filtered.length} ${filtered.length===1?'materiale':'materiali'}`;
-  const credits=courses.find(c=>c.id===course)?.credits,creditsLink=$('#course-credits');creditsLink.hidden=!credits;creditsLink.innerHTML=credits?`<a href="${escape(new URL(credits,schoolBase).href)}">Fonti e crediti del percorso ↗</a>`:'';
   selectCourse();document.querySelectorAll('[data-kind]').forEach(b=>{const selected=b.dataset.kind===kind;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',selected)});
   const saved=getSaved();
   $('#materials').hidden=view==='map';map.hidden=view!=='map';

@@ -90,8 +90,7 @@ window.schoolCatalog = {
             "laboratorio-express.html"
           ]
         }
-      ],
-      "credits": "materials/node/capitoli/riferimenti.html#crediti"
+      ]
     },
     {
       "id": "cpp",
@@ -316,8 +315,7 @@ window.schoolCatalog = {
             "esercizi.html"
           ]
         }
-      ],
-      "credits": "materials/crittografia/fonti.html#crediti"
+      ]
     },
     {
       "id": "fondamenti",
@@ -650,7 +648,7 @@ window.schoolCatalog = {
     {
       "id": "node-capitoli-riferimenti",
       "course": "node",
-      "title": "Fonti e crediti · Node.js ed Express",
+      "title": "Fonti · Node.js ed Express",
       "kind": "lesson",
       "path": "materials/node/capitoli/riferimenti.html",
       "description": "Lezione di approfondimento"
@@ -1190,10 +1188,10 @@ window.schoolCatalog = {
     {
       "id": "crittografia-fonti",
       "course": "crittografia",
-      "title": "Fonti e crediti · Crittografia",
+      "title": "Fonti e riferimenti · Crittografia",
       "kind": "lesson",
       "path": "materials/crittografia/fonti.html",
-      "description": "Riferimenti primari commentati, corrispondenza con le trascrizioni e correzioni tecniche esplicite su Enigma, AES, RSA, firme, TLS e PEC."
+      "description": "Documentazione e riferimenti tecnici su Enigma, AES, RSA, firme, TLS e PEC."
     },
     {
       "id": "crittografia-test",

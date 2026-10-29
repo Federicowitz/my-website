@@ -15,7 +15,7 @@ const app = express();
 app.use('/api/persone', personeRouter);
 app.listen(3000);
 </code></pre>
-<p><strong>Esempio aggiuntivo:</strong> un futuro progetto può dividere codice in <code>routes/</code>, <code>controllers/</code>, <code>services/</code> e <code>repositories/</code>. Il video finale accenna a sviluppi successivi (MVC e database), ma queste parti <strong>non sono spiegate</strong> nel materiale introduttivo fornito.</p>
+<p><strong>Esempio aggiuntivo:</strong> un futuro progetto può dividere codice in <code>routes/</code>, <code>controllers/</code>, <code>services/</code> e <code>repositories/</code>. MVC e database sono possibili approfondimenti successivi.</p>
 
 <div class="deepening"><h3>Chi fa cosa, e perché</h3><p><code>app.use("/api/persone", personeRouter)</code> affida al router le richieste sotto quel prefisso. All’interno scrivi <code>router.get("/")</code> e <code>router.get("/:id")</code>. Ripetere <code>/api/persone</code> dentro il router produrrebbe un percorso duplicato. Per una richiesta al router, <code>req.originalUrl</code> conserva l’URL originale, mentre Express gestisce il percorso relativo al montaggio.</p><p>La catena completa può essere: server → parser e middleware → router → controller → service → repository → risposta. Il router sceglie chi gestisce la richiesta; non è lui, da solo, a rendere persistenti i dati. Parti da pochi file con responsabilità chiare e separali quando questo rende il flusso più comprensibile.</p><h3>Un altro esempio guidato</h3><pre><code class="language-js">// controllers/salute.cjs
 function leggiSalute(req, res) {
