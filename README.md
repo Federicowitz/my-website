@@ -2,6 +2,18 @@
 
 Il portfolio originale è mantenuto in `index.html`. La sezione School è autonoma, sotto `/teaching/` (anche `/teaching` viene risolto dal server locale). Non interroga GitHub: il catalogo e tutti i contenuti sono file locali, pronti da versionare.
 
+## Lingue del portfolio
+
+La home offre italiano e inglese tramite un unico selettore compatto, a sinistra di “speak as you eat” nel gruppo fisso in basso a destra: mostra la lingua attuale (IT o EN) e ogni clic passa all’altra. I link `?lang=it` e `?lang=en` hanno precedenza sulla preferenza salvata nel browser; alla prima visita la lingua è italiana. Il cambio lingua conserva modalità normale/informale, pannelli, posizione e ricerca, aggiornando i risultati nella lingua scelta. La scritta “speak as you eat” resta identica in entrambe le lingue. Senza JavaScript resta disponibile la home italiana.
+
+`home-i18n.js` contiene le traduzioni inglesi dei testi italiani della home, comprese descrizioni, diario, metadati, etichette accessibili e messaggi dinamici. Quando si modifica un testo italiano, aggiornare anche la relativa voce del dizionario. `scripts/test-home-i18n.cjs`, incluso in `npm test`, verifica copertura e comportamento del selettore. La cartella `teaching/` e tutti i materiali School rimangono esclusivamente in italiano e non caricano questo script.
+
+## Privacy
+
+`privacy.html` contiene l’informativa in italiano e inglese, raggiungibile dal footer della home. Descrive archiviazione locale, hosting Vercel, risorse Google Fonts/jsDelivr, contatti email e diritti. Non copre i progetti su sottodomini o Datafalco. Nessun banner di consenso è stato aggiunto per i salvataggi tecnici individuati nel codice.
+
+Prima della pubblicazione attivare `info@federicolelli.com`, usata anche dal modulo contatti, e verificare sul progetto Vercel le impostazioni effettive di log, conservazione, analytics e gli accordi sul trattamento/trasferimento dati con i fornitori. Queste configurazioni non sono verificabili dal repository: l’informativa non costituisce una certificazione di conformità. Aggiornarla se vengono introdotti backend, analytics, nuovi servizi o modifiche ai dati salvati. I font e Three.js sono ancora caricati da servizi esterni; servirli localmente eviterebbe quelle richieste a terzi.
+
 ## Anteprima locale
 
 Serve Node.js, senza installare pacchetti:

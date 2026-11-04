@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Privacy e dati — Federico Lelli</title>
+  <meta name="description" content="Informativa privacy, dati di navigazione e archiviazione locale su federicolelli.com.">
+  <link rel="canonical" href="https://federicolelli.com/privacy.html">
+  <link rel="icon" href="./favicon.ico">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fff; color: #1f1f1f; font: 16px/1.7 system-ui, sans-serif; }
+    main { max-width: 760px; margin: auto; padding: 32px 24px 80px; }
+    nav { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 48px; }
+    a { color: #1a73e8; text-underline-offset: 3px; }
+    h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 12px; }
+    h2 { font-size: 1.15rem; margin-top: 32px; }
+    .date { color: #666; font-size: .9rem; }
+    .summary { padding: 18px 22px; border: 1px solid #e8eaed; border-radius: 12px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { padding: 12px 8px; text-align: left; vertical-align: top; border-bottom: 1px solid #e8eaed; }
+    code { overflow-wrap: anywhere; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <nav aria-label="Navigazione"><a id="homeLink" href="./index.html">← Federico Lelli</a><a id="privacyLanguage" href="?lang=en" hreflang="en" lang="en">English</a></nav>
+  <article lang="it" id="privacyIt">
+    <h1>Privacy e dati</h1>
+    <p class="date">Ultimo aggiornamento: 4 novembre 2026</p>
+    <p class="summary">Il codice del sito non integra pubblicità, analytics o profilazione e non imposta cookie. Salva nel tuo browser alcune preferenze e i progressi didattici. Il caricamento del sito e di risorse esterne comporta comunque il trattamento di dati tecnici di navigazione.</p>
+
+    <h2>1. Titolare e ambito</h2>
+    <p>Il titolare del trattamento è Federico Lelli. Per informazioni e richieste relative ai tuoi dati: <a href="mailto:info@federicolelli.com">info@federicolelli.com</a>. Questa informativa riguarda il portfolio e School su <strong>federicolelli.com</strong>. I progetti su sottodomini o domini distinti, compresi Playground e Datafalco, hanno caratteristiche proprie e non sono coperti da questa informativa.</p>
+
+    <h2>2. Navigazione e hosting</h2>
+    <p>Il sito è ospitato da Vercel. Per distribuire le pagine e proteggere l’infrastruttura, il servizio riceve dati quali indirizzo IP, URL richiesto, data e ora, browser e dati della richiesta HTTP. Il codice del sito non crea un archivio autonomo delle visite e non associa questi dati ai progressi School. I dati tecnici sono trattati per erogare e proteggere il sito, sulla base del legittimo interesse al suo funzionamento e alla sicurezza (art. 6, par. 1, lett. f GDPR).</p>
+    <p>Vercel gestisce log e conservazione secondo il servizio, il piano e le impostazioni applicate. I dati tecnici devono essere conservati per il periodo necessario a erogazione, diagnosi e sicurezza, salvo obblighi di legge o accertamento di abusi. Per informazioni sul periodo applicabile alla tua richiesta puoi contattare il titolare. Riferimenti: <a href="https://vercel.com/legal/privacy-notice">privacy Vercel</a> e <a href="https://vercel.com/docs/logs">documentazione dei log</a>.</p>
+
+    <h2>3. Dati salvati nel browser</h2>
+    <p>Le seguenti informazioni sono memorizzate in <code>localStorage</code> sul dispositivo e nel profilo del browser che utilizzi. Il codice del sito non le invia a un server e non richiede un account.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Chiave o funzione</th><th>Contenuto e finalità</th></tr></thead>
+      <tbody>
+        <tr><td><code>portfolio-language</code></td><td>Lingua scelta per il portfolio: italiano o inglese.</td></tr>
+        <tr><td><code>school:view</code></td><td>Visualizzazione di School: elenco o mappa.</td></tr>
+        <tr><td><code>school:completed</code></td><td>Lezioni che hai segnato come completate.</td></tr>
+        <tr><td><code>school:quiz:…</code></td><td>Numero di risposte corrette e numero totale delle domande nei quiz.</td></tr>
+        <tr><td>Progressi degli esercizi</td><td>Stato di completamento e dati delle attività interattive. Le raccolte usano chiavi dedicate, tra cui <code>js-exercises-progress-v2</code>, <code>cpp-base-exercises-progress-v1</code>, <code>cpp-while-exercises-progress-v1</code> e <code>cpp-pointer-exercises-progress-v1</code>. Alcune soluzioni dimostrative possono salvare i dati che inserisci nell’esempio, ad esempio una lista di studenti.</td></tr>
+      </tbody>
+    </table></div>
+    <p>Questi salvataggi servono esclusivamente alle funzionalità richieste, non a misurare il tuo comportamento o a creare profili pubblicitari. Non hanno una scadenza automatica nel codice: restano finché li cancelli, il browser li rimuove o utilizzi eventuali comandi di ripristino dell’attività. Puoi eliminarli dalle impostazioni del browser, cancellando i dati del sito: perderai preferenze e progressi. Puoi anche impedirne il salvataggio; le funzioni che ricordano le scelte non saranno disponibili.</p>
+    <p>La memorizzazione tecnica necessaria a queste funzionalità rientra nell’eccezione al consenso dell’art. 122 del Codice Privacy. Per gli eventuali dati personali trattati per fornire tali funzioni, la base giuridica è il legittimo interesse a erogare il servizio richiesto (art. 6, par. 1, lett. f GDPR). Per questo utilizzo tecnico non viene presentato un banner di consenso.</p>
+
+    <h2>4. Risorse esterne e destinatari</h2>
+    <p>La home richiede a Google Fonts i caratteri tipografici e a jsDelivr la libreria Three.js per gli effetti grafici. Questi fornitori ricevono almeno l’indirizzo IP e i dati tecnici necessari alla richiesta, anche se non interagisci con i link esterni. Non sono semplici collegamenti: il browser li contatta al caricamento della pagina.</p>
+    <p>La finalità è visualizzare caratteri ed effetti grafici; la base individuata per questa funzionalità è il legittimo interesse alla presentazione del portfolio (art. 6, par. 1, lett. f GDPR). Consulta le informazioni di <a href="https://fonts.googleblog.com/2022/11/your-privacy-and-google-fonts.html">Google Fonts</a> e la <a href="https://github.com/jsdelivr/jsdelivr/blob/master/Privacy%20Policy.md">privacy di jsDelivr</a> per categorie di dati, finalità e conservazione da parte dei fornitori. Il browser può inoltre conservare copie delle risorse nella propria cache.</p>
+    <p>Il repository GitHub contiene il codice del sito; le normali richieste alle pagine di questo dominio sono servite da Vercel. I link ai social e agli altri progetti aprono servizi esterni con proprie informative.</p>
+
+    <h2>5. Modulo contatti ed email</h2>
+    <p>Il modulo non invia i dati a un backend: prepara un messaggio nella tua app di posta tramite un link <code>mailto:</code>. Nome, indirizzo email, motivo del contatto e messaggio sono trasmessi soltanto se invii l’email. Il codice non salva questi campi nel localStorage.</p>
+    <p>Se scrivi al titolare, i dati vengono usati per rispondere e gestire la richiesta, sulla base delle misure precontrattuali richieste da te quando applicabili (art. 6, par. 1, lett. b GDPR), oppure del legittimo interesse a gestire la corrispondenza (lett. f). L’indirizzo pubblico info@federicolelli.com usa Porkbun per inoltrare i messaggi a una casella privata del titolare: Porkbun non ospita la casella di destinazione. Il servizio di inoltro e il fornitore della casella di destinazione trattano il contenuto e i metadati necessari alla consegna e alla gestione della corrispondenza; anche il tuo fornitore di posta tratta il messaggio secondo le proprie condizioni. L’indirizzo della casella privata non è pubblicato sul sito. La corrispondenza viene conservata per il tempo necessario a gestire la richiesta e gli eventuali rapporti conseguenti, oltre agli obblighi legali applicabili e alla tutela di diritti in caso di controversia. Fornire i dati è facoltativo, ma senza un recapito non è possibile rispondere. Consulta la <a href="https://porkbun.com/legal/agreement/privacy_policy">privacy Porkbun</a>.</p>
+
+    <h2>6. Trasferimenti internazionali</h2>
+    <p>I fornitori indicati utilizzano infrastrutture anche fuori dallo Spazio economico europeo, inclusi gli Stati Uniti. I loro documenti privacy e contrattuali descrivono paesi, destinatari e garanzie applicabili, quali decisioni di adeguatezza e clausole contrattuali standard ove pertinenti. Puoi chiedere al titolare informazioni sulle garanzie applicabili al trattamento che ti riguarda. La presenza di questa informativa non sostituisce la verifica delle impostazioni e degli accordi con i fornitori.</p>
+
+    <h2>7. I tuoi diritti</h2>
+    <p>Nei casi previsti dal GDPR puoi chiedere accesso, rettifica, cancellazione, limitazione, portabilità e opporti ai trattamenti basati sul legittimo interesse, scrivendo a <a href="mailto:info@federicolelli.com">info@federicolelli.com</a>. Puoi presentare reclamo al <a href="https://www.garanteprivacy.it/">Garante per la protezione dei dati personali</a> o all’autorità competente. Non vengono svolti processi decisionali automatizzati con effetti giuridici né profilazione da parte del codice del sito. I progressi conservati esclusivamente sul tuo dispositivo si gestiscono direttamente dal browser.</p>
+  </article>
+
+  <article lang="en" id="privacyEn" hidden>
+    <h1>Privacy &amp; data</h1>
+    <p class="date">Last updated: November 4, 2026</p>
+    <p class="summary">The website code includes no advertising, analytics or profiling and sets no cookies. It stores some preferences and learning progress in your browser. Loading the website and external resources still involves processing technical browsing data.</p>
+
+    <h2>1. Controller and scope</h2>
+    <p>The data controller is Federico Lelli. For questions and data requests, contact <a href="mailto:info@federicolelli.com">info@federicolelli.com</a>. This notice covers the portfolio and School on <strong>federicolelli.com</strong>. Projects on separate domains or subdomains, including Playground and Datafalco, have their own features and are outside its scope.</p>
+
+    <h2>2. Browsing and hosting</h2>
+    <p>Vercel hosts this website. To deliver pages and protect its infrastructure, the service receives information such as IP addresses, requested URLs, timestamps, browser details and HTTP request data. The website code does not maintain its own visitor database or associate these data with School progress. Technical data are processed to deliver and secure the website, based on the legitimate interest in its operation and security (Article 6(1)(f) GDPR).</p>
+    <p>Vercel manages logs and retention according to its service, plan and applicable settings. Technical data should be retained for the period needed for delivery, diagnostics and security, subject to legal requirements or investigations of abuse. Contact the controller for the retention period applicable to your request. See <a href="https://vercel.com/legal/privacy-notice">Vercel’s privacy notice</a> and <a href="https://vercel.com/docs/logs">logging documentation</a>.</p>
+
+    <h2>3. Information stored in your browser</h2>
+    <p>The following information is stored in <code>localStorage</code> on your device and browser profile. The website code does not send it to a server and does not require an account.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Key or feature</th><th>Contents and purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>portfolio-language</code></td><td>Your portfolio language: Italian or English.</td></tr>
+        <tr><td><code>school:view</code></td><td>Your School view: list or map.</td></tr>
+        <tr><td><code>school:completed</code></td><td>Lessons you marked as completed.</td></tr>
+        <tr><td><code>school:quiz:…</code></td><td>Correct answers and total question count in quizzes.</td></tr>
+        <tr><td>Exercise progress</td><td>Completion status and interactive activity data. Collections use dedicated keys, including <code>js-exercises-progress-v2</code>, <code>cpp-base-exercises-progress-v1</code>, <code>cpp-while-exercises-progress-v1</code> and <code>cpp-pointer-exercises-progress-v1</code>. Some demonstration solutions may store data entered into an example, such as a student list.</td></tr>
+      </tbody>
+    </table></div>
+    <p>These records support the features you request; they are not used to measure your behavior or create advertising profiles. The code sets no automatic expiry: records remain until you delete them, the browser removes them or you use an activity’s reset controls where available. You can delete them through your browser’s site-data settings, losing saved preferences and progress. You can also block storage; features that remember your choices will then be unavailable.</p>
+    <p>Technical storage necessary for these features falls within the consent exemption under Article 122 of the Italian Privacy Code. Where personal data are processed to provide these functions, the legal basis is the legitimate interest in delivering the requested service (Article 6(1)(f) GDPR). No consent banner is displayed for this technical use.</p>
+
+    <h2>4. External resources and recipients</h2>
+    <p>The home page requests fonts from Google Fonts and the Three.js library from jsDelivr for graphical effects. These providers receive at least your IP address and the technical data needed for the request, even if you do not click any external links. These are not merely links: your browser contacts the services when the page loads.</p>
+    <p>The purpose is to display fonts and graphical effects; the identified legal basis is the legitimate interest in presenting the portfolio (Article 6(1)(f) GDPR). See the information from <a href="https://fonts.googleblog.com/2022/11/your-privacy-and-google-fonts.html">Google Fonts</a> and <a href="https://github.com/jsdelivr/jsdelivr/blob/master/Privacy%20Policy.md">jsDelivr’s privacy policy</a> for their data categories, purposes and retention practices. Your browser may also cache copies of resources.</p>
+    <p>The GitHub repository holds the website’s source code; normal page requests on this domain are served by Vercel. Social links and other projects open external services with their own privacy notices.</p>
+
+    <h2>5. Contact form and email</h2>
+    <p>The form does not send data to a backend: it prepares a message in your email app using a <code>mailto:</code> link. Your name, email address, contact reason and message are transmitted only if you send the email. The code does not save these fields in localStorage.</p>
+    <p>If you contact the controller, your data are used to answer and manage your request, based on precontractual steps you request where applicable (Article 6(1)(b) GDPR), or the legitimate interest in managing correspondence (Article 6(1)(f)). The public address info@federicolelli.com uses Porkbun to forward messages to the controller’s private mailbox: Porkbun does not host the destination mailbox. The forwarding service and the destination email provider process the contents and metadata needed to deliver and manage correspondence; your own email provider also processes the message under its terms. The private mailbox address is not published on this website. Correspondence is retained for as long as needed to handle your request and any resulting relationship, applicable legal obligations and the protection of rights in a dispute. Providing data is optional, but a reply requires contact details. See <a href="https://porkbun.com/legal/agreement/privacy_policy">Porkbun’s privacy policy</a>.</p>
+
+    <h2>6. International transfers</h2>
+    <p>The providers listed above use infrastructure outside the European Economic Area, including in the United States. Their privacy and contractual documents describe relevant countries, recipients and safeguards, such as adequacy decisions and standard contractual clauses where applicable. You may request information from the controller about safeguards relevant to your data. This notice does not replace verification of provider settings and agreements.</p>
+
+    <h2>7. Your rights</h2>
+    <p>Where the GDPR provides, you may request access, rectification, erasure, restriction and portability, and object to processing based on legitimate interests, by writing to <a href="mailto:info@federicolelli.com">info@federicolelli.com</a>. You may complain to the <a href="https://www.garanteprivacy.it/">Italian Data Protection Authority</a> or your competent authority. The website code performs no profiling or automated decision-making with legal effects. Progress stored exclusively on your device is managed directly through your browser.</p>
+  </article>
+</main>
+<script>
+  (function () {
+    var language = new URL(location.href).searchParams.get('lang');
+    if (language !== 'it' && language !== 'en') {
+      try { language = localStorage.getItem('portfolio-language'); } catch (_) {}
+    }
+    var english = language === 'en';
+    document.documentElement.lang = english ? 'en' : 'it';
+    document.title = (english ? 'Privacy & data' : 'Privacy e dati') + ' — Federico Lelli';
+    document.getElementById('privacyIt').hidden = english;
+    document.getElementById('privacyEn').hidden = !english;
+    document.querySelector('nav').setAttribute('aria-label', english ? 'Navigation' : 'Navigazione');
+    document.querySelector('meta[name="description"]').content = english ? 'Privacy notice, browsing data and local storage on federicolelli.com.' : 'Informativa privacy, dati di navigazione e archiviazione locale su federicolelli.com.';
+    var link = document.getElementById('privacyLanguage');
+    link.href = '?lang=' + (english ? 'it' : 'en');
+    link.textContent = english ? 'Italiano' : 'English';
+    link.hreflang = link.lang = english ? 'it' : 'en';
+    document.getElementById('homeLink').href = './index.html?lang=' + (english ? 'en' : 'it');
+  })();
+</script>
+</body>
+</html>
