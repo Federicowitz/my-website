@@ -317,7 +317,13 @@
   body.fun-mode .fun-fab { background: var(--accent); border-color: var(--accent); color: #fff; }
 
   @media (max-width: 480px) { .stack-grid { grid-template-columns: 1fr; } }
-.school-shortcut{color:var(--ink-soft);display:flex;padding:7px;border-radius:8px}.school-shortcut:hover{background:#edf4ff;color:var(--accent)}</style>
+  .school-shortcut, .playground-shortcut { color: var(--ink-soft); display: flex; padding: 7px; border-radius: 8px; }
+  .school-shortcut:hover, .playground-shortcut:hover { background: #edf4ff; color: var(--accent); }
+  .school-shortcut:focus-visible, .playground-shortcut:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .playground-shortcut:hover svg { transform: rotate(-10deg); }
+  .playground-shortcut svg { transition: transform .2s ease; }
+  @media (prefers-reduced-motion: reduce) { .playground-shortcut svg { transition: none; } }
+</style>
 </head>
 <body>
 
@@ -327,6 +333,7 @@
   <div class="top-bar-inner">
     <span class="brand">Federico</span>
     <div class="spacer"></div><a class="school-shortcut" href="./teaching/index.html" aria-label="Apri School"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m2 8 10-5 10 5-10 5Z M6 10v7q6 5 12 0v-7 M22 8v8"/></svg></a>
+    <a class="playground-shortcut" href="https://playground.federicolelli.com" aria-label="Apri Playground, il mio parco giochi personale" title="Playground · il mio parco giochi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 18h8M12 11v7M5 18h14l1 4H4ZM12 11l4-5"/><circle cx="17" cy="4" r="2.5"/><path d="M5 5v4M3 7h4"/></svg></a>
     <button class="burger" id="burgerBtn" aria-label="Menu">
       <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
@@ -512,6 +519,13 @@
         <p class="desc plain fun">Un trucco per programmatori: rende più veloce copiare e spostare file dentro e fuori dall'editor di codice.</p>
       </div>
 
+    </div>
+  </section>
+
+  <section class="cat-section" data-cat="finance" id="cat-finance">
+    <h2 class="cat-heading"><span class="normal">Finanza & automazione</span><span class="fun">Robot per i soldi e le scartoffie</span></h2>
+    <div class="rows">
+
       <div class="row" data-url="https://github.com/Federicowitz">
         <div class="row-head">
           <span class="dot dot-live"></span>
@@ -523,13 +537,6 @@
         <p class="desc long normal">Risolutore a programmazione vincolata (Google OR-Tools, CP-SAT): minimizza i buchi in orario, gestisce compresenze di laboratorio, vincoli a blocchi consecutivi e il congelamento di assegnazioni parziali.</p>
         <p class="desc plain fun">Fa gli orari scolastici al posto delle segreterie, senza buchi e senza litigate tra docenti.</p>
       </div>
-
-    </div>
-  </section>
-
-  <section class="cat-section" data-cat="finance" id="cat-finance">
-    <h2 class="cat-heading"><span class="normal">Finanza & automazione</span><span class="fun">Robot per i soldi e le scartoffie</span></h2>
-    <div class="rows">
 
       <div class="row">
         <div class="row-head">
@@ -592,6 +599,18 @@
   <section class="cat-section" data-cat="games" id="cat-games">
     <h2 class="cat-heading"><span class="normal">Giochi</span><span class="fun">Giochi</span></h2>
     <div class="rows">
+
+      <div class="row" data-url="https://playground.federicolelli.com">
+        <div class="row-head">
+          <span class="dot dot-wip"></span>
+          <span class="title">Playground</span>
+          <a class="open-btn" href="https://playground.federicolelli.com" data-url="https://playground.federicolelli.com" aria-label="Apri Playground"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+          <span class="chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <p class="desc short normal">Il mio parco giochi personale: giochini web ed esperimenti interattivi.</p>
+        <p class="desc long normal">Uno spazio indipendente dove pubblico giochi da provare nel browser, prototipi e idee nate per divertimento. Un posto dove sperimentare e aggiungere cose nuove, un gioco alla volta.</p>
+        <p class="desc plain fun">Il mio parco giochi personale: pubblico giochini web, provo idee e costruisco cose per il gusto di farlo. Vieni a fare un giro.</p>
+      </div>
 
       <div class="row" data-url="https://github.com/Federicowitz">
         <div class="row-head">
