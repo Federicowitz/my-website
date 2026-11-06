@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/05-lezione.html"><meta property="og:title" content="Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/05-lezione.html"><meta property="og:description" content="Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-05-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-04-lezione" rel="prev" href="04-lezione.html"><small>← Precedente</small><span>Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>6 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-06-lezione" rel="next" href="06-lezione.html"><small>Successiva →</small><span>Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-5-proxy-e-dmz-pubblicare-servizi-senza-esporre-tutta-la-rete">Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Un server deve essere raggiungibile da Internet: dove lo colloco e come limito ciò che può raggiungere?»</em></p>
+<h2 id="il-problema-del-server-pubblico">1. Il problema del server pubblico</h2>
+<p>La scuola vuole un sito per orari e avvisi, accessibile a genitori e studenti anche da casa. Se il server pubblico fosse nello stesso segmento e con le stesse possibilità di accesso dei computer amministrativi, un problema su quel server rischierebbe di diventare una via verso risorse interne. Occorre separare <strong>ciò che deve essere pubblico</strong> da <strong>ciò che deve restare riservato</strong>.</p>
+<p>Due soluzioni concettuali aiutano: creare un'area di rete dedicata ai servizi esposti (<strong>DMZ</strong>) e introdurre, quando serve, un intermediario (<strong>proxy</strong>).</p>
+<h2 id="dmz-una-zona-controllata">2. DMZ: una zona controllata</h2>
+<p><strong>DMZ</strong> è l'abbreviazione di <em>Demilitarized Zone</em>, «zona demilitarizzata». Nelle reti è un segmento separato, normalmente posto tra Internet e la LAN più riservata, destinato a ospitare servizi che devono essere esposti all'esterno. L'analogia militare serve solo a ricordare che è una zona di separazione.</p>
+<pre><code class="language-text">                          INTERNET
+                             |
+                      Router / firewall
+                         /        \
+                        /          \
+                   DMZ              LAN INTERNA
+             [Server Web]     [Segreteria] [PC] [DB]
+</code></pre>
+<p>L'illustrazione è <strong>logica</strong>: la realizzazione fisica può usare interfacce distinte, VLAN, firewall dedicati o componenti virtuali. Una DMZ non è una «porta magica» che rende sicuro qualunque servizio; servono regole rigorose.</p>
+<p>Un esempio di politica:</p>
+<ul>
+<li>Da Internet al server Web nella DMZ: ammettere soltanto le comunicazioni necessarie al servizio pubblico.</li>
+<li>Da Internet alla LAN interna: negare accesso diretto.</li>
+<li>Dalla DMZ alla LAN interna: negare per impostazione predefinita; consentire eventuali flussi strettamente necessari e motivati.</li>
+<li>Dalla LAN verso il server nella DMZ: autorizzare solo le attività di gestione definite.</li>
+</ul>
+<p><strong>Attenzione:</strong> i dati riservati non dovrebbero essere collocati su un server pubblico solo perché «si trova nella DMZ». La DMZ è una misura di contenimento, non un sostituto di aggiornamenti, autenticazione, cifratura e controllo delle autorizzazioni.</p>
+<h2 id="forward-proxy-intermediario-del-client">3. Forward proxy: intermediario del client</h2>
+<p><strong>Proxy</strong> significa intermediario. Un <strong>forward proxy</strong> riceve richieste dai client e le inoltra ai server esterni, secondo una politica. Può servire per controllare accessi, registrare richieste, gestire cache o imporre regole organizzative.</p>
+<pre><code class="language-text">Browser dei laboratori ──&gt; PROXY ──&gt; Server esterno
+                           |
+                   filtro / cache / log
+</code></pre>
+<p><strong>Cache</strong>: memoria temporanea di contenuti o risultati per riutilizzarli quando le regole lo consentono. <strong>Log</strong>: registrazione di eventi, utile per diagnostica e sicurezza, da gestire rispettando privacy e politiche dell'organizzazione.</p>
+<p>Attenzione: per le comunicazioni <strong>HTTPS</strong> (<em>Hypertext Transfer Protocol Secure</em>), cifrate tramite <strong>TLS</strong> (<em>Transport Layer Security</em>), un proxy non legge normalmente tutto il contenuto senza ulteriori meccanismi e configurazioni; filtraggio e ispezione hanno limiti tecnici e implicazioni sulla riservatezza.</p>
+<h2 id="reverse-proxy-intermediario-davanti-ai-server">4. Reverse proxy: intermediario davanti ai server</h2>
+<p>Un <strong>reverse proxy</strong> è invece posto davanti a uno o più server e riceve le richieste dei client esterni. Può:</p>
+<ul>
+<li>instradare <code>/notizie</code> verso un servizio e <code>/registro</code> verso un altro;</li>
+<li>terminare una connessione TLS e inoltrare richieste verso servizi interni secondo la configurazione;</li>
+<li>applicare limiti, cache o bilanciamento del carico (<em>load balancing</em>, distribuzione delle richieste).</li>
+</ul>
+<pre><code class="language-text">Internet -&gt; Reverse proxy -&gt; Server Web / applicazione A
+                          -&gt; Server applicativo B
+</code></pre>
+<p>Proxy in uscita e reverse proxy <strong>non sono sinonimi</strong>. Il primo rappresenta, in modo semplificato, i client verso l'esterno; il secondo si presenta davanti ai server esposti.</p>
+<h2 id="riutilizzare-lo-stesso-caso-quando-parleremo-di-architetture">5. Riutilizzare lo stesso caso quando parleremo di architetture</h2>
+<p>Più avanti, per un servizio di prenotazione della biblioteca, avremo:</p>
+<ul>
+<li>un'interfaccia pubblica (pagina Web);</li>
+<li>un servizio che controlla le richieste e le autorizzazioni;</li>
+<li>un archivio dei libri e dei prestiti.</li>
+</ul>
+<p>La DMZ e il reverse proxy riguardano <strong>come il servizio viene esposto</strong>, mentre gli strati di presentazione, logica e dati riguardano <strong>come è progettato il software</strong>. Sono prospettive diverse dello stesso sistema.</p>
+<h2 id="verifica">6. Verifica</h2>
+<p><strong>Scenario:</strong> un server pubblico è stato compromesso. Qual è l'utilità della DMZ? <em>Riduce le possibilità di movimento verso la LAN interna quando sono state stabilite regole di separazione adeguate.</em></p>
+<p><strong>Domande:</strong></p>
+<ol>
+<li>Il proxy deve sempre essere usato? <em>No, è una scelta architetturale.</em></li>
+<li>Un reverse proxy è automaticamente un firewall? <em>No, anche se può integrare controlli sul traffico.</em></li>
+<li>Che cosa non dovrebbe mai essere permesso senza motivo dalla DMZ? <em>Accesso indiscriminato alle risorse della LAN interna.</em></li>
+<li>NAT, VLAN, firewall, proxy e DMZ risolvono lo stesso problema? <em>No: traduzione, separazione, controllo e intermediazione svolgono ruoli differenti.</em></li>
+</ol>
+<p><strong>Passaggio:</strong> ora sappiamo come organizzare e proteggere le reti. Ma quando due software vogliono comunicare attraverso Internet, che cosa devono conoscere?</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-04-lezione" rel="prev" href="04-lezione.html"><small>← Precedente</small><span>Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>6 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-06-lezione" rel="next" href="06-lezione.html"><small>Successiva →</small><span>Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

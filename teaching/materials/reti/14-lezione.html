@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/14-lezione.html"><meta property="og:title" content="Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/14-lezione.html"><meta property="og:description" content="Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-14-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-13-lezione" rel="prev" href="13-lezione.html"><small>← Precedente</small><span>Lezione 13 — Persistenza: perch&amp;#233; i dati non possono vivere soltanto nella memoria del programma</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>15 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-15-lezione" rel="next" href="15-lezione.html"><small>Successiva →</small><span>Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-14-logico-e-fisico-processi-macchine-virtuali-container-e-cloud">Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Se frontend, backend e database sono in tre container Docker sullo stesso computer, abbiamo tre livelli oppure tre macchine?»</em></p>
+<h2 id="tre-modi-diversi-di-dividere-un-sistema">1. Tre modi diversi di dividere un sistema</h2>
+<p>Il punto più importante di questa lezione è non usare indistintamente le parole «separare», «livello» e «server».</p>
+<p><strong>Separazione logica:</strong> dividiamo il software in responsabilità, per esempio presentazione, logica applicativa e dati. È una scelta di progettazione.</p>
+<p><strong>Separazione dei processi e degli ambienti di esecuzione:</strong> facciamo girare componenti in processi diversi, magari dentro container separati. È una scelta di organizzazione ed esecuzione del software.</p>
+<p><strong>Separazione fisica:</strong> collochiamo componenti su <strong>computer fisici differenti</strong>, con processori, memoria e dispositivi fisici distinti. È una scelta infrastrutturale.</p>
+<p>Queste tre separazioni possono coesistere, ma <strong>non sono equivalenti</strong>.</p>
+<h2 id="un-caso-quattro-configurazioni">2. Un caso, quattro configurazioni</h2>
+<p><strong>Caso A — Tutto in un solo processo.</strong> Un piccolo programma contiene interfaccia, regole e accesso ai dati; in un'app desktop può essere possibile. Possiamo comunque identificare tre <strong>layer logici</strong> anche se non ci sono tre processi.</p>
+<p><strong>Caso B — Più processi sullo stesso computer.</strong> Il server Web, il backend e un DBMS sono processi distinti sullo stesso sistema operativo. Ci sono confini tra processi e comunicazione locale, ma una sola macchina fisica.</p>
+<p><strong>Caso C — Tre container Docker sulla stessa macchina.</strong> Ogni componente gira in un container distinto. La separazione è di <strong>ambienti di esecuzione/container</strong>, non di host fisici.</p>
+<p><strong>Caso D — Tre macchine (o host distinti).</strong> Frontend, backend e database vengono distribuiti su host differenti. La separazione fisica aumenta, con nuove possibilità ma anche nuovi costi e dipendenze di rete.</p>
+<pre><code class="language-text">A) Un processo                B) Processi distinti, stesso host
+[UI + Logica + Dati]          [Web] [Backend] [DBMS]
+
+C) Tre container, stesso host fisico
++------------------- HOST FISICO -------------------+
+| [Container Web]  [Container Backend] [Container DB]|
+|     processi isolati e rete virtuale/container     |
++---------------------------------------------------+
+
+D) Tre host fisici
+[Host Web]   &lt;--&gt;   [Host Backend]   &lt;--&gt;   [Host Database]
+</code></pre>
+<h2 id="che-cose-docker">3. Che cos'è Docker?</h2>
+<p><strong>Docker</strong> è una piattaforma diffusa per costruire, distribuire ed eseguire applicazioni in <strong>container</strong>. Un <strong>container</strong> impacchetta un'applicazione con le dipendenze necessarie e ne esegue i processi in un ambiente isolato secondo i meccanismi del sistema ospitante. Una <strong>image</strong> (immagine container) è un modello da cui si avvia un container; un container è un'istanza in esecuzione.</p>
+<p>Un container <strong>non è automaticamente una macchina virtuale completa</strong>. Su Linux, i container normalmente condividono il <strong>kernel</strong> del sistema ospitante e utilizzano forme di isolamento offerte dal sistema operativo. Su altri sistemi, il motore dei container può appoggiarsi a una macchina virtuale: rimane corretta l'idea di isolamento dell'ambiente applicativo, non quella di una macchina fisica per container.</p>
+<p>Un esempio plausibile per la biblioteca:</p>
+<ul>
+<li><code>web</code>: software che presenta l'interfaccia o distribuisce risorse statiche;</li>
+<li><code>backend</code>: programma che gestisce la logica dei prestiti e l'API;</li>
+<li><code>db</code>: DBMS, per esempio PostgreSQL, con il volume di dati persistenti.</li>
+</ul>
+<p>Tutti e tre possono funzionare sulla <strong>stessa macchina fisica</strong> e comunicare tramite una rete virtuale gestita dal motore container. Il browser dell'utente si collega al servizio esposto; il database non deve essere raggiungibile direttamente da Internet.</p>
+<h2 id="sono-tre-tier-se-sono-sullo-stesso-host">4. Sono «tre tier» se sono sullo stesso host?</h2>
+<p>Dipende da <strong>come definiamo «tier» nel contesto</strong>. Nella pratica si parla spesso di <em>three-tier architecture</em> anche quando la presentazione, l'applicazione e i dati sono distribuiti in componenti o ambienti separati sullo stesso host. Questa denominazione descrive una separazione delle <strong>zone di esecuzione e delle responsabilità</strong>, non prova che esistano tre computer fisici.</p>
+<p>Una formulazione rigorosa è:</p>
+<blockquote>
+<p>«Abbiamo tre responsabilità logiche e tre componenti eseguiti separatamente. Se usiamo tre container Docker su un solo computer, <strong>non abbiamo tre macchine fisiche</strong>. Possiamo parlare di una distribuzione a tre componenti/tier applicativi, ma la separazione fisica degli host è una sola.»</p>
+</blockquote>
+<p>Questo evita entrambi gli errori: pensare che three-tier richieda sempre tre server fisici; pensare che tre container siano automaticamente tre computer indipendenti.</p>
+<h2 id="quali-vantaggi-e-limiti-porta-questa-scelta">5. Quali vantaggi e limiti porta questa scelta?</h2>
+<p><strong>Vantaggi dei container sullo stesso host:</strong> dipendenze organizzate, avvio e aggiornamento dei componenti più separati, ambiente riproducibile, possibilità di cambiare un componente senza necessariamente modificare gli altri, distribuzione facilitata.</p>
+<p><strong>Limiti:</strong> CPU, RAM, disco e guasto fisico dell'host rimangono <strong>condivisi</strong>. Se l'unico host si ferma, si fermano anche i tre componenti. L'isolamento dei container non equivale a separazione fisica e non è una garanzia assoluta di sicurezza. Sono ancora necessari aggiornamenti, permessi, configurazione di rete e backup.</p>
+<p><strong>Persistenza in Docker:</strong> se un DBMS scrive soltanto nello spazio effimero del container, eliminare e ricreare quel container può comportare la perdita dei dati. Per dati che devono sopravvivere è normale usare <strong>volumi persistenti</strong> o altri sistemi di archiviazione adeguati. Questa osservazione collega perfettamente la lezione sui database alla scelta infrastrutturale.</p>
+<h2 id="una-macchina-virtuale-e-diversa-da-un-container">6. Una macchina virtuale è diversa da un container</h2>
+<p>Una <strong>VM</strong>, <em>Virtual Machine</em> o macchina virtuale, simula un ambiente di macchina completo gestito da un <strong>hypervisor</strong> (software di virtualizzazione) e normalmente esegue un proprio sistema operativo guest. Un container tende invece a isolare applicazioni e processi, normalmente condividendo il kernel dell'ambiente che lo ospita.</p>
+<p>In entrambi i casi, <strong>tre VM sullo stesso server</strong> e <strong>tre container sullo stesso server</strong> non costituiscono tre host fisici indipendenti.</p>
+<h2 id="e-il-cloud">7. E il cloud?</h2>
+<p>Il <strong>cloud computing</strong> consiste nell'utilizzare risorse informatiche e servizi forniti mediante infrastrutture gestite e accessibili in rete, con capacità di provisioning e gestione flessibili secondo il modello di servizio. Un'applicazione nel cloud continua ad avere processi, rete, archiviazione e macchine fisiche da qualche parte: il cloud <strong>non elimina l'hardware</strong>, ne cambia il modo in cui le risorse sono fornite e amministrate.</p>
+<p>Si possono utilizzare container su una macchina del laboratorio, su un server aziendale o su infrastruttura cloud. <strong>Docker e cloud non sono sinonimi:</strong> Docker è uno strumento di esecuzione e distribuzione; il cloud è un modello di erogazione delle risorse. Approfondiremo SaaS, PaaS e IaaS nella prossima lezione.</p>
+<h2 id="analisi-comparata-delle-configurazioni">8. Analisi comparata delle configurazioni</h2>
+<p>La stessa applicazione gestisce <strong>presentazione</strong>, <strong>logica applicativa</strong> e <strong>accesso ai dati</strong>. Si considerino quattro scelte di distribuzione:</p>
+<table>
+<thead>
+<tr>
+<th>Configurazione</th>
+<th>Separazione logica</th>
+<th>Processi o ambienti distinti</th>
+<th>Host fisici indipendenti</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A — Una singola applicazione desktop</td>
+<td>Possibile</td>
+<td>Un processo principale</td>
+<td>Uno</td>
+</tr>
+<tr>
+<td>B — Web, backend e DBMS come processi distinti sullo stesso computer</td>
+<td>Sì</td>
+<td>Sì</td>
+<td>Uno</td>
+</tr>
+<tr>
+<td>C — Web, backend e DBMS in tre container Docker sullo stesso computer</td>
+<td>Sì</td>
+<td>Sì, tre container</td>
+<td>Uno</td>
+</tr>
+<tr>
+<td>D — Web, backend e DBMS su tre computer differenti</td>
+<td>Sì</td>
+<td>Sì</td>
+<td>Tre</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Problema 1 — Guasto.</strong> Quali configurazioni possono perdere contemporaneamente tutti i componenti a causa del guasto di un singolo host? <em>A, B e C. In D il guasto di un host può comunque interrompere l'intero servizio, ma gli host fisici non sono tutti lo stesso computer.</em></p>
+<p><strong>Problema 2 — Persistenza.</strong> In C si elimina il container che ospita il database. La presenza di tre container garantisce che i dati sopravvivano? <em>No: occorre archiviazione persistente, per esempio volumi correttamente gestiti.</em></p>
+<p><strong>Problema 3 — Layer e tier.</strong> La distribuzione C modifica necessariamente la separazione tra presentation, business logic e data? <em>No: sono responsabilità logiche. Cambia l'organizzazione dei componenti in esecuzione.</em></p>
+<p><strong>Problema 4 — Isolamento.</strong> Tre container sullo stesso computer costituiscono tre barriere di sicurezza equivalenti a tre host fisici distinti? <em>No: condividono risorse, kernel o infrastruttura sottostante e dipendono da un unico host fisico.</em></p>
+<h3 id="verifica">Verifica</h3>
+<ol>
+<li>Tre container significano tre macchine fisiche? <em>No.</em></li>
+<li>Una VM è identica a un container? <em>No: cambia il modello di virtualizzazione e isolamento.</em></li>
+<li>Un sistema a tre livelli logici richiede tre server fisici? <em>No.</em></li>
+<li>Il cloud elimina il bisogno di infrastruttura fisica? <em>No: ne modifica il modello di gestione.</em></li>
+</ol>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-13-lezione" rel="prev" href="13-lezione.html"><small>← Precedente</small><span>Lezione 13 — Persistenza: perch&amp;#233; i dati non possono vivere soltanto nella memoria del programma</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>15 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-15-lezione" rel="next" href="15-lezione.html"><small>Successiva →</small><span>Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

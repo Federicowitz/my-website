@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/06-lezione.html"><meta property="og:title" content="Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/06-lezione.html"><meta property="og:description" content="Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-06-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-05-lezione" rel="prev" href="05-lezione.html"><small>← Precedente</small><span>Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>7 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-07-lezione" rel="next" href="07-lezione.html"><small>Successiva →</small><span>Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-6-internet-prima-del-web-reti-nomi-trasporto-e-servizi">Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Se spegnessimo tutti i browser, Internet cesserebbe di esistere?»</em></p>
+<h2 id="internet-non-coincide-con-il-web">1. Internet non coincide con il Web</h2>
+<p><strong>Internet</strong> è un sistema globale di reti interconnesse che utilizza protocolli condivisi per consentire lo scambio di pacchetti. Il <strong>Web</strong>, o <strong>WWW</strong> (<em>World Wide Web</em>), è uno degli insiemi di servizi che vi operano: documenti, applicazioni e risorse raggiungibili tramite tecnologie come <strong>HTTP</strong> (<em>Hypertext Transfer Protocol</em>), URL e browser.</p>
+<p>La posta elettronica, l'accesso remoto, la comunicazione fra programmi e numerosi altri servizi possono usare Internet senza essere «pagine Web». Un'applicazione che scambia messaggi mediante un protocollo inventato per un esercizio sfrutta Internet (o una rete locale) ma non sta necessariamente usando il Web.</p>
+<p><strong>Collegamento con il modulo precedente:</strong> il modello ISO/OSI descrive le funzioni della comunicazione su livelli, mentre Internet è una rete reale che utilizza una famiglia di protocolli detta <strong>TCP/IP</strong> (<em>Transmission Control Protocol / Internet Protocol</em>). Questi nomi non si riferiscono a una singola applicazione.</p>
+<h2 id="internet-e-una-rete-di-reti">2. Internet è una rete di reti</h2>
+<p>Un <strong>ISP</strong> (<em>Internet Service Provider</em>) offre accesso a Internet. Gli ISP e altre reti autonome si scambiano traffico attraverso collegamenti, punti di interconnessione e infrastrutture ad alta capacità. Il termine <strong>backbone</strong> descrive la dorsale, cioè collegamenti e nodi ad alta capacità che trasportano grandi quantità di traffico fra reti.</p>
+<p>Un percorso semplificato:</p>
+<pre><code class="language-text">Laptop ─ Wi-Fi ─ Router domestico ─ ISP A ─ altre reti ─ ISP B ─ Server
+</code></pre>
+<p>Non immaginiamo «un unico cavo centrale» né un router che conosca in dettaglio tutti i computer del pianeta. Il traffico viene inoltrato in più passaggi. I percorsi possono cambiare, e l'instradamento è frutto di decisioni dei router e dei protocolli tra reti, non di una singola tabella universale.</p>
+<h2 id="ip-consegna-pacchetti-tcp-e-udp-offrono-servizi-di-trasporto">3. IP consegna pacchetti; TCP e UDP offrono servizi di trasporto</h2>
+<p><strong>IP</strong> (<em>Internet Protocol</em>) serve all'indirizzamento e all'instradamento dei pacchetti. Non promette da solo la consegna, l'ordine o l'assenza di duplicazioni.</p>
+<p><strong>TCP</strong> (<em>Transmission Control Protocol</em>) è un protocollo di trasporto orientato alla connessione. Presenta alle applicazioni un <strong>flusso ordinato di byte</strong> e fornisce meccanismi di conferma, ritrasmissione, controllo del flusso e della congestione. «Affidabile» non vuol dire che la rete non possa interrompersi: significa che TCP rileva e gestisce varie perdite finché la connessione è operativa, oppure segnala un errore.</p>
+<p><strong>UDP</strong> (<em>User Datagram Protocol</em>) trasporta datagrammi senza creare una connessione TCP e senza offrire, da solo, garanzie di consegna, ordine o ritrasmissione. Può essere utile quando la semplicità e la latenza contano e l'applicazione o un altro protocollo gestisce ciò che occorre.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>TCP</th>
+<th>UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unità vista dall'applicazione</td>
+<td>Flusso ordinato di byte</td>
+<td>Datagrammi distinti</td>
+</tr>
+<tr>
+<td>Connessione</td>
+<td>Sì</td>
+<td>No, nel senso di TCP</td>
+</tr>
+<tr>
+<td>Ordinamento e ritrasmissione del trasporto</td>
+<td>Sì</td>
+<td>Non garantiti da UDP</td>
+</tr>
+<tr>
+<td>Esempio</td>
+<td>Socket TCP e HTTP/1.1</td>
+<td>DNS spesso; trasporto di QUIC</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Precisazione:</strong> non è corretto affermare che «il Web usa sempre TCP». <strong>HTTP/1.1</strong> e <strong>HTTP/2</strong> normalmente usano TCP, mentre <strong>HTTP/3</strong> usa <strong>QUIC</strong>, un protocollo che opera sopra UDP e fornisce funzioni di trasporto più evolute. HTTP/1.1 su TCP è particolarmente adatto a comprendere lo scambio di richieste e risposte testuali.</p>
+<h2 id="indirizzo-ip-porta-e-programma">4. Indirizzo IP, porta e programma</h2>
+<p>Sapere l'indirizzo IP del computer non basta: su una stessa macchina possono funzionare un server Web, un server di posta e un'applicazione di laboratorio. La <strong>porta</strong> è un numero usato dai protocolli di trasporto per distinguere i punti di comunicazione dei servizi.</p>
+<p>Esempio: <code>198.51.100.20:443</code> identifica un indirizzo IP e una porta di destinazione. L'indirizzo individua un'interfaccia nel percorso di rete, la porta contribuisce a indirizzare la comunicazione verso il corretto servizio. Il sistema operativo collega le porte ai socket e ai processi che le utilizzano.</p>
+<p>Un client utilizza normalmente anche una <strong>porta locale temporanea</strong> (<em>effimera</em>), scelta per la connessione. È la ragione per cui due browser o più schede possono avviare numerose connessioni verso la stessa destinazione.</p>
+<h2 id="i-nomi-sono-piu-comodi-degli-indirizzi-dns">5. I nomi sono più comodi degli indirizzi: DNS</h2>
+<p><strong>DNS</strong> significa <em>Domain Name System</em>, sistema dei nomi di dominio. Permette di associare nomi come <code>www.example.org</code> a informazioni, spesso indirizzi IP. Il nome è utile perché è leggibile e può continuare a essere utilizzato anche se l'infrastruttura server cambia.</p>
+<p>Quando un'applicazione deve contattare <code>www.example.org</code>, in modo semplificato:</p>
+<ol>
+<li>Verifica se l'informazione necessaria è già disponibile in una cache locale.</li>
+<li>Interroga il servizio di risoluzione DNS configurato, se necessario.</li>
+<li>Ottiene uno o più indirizzi IP associati al nome, per esempio attraverso record <strong>A</strong> (IPv4) o <strong>AAAA</strong> (IPv6).</li>
+<li>Usa un indirizzo opportuno per tentare la comunicazione.</li>
+</ol>
+<p>Il DNS non trasferisce la pagina Web e non «scarica il sito»: risponde a domande sui nomi. Può essere usato anche per servizi non Web. Alcune risposte possono essere memorizzate temporaneamente (<em>cache</em>) secondo regole di durata.</p>
+<h2 id="non-e-vero-che-ogni-comunicazione-e-una-richiesta-web">6. Non è vero che ogni comunicazione è una richiesta Web</h2>
+<p>Un client può inviare al server la stringa <code>CIAO</code> e ricevere <code>BENVENUTO</code>, purché i due programmi abbiano stabilito il significato delle sequenze. Non c'è HTTP né HTML: c'è <strong>un protocollo applicativo semplice</strong> concordato dai due programmi.</p>
+<p>Questa osservazione è il ponte verso i socket. Si distinguano già tre piani:</p>
+<ul>
+<li><strong>Rete IP:</strong> come arrivare all'host remoto.</li>
+<li><strong>Trasporto TCP o UDP:</strong> come applicazioni scambiano un flusso di byte o datagrammi.</li>
+<li><strong>Protocollo applicativo:</strong> che significato attribuire ai dati ricevuti.</li>
+</ul>
+<h2 id="attivita-e-controllo">7. Attività e controllo</h2>
+<p><strong>Caso di analisi:</strong> un programma di supervisione controlla le luci di un edificio tramite una connessione TCP con un server di automazione. È per questo un «sito Web»? <em>No: TCP da solo non implica HTTP o Web. Per stabilire se si usa il Web bisogna conoscere il protocollo applicativo.</em></p>
+<p><strong>Controllo:</strong></p>
+<ol>
+<li>Internet e Web sono sinonimi? <em>No.</em></li>
+<li>Una porta sostituisce un indirizzo IP? <em>No: servono a scopi diversi.</em></li>
+<li>DNS trasporta l'HTML di un sito? <em>No: risolve nomi e fornisce altri record.</em></li>
+<li>Perché TCP è adatto all’esempio introduttivo dei socket? <em>Permette di osservare una connessione tra programmi e un flusso ordinato di byte.</em></li>
+</ol>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-05-lezione" rel="prev" href="05-lezione.html"><small>← Precedente</small><span>Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>7 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-07-lezione" rel="next" href="07-lezione.html"><small>Successiva →</small><span>Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

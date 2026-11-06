@@ -322,6 +322,41 @@ window.schoolCatalog = {
       "title": "Informatica",
       "symbol": "01",
       "description": "Capire cosa c’è sotto il codice."
+    },
+    {
+      "id": "reti",
+      "title": "Dalle reti alle applicazioni distribuite",
+      "symbol": "IP",
+      "description": "Classe quinta: sicurezza delle reti, Web, API, architetture, persistenza, cloud e protezione dei dati.",
+      "chapters": [
+        {
+          "id": "reti-01",
+          "title": "Dalle reti alle applicazioni distribuite",
+          "description": "18 lezioni con introduzione e appendice, in un unico percorso.",
+          "files": [
+            "00-introduzione.html",
+            "01-lezione.html",
+            "02-lezione.html",
+            "03-lezione.html",
+            "04-lezione.html",
+            "05-lezione.html",
+            "06-lezione.html",
+            "07-lezione.html",
+            "08-lezione.html",
+            "09-lezione.html",
+            "10-lezione.html",
+            "11-lezione.html",
+            "12-lezione.html",
+            "13-lezione.html",
+            "14-lezione.html",
+            "15-lezione.html",
+            "16-lezione.html",
+            "17-lezione.html",
+            "18-lezione.html",
+            "19-appendice.html"
+          ]
+        }
+      ]
     }
   ],
   "items": [
@@ -1208,6 +1243,186 @@ window.schoolCatalog = {
       "kind": "lesson",
       "path": "materials/lezioni/rappresentazione-interi.html",
       "description": "Lezione di approfondimento"
+    },
+    {
+      "id": "reti-00-introduzione",
+      "course": "reti",
+      "title": "Dalle reti alle applicazioni distribuite",
+      "kind": "lesson",
+      "path": "materials/reti/00-introduzione.html",
+      "description": "Dalle reti alle applicazioni distribuite",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-01-lezione",
+      "course": "reti",
+      "title": "Lezione 1 — Dalla comunicazione alla sicurezza delle reti",
+      "kind": "lesson",
+      "path": "materials/reti/01-lezione.html",
+      "description": "Lezione 1 — Dalla comunicazione alla sicurezza delle reti",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-02-lezione",
+      "course": "reti",
+      "title": "Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento",
+      "kind": "lesson",
+      "path": "materials/reti/02-lezione.html",
+      "description": "Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-03-lezione",
+      "course": "reti",
+      "title": "Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT",
+      "kind": "lesson",
+      "path": "materials/reti/03-lezione.html",
+      "description": "Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-04-lezione",
+      "course": "reti",
+      "title": "Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL",
+      "kind": "lesson",
+      "path": "materials/reti/04-lezione.html",
+      "description": "Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-05-lezione",
+      "course": "reti",
+      "title": "Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete",
+      "kind": "lesson",
+      "path": "materials/reti/05-lezione.html",
+      "description": "Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-06-lezione",
+      "course": "reti",
+      "title": "Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi",
+      "kind": "lesson",
+      "path": "materials/reti/06-lezione.html",
+      "description": "Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-07-lezione",
+      "course": "reti",
+      "title": "Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web",
+      "kind": "lesson",
+      "path": "materials/reti/07-lezione.html",
+      "description": "Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-08-lezione",
+      "course": "reti",
+      "title": "Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine",
+      "kind": "lesson",
+      "path": "materials/reti/08-lezione.html",
+      "description": "Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-09-lezione",
+      "course": "reti",
+      "title": "Lezione 9 — Il browser &#232; un programma: rete, rendering, interpretazione e compilazione",
+      "kind": "lesson",
+      "path": "materials/reti/09-lezione.html",
+      "description": "Lezione 9 — Il browser &#232; un programma: rete, rendering, interpretazione e compilazione",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-10-lezione",
+      "course": "reti",
+      "title": "Lezione 10 — API: una pagina pu&#242; chiedere dati invece di una pagina intera",
+      "kind": "lesson",
+      "path": "materials/reti/10-lezione.html",
+      "description": "Lezione 10 — API: una pagina pu&#242; chiedere dati invece di una pagina intera",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-11-lezione",
+      "course": "reti",
+      "title": "Lezione 11 — Il server non &#232; un linguaggio: diverse tecnologie, stessa funzione",
+      "kind": "lesson",
+      "path": "materials/reti/11-lezione.html",
+      "description": "Lezione 11 — Il server non &#232; un linguaggio: diverse tecnologie, stessa funzione",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-12-lezione",
+      "course": "reti",
+      "title": "Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli",
+      "kind": "lesson",
+      "path": "materials/reti/12-lezione.html",
+      "description": "Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-13-lezione",
+      "course": "reti",
+      "title": "Lezione 13 — Persistenza: perch&#233; i dati non possono vivere soltanto nella memoria del programma",
+      "kind": "lesson",
+      "path": "materials/reti/13-lezione.html",
+      "description": "Lezione 13 — Persistenza: perch&#233; i dati non possono vivere soltanto nella memoria del programma",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-14-lezione",
+      "course": "reti",
+      "title": "Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud",
+      "kind": "lesson",
+      "path": "materials/reti/14-lezione.html",
+      "description": "Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-15-lezione",
+      "course": "reti",
+      "title": "Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing",
+      "kind": "lesson",
+      "path": "materials/reti/15-lezione.html",
+      "description": "Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-16-lezione",
+      "course": "reti",
+      "title": "Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS",
+      "kind": "lesson",
+      "path": "materials/reti/16-lezione.html",
+      "description": "Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-17-lezione",
+      "course": "reti",
+      "title": "Lezione 17 — Firma digitale e PEC: autenticit&#224;, integrit&#224; e prova della consegna",
+      "kind": "lesson",
+      "path": "materials/reti/17-lezione.html",
+      "description": "Lezione 17 — Firma digitale e PEC: autenticit&#224;, integrit&#224; e prova della consegna",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-18-lezione",
+      "course": "reti",
+      "title": "Lezione 18 — Caso conclusivo: progettare una piattaforma scolastica e spiegare le scelte",
+      "kind": "lesson",
+      "path": "materials/reti/18-lezione.html",
+      "description": "Lezione 18 — Caso conclusivo: progettare una piattaforma scolastica e spiegare le scelte",
+      "chapter": "reti-01"
+    },
+    {
+      "id": "reti-19-appendice",
+      "course": "reti",
+      "title": "Appendice — Glossario, collegamenti e fonti di riferimento",
+      "kind": "lesson",
+      "path": "materials/reti/19-appendice.html",
+      "description": "Appendice — Glossario, collegamenti e fonti di riferimento",
+      "chapter": "reti-01"
     }
   ]
 };

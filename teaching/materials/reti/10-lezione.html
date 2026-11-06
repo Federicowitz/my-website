@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 10 — API: una pagina pu&amp;#242; chiedere dati invece di una pagina intera — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 10 — API: una pagina pu&#242; chiedere dati invece di una pagina intera"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/10-lezione.html"><meta property="og:title" content="Lezione 10 — API: una pagina pu&amp;#242; chiedere dati invece di una pagina intera — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/10-lezione.html"><meta property="og:description" content="Lezione 10 — API: una pagina pu&amp;#242; chiedere dati invece di una pagina intera. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-10-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-09-lezione" rel="prev" href="09-lezione.html"><small>← Precedente</small><span>Lezione 9 — Il browser &amp;#232; un programma: rete, rendering, interpretazione e compilazione</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>11 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-11-lezione" rel="next" href="11-lezione.html"><small>Successiva →</small><span>Lezione 11 — Il server non &amp;#232; un linguaggio: diverse tecnologie, stessa funzione</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-10-api-una-pagina-puo-chiedere-dati-invece-di-una-pagina-intera">Lezione 10 — API: una pagina può chiedere dati invece di una pagina intera</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Quando un sito mostra il numero dei libri disponibili, da dove prende quel numero e come può aggiornarlo?»</em></p>
+<h2 id="il-problema-dei-servizi-riutilizzabili">1. Il problema dei servizi riutilizzabili</h2>
+<p>Una biblioteca scolastica vuole rendere consultabili gli stessi libri dal sito Web, dal software della segreteria e da un’app mobile. Inventare un protocollo diverso per ogni client renderebbe difficile l’integrazione. È più utile esporre <strong>funzioni e dati attraverso un’interfaccia condivisa</strong>.</p>
+<p><strong>API</strong> significa <em>Application Programming Interface</em>, interfaccia di programmazione delle applicazioni. È un <strong>contratto</strong> che descrive come un software può usare le funzioni di un altro componente: quali operazioni sono disponibili, come richiederle, quali dati passare e quali risultati aspettarsi. Le API non sono necessariamente su Internet: anche il sistema operativo e le librerie software ne offrono.</p>
+<p>Nel Web incontriamo due concetti distinti:</p>
+<ul>
+<li><strong>API del browser:</strong> funzioni che il browser mette a disposizione al codice eseguito nella pagina, per esempio <code>fetch</code> per richiedere risorse e il DOM per modificare il documento.</li>
+<li><strong>Web API del server:</strong> funzionalità che un'applicazione remota rende accessibili, spesso attraverso richieste e risposte HTTP.</li>
+</ul>
+<p>Quando una pagina esegue <code>fetch('/api/libri')</code>, <strong>usa una API del browser per chiamare una API esposta dal server</strong>. Sono due interfacce differenti nello stesso percorso.</p>
+<h2 id="endpoint-e-operazioni-http">2. Endpoint e operazioni HTTP</h2>
+<p>Un <strong>endpoint</strong> è un punto di accesso a una funzionalità o risorsa. Ad esempio:</p>
+<table>
+<thead>
+<tr>
+<th>Richiesta</th>
+<th>Significato orientativo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /api/libri</code></td>
+<td>Ottieni l'elenco dei libri</td>
+</tr>
+<tr>
+<td><code>GET /api/libri/15</code></td>
+<td>Ottieni il libro 15</td>
+</tr>
+<tr>
+<td><code>POST /api/prestiti</code></td>
+<td>Richiedi la registrazione di un prestito</td>
+</tr>
+<tr>
+<td><code>DELETE /api/prenotazioni/9</code></td>
+<td>Richiedi l'eliminazione della prenotazione 9</td>
+</tr>
+</tbody>
+</table>
+<p>Queste convenzioni sono tipiche di molte API HTTP progettate secondo principi <strong>REST</strong> (<em>Representational State Transfer</em>, uno stile architetturale per sistemi a risorse). Non tutte le Web API sono REST e non basta usare JSON per renderle tali. La relazione centrale è quella fra <strong>metodo, percorso, dati e risposta</strong>.</p>
+<h2 id="json-dati-non-una-pagina">3. JSON: dati, non una pagina</h2>
+<p>Un servizio può rispondere con <strong>JSON</strong>, <em>JavaScript Object Notation</em>, un formato testuale per rappresentare dati strutturati. Per esempio:</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: 15,
+  &quot;titolo&quot;: &quot;Le città invisibili&quot;,
+  &quot;disponibile&quot;: true
+}
+</code></pre>
+<p>JSON non è una pagina Web da renderizzare come HTML. È una rappresentazione di dati: nomi di proprietà, numeri, stringhe, valori booleani e strutture annidate. Può essere letto da applicazioni scritte in linguaggi diversi da JavaScript.</p>
+<p>Il server potrebbe produrre una risposta del tipo:</p>
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/json
+
+{&quot;titolo&quot;:&quot;Le città invisibili&quot;,&quot;disponibile&quot;:true}
+</code></pre>
+<p>L'intestazione indica che il contenuto rappresenta JSON. <strong>Non è richiesto che il server sia scritto in JavaScript</strong> solo perché il formato si chiama JavaScript Object Notation.</p>
+<h2 id="la-pagina-richiede-informazioni-senza-essere-ricaricata">4. La pagina richiede informazioni senza essere ricaricata</h2>
+<p>La relazione tra JavaScript, API del browser e Web API del server compare in questo esempio minimo:</p>
+<pre><code class="language-javascript">fetch(&quot;/api/libri/15&quot;)
+  .then(risposta =&gt; risposta.json())
+  .then(libro =&gt; console.log(libro.titolo));
+</code></pre>
+<p>La sequenza concettuale:</p>
+<ol>
+<li>Il codice JavaScript è eseguito nel browser.</li>
+<li>Chiama <code>fetch</code>, un'API che il browser fornisce al programma.</li>
+<li>Il browser gestisce la richiesta HTTP e riceve la risposta.</li>
+<li>La risposta viene letta come JSON; JavaScript può usare i dati e, se previsto, aggiornare il DOM.</li>
+</ol>
+<p><strong>AJAX</strong> (<em>Asynchronous JavaScript and XML</em>) è un nome storico per tecniche che consentono richieste asincrone e aggiornamenti parziali di una pagina. Il termine non indica un protocollo di trasporto differente: il punto centrale rimane lo scambio di dati tramite HTTP e API.</p>
+<p><strong>Attenzione:</strong> la stessa API del server potrebbe essere usata da un'applicazione mobile o da un programma Python. HTTP è l'interfaccia comune; il browser non è un intermediario obbligatorio per tutti i client.</p>
+<h2 id="le-api-non-danno-automaticamente-il-permesso-di-fare-tutto">5. Le API non danno automaticamente il permesso di fare tutto</h2>
+<p>Un endpoint è una funzionalità esposta; è il server che deve controllare <strong>autenticazione</strong> e <strong>autorizzazione</strong>. Nascondere un pulsante nella pagina non impedisce a un programma di inviare direttamente una richiesta HTTP. Le regole applicative vanno verificate <strong>lato server</strong>, indipendentemente dall'interfaccia mostrata.</p>
+<p>Esempio: <code>/api/miei-prestiti</code> dovrebbe restituire soltanto i dati della persona autorizzata. Non basta affidarsi a un numero ID scelto dal browser; il backend deve verificare l'identità e le autorizzazioni.</p>
+<h2 id="verifica">6. Verifica</h2>
+<ol>
+<li>Un'API è necessariamente un sito Web? <em>No.</em></li>
+<li>Qual è la differenza fra <code>fetch</code> e <code>/api/libri</code>? <em>Il primo è un'API del browser; il secondo è un endpoint esposto dal server.</em></li>
+<li>JSON richiede l'utilizzo di Node.js sul server? <em>No.</em></li>
+<li>È il browser a decidere se uno studente può vedere il prestito di un altro? <em>Il controllo definitivo deve essere lato server.</em></li>
+</ol>
+<p><strong>Passaggio:</strong> che cosa può esserci dietro <code>/api/libri</code>? Un programma scritto con tecnologie molto diverse. L'architettura prescinde dal linguaggio.</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-09-lezione" rel="prev" href="09-lezione.html"><small>← Precedente</small><span>Lezione 9 — Il browser &amp;#232; un programma: rete, rendering, interpretazione e compilazione</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>11 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-11-lezione" rel="next" href="11-lezione.html"><small>Successiva →</small><span>Lezione 11 — Il server non &amp;#232; un linguaggio: diverse tecnologie, stessa funzione</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

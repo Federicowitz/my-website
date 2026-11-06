@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/15-lezione.html"><meta property="og:title" content="Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/15-lezione.html"><meta property="og:description" content="Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-15-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-14-lezione" rel="prev" href="14-lezione.html"><small>← Precedente</small><span>Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>16 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-16-lezione" rel="next" href="16-lezione.html"><small>Successiva →</small><span>Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-15-intranet-extranet-web-2.0-e-cloud-computing">Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Lo stesso servizio Web deve essere accessibile a chiunque oppure può essere riservato a un'organizzazione o ai suoi partner?»</em></p>
+<h2 id="internet-intranet-ed-extranet-che-cosa-cambia">1. Internet, intranet ed extranet: che cosa cambia?</h2>
+<p>Una <strong>intranet</strong> è un insieme di servizi e risorse di rete destinati agli utenti interni di un'organizzazione. Può utilizzare esattamente tecnologie Web come browser, HTTP/HTTPS, server e API, ma l'accesso è riservato. La parola non richiede un'infrastruttura fisica del tutto separata da Internet: l'accesso può essere realizzato tramite reti private, sistemi di autenticazione o connessioni protette.</p>
+<p>Una <strong>extranet</strong> estende in modo <strong>controllato</strong> l'accesso a determinate risorse anche a soggetti esterni autorizzati, per esempio fornitori, clienti o consulenti. Non significa «mettere tutta la intranet su Internet»: l'organizzazione espone solo ciò che è necessario.</p>
+<p><strong>Esempio unico:</strong></p>
+<ul>
+<li>Sito pubblico della scuola: presenta orari, notizie e contatti.</li>
+<li>Intranet: permette a dipendenti autorizzati di consultare procedure e documenti interni.</li>
+<li>Extranet: permette a un fornitore esterno di consultare gli ordini che lo riguardano, senza accedere al resto dell'organizzazione.</li>
+</ul>
+<p>Collega immediatamente la distinzione alla prima parte del modulo: firewall, autenticazione, autorizzazioni, DMZ e segmentazione concorrono a limitare <strong>chi raggiunge quali risorse</strong>.</p>
+<h2 id="web-2.0-partecipazione-degli-utenti-non-un-nuovo-protocollo">2. Web 2.0: partecipazione degli utenti, non un nuovo protocollo</h2>
+<p><strong>Web 2.0</strong> è un'espressione storica che descrive l'evoluzione del Web verso contenuti creati dagli utenti, servizi collaborativi e maggiore interattività. Blog, wiki, social network e piattaforme collaborative sono esempi di servizi nei quali gli utenti non si limitano a leggere pagine pubblicate da pochi autori.</p>
+<p><strong>Non</strong> è il successore tecnico di HTTP/1.1, HTTP/2 o HTTP/3. Non esiste un «protocollo Web 2.0» da sostituire a HTTP. È un'etichetta sociotecnologica legata agli usi e ai modelli di partecipazione.</p>
+<p>Questo tema consente una riflessione critica: se milioni di utenti producono dati, aumentano i problemi di moderazione, tutela della privacy, qualità delle informazioni e conservazione dei contenuti. È un buon ponte con le competenze di cittadinanza digitale.</p>
+<h2 id="il-problema-di-gestire-tutto-in-proprio">3. Il problema di gestire tutto in proprio</h2>
+<p>Un'organizzazione che ospita autonomamente un servizio deve procurarsi macchine, spazio disco, connettività, personale, aggiornamenti, continuità elettrica e backup. Per alcune attività è una scelta ragionevole; per altre conviene utilizzare risorse erogate da un fornitore.</p>
+<p><strong>Cloud computing</strong> indica un modello di accesso a risorse informatiche configurabili e servizi, spesso su richiesta e con capacità di adattamento al carico. Non è semplicemente «i miei file sono su Internet» e non coincide con «uso un sito Web»: un servizio può essere cloud anche quando non è direttamente un sito aperto nel browser.</p>
+<h2 id="tre-modelli-di-servizio-iaas-paas-e-saas">4. Tre modelli di servizio: IaaS, PaaS e SaaS</h2>
+<table>
+<thead>
+<tr>
+<th>Modello</th>
+<th>Acronimo e definizione</th>
+<th>Chi si occupa di cosa?</th>
+<th>Esempio concettuale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>IaaS</strong></td>
+<td><em>Infrastructure as a Service</em>, infrastruttura come servizio</td>
+<td>Il fornitore offre capacità di calcolo, rete, storage; l'utente gestisce gran parte del software</td>
+<td>Si affitta una macchina virtuale e si installa il proprio server</td>
+</tr>
+<tr>
+<td><strong>PaaS</strong></td>
+<td><em>Platform as a Service</em>, piattaforma come servizio</td>
+<td>Il fornitore gestisce buona parte dell'ambiente di esecuzione; l'utente distribuisce il programma</td>
+<td>Si carica un'applicazione senza amministrare il sistema operativo sottostante</td>
+</tr>
+<tr>
+<td><strong>SaaS</strong></td>
+<td><em>Software as a Service</em>, software come servizio</td>
+<td>Il fornitore gestisce l'applicazione utilizzata dal cliente</td>
+<td>Si utilizza un servizio di posta o collaborazione già pronto</td>
+</tr>
+</tbody>
+</table>
+<p>La distinzione non stabilisce chi sia automaticamente responsabile di tutta la sicurezza: esiste una <strong>responsabilità condivisa</strong> che cambia a seconda del contratto e del servizio. L'utente continua, per esempio, a gestire credenziali, permessi e corretto uso dei dati.</p>
+<h2 id="cloud-distribuzione-e-persistenza">5. Cloud, distribuzione e persistenza</h2>
+<p>Un database nel cloud resta un sistema che organizza dati su storage fisico. Un'applicazione distribuita può essere eseguita in cloud, localmente o in un ambiente ibrido. I container possono essere usati in ognuno di questi contesti.</p>
+<p><strong>Vantaggi possibili:</strong> disponibilità rapida di risorse, scalabilità, servizi gestiti, riduzione dell'onere di mantenere hardware proprio. <strong>Limiti o criticità:</strong> dipendenza dal fornitore, costi ricorrenti, gestione dei dati personali, vincoli contrattuali, disponibilità della connettività e necessità di progettare ripristino e sicurezza.</p>
+<h2 id="verifica">6. Verifica</h2>
+<ol>
+<li>Una intranet può utilizzare un browser? <em>Sì.</em></li>
+<li>Un'extranet concede l'intera rete interna ai fornitori? <em>No, solo risorse autorizzate.</em></li>
+<li>Web 2.0 è una versione di HTTP? <em>No.</em></li>
+<li>In IaaS l'utente deve di solito amministrare più parti del software rispetto a SaaS? <em>Sì.</em></li>
+<li>Un'applicazione cloud può conservare dati in un DBMS tradizionale? <em>Sì.</em></li>
+</ol>
+<p><strong>Passaggio:</strong> abbiamo progettato comunicazioni, controlli e servizi. Resta un altro problema: i dati possono attraversare reti che non controlliamo. Come proteggiamo <strong>il loro contenuto</strong>?</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-14-lezione" rel="prev" href="14-lezione.html"><small>← Precedente</small><span>Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>16 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-16-lezione" rel="next" href="16-lezione.html"><small>Successiva →</small><span>Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

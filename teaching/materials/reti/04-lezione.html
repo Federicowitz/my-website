@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/04-lezione.html"><meta property="og:title" content="Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/04-lezione.html"><meta property="og:description" content="Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-04-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-03-lezione" rel="prev" href="03-lezione.html"><small>← Precedente</small><span>Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>5 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-05-lezione" rel="next" href="05-lezione.html"><small>Successiva →</small><span>Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-4-segmentazione-vlan-subnet-firewall-e-acl">Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Si possono usare gli stessi switch e gli stessi cavi senza mettere tutti i dispositivi nella stessa rete logica?»</em></p>
+<h2 id="perche-la-lan-unica-diventa-un-problema">1. Perché la LAN unica diventa un problema</h2>
+<p>Una scuola collega allo stesso insieme di switch computer dei laboratori, uffici, stampanti e access point degli ospiti. Se la rete è un unico grande dominio di comunicazione a livello 2, molte comunicazioni locali non richiedono il passaggio attraverso un router, e separare gli usi diventa difficile. Inoltre, il traffico di diffusione locale (<em>broadcast</em>) raggiunge un numero elevato di dispositivi.</p>
+<p>Il punto non è soltanto ridurre il traffico: <strong>vogliamo creare confini amministrativi e di sicurezza</strong> tra gruppi di utenti che utilizzano la stessa infrastruttura fisica.</p>
+<h2 id="vlan-reti-locali-virtuali">2. VLAN: reti locali virtuali</h2>
+<p><strong>VLAN</strong> significa <em>Virtual Local Area Network</em>, rete locale virtuale. Uno switch gestito può associare porte e traffico a VLAN diverse, creando <strong>domini di livello 2 separati</strong> anche utilizzando una sola infrastruttura di switch.</p>
+<p>Esempio:</p>
+<table>
+<thead>
+<tr>
+<th>VLAN</th>
+<th>Reparto</th>
+<th>Indirizzi privati d'esempio</th>
+<th>Politica desiderata</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VLAN 10</td>
+<td>Segreteria</td>
+<td><code>192.168.10.0/24</code></td>
+<td>Accesso ai gestionali</td>
+</tr>
+<tr>
+<td>VLAN 20</td>
+<td>Laboratorio</td>
+<td><code>192.168.20.0/24</code></td>
+<td>Accesso alle risorse didattiche</td>
+</tr>
+<tr>
+<td>VLAN 30</td>
+<td>Ospiti</td>
+<td><code>192.168.30.0/24</code></td>
+<td>Solo connettività verso Internet</td>
+</tr>
+</tbody>
+</table>
+<p><code>/24</code> indica qui un prefisso di 24 bit. Non è necessario calcolare tutti gli host disponibili; basta capire che le tre reti IP sono distinte.</p>
+<pre><code class="language-text">PC segreteria ──┐      ┌────────────────────────┐
+                ├──────│  Switch con VLAN 10    │
+PC laboratorio ─┤      │  VLAN 20 / VLAN 30    │──── Router / firewall
+Ospite Wi-Fi ───┘      └────────────────────────┘
+</code></pre>
+<p><strong>Porta access:</strong> una porta di switch normalmente assegnata a una VLAN per collegare un dispositivo finale. <strong>Porta trunk:</strong> collegamento che trasporta traffico di più VLAN, mediante identificazione appropriata (tipicamente standard <strong>IEEE 802.1Q</strong>, <em>Institute of Electrical and Electronics Engineers</em>). Basta comprenderne lo scopo; non serve saper configurare switch Cisco.</p>
+<h3 id="vlan-non-significa-automaticamente-subnet">VLAN non significa automaticamente subnet</h3>
+<p>Una <strong>VLAN</strong> è un concetto prevalentemente di <strong>livello 2</strong>, mentre una <strong>subnet IP</strong> è una suddivisione logica dell'indirizzamento di <strong>livello 3</strong>. Spesso si associa una subnet IP a ciascuna VLAN, ma non si tratta della stessa cosa. E «tre VLAN» non significa necessariamente «tre switch»: la separazione è logica.</p>
+<h2 id="come-comunicano-due-vlan">3. Come comunicano due VLAN?</h2>
+<p>Di norma la comunicazione tra reti IP diverse richiede <strong>routing</strong>: un router o uno <strong>switch di livello 3</strong> decide a quale rete inoltrare i pacchetti. Questo passaggio è utile perché diventa un punto in cui applicare controlli.</p>
+<pre><code class="language-text">VLAN 20 (laboratorio) ──&gt; Router / firewall ──&gt; VLAN 10 (segreteria)
+                              ↑
+                      applicazione delle regole
+</code></pre>
+<p>In assenza di routing tra VLAN, i dispositivi restano separati sul piano IP. <strong>Una VLAN, da sola, non garantisce una protezione completa:</strong> configurazioni errate, controlli mancanti su altri collegamenti o servizi esposti possono vanificare la separazione prevista.</p>
+<h2 id="firewall-controllo-del-traffico-e-livelli-isoosi">4. Firewall: controllo del traffico e livelli ISO/OSI</h2>
+<p><strong>Problema.</strong> Due dispositivi possono essere collegati alla stessa infrastruttura senza avere il diritto di accedere agli stessi servizi. Occorre un componente che applichi regole alle comunicazioni: quali richieste possono attraversare il confine tra reti e quali devono essere rifiutate?</p>
+<p>Un <strong>firewall</strong> è una funzione hardware, software o virtuale che controlla il traffico secondo una <strong>politica di sicurezza</strong>. Può trovarsi sul singolo computer (<em>host-based firewall</em>), al confine della rete, tra VLAN o segmenti interni, oppure davanti a servizi cloud. L'efficacia dipende dalle regole, dalla collocazione e dai flussi che attraversano davvero il controllo.</p>
+<h3 id="tre-grandi-famiglie-storiche-a-livelli-diversi">4.1 Tre grandi famiglie storiche, a livelli diversi</h3>
+<p>La classificazione tradizionale distingue questi meccanismi. I livelli ISO/OSI indicano <em>quali informazioni vengono considerate</em>: nella pratica le tecnologie non si collocano sempre rigidamente in un solo livello.</p>
+<table>
+<thead>
+<tr>
+<th>Famiglia</th>
+<th>Livello o informazioni considerate</th>
+<th>Che cosa controlla</th>
+<th>Limite esemplificativo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Packet-filtering firewall</strong>, filtro di pacchetti</td>
+<td>Livello 3 (rete) e spesso livello 4 (trasporto)</td>
+<td>IP sorgente/destinazione, protocollo e porte TCP/UDP</td>
+<td>Non comprende da solo il significato di una richiesta <code>GET /admin</code></td>
+</tr>
+<tr>
+<td><strong>Circuit-level gateway</strong>, gateway di circuito</td>
+<td>Comunicazione/sessione; nelle classificazioni OSI tradizionali viene associato al livello 5</td>
+<td>Consente o media l'instaurazione di una sessione o di un circuito logico, senza analizzare necessariamente ogni comando applicativo</td>
+<td>Sa che esiste una sessione autorizzata, ma può non distinguere le operazioni interne</td>
+</tr>
+<tr>
+<td><strong>Application-level gateway</strong>, gateway a livello applicativo</td>
+<td>Livello 7 (applicazione)</td>
+<td>Interpreta un protocollo applicativo specifico (per esempio HTTP) e può agire da proxy, con filtri più mirati</td>
+<td>Richiede conoscenza del protocollo e introduce ulteriori elaborazioni</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Esempio di packet filtering:</strong> una regola permette da una rete di laboratorio il traffico TCP verso <code>198.51.100.20</code> sulla porta <code>443</code>, e nega l'accesso TCP alla porta <code>445</code> della segreteria. L'apparato può decidere usando intestazioni di rete e trasporto, senza leggere il documento Web richiesto.</p>
+<p><strong>Esempio di gateway di circuito:</strong> un intermediario accetta una connessione da un client autorizzato e stabilisce per suo conto una connessione verso un servizio remoto. Può controllare l'apertura del collegamento, senza riconoscere necessariamente ogni operazione applicativa contenuta nello scambio. Il termine <em>sessione</em> qui è concettuale: non implica che i moderni dispositivi TCP implementino letteralmente il livello 5 del modello teorico.</p>
+<p><strong>Esempio di application-level gateway:</strong> un proxy HTTP può riconoscere metodi, destinazioni e altre proprietà della richiesta Web e applicare una politica specifica per quel protocollo. È un controllo più vicino al significato dei dati, non semplicemente alla porta usata.</p>
+<h3 id="filtraggio-stateless-e-stateful-pacchetto-isolato-o-connessione">4.2 Filtraggio stateless e stateful: pacchetto isolato o connessione?</h3>
+<p>Un filtro <strong>stateless</strong> (<em>senza stato</em>) valuta ogni pacchetto rispetto alle regole, senza mantenere per quella decisione una tabella dello stato delle comunicazioni. Un firewall <strong>stateful</strong> (<em>con stato</em>) tiene traccia dei flussi o delle connessioni autorizzate e può riconoscere le risposte che ne fanno parte.</p>
+<pre><code class="language-text">PC interno: 192.168.20.10:51000  ----TCP----&gt;  Server: 198.51.100.20:443
+              richiesta autorizzata
+              &lt;----------------------  risposta della stessa connessione
+                 (riconosciuta dallo stato)
+</code></pre>
+<p>Se è consentita una connessione TCP in uscita, un firewall stateful può accettare il traffico di risposta coerente con lo stato registrato senza aprire in modo indiscriminato tutte le connessioni nuove dall'esterno. Questo controllo <strong>non</strong> significa che il firewall conosca automaticamente la pagina HTML, le credenziali o l'operazione applicativa trasmessa.</p>
+<h3 id="ispezione-applicativa-ngfw-e-waf">4.3 Ispezione applicativa, NGFW e WAF</h3>
+<p>Molti prodotti combinano più meccanismi: non è necessario comprare «un firewall diverso» per ogni livello. Un <strong>NGFW</strong> (<em>Next-Generation Firewall</em>, firewall di nuova generazione) può unire filtraggio stateful, riconoscimento delle applicazioni, ispezione approfondita e funzioni aggiuntive di prevenzione delle minacce.</p>
+<p>Un <strong>WAF</strong> (<em>Web Application Firewall</em>, firewall per applicazioni Web) è un controllo specializzato sul traffico HTTP/HTTPS verso applicazioni Web. Può analizzare richieste e regole relative al comportamento applicativo, per esempio schemi di richieste anomale, ma <strong>non sostituisce il controllo delle autorizzazioni nel backend</strong>.</p>
+<p><strong>Limite della cifratura:</strong> su una connessione HTTPS, un semplice firewall che osserva IP e porte non può leggere il percorso <code>/admin</code> o il corpo della richiesta, protetti da TLS (<em>Transport Layer Security</em>). Un controllo applicativo può osservare il contenuto <strong>solo dove è disponibile in chiaro</strong>, ad esempio nel componente che termina TLS o mediante un'ispezione configurata che comporta specifiche implicazioni tecniche e di fiducia. Un firewall a livello applicativo non «vede tutto» per magia.</p>
+<h3 id="regole-fondamentali">4.4 Regole fondamentali</h3>
+<ul>
+<li><strong>Minimo privilegio:</strong> permettere solo il traffico necessario.</li>
+<li><strong>Default deny</strong> (negazione predefinita): ciò che non è espressamente consentito viene bloccato, dove questa scelta è adeguata alla politica adottata.</li>
+<li><strong>Controlli in ingresso e in uscita:</strong> filtrare anche le connessioni originate dall'interno, quando serve.</li>
+<li><strong>Registrazione e verifica:</strong> un filtro è utile solo se le regole corrispondono ai flussi desiderati e vengono mantenute aggiornate.</li>
+</ul>
+<p>Un firewall e una VLAN non svolgono lo stesso compito: la VLAN crea una separazione logica di livello 2, il firewall applica una politica di comunicazione ai flussi che lo attraversano.</p>
+<h2 id="acl-regole-di-controllo-degli-accessi">5. ACL: regole di controllo degli accessi</h2>
+<p><strong>ACL</strong> significa <em>Access Control List</em>, lista di controllo degli accessi. È un insieme ordinato o strutturato di regole che consente o nega determinate azioni. Nelle reti è spesso utilizzata per filtrare traffico in base a IP, protocolli e porte; il termine ACL compare anche nei file system e in altre aree dell'informatica.</p>
+<p>Una <strong>ACL non è necessariamente un dispositivo</strong>: è una modalità di esprimere regole. Un firewall può usare ACL, e anche un router o uno switch può applicarle. Non è quindi corretta la contrapposizione «ACL oppure firewall» come se fossero oggetti dello stesso tipo.</p>
+<h3 id="mini-caso-rete-scolastica">Mini-caso: rete scolastica</h3>
+<table>
+<thead>
+<tr>
+<th>Sorgente</th>
+<th>Destinazione</th>
+<th>Servizio</th>
+<th>Regola</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ospiti</td>
+<td>Internet</td>
+<td>Web (HTTP/HTTPS)</td>
+<td>Consenti</td>
+</tr>
+<tr>
+<td>Ospiti</td>
+<td>Segreteria</td>
+<td>Qualunque servizio</td>
+<td>Nega</td>
+</tr>
+<tr>
+<td>Laboratori</td>
+<td>Server didattico</td>
+<td>Servizio didattico</td>
+<td>Consenti</td>
+</tr>
+<tr>
+<td>Internet</td>
+<td>Database riservato</td>
+<td>Qualunque servizio diretto</td>
+<td>Nega</td>
+</tr>
+<tr>
+<td>Server applicativo</td>
+<td>Database</td>
+<td>Porta del DB definita</td>
+<td>Consenti</td>
+</tr>
+</tbody>
+</table>
+<p>La tabella è una <strong>politica concettuale</strong>, non una configurazione pronta all'uso: nelle installazioni vere bisogna verificare il traffico di risposta, la risoluzione DNS, gli aggiornamenti, la registrazione degli accessi e altri flussi necessari.</p>
+<h2 id="confronto-finale-dei-tre-concetti">6. Confronto finale dei tre concetti</h2>
+<ul>
+<li><strong>VLAN:</strong> crea gruppi logici di livello 2 usando l'infrastruttura condivisa.</li>
+<li><strong>Routing tra VLAN:</strong> permette la comunicazione tra reti IP diverse.</li>
+<li><strong>Firewall/ACL:</strong> consente o blocca comunicazioni secondo criteri e regole.</li>
+</ul>
+<p>Una VLAN non cifra il traffico. Un firewall non modifica necessariamente gli indirizzi (è il NAT a farlo). Una ACL non costituisce di per sé un apparecchio separato.</p>
+<h2 id="analisi-applicativa-quali-informazioni-servono-al-firewall">7. Analisi applicativa: quali informazioni servono al firewall?</h2>
+<p>Una rete contiene:</p>
+<ul>
+<li>VLAN 10 — segreteria: <code>192.168.10.0/24</code>, con server documenti <code>192.168.10.20</code>;</li>
+<li>VLAN 20 — laboratori: <code>192.168.20.0/24</code>;</li>
+<li>VLAN 30 — ospiti: <code>192.168.30.0/24</code>;</li>
+<li>un sito pubblico di prova: <code>198.51.100.20</code>, accessibile tramite HTTPS sulla porta TCP <code>443</code>.</li>
+</ul>
+<p>Si considerino questi flussi:</p>
+<table>
+<thead>
+<tr>
+<th>Flusso richiesto</th>
+<th>Decisione proposta</th>
+<th>Motivazione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>192.168.30.44</code> → <code>192.168.10.20:445/TCP</code></td>
+<td><strong>Nega</strong></td>
+<td>Gli ospiti non devono accedere ai servizi di condivisione interna</td>
+</tr>
+<tr>
+<td><code>192.168.20.15</code> → <code>198.51.100.20:443/TCP</code></td>
+<td><strong>Consenti</strong></td>
+<td>Il laboratorio può visitare il sito pubblico</td>
+</tr>
+<tr>
+<td><code>192.168.30.44</code> → <code>198.51.100.20:443/TCP</code></td>
+<td><strong>Consenti</strong></td>
+<td>La rete ospiti può consultare siti HTTPS</td>
+</tr>
+<tr>
+<td><code>198.51.100.20:443/TCP</code> → <code>192.168.20.15:51000/TCP</code></td>
+<td><strong>Consenti soltanto come risposta</strong></td>
+<td>Un firewall stateful la riconosce se appartiene alla connessione autorizzata</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Problema A — Livelli ISO/OSI.</strong> Quale firewall può decidere usando soltanto IP, protocollo e porte? <em>Un packet filter a livello rete/trasporto.</em> Quale controllo può distinguere una richiesta HTTP a <code>/notizie</code> da una a <code>/admin</code>, se il contenuto è visibile? <em>Un controllo a livello applicativo, non un semplice filtro IP/porta.</em></p>
+<p><strong>Problema B — Il confine della cifratura.</strong> Due richieste HTTPS raggiungono lo stesso indirizzo e la stessa porta, ma una chiede <code>/notizie</code> e l'altra <code>/admin</code>. Un filtro di pacchetti può distinguerle dal solo IP e dalla porta? <em>No.</em> Per proteggere <code>/admin</code> serve in ogni caso anche <strong>autorizzazione applicativa</strong>.</p>
+<p><strong>Problema C — Segmentazione e routing.</strong> Se due dispositivi sono in VLAN diverse ma lo switch di livello 3 permette tutto il traffico tra di esse, la numerazione VLAN assicura che l'ufficio amministrativo sia irraggiungibile? <em>No: il routing consente la comunicazione; occorrono regole coerenti con i permessi desiderati.</em></p>
+<h3 id="verifica">Verifica</h3>
+<ol>
+<li>Perché un firewall stateful è diverso da un filtro stateless? <em>Tiene traccia dei flussi e del relativo stato.</em></li>
+<li>Qual è la differenza tra firewall e ACL? <em>Il firewall è un sistema di controllo; una ACL è una forma di esprimere regole applicabili anche da router e switch.</em></li>
+<li>Un WAF sostituisce il login e la verifica dei permessi? <em>No.</em></li>
+<li>Un gateway a livello applicativo e un gateway di circuito analizzano necessariamente gli stessi dati? <em>No: il primo può comprendere il protocollo applicativo; il secondo controlla soprattutto l'instaurazione della comunicazione.</em></li>
+</ol>
+<p><strong>Passaggio alla lezione 5:</strong> abbiamo isolato la rete interna. E se vogliamo pubblicare un sito accessibile a tutti senza esporre i dati della segreteria?</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-03-lezione" rel="prev" href="03-lezione.html"><small>← Precedente</small><span>Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>5 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-05-lezione" rel="next" href="05-lezione.html"><small>Successiva →</small><span>Lezione 5 — Proxy e DMZ: pubblicare servizi senza esporre tutta la rete</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

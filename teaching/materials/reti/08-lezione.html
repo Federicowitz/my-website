@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/08-lezione.html"><meta property="og:title" content="Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/08-lezione.html"><meta property="og:description" content="Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-08-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-07-lezione" rel="prev" href="07-lezione.html"><small>← Precedente</small><span>Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>9 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-09-lezione" rel="next" href="09-lezione.html"><small>Successiva →</small><span>Lezione 9 — Il browser &amp;#232; un programma: rete, rendering, interpretazione e compilazione</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-8-dal-socket-al-web-protocollo-http-e-prime-pagine">Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Se TCP trasporta soltanto byte, come fa il browser a sapere che deve visualizzare una pagina?»</em></p>
+<h2 id="il-problema-della-comprensione-reciproca">1. Il problema della comprensione reciproca</h2>
+<p>Nel laboratorio Python potevamo decidere che <code>CIAO</code> fosse un messaggio valido. Nel Web un browser scritto da una società e un server sviluppato da un'altra devono capirsi usando regole comuni. Entra in gioco <strong>HTTP</strong>, <em>Hypertext Transfer Protocol</em>, protocollo per scambiare rappresentazioni di risorse mediante richieste e risposte.</p>
+<p>La distinzione che ci interessa:</p>
+<ul>
+<li><strong>Socket TCP:</strong> consente lo scambio di un flusso di byte tra processi.</li>
+<li><strong>HTTP/1.1:</strong> definisce il formato e il significato di richieste e risposte applicative trasportate su quel flusso.</li>
+<li><strong>HTML:</strong> <em>HyperText Markup Language</em>, linguaggio di marcatura che può comparire nel contenuto di una risposta HTTP per descrivere la struttura di una pagina.</li>
+</ul>
+<p>HTTP non coincide con HTML: una risposta HTTP può contenere HTML, JSON, un'immagine, un PDF o nessun corpo.</p>
+<h2 id="come-fatta-una-richiesta-http1.1">2. Com'è fatta una richiesta HTTP/1.1?</h2>
+<p>Un esempio semplificato di richiesta:</p>
+<pre><code class="language-http">GET /orari HTTP/1.1
+Host: www.example.org
+
+</code></pre>
+<ul>
+<li><code>GET</code> è il <strong>metodo</strong>: qui si vuole ottenere una rappresentazione di una risorsa.</li>
+<li><code>/orari</code> è il percorso richiesto.</li>
+<li><code>HTTP/1.1</code> identifica la versione del protocollo mostrata.</li>
+<li><code>Host</code> è un'<strong>intestazione</strong> (<em>header</em>) che identifica l'host logico richiesto: più siti possono convivere sulla stessa infrastruttura.</li>
+<li>La riga vuota separa le intestazioni dall'eventuale corpo della richiesta.</li>
+</ul>
+<p><strong>POST</strong> è un altro metodo, comunemente usato per inviare dati da elaborare. Non è vero che «GET è la prima richiesta e POST sono tutte le successive»: una pagina può produrre molti GET, POST e altri metodi in diversi momenti. Il metodo dipende dall'operazione, non da quando viene eseguita.</p>
+<h2 id="come-fatta-una-risposta">3. Com'è fatta una risposta?</h2>
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 27
+
+&lt;h1&gt;Benvenuti a scuola&lt;/h1&gt;
+</code></pre>
+<p>Il valore di <code>Content-Length</code> indica la dimensione <strong>in byte</strong> del corpo della risposta. In questo semplice esempio il corpo contiene soltanto caratteri ASCII, quindi il numero dei caratteri coincide con il numero dei byte.</p>
+<p><code>200 OK</code> indica una risposta riuscita; <code>Content-Type</code> dichiara il tipo di contenuto mediante un <strong>MIME type</strong> (<em>Multipurpose Internet Mail Extensions</em>, convenzione per indicare tipi di contenuto). Altri codici da conoscere: <code>301</code> o <code>302</code> reindirizzamento, <code>404</code> risorsa non trovata, <code>500</code> errore del server. Un errore <code>404</code> non implica che «Internet sia rotto».</p>
+<p><strong>URL</strong> significa <em>Uniform Resource Locator</em>: un indirizzo di risorsa che include normalmente uno schema, un host, un percorso ed eventualmente porta, query e frammento, ad esempio:</p>
+<pre><code class="language-text">http://127.0.0.1:18080/notizie?anno=2026
+│      │         │   │       └── query
+│      │         │   └────────── percorso
+│      │         └────────────── porta
+│      └──────────────────────── host
+└─────────────────────────────── schema
+</code></pre>
+<p>Il frammento <code>#sezione</code> eventualmente presente nell'URL è gestito in molti casi dal browser e non viene normalmente trasmesso nel percorso della richiesta HTTP al server.</p>
+<h2 id="una-dimostrazione-potente-http-scritto-a-mano-su-un-socket-python">4. Una dimostrazione potente: HTTP scritto a mano su un socket Python</h2>
+<p>Un socket non restituisce «una pagina» spontaneamente. <strong>Se un programma costruisce una risposta HTTP valida</strong>, il browser può interpretarne il contenuto. Il seguente server dimostrativo ascolta solo sul computer locale e risponde a ogni connessione con una pagina elementare:</p>
+<pre><code class="language-python">import socket
+
+pagina = &quot;&lt;h1&gt;Il browser ha capito HTTP!&lt;/h1&gt;&quot;.encode(&quot;utf-8&quot;)
+intestazioni = (
+    &quot;HTTP/1.1 200 OK\r\n&quot;
+    &quot;Content-Type: text/html; charset=utf-8\r\n&quot;
+    f&quot;Content-Length: {len(pagina)}\r\n&quot;
+    &quot;Connection: close\r\n\r\n&quot;
+).encode(&quot;ascii&quot;)
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((&quot;127.0.0.1&quot;, 18080))
+    server.listen()
+    print(&quot;Apri http://127.0.0.1:18080&quot;)
+    while True:
+        conn, _ = server.accept()
+        with conn:
+            richiesta = conn.recv(4096)
+            print(&quot;Richiesta ricevuta:&quot;, richiesta[:200])
+            conn.sendall(intestazioni + pagina)
+</code></pre>
+<p><strong>Risultato osservabile:</strong> con il processo server in esecuzione, l’indirizzo <code>http://127.0.0.1:18080</code> mostra il titolo nel browser, mentre il terminale stampa l’inizio della <strong>richiesta testuale HTTP</strong>. L’esempio termina con <code>Ctrl+C</code>. <strong>Limite tecnico:</strong> il programma non analizza completamente le richieste, non gestisce in modo robusto tutti i casi del flusso TCP e restituisce la stessa risposta per ogni percorso: non è un server di produzione.</p>
+<p><strong>Il punto fondamentale:</strong> lo stesso socket TCP dell’esempio precedente diventa uno strumento per il Web quando i byte sono organizzati secondo il protocollo applicativo HTTP. Il browser comprende il protocollo, non il linguaggio in cui è stato scritto il server.</p>
+<h2 id="che-cosa-avviene-davvero-quando-apriamo-un-url">5. Che cosa avviene davvero quando apriamo un URL?</h2>
+<p>Per il nostro indirizzo locale non occorre una risoluzione DNS esterna. Per un sito pubblico, normalmente si passa dal nome all'indirizzo tramite DNS, poi si stabilisce la comunicazione con il server. In HTTP/1.1 su TCP la richiesta ha una struttura leggibile e il server restituisce una risposta. Il browser determina che cosa fare in base a <strong>tipo di risorsa</strong>, contenuto, sicurezza e contesto.</p>
+<p>Una pagina reale contiene spesso altri riferimenti (CSS, JavaScript, immagini). Il browser invia <strong>altre richieste anche senza l'intervento di JavaScript</strong>. Non possiamo quindi dire «il browser fa solo il primo GET e dopo lavora sempre JavaScript». Il funzionamento del browser chiarisce il motivo.</p>
+<p><strong>Precisazione sulle versioni:</strong> HTTP/2 codifica in modo differente i messaggi e normalmente usa TCP; HTTP/3 usa QUIC su UDP. L'esempio testuale vale per <strong>HTTP/1.1</strong>. Il concetto generale di <em>richiesta, risposta, intestazioni e contenuto</em> resta utile per comprendere anche le versioni più recenti.</p>
+<h2 id="distingui-server-web-e-sito-web">6. Distingui server Web e sito Web</h2>
+<p>Il <strong>server Web</strong> è il software (e spesso, per estensione, il computer) che gestisce richieste HTTP e produce risposte. Il <strong>sito Web</strong> è un insieme organizzato di risorse e funzionalità accessibili dagli utenti. Il server può restituire un file già pronto (<em>contenuto statico</em>) o generare una risposta calcolata al momento (<em>contenuto dinamico</em>).</p>
+<p>Un server può essere realizzato usando diversi linguaggi e tecnologie. Non esiste una dipendenza necessaria tra «essere un server» e «usare Node.js»: nella lezione 11 confronteremo varie possibilità.</p>
+<h2 id="analisi-di-una-pagina-e-delle-sue-richieste">7. Analisi di una pagina e delle sue richieste</h2>
+<p>Il browser richiede <code>/index.html</code> e riceve:</p>
+<pre><code class="language-html">&lt;link rel=&quot;stylesheet&quot; href=&quot;stile.css&quot;&gt;
+&lt;img src=&quot;logo.png&quot; alt=&quot;Logo&quot;&gt;
+&lt;script src=&quot;app.js&quot; defer&gt;&lt;/script&gt;
+</code></pre>
+<p><strong>Questione 1.</strong> Quale richiesta ha dato inizio alla navigazione? <em>La richiesta del documento HTML.</em></p>
+<p><strong>Questione 2.</strong> Perché il browser effettua poi richieste per <code>stile.css</code>, <code>logo.png</code> e <code>app.js</code>? <em>Perché l’analisi del documento rileva collegamenti a ulteriori risorse, anche senza che JavaScript avvii quelle richieste.</em></p>
+<p><strong>Questione 3.</strong> Un’eventuale richiesta successiva <code>GET /api/libri</code> è necessariamente una nuova navigazione? <em>No: può essere avviata dal codice dell’applicazione ed elaborata senza sostituire il documento visualizzato.</em></p>
+<p><strong>Questione 4.</strong> Se il server restituisce <code>Content-Type: application/json</code>, deve sempre mostrare una nuova pagina? <em>No: il contenuto è costituito da dati, che possono essere elaborati da altri programmi.</em></p>
+<h3 id="verifica">Verifica</h3>
+<ol>
+<li>TCP crea da solo l’intestazione <code>HTTP/1.1</code>? <em>No, la crea il software che implementa HTTP.</em></li>
+<li>HTTP e HTML sono la stessa cosa? <em>No: protocollo applicativo e linguaggio di marcatura.</em></li>
+<li>Il metodo HTTP dipende dall’essere la prima richiesta? <em>No: descrive il tipo di operazione.</em></li>
+<li>Perché un server scritto in Python può rispondere a Chrome? <em>Perché entrambi utilizzano lo stesso protocollo applicativo.</em></li>
+</ol>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-07-lezione" rel="prev" href="07-lezione.html"><small>← Precedente</small><span>Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>9 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-09-lezione" rel="next" href="09-lezione.html"><small>Successiva →</small><span>Lezione 9 — Il browser &amp;#232; un programma: rete, rendering, interpretazione e compilazione</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

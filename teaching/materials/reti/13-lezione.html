@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 13 — Persistenza: perch&amp;#233; i dati non possono vivere soltanto nella memoria del programma — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 13 — Persistenza: perch&#233; i dati non possono vivere soltanto nella memoria del programma"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/13-lezione.html"><meta property="og:title" content="Lezione 13 — Persistenza: perch&amp;#233; i dati non possono vivere soltanto nella memoria del programma — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/13-lezione.html"><meta property="og:description" content="Lezione 13 — Persistenza: perch&amp;#233; i dati non possono vivere soltanto nella memoria del programma. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-13-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-12-lezione" rel="prev" href="12-lezione.html"><small>← Precedente</small><span>Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>14 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-14-lezione" rel="next" href="14-lezione.html"><small>Successiva →</small><span>Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-13-persistenza-perche-i-dati-non-possono-vivere-soltanto-nella-memoria-del-programma">Lezione 13 — Persistenza: perché i dati non possono vivere soltanto nella memoria del programma</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Se chiudo il server della biblioteca e lo riavvio domani, come fa a ricordare tutti i prestiti?»</em></p>
+<h2 id="il-problema-della-memoria-temporanea">1. Il problema della memoria temporanea</h2>
+<p>Quando un programma viene eseguito usa la <strong>RAM</strong> (<em>Random Access Memory</em>, memoria ad accesso casuale) per variabili, oggetti e dati temporanei. Se un prestito esiste soltanto in una lista in RAM, normalmente scompare quando il processo termina o si riavvia. Alcune informazioni devono sopravvivere: utenti, prenotazioni, ordini, pagamenti, voti.</p>
+<p>Chiamiamo <strong>persistenza dei dati</strong> la capacità di conservarli oltre la vita di una singola esecuzione del programma. Un SSD, un disco o un servizio di archiviazione possono conservare dati in modo durevole. Ma <strong>salvare</strong> e <strong>gestire correttamente</strong> non sono sinonimi: quando più utenti modificano gli stessi dati occorrono regole aggiuntive.</p>
+<h2 id="perche-non-salvare-tutto-in-un-file.txt">2. Perché non salvare tutto in un file <code>.txt</code>?</h2>
+<p>In effetti <strong>si può</strong>. Il sistema potrebbe creare <code>prestiti.txt</code>:</p>
+<pre><code class="language-text">Studente;Libro;Data restituzione
+Ada;Libro 15;2026-11-20
+Marco;Libro 8;2026-11-18
+</code></pre>
+<p>Oppure <code>prestiti.json</code>:</p>
+<pre><code class="language-json">[
+  {&quot;studente&quot;: &quot;Ada&quot;, &quot;libro&quot;: 15, &quot;restituito&quot;: false},
+  {&quot;studente&quot;: &quot;Marco&quot;, &quot;libro&quot;: 8, &quot;restituito&quot;: false}
+]
+</code></pre>
+<p>Il primo file è testo separato da delimitatori; il secondo è JSON, cioè testo strutturato. In un piccolo esercizio o per un elenco che cambia raramente possono andare benissimo. <strong>I file non diventano inutili con l’introduzione dei database</strong>: archivi, fotografie, configurazioni, esportazioni e documenti continuano a essere conservati in file.</p>
+<h3 id="un-breve-accenno-alle-estensioni">Un breve accenno alle estensioni</h3>
+<p>L'<strong>estensione</strong> è la parte del nome dopo l'ultimo punto e normalmente segnala una convenzione di formato o utilizzo. Non modifica magicamente il contenuto del file.</p>
+<table>
+<thead>
+<tr>
+<th>Estensione</th>
+<th>Uso comune</th>
+<th>Precisazione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.txt</code></td>
+<td>Testo semplice</td>
+<td>Non impone una struttura uniforme</td>
+</tr>
+<tr>
+<td><code>.csv</code></td>
+<td><em>Comma-Separated Values</em>, dati tabellari delimitati</td>
+<td>I delimitatori possono variare secondo il contesto</td>
+</tr>
+<tr>
+<td><code>.json</code></td>
+<td>Dati strutturati in formato JSON</td>
+<td>Rimane un file testuale</td>
+</tr>
+<tr>
+<td><code>.md</code></td>
+<td><strong>Markdown</strong>, testo con marcatori per titoli, elenchi, codice</td>
+<td>È un formato di documento, non un DB</td>
+</tr>
+<tr>
+<td><code>.html</code></td>
+<td>Pagina o documento HTML</td>
+<td>Contenuto di marcatura per il browser</td>
+</tr>
+<tr>
+<td><code>.db</code> / <code>.sqlite</code></td>
+<td>Spesso file di una base dati SQLite</td>
+<td>Il nome non garantisce il tipo reale: conta il formato</td>
+</tr>
+</tbody>
+</table>
+<p>Rinominare <code>prestiti.txt</code> in <code>prestiti.json</code> <strong>non converte</strong> i dati in JSON: per farlo bisogna trasformarne la struttura. Un software deve saper leggere il formato, non semplicemente riconoscere l'estensione.</p>
+<h2 id="quando-i-file-cominciano-a-complicarsi">3. Quando i file cominciano a complicarsi</h2>
+<p>Supponiamo che l'archivio dei prestiti sia un unico file JSON. Due addetti aprono quasi contemporaneamente il registro e leggono che il libro 15 è disponibile. Entrambi lo prenotano. Il primo salva; il secondo salva la propria versione, magari cancellando inavvertitamente il cambiamento del primo. È un problema di <strong>concorrenza</strong> (<em>concurrency</em>): più operazioni cercano di gestire dati condivisi nello stesso intervallo di tempo.</p>
+<p>Altri problemi emergono gradualmente:</p>
+<ul>
+<li><strong>Ricerca:</strong> per trovare tutti i prestiti scaduti si può finire a leggere ogni volta l'intero file.</li>
+<li><strong>Coerenza:</strong> se uno studente viene eliminato, che cosa succede ai suoi prestiti e ai riferimenti al suo identificativo?</li>
+<li><strong>Aggiornamenti parziali:</strong> se manca corrente durante il salvataggio, in che stato resta il file?</li>
+<li><strong>Autorizzazioni:</strong> come permettere al bibliotecario di aggiornare i prestiti e a uno studente di vedere soltanto i propri?</li>
+<li><strong>Concorrenza e recupero:</strong> come gestire decine di operazioni e come ripristinare dati dopo un errore?</li>
+</ul>
+<p>Tutti questi problemi <strong>possono</strong> essere affrontati con codice applicativo e file, ma il costo e la complessità crescono. Qui nasce il ruolo dei software specializzati per la gestione dei dati.</p>
+<h2 id="database-e-dbms-dati-e-sistema-di-gestione">4. Database e DBMS: dati e sistema di gestione</h2>
+<p>Un <strong>database</strong> è una raccolta organizzata di dati persistenti. Il <strong>DBMS</strong>, <em>Database Management System</em> (sistema di gestione di basi di dati), è il software che permette di crearli, consultarli, modificarli e gestirli in modo controllato.</p>
+<p>Il DBMS offre, secondo la tecnologia e la configurazione, meccanismi per:</p>
+<ul>
+<li>organizzare i dati e ricercarli efficientemente;</li>
+<li>gestire accessi concorrenti;</li>
+<li>applicare vincoli di integrità;</li>
+<li>fornire transazioni;</li>
+<li>verificare autorizzazioni;</li>
+<li>mantenere indici, log di recupero, backup e ripristino.</li>
+</ul>
+<p><strong>Attenzione:</strong> un database non è semplicemente «un file più grosso». Per esempio <strong>SQLite</strong> è un DBMS incorporato direttamente nel programma (<em>embedded</em>), normalmente con un file su disco, <strong>senza un processo server database separato</strong>. <strong>PostgreSQL</strong> e <strong>MySQL</strong> sono esempi di DBMS client-server: un processo dedicato riceve e gestisce richieste da altri programmi.</p>
+<p>Questa distinzione è perfetta per il tema «fisico vs logico»: il livello dati può utilizzare SQLite sullo stesso host dell'applicazione oppure un database remoto. Cambia la distribuzione, non il bisogno di una strategia di persistenza.</p>
+<h2 id="un-database-relazionale-molto-brevemente">5. Un database relazionale, molto brevemente</h2>
+<p>Un database <strong>relazionale</strong> organizza i dati in tabelle con righe e colonne, collegate mediante chiavi e vincoli. Esempio:</p>
+<p><strong>Tabella Libri</strong></p>
+<table>
+<thead>
+<tr>
+<th>id_libro</th>
+<th>titolo</th>
+<th>autore</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>15</td>
+<td>Le città invisibili</td>
+<td>Italo Calvino</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Il barone rampante</td>
+<td>Italo Calvino</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tabella Prestiti</strong></p>
+<table>
+<thead>
+<tr>
+<th>id_prestito</th>
+<th>id_libro</th>
+<th>id_studente</th>
+<th>restituito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>501</td>
+<td>15</td>
+<td>32</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p><code>id_libro</code> nella tabella Prestiti fa riferimento al libro corrispondente. Una <strong>chiave primaria</strong> identifica una riga; una <strong>chiave esterna</strong> collega dati di tabelle diverse. Un vincolo può evitare la registrazione di un prestito riferito a un libro inesistente.</p>
+<p><strong>SQL</strong> (<em>Structured Query Language</em>) è un linguaggio largamente usato per interrogare e modificare database relazionali. Una semplice interrogazione SQL è:</p>
+<pre><code class="language-sql">SELECT titolo FROM Libri WHERE id_libro = 15;
+</code></pre>
+<p>Il DBMS restituisce il titolo richiesto. Una base dati può naturalmente essere organizzata anche secondo modelli non relazionali: per esempio documenti e strutture chiave-valore; SQL non è l’unico modello possibile di gestione dei dati.</p>
+<h2 id="transazioni-unoperazione-deve-riuscire-tutta-oppure-non-risultare-fatta">6. Transazioni: un'operazione deve riuscire tutta oppure non risultare fatta</h2>
+<p>Immagina un trasferimento di 10 crediti tra due account. Bisogna sottrarre 10 al primo e aggiungerne 10 al secondo. Se l'applicazione si interrompe dopo la sottrazione, il risultato è incoerente. Una <strong>transazione</strong> permette di raggruppare più modifiche in una singola unità logica: oppure vengono confermate tutte, oppure vengono annullate secondo le regole del DBMS.</p>
+<p>Quattro proprietà classiche sono riassunte dall'acronimo <strong>ACID</strong>:</p>
+<ul>
+<li><strong>Atomicity</strong> (<em>atomicità</em>): l'operazione viene considerata un tutto indivisibile.</li>
+<li><strong>Consistency</strong> (<em>consistenza</em>): le operazioni rispettano i vincoli di integrità definiti.</li>
+<li><strong>Isolation</strong> (<em>isolamento</em>): le transazioni concorrenti non devono interferire in modi vietati dal livello di isolamento scelto.</li>
+<li><strong>Durability</strong> (<em>durabilità</em>): dopo la conferma, i dati devono resistere secondo le garanzie di persistenza del sistema.</li>
+</ul>
+<p>Le transazioni non eliminano ogni possibile errore dell'applicazione e non sostituiscono i backup: affrontano un insieme ben preciso di problemi di coerenza.</p>
+<h2 id="file-database-e-backup">7. File, database e backup</h2>
+<p>Un database può utilizzare file al suo interno: non c'è opposizione fra «database» e «file», come se uno escludesse l'altro. La distinzione centrale è che un <strong>DBMS gestisce strutture, accessi e proprietà operative</strong>. I file rimangono essenziali per documenti, immagini, contenuti statici, configurazioni ed esportazioni.</p>
+<p>Un <strong>backup</strong> è una copia utilizzabile per recuperare informazioni dopo cancellazioni, errori o guasti. Non basta poter «salvare su disco»: bisogna anche prevedere il recupero, la disponibilità, i permessi e la protezione dei dati memorizzati.</p>
+<h2 id="verifica">8. Verifica</h2>
+<ol>
+<li>Perché una lista Python in RAM non basta per il registro prestiti? <em>Scompare quando il processo termina, salvo persistenza esterna.</em></li>
+<li>Posso fare un'applicazione corretta con file JSON? <em>Sì, per casi semplici; ma concorrenza, ricerche e integrità richiedono soluzioni aggiuntive.</em></li>
+<li>Qual è la differenza fra database e DBMS? <em>Dati organizzati e software che li gestisce.</em></li>
+<li>SQLite richiede sempre un server separato? <em>No, è in genere incorporato nel programma e usa un file di database.</em></li>
+<li>A cosa servono le transazioni? <em>A gestire operazioni come unità coerenti, anche in presenza di errori o concorrenza.</em></li>
+</ol>
+<p><strong>Passaggio:</strong> abbiamo tre responsabilità logiche. Su quali macchine girano? Possiamo eseguire tre componenti su un solo server fisico?</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-12-lezione" rel="prev" href="12-lezione.html"><small>← Precedente</small><span>Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>14 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-14-lezione" rel="next" href="14-lezione.html"><small>Successiva →</small><span>Lezione 14 — Logico e fisico: processi, macchine virtuali, container e cloud</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

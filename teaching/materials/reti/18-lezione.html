@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 18 — Caso conclusivo: progettare una piattaforma scolastica e spiegare le scelte — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 18 — Caso conclusivo: progettare una piattaforma scolastica e spiegare le scelte"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/18-lezione.html"><meta property="og:title" content="Lezione 18 — Caso conclusivo: progettare una piattaforma scolastica e spiegare le scelte — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/18-lezione.html"><meta property="og:description" content="Lezione 18 — Caso conclusivo: progettare una piattaforma scolastica e spiegare le scelte. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-18-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-17-lezione" rel="prev" href="17-lezione.html"><small>← Precedente</small><span>Lezione 17 — Firma digitale e PEC: autenticit&amp;#224;, integrit&amp;#224; e prova della consegna</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>19 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-19-appendice" rel="next" href="19-appendice.html"><small>Successiva →</small><span>Appendice — Glossario, collegamenti e fonti di riferimento</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-18-caso-conclusivo-progettare-una-piattaforma-scolastica-e-spiegare-le-scelte">Lezione 18 — Caso conclusivo: progettare una piattaforma scolastica e spiegare le scelte</h1>
+<p><strong>Problema finale:</strong> una scuola vuole offrire un portale che mostri orari e comunicazioni pubbliche, permetta agli studenti di prenotare libri e consenta alla segreteria di gestire dati riservati.</p>
+<h2 id="prima-i-requisiti-poi-le-tecnologie">1. Prima i requisiti, poi le tecnologie</h2>
+<p><strong>Scenario da analizzare:</strong></p>
+<blockquote>
+<p>Il portale deve essere raggiungibile da casa e dalla rete scolastica. La sezione «Notizie» è pubblica. La prenotazione dei libri richiede accesso personale. La segreteria gestisce utenti e prestiti. Il sistema deve conservare le informazioni dopo lo spegnimento del server. Un guasto o un accesso non autorizzato non deve consentire di leggere indiscriminatamente i dati amministrativi.</p>
+</blockquote>
+<p>Una corretta analisi separa <strong>requisiti funzionali</strong> (che cosa deve fare il sistema) e <strong>requisiti non funzionali</strong> (sicurezza, affidabilità, disponibilità, integrità e protezione dei dati).</p>
+<h2 id="unarchitettura-possibile-non-lunica">2. Un'architettura possibile, non l'unica</h2>
+<pre><code class="language-text">                         INTERNET
+                             |
+                   [Router / firewall]
+                             |
+                    [Reverse proxy Web]
+                    sito + accesso HTTPS
+                             |
+                         [Backend]
+                 API + business logic
+                             |
+                       [Database]
+            utenti, libri, prestiti, vincoli
+
+Rete scolastica (separata in VLAN):
+  VLAN 10 → Segreteria → gestionali autorizzati
+  VLAN 20 → Laboratori → risorse didattiche
+  VLAN 30 → Ospiti → Internet, non segreteria
+</code></pre>
+<p>Lo schema è <strong>logico</strong> e deve essere accompagnato da un ragionamento di rete. Il reverse proxy può essere collocato in una <strong>DMZ</strong>. Il database non è esposto direttamente a Internet e i flussi backend/database sono limitati a quelli necessari. Il front-end potrebbe essere servito dal reverse proxy o da un servizio apposito; non occorre che ogni rettangolo coincida con una macchina fisica.</p>
+<h2 id="percorso-di-una-prenotazione-dal-clic-al-dato-persistente">3. Percorso di una prenotazione: dal clic al dato persistente</h2>
+<h3 id="passo-1-il-browser-mostra-linterfaccia">Passo 1 — Il browser mostra l'interfaccia</h3>
+<p>L'utente apre un URL HTTPS. Il browser risolve il nome tramite DNS se necessario, avvia la connessione sicura e riceve l'HTML. Il browser analizza HTML e CSS, carica le risorse e avvia l'eventuale JavaScript. È il <strong>programma client</strong> che rende visibile l'interfaccia.</p>
+<h3 id="passo-2-il-software-client-chiede-unoperazione">Passo 2 — Il software client chiede un'operazione</h3>
+<p>Quando lo studente seleziona un libro, la pagina potrebbe usare un form o JavaScript con <code>fetch()</code> per inviare una richiesta HTTP a un endpoint della Web API, per esempio <code>POST /api/prenotazioni</code>. In entrambi i casi il browser gestisce le comunicazioni secondo gli standard del Web.</p>
+<h3 id="passo-3-il-backend-applica-le-regole">Passo 3 — Il backend applica le regole</h3>
+<p>La logica applicativa verifica che l'utente sia autenticato e autorizzato, controlla i limiti di prenotazione e la disponibilità del libro. <strong>Il browser non è la fonte definitiva delle autorizzazioni</strong>: un utente potrebbe inviare una richiesta senza utilizzare l'interfaccia prevista.</p>
+<h3 id="passo-4-il-database-salva">Passo 4 — Il database salva</h3>
+<p>Il sistema usa un DBMS, ad esempio PostgreSQL oppure SQLite per una soluzione piccola, secondo i requisiti. La prenotazione deve essere salvata in modo persistente e coerente, eventualmente tramite transazione. Se due studenti prenotano lo stesso ultimo libro nello stesso istante, la logica e la gestione transazionale devono evitare risultati incompatibili.</p>
+<h3 id="passo-5-la-risposta-torna-al-client">Passo 5 — La risposta torna al client</h3>
+<p>Il backend restituisce un esito, spesso in JSON. Il browser può aggiornare la schermata. Un errore può essere segnalato con un codice HTTP opportuno e un messaggio applicativo; non è necessario ricaricare l'intera pagina in ogni caso.</p>
+<h2 id="sicurezza-della-piattaforma-sette-controlli-complementari">4. Sicurezza della piattaforma: sette controlli complementari</h2>
+<p>La protezione della piattaforma richiede controlli differenti, che si completano a vicenda:</p>
+<ol>
+<li>«Le VLAN separano laboratori, ospiti e segreteria sul livello della rete locale.»</li>
+<li>«Il firewall e le regole ACL controllano i flussi consentiti fra segmenti e verso Internet.»</li>
+<li>«NAT/PAT permettono la condivisione degli indirizzi IPv4 pubblici, ma non sostituiscono i controlli di accesso.»</li>
+<li>«Il servizio Web esposto può stare in un segmento dedicato, come una DMZ, con un reverse proxy.»</li>
+<li>«Il database deve essere raggiungibile soltanto dai componenti autorizzati.»</li>
+<li>«HTTPS/TLS protegge il traffico in transito; l'autenticazione e le regole del backend proteggono l'uso del servizio.»</li>
+<li>«Backup, aggiornamenti e persistenza sono necessari anche quando la comunicazione è cifrata.»</li>
+</ol>
+<h2 id="tre-possibili-distribuzioni-dello-stesso-sistema">5. Tre possibili distribuzioni dello stesso sistema</h2>
+<p><strong>Distribuzione 1 — Un server fisico:</strong> web, backend e DBMS sono processi distinti sul medesimo computer; i layer logici rimangono separati nel progetto.</p>
+<p><strong>Distribuzione 2 — Un server fisico con container:</strong> web, backend e DBMS sono tre container Docker, con una rete virtuale privata tra servizi e storage persistente per i dati. <strong>Sono tre ambienti di esecuzione, non tre computer fisici.</strong></p>
+<p><strong>Distribuzione 3 — Host separati:</strong> l'interfaccia può essere servita da un host, il backend da un secondo e il database da un terzo; oppure alcuni servizi possono essere gestiti in cloud. Aumentano possibilità di distribuzione e isolamento fisico, ma anche complessità di rete, gestione e costi.</p>
+<p><strong>Quale configurazione è sicura?</strong> Il numero delle macchine non è sufficiente a stabilirlo: ogni configurazione può essere progettata bene o male, con vincoli e rischi diversi.</p>
+<h2 id="traccia-di-verifica-10-domande-ragionate">6. Traccia di verifica: 10 domande ragionate</h2>
+<ol>
+<li>Spiega perché la sicurezza di una rete non può essere valutata soltanto verificando che i pacchetti arrivino.</li>
+<li>Perché la disponibilità di nuovi IPv4 pubblici è scarsa? Distingui l'esaurimento delle assegnazioni dall'idea sbagliata che IPv4 non funzioni più.</li>
+<li>In che modo PAT permette a più dispositivi di uscire con lo stesso indirizzo IPv4 pubblico?</li>
+<li>Perché una scuola potrebbe usare tre VLAN, e che cosa servirebbe per controllare il traffico tra esse?</li>
+<li>Un programma invia <code>b&quot;CIAO&quot;</code> attraverso un socket TCP. Che cosa capisce automaticamente TCP del contenuto? Perché occorre un protocollo applicativo?</li>
+<li>Spiega perché un browser può richiedere file CSS e immagini senza che il codice JavaScript della pagina chiami <code>fetch()</code>.</li>
+<li>Che cosa fanno HTML, CSS e JavaScript nel browser? Che cosa significa che il motore JavaScript può interpretare e compilare?</li>
+<li>Qual è la differenza tra una API del browser e una Web API esposta dal server?</li>
+<li>Spiega la differenza fra presentation, business logic e data e distingui layer, tier, container e macchina fisica.</li>
+<li>Perché usare un database invece di un file JSON per un registro con molti utenti? Distingui infine le funzioni di HTTPS, firma digitale e PEC.</li>
+</ol>
+<h3 id="caratteristiche-di-una-risposta-completa">Caratteristiche di una risposta completa</h3>
+<table>
+<thead>
+<tr>
+<th>Dimensione</th>
+<th>Risposta adeguata</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accuratezza tecnica</td>
+<td>Distingue NAT/firewall, TCP/HTTP, browser/motore JavaScript, layer/tier, cifratura/firma</td>
+</tr>
+<tr>
+<td>Collegamenti causali</td>
+<td>Parte dal problema concreto e giustifica la scelta della tecnologia</td>
+</tr>
+<tr>
+<td>Analisi dei rischi</td>
+<td>Identifica risorse esposte, accessi da limitare e dati da proteggere</td>
+</tr>
+<tr>
+<td>Linguaggio tecnico</td>
+<td>Scioglie gli acronimi essenziali e distingue termini simili</td>
+</tr>
+</tbody>
+</table>
+<h2 id="casi-di-approfondimento-richieste-web-container-e-accessi">7. Casi di approfondimento: richieste Web, container e accessi</h2>
+<h3 id="caso-a-una-pagina-web-genera-piu-richieste">Caso A — Una pagina Web genera più richieste</h3>
+<p>Il caricamento di <code>/index.html</code> produce richieste per <code>/stile.css</code>, <code>/logo.png</code> e <code>/app.js</code>. Dopo un clic su un pulsante compare anche <code>/api/prenotazioni</code>.</p>
+<p><strong>Analisi.</strong> Le richieste per CSS, immagine e script possono nascere dal caricamento delle risorse riconosciute dal browser. L'ultima richiesta potrebbe invece essere partita dal JavaScript della pagina tramite una Web API come <code>fetch()</code>. <strong>Non esiste una regola secondo cui solo il primo GET viene eseguito dal browser e tutto il resto è eseguito direttamente dal motore JavaScript:</strong> rete e API del browser restano coinvolte.</p>
+<p><strong>Domande di approfondimento:</strong> Che cosa accade se JavaScript è disabilitato? <em>Le risorse necessarie alla visualizzazione possono essere comunque scaricate; certe funzioni interattive potrebbero non essere disponibili.</em> Un form HTML può inviare dati anche senza JavaScript? <em>Sì.</em></p>
+<h3 id="caso-b-tre-container-un-solo-computer">Caso B — Tre container, un solo computer</h3>
+<pre><code class="language-text">Host fisico
+  ├── container «web»
+  ├── container «backend»
+  └── container «database» ─── volume persistente
+</code></pre>
+<p><strong>Analisi.</strong> I tre componenti sono separati nell'esecuzione, ma condividono lo stesso host fisico. Un guasto dell'host può interrompere l'intero sistema; il volume evita che il ciclo di vita effimero del container determini automaticamente la perdita dei dati, ma non sostituisce backup e ripristino.</p>
+<p><strong>Domande di approfondimento:</strong> Se il database viene spostato su un secondo host, il numero di layer logici cambia? <em>No.</em> Aumenta l'indipendenza rispetto al guasto del primo host? <em>Sì, sul piano della collocazione del database, ma il servizio complessivo può comunque dipendere dal backend.</em></p>
+<h3 id="caso-c-un-servizio-web-esposto-e-un-database-riservato">Caso C — Un servizio Web esposto e un database riservato</h3>
+<p>Il servizio pubblico ascolta su HTTPS/TCP 443. Un database è disponibile soltanto per i processi applicativi autorizzati. Una richiesta <code>GET /admin</code> raggiunge il sito da un utente non autenticato.</p>
+<p><strong>Analisi.</strong> Un firewall che lascia passare HTTPS non verifica automaticamente se l'utente è autorizzato a usare <code>/admin</code>. Occorrono controlli applicativi sul server; un WAF può aggiungere filtri sulle richieste, ma non sostituisce il controllo degli accessi. Il database non deve essere esposto direttamente ai client Internet solo perché il sito è pubblico.</p>
+<p><strong>Domande di approfondimento:</strong> Che cosa deve poter attraversare il firewall? <em>Solo i flussi realmente necessari.</em> Il fatto che il traffico sia cifrato da TLS basta a renderlo lecito? <em>No: cifratura e autorizzazione risolvono problemi diversi.</em></p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-17-lezione" rel="prev" href="17-lezione.html"><small>← Precedente</small><span>Lezione 17 — Firma digitale e PEC: autenticit&amp;#224;, integrit&amp;#224; e prova della consegna</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>19 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-19-appendice" rel="next" href="19-appendice.html"><small>Successiva →</small><span>Appendice — Glossario, collegamenti e fonti di riferimento</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

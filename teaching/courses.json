@@ -368,6 +368,64 @@
       "order": [
         "rappresentazione-interi.html"
       ]
+    },
+    {
+      "id": "reti",
+      "folder": "reti",
+      "title": "Dalle reti alle applicazioni distribuite",
+      "symbol": "IP",
+      "description": "Classe quinta: sicurezza delle reti, Web, API, architetture, persistenza, cloud e protezione dei dati.",
+      "order": [
+        "00-introduzione.html",
+        "01-lezione.html",
+        "02-lezione.html",
+        "03-lezione.html",
+        "04-lezione.html",
+        "05-lezione.html",
+        "06-lezione.html",
+        "07-lezione.html",
+        "08-lezione.html",
+        "09-lezione.html",
+        "10-lezione.html",
+        "11-lezione.html",
+        "12-lezione.html",
+        "13-lezione.html",
+        "14-lezione.html",
+        "15-lezione.html",
+        "16-lezione.html",
+        "17-lezione.html",
+        "18-lezione.html",
+        "19-appendice.html"
+      ],
+      "chapters": [
+        {
+          "id": "reti-01",
+          "title": "Dalle reti alle applicazioni distribuite",
+          "description": "18 lezioni con introduzione e appendice, in un unico percorso.",
+          "files": [
+            "00-introduzione.html",
+            "01-lezione.html",
+            "02-lezione.html",
+            "03-lezione.html",
+            "04-lezione.html",
+            "05-lezione.html",
+            "06-lezione.html",
+            "07-lezione.html",
+            "08-lezione.html",
+            "09-lezione.html",
+            "10-lezione.html",
+            "11-lezione.html",
+            "12-lezione.html",
+            "13-lezione.html",
+            "14-lezione.html",
+            "15-lezione.html",
+            "16-lezione.html",
+            "17-lezione.html",
+            "18-lezione.html",
+            "19-appendice.html"
+          ]
+        }
+      ]
     }
   ]
 }

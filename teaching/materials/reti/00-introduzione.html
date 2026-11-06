@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dalle reti alle applicazioni distribuite — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Dalle reti alle applicazioni distribuite"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/00-introduzione.html"><meta property="og:title" content="Dalle reti alle applicazioni distribuite — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/00-introduzione.html"><meta property="og:description" content="Dalle reti alle applicazioni distribuite. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-00-introduzione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><span class="lesson-neighbor lesson-boundary"><small>Inizio del percorso</small><span>Dalle reti alle applicazioni distribuite</span></span><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>1 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-01-lezione" rel="next" href="01-lezione.html"><small>Successiva →</small><span>Lezione 1 — Dalla comunicazione alla sicurezza delle reti</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="dalle-reti-alle-applicazioni-distribuite">Dalle reti alle applicazioni distribuite</h1>
+<p><strong>Informatica · Classe quinta · Liceo Scientifico, opzione Scienze Applicate · Novembre 2026</strong></p>
+<h2 id="il-percorso-dalle-reti-gia-studiate-ai-servizi-e-alla-protezione-dei-dati">Il percorso: dalle reti già studiate ai servizi e alla protezione dei dati</h2>
+<p>I livelli ISO/OSI e TCP/IP spiegano <strong>come</strong> un messaggio viene trasferito tra dispositivi. Resta da comprendere <strong>quali comunicazioni autorizzare</strong>, <strong>come i programmi scambiano e interpretano dati</strong>, <strong>come funzionano le applicazioni Web</strong>, <strong>dove si esegue il software</strong> e <strong>come vengono conservate e protette le informazioni</strong>.</p>
+<p>Il percorso segue il filo dei problemi tecnici, non l'ordine cronologico con cui le tecnologie sono nate.</p>
+<table>
+<thead>
+<tr>
+<th>Lezione</th>
+<th>Argomento e problema principale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Sicurezza delle reti: comunicare non significa comunicare in sicurezza</td>
+</tr>
+<tr>
+<td>2</td>
+<td>IPv4: perché gli indirizzi pubblici sono una risorsa scarsa</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Gateway, NAT, PAT e CGNAT: condividere un indirizzo pubblico</td>
+</tr>
+<tr>
+<td>4</td>
+<td>VLAN, subnet, firewall e ACL: separare e controllare le comunicazioni</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Proxy e DMZ: rendere pubblici alcuni servizi, non tutta la rete</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Internet senza Web: reti, IP, TCP, UDP, porte e DNS</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Socket TCP: due programmi scambiano un flusso di byte</td>
+</tr>
+<tr>
+<td>8</td>
+<td>HTTP: dare una struttura condivisa alle richieste e alle risposte</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Browser: HTML, CSS, rendering, JavaScript, interpretazione e compilazione</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Web API: scambio di dati tra componenti applicativi</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Server Web e applicativi: tecnologie diverse, stesso ruolo</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Architetture distribuite: client-server, livelli logici e tier</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Persistenza: file, database e DBMS</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Processi, container, host fisici e cloud: dove gira il software</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Intranet, extranet, Web partecipativo e servizi cloud</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Crittografia, hash, TLS, certificati e HTTPS</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Firma digitale e Posta Elettronica Certificata (PEC)</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Analisi integrata di una piattaforma e domande di verifica</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conoscenze-iniziali">Conoscenze iniziali</h2>
+<p>Classificazione e topologie delle reti; dispositivi e mezzi trasmissivi; modello ISO/OSI; famiglia TCP/IP; incapsulamento; indirizzi MAC e IP; trasferimento dei pacchetti.</p>
+<h2 id="competenze-da-sviluppare">Competenze da sviluppare</h2>
+<p>Al termine del percorso diventano possibili spiegazioni fondate su causa ed effetto: perché un determinato traffico va filtrato; perché più dispositivi condividono un IPv4 pubblico; perché TCP non definisce il significato dei byte; perché il browser genera richieste ed esegue codice JavaScript; perché le API non dipendono dal linguaggio; perché un DBMS gestisce problemi che un file isolato non risolve automaticamente; perché tre container non significano tre computer fisici; come crittografia e firme affrontano esigenze diverse.</p>
+<h2 id="lettura-degli-esempi">Lettura degli esempi</h2>
+<p>Gli esempi rappresentano situazioni tecniche semplificate, non configurazioni utilizzabili direttamente in produzione. I brevi frammenti di codice servono a <strong>osservare concetti</strong>, non a studiare un framework specifico. Le sezioni <strong>Analisi di un caso</strong> e <strong>Verifica</strong> contengono problemi applicativi e domande di ragionamento.</p>
+<p><code>127.0.0.1</code> indica l'host locale. Gli indirizzi <code>192.0.2.0/24</code>, <code>198.51.100.0/24</code> e <code>203.0.113.0/24</code> appartengono a intervalli riservati alla documentazione e non identificano server reali degli esempi. Il glossario conclusivo riassume gli acronimi.</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><span class="lesson-neighbor lesson-boundary"><small>Inizio del percorso</small><span>Dalle reti alle applicazioni distribuite</span></span><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>1 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-01-lezione" rel="next" href="01-lezione.html"><small>Successiva →</small><span>Lezione 1 — Dalla comunicazione alla sicurezza delle reti</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

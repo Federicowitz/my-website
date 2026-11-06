@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/16-lezione.html"><meta property="og:title" content="Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/16-lezione.html"><meta property="og:description" content="Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-16-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-15-lezione" rel="prev" href="15-lezione.html"><small>← Precedente</small><span>Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>17 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-17-lezione" rel="next" href="17-lezione.html"><small>Successiva →</small><span>Lezione 17 — Firma digitale e PEC: autenticit&amp;#224;, integrit&amp;#224; e prova della consegna</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-16-proteggere-il-contenuto-crittografia-hash-certificati-e-https">Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Abbiamo controllato chi può parlare con chi. E se qualcuno riuscisse comunque a osservare il traffico su una rete che non controlliamo?»</em></p>
+<h2 id="le-barriere-di-rete-non-proteggono-da-sole-il-significato-dei-dati">1. Le barriere di rete non proteggono da sole il significato dei dati</h2>
+<p>Un firewall può stabilire se una comunicazione è permessa; una VLAN separa gruppi di dispositivi; un proxy intermedia richieste. Queste misure <strong>non sostituiscono la protezione dei contenuti</strong>. Se i dati viaggiano in chiaro, un soggetto in grado di intercettare il traffico può, in certe condizioni, osservarne i contenuti. Inoltre, la rete da un browser a un server può attraversare infrastrutture di più soggetti.</p>
+<p>La <strong>crittografia</strong> studia tecniche che permettono di proteggere informazioni mediante trasformazioni basate su algoritmi e, normalmente, su <strong>chiavi</strong>. Un algoritmo moderno dovrebbe poter essere pubblico: la sicurezza non dovrebbe dipendere dal fatto che l'aggressore ignori come funziona, ma dalla protezione della chiave e dalla robustezza del sistema.</p>
+<h2 id="testo-in-chiaro-testo-cifrato-chiave">2. Testo in chiaro, testo cifrato, chiave</h2>
+<p><strong>Testo in chiaro</strong> (<em>plaintext</em>) è il contenuto prima della protezione; <strong>testo cifrato</strong> (<em>ciphertext</em>) è il risultato della cifratura. Una <strong>chiave crittografica</strong> è un valore utilizzato dall'algoritmo per trasformare o recuperare il contenuto.</p>
+<pre><code class="language-text">MESSAGGIO LEGGIBILE
+      │
+      ▼  cifratura + chiave
+MESSAGGIO CIFRATO
+      │
+      ▼  decifratura + chiave appropriata
+MESSAGGIO LEGGIBILE
+</code></pre>
+<p>Un esempio didattico come lo spostamento delle lettere dell'alfabeto può essere utile per capire l'idea astratta, ma <strong>non è sicuro nella pratica</strong> e non spiega le proprietà dei moderni sistemi. I moderni algoritmi richiedono costruzioni matematiche e verifiche ben più complesse dei cifrari a sostituzione.</p>
+<h2 id="crittografia-simmetrica">3. Crittografia simmetrica</h2>
+<p>Nella <strong>crittografia simmetrica</strong>, mittente e destinatario utilizzano la <strong>stessa chiave segreta</strong>, o chiavi facilmente derivabili fra loro, per cifrare e decifrare. È adatta a proteggere grandi quantità di dati in modo efficiente.</p>
+<p>Un problema fondamentale è la <strong>distribuzione della chiave</strong>: come fanno due soggetti che non si sono mai incontrati a condividere una chiave segreta senza esporla proprio durante lo scambio?</p>
+<p>Esempio: un programma deve conservare in forma protetta un archivio o cifrare i dati di una sessione. Il sistema può usare un algoritmo simmetrico come <strong>AES</strong>, <em>Advanced Encryption Standard</em>. Il nome serve come riferimento, non come materia di esercitazione.</p>
+<h2 id="crittografia-asimmetrica">4. Crittografia asimmetrica</h2>
+<p>Nella <strong>crittografia asimmetrica</strong> si usa una <strong>coppia di chiavi correlate</strong>:</p>
+<ul>
+<li><strong>chiave pubblica:</strong> può essere distribuita;</li>
+<li><strong>chiave privata:</strong> deve essere tenuta segreta dal titolare.</li>
+</ul>
+<p>In alcuni schemi la chiave pubblica del destinatario permette di cifrare un messaggio e la privata di decifrarlo. Altri schemi a chiave pubblica servono alla <strong>firma digitale</strong> o all'<strong>accordo di chiave</strong>. <strong>Non tutti gli algoritmi asimmetrici svolgono indistintamente tutte queste funzioni</strong>.</p>
+<p>Vantaggi: offre strumenti per risolvere problemi di distribuzione delle chiavi e di autenticazione. Limiti: le operazioni possono essere più costose; per molti protocolli si usa una soluzione <strong>ibrida</strong>, combinando meccanismi asimmetrici per autenticazione/accordo iniziale e algoritmi simmetrici per proteggere la comunicazione vera e propria.</p>
+<h2 id="integrita-la-funzione-hash-non-e-una-cifratura">5. Integrità: la funzione hash non è una cifratura</h2>
+<p>Una <strong>funzione hash crittografica</strong> trasforma un dato di dimensione arbitraria in un'impronta (<em>digest</em>) di lunghezza fissa. È progettata perché sia computazionalmente difficile risalire al contenuto originale o trovare collisioni utili in attacchi, secondo le proprietà richieste.</p>
+<pre><code class="language-text">Documento A ──&gt; funzione hash ──&gt; impronta A
+Documento A modificato ──&gt; hash ──&gt; impronta molto probabilmente diversa
+</code></pre>
+<p>Un hash <strong>non si decifra</strong>: non è un sistema per nascondere un messaggio e poi recuperarlo. Da solo, inoltre, non prova chi ha prodotto il documento: chiunque potrebbe modificare il file e ricalcolarne l'hash. Per autenticazione e integrità affidabile servono meccanismi aggiuntivi, per esempio <strong>MAC</strong> (<em>Message Authentication Code</em>, codice di autenticazione del messaggio) con chiave segreta oppure firme digitali.</p>
+<p>Per le password, non è corretto dire «le cifriamo così poi le decifriamo per controllarle». In genere si memorizzano <strong>verificatori derivati da password</strong> usando funzioni appropriate per password, con <strong>salt</strong> (valore casuale associato alla password), non cifrature reversibili o semplici hash veloci senza ulteriori difese.</p>
+<h2 id="https-la-versione-sicura-della-comunicazione-web">6. HTTPS: la versione sicura della comunicazione Web</h2>
+<p><strong>HTTPS</strong> significa comunemente <em>Hypertext Transfer Protocol Secure</em>: è HTTP utilizzato sopra un canale protetto da <strong>TLS</strong>, <em>Transport Layer Security</em>. TLS mira a fornire protezione del traffico <strong>in transito</strong>, inclusi riservatezza e integrità e, nelle forme comuni di uso Web, autenticazione del server.</p>
+<p>Per i nostri scopi, il funzionamento può essere raccontato così:</p>
+<ol>
+<li>Il browser vuole collegarsi a <code>https://www.example.org</code>.</li>
+<li>Browser e server negoziano parametri di sicurezza tramite TLS.</li>
+<li>Il server presenta normalmente un <strong>certificato digitale</strong>, che contiene informazioni utili a verificarne l'identità e la chiave pubblica.</li>
+<li>Il browser controlla la validità della catena di certificazione, il nome del server e altre condizioni pertinenti.</li>
+<li>Mediante appositi meccanismi crittografici le parti stabiliscono <strong>chiavi di sessione</strong> e proteggono i dati scambiati.</li>
+<li>All'interno del canale sicuro viaggiano le richieste e le risposte HTTP.</li>
+</ol>
+<p>È una descrizione <strong>concettuale</strong>: i dettagli delle versioni moderne di TLS includono meccanismi di accordo delle chiavi e verifiche più sofisticati di un semplice «il server cifra con la chiave pubblica e il browser decifra».</p>
+<h2 id="certificati-e-autorita-di-certificazione">7. Certificati e autorità di certificazione</h2>
+<p>Una <strong>CA</strong>, <em>Certification Authority</em> (autorità di certificazione), è un soggetto che emette certificati digitali. Il browser dispone di un insieme di autorità considerate attendibili e può verificare le catene di certificazione. Il certificato aiuta a collegare una <strong>chiave pubblica</strong> al <strong>nome del servizio</strong>.</p>
+<p><strong>Attenzione:</strong> il lucchetto/HTTPS indica che la connessione è protetta e che il browser ha effettuato le verifiche richieste, <strong>non</strong> che il contenuto del sito sia vero, moralmente corretto o esente da frodi. Anche un sito di phishing può usare HTTPS. Inoltre HTTPS protegge tipicamente il collegamento fra i due estremi TLS: se un server riceve i dati e li conserva senza protezioni adeguate, la cifratura del trasporto non risolve quel problema.</p>
+<p>Confronto utile:</p>
+<table>
+<thead>
+<tr>
+<th>Tecnologia</th>
+<th>Problema principale che affronta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Firewall / ACL</td>
+<td>Autorizzare o bloccare comunicazioni</td>
+</tr>
+<tr>
+<td>VLAN / DMZ</td>
+<td>Separare porzioni e servizi di rete</td>
+</tr>
+<tr>
+<td>NAT / PAT</td>
+<td>Tradurre indirizzi e porte</td>
+</tr>
+<tr>
+<td>TLS / HTTPS</td>
+<td>Proteggere le comunicazioni in transito e autenticare il servizio secondo le verifiche previste</td>
+</tr>
+<tr>
+<td>Hash</td>
+<td>Produrre un'impronta utile per controlli di integrità, se usata correttamente</td>
+</tr>
+<tr>
+<td>Firma digitale</td>
+<td>Collegare un documento al firmatario e verificare integrità e autenticità</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verifica-e-discussione">8. Verifica e discussione</h2>
+<ol>
+<li>Un firewall sostituisce HTTPS? <em>No: filtra traffico, non cifra necessariamente i contenuti.</em></li>
+<li>Perché non si usa soltanto la crittografia asimmetrica per tutti i dati di una sessione? <em>I protocolli tipicamente combinano meccanismi di accordo/autenticazione con cifratura simmetrica efficiente.</em></li>
+<li>Un hash è una cifratura reversibile? <em>No.</em></li>
+<li>Se appare HTTPS, il sito è certamente affidabile dal punto di vista del contenuto? <em>No.</em></li>
+<li>La cifratura in transito garantisce che il database non subisca furti? <em>No: bisogna proteggere anche applicazione, sistemi e dati conservati.</em></li>
+</ol>
+<p><strong>Passaggio alla lezione 17:</strong> cifrare un messaggio significa renderne protetto il contenuto. Ma come dimostriamo l'autenticità di un documento firmato o l'avvenuta consegna di una comunicazione ufficiale?</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-15-lezione" rel="prev" href="15-lezione.html"><small>← Precedente</small><span>Lezione 15 — Intranet, extranet, Web 2.0 e cloud computing</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>17 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-17-lezione" rel="next" href="17-lezione.html"><small>Successiva →</small><span>Lezione 17 — Firma digitale e PEC: autenticit&amp;#224;, integrit&amp;#224; e prova della consegna</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/07-lezione.html"><meta property="og:title" content="Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/07-lezione.html"><meta property="og:description" content="Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-07-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-06-lezione" rel="prev" href="06-lezione.html"><small>← Precedente</small><span>Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>8 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-08-lezione" rel="next" href="08-lezione.html"><small>Successiva →</small><span>Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-7-socket-tcp-due-programmi-si-scambiano-byte-non-pagine-web">Lezione 7 — Socket TCP: due programmi si scambiano byte, non pagine Web</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Abbiamo un indirizzo e una porta. Quale strumento usa concretamente un programma per spedire e ricevere dati?»</em></p>
+<h2 id="che-cose-un-socket">1. Che cos'è un socket?</h2>
+<p>Un <strong>socket</strong> è un'interfaccia software tramite la quale un programma utilizza i servizi di comunicazione della rete offerti dal sistema operativo. Non è un protocollo applicativo, né una porta fisica del computer. Nel caso studiato useremo un <strong>socket TCP</strong>, che consente a due processi di scambiare un flusso ordinato di byte.</p>
+<p>Se eseguiamo due programmi sullo <strong>stesso computer</strong>, possiamo comunque osservare il modello client-server: il traffico passa per l'interfaccia virtuale di <em>loopback</em>. L'indirizzo <code>127.0.0.1</code> significa «questo stesso host».</p>
+<p>Schema dei ruoli:</p>
+<pre><code class="language-text">SERVER                                  CLIENT
+crea socket                             crea socket
+associa indirizzo e porta               stabilisce connessione
+si mette in ascolto             &lt;------ connect
+accetta connessione
+riceve byte                     &lt;------ invia byte
+invia byte                      ------&gt; riceve byte
+chiude la connessione                  chiude la connessione
+</code></pre>
+<p>Il server in attesa di connessioni non «spinge» automaticamente una pagina. Rimane disponibile a ricevere contatti; dopo la connessione il comportamento è stabilito dai programmi.</p>
+<h2 id="dimostrazione-essenziale-in-python">2. Dimostrazione essenziale in Python</h2>
+<p><strong>Lettura delle operazioni fondamentali:</strong> <code>listen</code> abilita l’ascolto delle connessioni, <code>accept</code> accetta un client, <code>recv</code> legge fino a un numero massimo di byte, <code>sendall</code> invia i byte richiesti finché l’operazione riesce o viene segnalato un errore. Il meccanismo è più importante della sintassi Python.</p>
+<p><em>Programma server — <code>server_tcp.py</code>:</em></p>
+<pre><code class="language-python">import socket
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((&quot;127.0.0.1&quot;, 50555))
+    server.listen(1)
+    print(&quot;In ascolto...&quot;)
+    conn, indirizzo = server.accept()
+    with conn:
+        dati = conn.recv(1024)
+        print(&quot;Ricevuti:&quot;, dati)
+        conn.sendall(b&quot;Ciao dal server&quot;)
+</code></pre>
+<p><em>Programma client — <code>client_tcp.py</code>:</em></p>
+<pre><code class="language-python">import socket
+
+with socket.create_connection((&quot;127.0.0.1&quot;, 50555)) as client:
+    client.sendall(b&quot;Ciao dal client&quot;)
+    print(&quot;Risposta:&quot;, client.recv(1024))
+</code></pre>
+<p><strong>Sequenza di esecuzione:</strong> prima parte il processo server, poi il client. L’output può contenere <code>b'Ciao dal client'</code> e <code>b'Ciao dal server'</code>: la <code>b</code> segnala una sequenza di <strong>byte</strong> in Python. Il contenuto non è automaticamente un oggetto HTTP, una pagina HTML o un oggetto JSON.</p>
+<p><strong>Limiti dell’esempio:</strong> il server ascolta soltanto su <code>127.0.0.1</code> e non espone intenzionalmente un servizio sulla rete esterna. Non implementa autenticazione, gestione di più client o completa gestione degli errori: è un esempio per osservare TCP, non un server di produzione.</p>
+<h2 id="da-caratteri-a-byte-codifica">3. Da caratteri a byte: codifica</h2>
+<p>Quando scriviamo <code>&quot;Ciao&quot;</code> pensiamo a caratteri; per trasmettere occorrono byte. Una <strong>codifica dei caratteri</strong> specifica come trasformare il testo in byte e viceversa. Una codifica usatissima è <strong>UTF-8</strong>, <em>Unicode Transformation Format, 8-bit</em>.</p>
+<pre><code class="language-python">messaggio = &quot;Città&quot;
+dati = messaggio.encode(&quot;utf-8&quot;)   # caratteri → byte
+nuovo_testo = dati.decode(&quot;utf-8&quot;) # byte → caratteri
+</code></pre>
+<p>Queste istruzioni mostrano perché due programmi devono accordarsi sulla codifica. Il trasferimento può funzionare perfettamente anche se il destinatario interpreta male i byte: il problema allora non è la rete, ma il <strong>formato applicativo</strong>.</p>
+<h2 id="un-equivoco-importantissimo-tcp-non-conserva-i-confini-dei-messaggi">4. Un equivoco importantissimo: TCP non conserva i confini dei messaggi</h2>
+<p>Nell'esempio abbiamo inviato un breve messaggio e ricevuto una sola volta. <strong>Una chiamata <code>sendall()</code> del client non corrisponde necessariamente a una singola <code>recv()</code> del server con lo stesso contenuto.</strong> TCP offre un flusso di byte, non pacchetti-messaggio visibili all'applicazione con gli stessi confini delle chiamate di invio.</p>
+<p>Se il client invia i byte di <code>BUONGIORNO</code>, il server potrebbe ricevere <code>BUON</code> e poi <code>GIORNO</code>, oppure tutto insieme. Anche due invii distinti potrebbero essere letti in un'unica <code>recv</code>. Una chiamata a <code>recv(1024)</code> restituisce <strong>fino a</strong> 1024 byte, non obbligatoriamente 1024.</p>
+<p>Un protocollo applicativo reale ha quindi bisogno di un criterio per riconoscere i messaggi:</p>
+<ul>
+<li>dimensione annunciata prima del contenuto;</li>
+<li>terminatore concordato, come un carattere di nuova riga;</li>
+<li>struttura del protocollo, come intestazioni con lunghezza del contenuto.</li>
+</ul>
+<p>Anche la fine del flusso è significativa: una <code>recv</code> che restituisce <code>b''</code> segnala normalmente la chiusura ordinata del lato remoto. <strong>Il problema non è il comando utilizzato, ma il fatto che il flusso TCP non conserva automaticamente i confini logici dei messaggi.</strong></p>
+<h2 id="il-protocollo-lo-decidono-le-applicazioni">5. Il protocollo lo decidono le applicazioni</h2>
+<p>Si considerino due coppie di programmi:</p>
+<pre><code class="language-text">Programma A: invia &quot;SOMMA 2 3&quot;  → Server A: restituisce &quot;5&quot;
+Programma B: invia &quot;ACCENDI&quot;    → Server B: restituisce &quot;OK&quot;
+</code></pre>
+<p>Entrambi possono usare esattamente TCP. Cambia soltanto la <strong>regola condivisa</strong> con cui interpretano i byte. Questa regola è un protocollo di livello applicativo. Non tutti i protocolli richiedono il Web; alcuni sono privati, altri standardizzati.</p>
+<p><strong>Ponte verso HTTP:</strong> browser e server Web hanno bisogno di capirsi anche quando sono scritti da persone diverse, in linguaggi differenti e su sistemi operativi differenti. Perciò non possono basarsi su un messaggio inventato per ogni coppia di programmi: utilizzano un protocollo condiviso, HTTP.</p>
+<h2 id="analisi-del-flusso-e-verifica">6. Analisi del flusso e verifica</h2>
+<p>Un client esegue due invii successivi, contenenti <code>b&quot;CIAO&quot;</code> e <code>b&quot;MONDO&quot;</code>. Il server chiama <code>recv(1024)</code>.</p>
+<p><strong>È garantito che la prima lettura restituisca <code>b&quot;CIAO&quot;</code> e la seconda <code>b&quot;MONDO&quot;</code>?</strong> No. Il server potrebbe leggere <code>b&quot;CIAOMONDO&quot;</code> tutto insieme, oppure byte suddivisi in più letture. TCP conserva l'ordine dei byte, non il confine dei due invii.</p>
+<p><strong>Come si può riconoscere dove finisce un messaggio?</strong> Una convenzione di livello applicativo può aggiungere un delimitatore, per esempio <code>CIAO\n</code>, oppure annunciare la lunghezza del contenuto prima dei byte. Sono esempi di <em>framing</em>, cioè delimitazione dei messaggi.</p>
+<p><strong>Perché <code>b&quot;Città&quot;</code> non è una rappresentazione appropriata direttamente scritta come letterale bytes Python?</strong> Per caratteri non ASCII è necessario applicare una codifica, per esempio <code>&quot;Città&quot;.encode(&quot;utf-8&quot;)</code>.</p>
+<h3 id="verifica">Verifica</h3>
+<ol>
+<li>Un socket TCP è un browser? <em>No: è un'interfaccia per usare il servizio di trasporto TCP.</em></li>
+<li>Il server deve conoscere il codice sorgente del client? <em>No: deve condividere il protocollo applicativo.</em></li>
+<li><code>recv(1024)</code> assicura sempre un messaggio completo? <em>No: indica un massimo di byte da leggere.</em></li>
+<li>A cosa serve UTF-8? <em>A codificare i caratteri in byte e a decodificarli.</em></li>
+<li>Client e server possono girare su un solo PC? <em>Sì, utilizzando l'interfaccia locale di loopback.</em></li>
+</ol>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-06-lezione" rel="prev" href="06-lezione.html"><small>← Precedente</small><span>Lezione 6 — Internet prima del Web: reti, nomi, trasporto e servizi</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>8 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-08-lezione" rel="next" href="08-lezione.html"><small>Successiva →</small><span>Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

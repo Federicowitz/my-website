@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 1 — Dalla comunicazione alla sicurezza delle reti — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 1 — Dalla comunicazione alla sicurezza delle reti"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/01-lezione.html"><meta property="og:title" content="Lezione 1 — Dalla comunicazione alla sicurezza delle reti — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/01-lezione.html"><meta property="og:description" content="Lezione 1 — Dalla comunicazione alla sicurezza delle reti. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-01-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-00-introduzione" rel="prev" href="00-introduzione.html"><small>← Precedente</small><span>Dalle reti alle applicazioni distribuite</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>2 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-02-lezione" rel="next" href="02-lezione.html"><small>Successiva →</small><span>Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-1-dalla-comunicazione-alla-sicurezza-delle-reti">Lezione 1 — Dalla comunicazione alla sicurezza delle reti</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Abbiamo visto come un messaggio arriva a destinazione. È sufficiente sapere che arriva?»</em></p>
+<h2 id="il-problema-prima-della-soluzione">1. Il problema prima della soluzione</h2>
+<p>Immaginiamo una scuola. In una stessa infrastruttura circolano pagine Web, registri elettronici, file didattici, dati amministrativi, messaggi personali. La rete ha assolto correttamente il suo compito tecnico se ha trasferito i dati. Ma questa osservazione non dice <strong>chi</strong> ha potuto accedervi, <strong>se</strong> sono stati alterati, né <strong>se</strong> il servizio era accessibile a chi ne aveva bisogno.</p>
+<p>La sicurezza delle reti nasce da questa separazione: <strong>comunicare</strong> e <strong>comunicare in modo controllato</strong> sono due problemi distinti. Ogni dispositivo collegato offre possibilità di comunicazione; alcune sono desiderate, altre non autorizzate. Un server pubblicamente raggiungibile è utile, ma la sua esposizione non dovrebbe rendere raggiungibili anche i computer della segreteria.</p>
+<p><strong>Caso concreto.</strong> Un dispositivo connesso al Wi-Fi ospiti può consultare il sito pubblico della scuola, ma non dovrebbe poter raggiungere una cartella riservata della contabilità. Non basta dichiarare «accesso vietato»: occorre definire <em>quale dispositivo può comunicare con quale servizio</em>, individuare il punto in cui controllare il traffico e applicare effettivamente la regola.</p>
+<h2 id="che-cosa-vogliamo-proteggere">2. Che cosa vogliamo proteggere?</h2>
+<p>Tre obiettivi fondamentali formano la triade <strong>CIA</strong>, dalle parole inglesi <em>Confidentiality, Integrity, Availability</em>:</p>
+<table>
+<thead>
+<tr>
+<th>Obiettivo</th>
+<th>Significato</th>
+<th>Esempio scolastico</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Riservatezza</strong> (<em>confidentiality</em>)</td>
+<td>Solo soggetti autorizzati leggono il contenuto</td>
+<td>I voti non sono visibili a studenti estranei</td>
+</tr>
+<tr>
+<td><strong>Integrità</strong> (<em>integrity</em>)</td>
+<td>I dati non vengono modificati senza autorizzazione</td>
+<td>Un voto registrato non viene alterato da terzi</td>
+</tr>
+<tr>
+<td><strong>Disponibilità</strong> (<em>availability</em>)</td>
+<td>Sistemi e dati sono fruibili quando servono</td>
+<td>Il registro resta utilizzabile durante le lezioni</td>
+</tr>
+</tbody>
+</table>
+<p>Aggiungiamo poi <strong>autenticazione</strong> (accertare chi si presenta), <strong>autorizzazione</strong> (stabilire che cosa può fare), <strong>tracciabilità</strong> (registrare eventi significativi) e <strong>responsabilità</strong>. Sono termini differenti: conoscere una password può autenticare una persona, ma non significa autorizzarla a leggere tutti i dati.</p>
+<p>Un sistema può essere cifrato e tuttavia non essere disponibile; può essere disponibile e tuttavia mostrare informazioni a persone sbagliate. Non esiste un singolo prodotto capace di garantire tutte le proprietà.</p>
+<h2 id="come-descrivere-un-rischio-senza-parlare-subito-di-hacker">3. Come descrivere un rischio senza parlare subito di «hacker»</h2>
+<p>Chiamiamo <strong>risorsa</strong> (<em>asset</em>) ciò che ha valore: dati, server, credenziali, servizi. Una <strong>vulnerabilità</strong> è una debolezza sfruttabile, una <strong>minaccia</strong> è una possibile causa di danno, un <strong>rischio</strong> dipende dalla probabilità e dall'impatto del danno.</p>
+<p>Esempio guidato:</p>
+<ul>
+<li>Risorsa: banca dati della segreteria.</li>
+<li>Vulnerabilità: servizio amministrativo accessibile a chiunque dalla rete ospiti.</li>
+<li>Minaccia: tentativi di accesso non autorizzato.</li>
+<li>Conseguenza possibile: divulgazione o alterazione dei dati.</li>
+<li>Contromisure: separazione delle reti, regole di accesso, autenticazione, aggiornamenti, copie di sicurezza.</li>
+</ul>
+<p>Un altro caso è l'attacco <strong>DoS</strong> (<em>Denial of Service</em>, negazione del servizio): il bersaglio diventa indisponibile. Se il traffico proviene da molte sorgenti coordinate si parla di <strong>DDoS</strong>, <em>Distributed Denial of Service</em>. L'obiettivo colpito è soprattutto la disponibilità, non necessariamente la riservatezza.</p>
+<p>La <strong>difesa in profondità</strong> usa più misure: segmentazione, regole di rete, aggiornamenti, identità, cifratura e backup. Il motivo è semplice: se una barriera fallisce, un'altra può ancora limitare il danno.</p>
+<h2 id="le-prime-tre-domande-di-sicurezza">4. Le prime tre domande di sicurezza</h2>
+<p>Ogni comunicazione può essere analizzata chiedendo:</p>
+<ol>
+<li><strong>Chi</strong> desidera comunicare? Esempio: un computer degli ospiti.</li>
+<li><strong>Con chi e per quale servizio?</strong> Esempio: un server Web sulla porta TCP 443.</li>
+<li><strong>È permesso?</strong> Esempio: navigazione Web sì, accesso al database interno no.</li>
+</ol>
+<p>Questa logica prepara i temi successivi: indirizzi IP e porte identificano gli interlocutori e i servizi; firewall e liste di controllo degli accessi applicano delle regole; le VLAN separano porzioni della rete; la crittografia protegge il <em>contenuto</em> del messaggio. Le tecnologie svolgono compiti complementari, non intercambiabili.</p>
+<h3 id="un-esempio-a-livello-intuitivo">Un esempio a livello intuitivo</h3>
+<pre><code class="language-text">Internet  ----&gt;  sito pubblico della scuola          CONSENTITO
+Internet  ----&gt;  computer amministrativo interno    BLOCCATO
+Ospiti    ----&gt;  Internet                          CONSENTITO
+Ospiti    ----&gt;  archivio riservato                 BLOCCATO
+Segreteria ----&gt; archivio riservato                 CONSENTITO, con login
+</code></pre>
+<p>Queste frasi descrivono una <strong>politica di accesso</strong>, non ancora una configurazione tecnica. Per tradurle in regole servono indirizzi IP, porte e la distinzione fra reti private e pubbliche.</p>
+<h2 id="distinguere-la-sicurezza-della-rete-da-quella-del-software">5. Distinguere la sicurezza della rete da quella del software</h2>
+<p>Un firewall può impedire connessioni indesiderate verso un servizio. Non garantisce però che il codice di un'applicazione esposta sia corretto: un sito accessibile legittimamente può contenere una vulnerabilità; un utente autenticato può avere permessi configurati male. La sicurezza riguarda quindi <strong>rete, sistemi, applicazioni, dati e persone</strong>.</p>
+<p><strong>Attenzione:</strong> «internet è pericoloso, perciò metto un firewall» è una spiegazione incompleta. La domanda giusta è «quale traffico voglio permettere e con quale scopo?».</p>
+<h2 id="analisi-di-un-caso-quattro-richieste-quattro-rischi-diversi">6. Analisi di un caso: quattro richieste, quattro rischi diversi</h2>
+<p>Una scuola dispone di un sito pubblico, di un gestionale amministrativo accessibile solo al personale, di stampanti interne e di computer di laboratorio. Si considerino quattro richieste:</p>
+<table>
+<thead>
+<tr>
+<th>Richiesta</th>
+<th>Decisione motivata</th>
+<th>Controllo necessario</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Un visitatore esterno consulta gli orari pubblici</td>
+<td>Consentire l'accesso al sito pubblico</td>
+<td>Esporre soltanto il servizio Web necessario; non la rete interna</td>
+</tr>
+<tr>
+<td>Un addetto della segreteria lavora da casa sulle fatture</td>
+<td>Consentire <strong>solo dopo</strong> verifica di identità e autorizzazione</td>
+<td>Accesso remoto protetto e permessi limitati alle funzioni richieste</td>
+</tr>
+<tr>
+<td>Un ospite vuole stampare sulla stampante riservata</td>
+<td>Negare: il dispositivo non appartiene all'area autorizzata</td>
+<td>Separazione della rete ospiti e filtro verso la rete amministrativa</td>
+</tr>
+<tr>
+<td>Un PC del laboratorio scarica aggiornamenti attendibili</td>
+<td>Consentire secondo la politica della rete</td>
+<td>Uscita verso i servizi necessari, controllo degli aggiornamenti e monitoraggio</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Perché non basta conoscere l'indirizzo IP?</strong> L'indirizzo può distinguere il percorso di rete, ma non sempre prova l'identità della persona. Inoltre la stessa macchina può ospitare servizi differenti. Si devono quindi distinguere <strong>controllo della rete</strong>, <strong>autenticazione dell'utente</strong> e <strong>autorizzazione del servizio</strong>.</p>
+<h3 id="verifica-ragionata">Verifica ragionata</h3>
+<ol>
+<li>Un portale sempre disponibile, ma consultabile da chiunque, soddisfa quale obiettivo della sicurezza e ne viola potenzialmente quale? <em>Disponibilità sì; riservatezza potenzialmente no.</em></li>
+<li>Un account riconosciuto dal sistema può leggere automaticamente tutti i documenti? <em>No: autenticazione e autorizzazione sono passaggi distinti.</em></li>
+<li>Perché il firewall non sostituisce la cifratura? <em>Il filtraggio dei flussi non rende automaticamente il contenuto illeggibile a chi lo intercetta.</em></li>
+<li>Se il sito pubblico è compromesso, quale altro controllo potrebbe ridurre il danno? <em>Segmentare la rete, limitare i permessi del server e impedire accessi non necessari ai servizi interni.</em></li>
+</ol>
+<p><strong>Collegamento alla lezione 2:</strong> per descrivere le regole di comunicazione serve individuare i dispositivi: ecco perché dobbiamo capire meglio gli indirizzi IPv4.</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-00-introduzione" rel="prev" href="00-introduzione.html"><small>← Precedente</small><span>Dalle reti alle applicazioni distribuite</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>2 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-02-lezione" rel="next" href="02-lezione.html"><small>Successiva →</small><span>Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

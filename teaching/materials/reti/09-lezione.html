@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 9 — Il browser &amp;#232; un programma: rete, rendering, interpretazione e compilazione — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 9 — Il browser &#232; un programma: rete, rendering, interpretazione e compilazione"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/09-lezione.html"><meta property="og:title" content="Lezione 9 — Il browser &amp;#232; un programma: rete, rendering, interpretazione e compilazione — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/09-lezione.html"><meta property="og:description" content="Lezione 9 — Il browser &amp;#232; un programma: rete, rendering, interpretazione e compilazione. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-09-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-08-lezione" rel="prev" href="08-lezione.html"><small>← Precedente</small><span>Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>10 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-10-lezione" rel="next" href="10-lezione.html"><small>Successiva →</small><span>Lezione 10 — API: una pagina pu&amp;#242; chiedere dati invece di una pagina intera</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-9-il-browser-e-un-programma-rete-rendering-interpretazione-e-compilazione">Lezione 9 — Il browser è un programma: rete, rendering, interpretazione e compilazione</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Perché la stessa applicazione Web può funzionare su sistemi operativi diversi senza installare ogni volta un programma costruito specificamente per quella macchina?»</em></p>
+<h2 id="il-browser-non-e-una-semplice-finestra-sulle-pagine">1. Il browser non è una semplice finestra sulle pagine</h2>
+<p>Il <strong>browser</strong> è un programma client complesso che offre un ambiente relativamente standardizzato per navigare, presentare documenti ed eseguire parti delle applicazioni Web. È client perché <strong>avvia richieste e utilizza servizi</strong>, ma non è l'unico tipo di client possibile: lo stesso servizio HTTP può essere chiamato da un'app mobile, da uno script o da un altro server.</p>
+<p>La forza del browser è duplice:</p>
+<ol>
+<li><strong>Nasconde buona parte della complessità di rete</strong>: la pagina o l'applicazione non deve implementare da zero DNS, gestione delle connessioni, HTTP, certificati, recupero delle risorse e molte altre funzioni.</li>
+<li><strong>Offre un ambiente d'esecuzione e presentazione</strong>: i contenuti Web rispettano standard condivisi e possono funzionare su piattaforme diverse, pur con alcune differenze tra browser.</li>
+</ol>
+<p>Il browser ha reso possibile distribuire applicazioni attraverso il Web senza obbligare ogni autore a fornire un eseguibile nativo specifico per Windows, macOS, Linux e ogni altro sistema. <strong>Non</strong> significa che il browser cancelli tutte le differenze, o che ogni applicazione Web possa accedere liberamente a tutte le funzioni del computer.</p>
+<h2 id="i-componenti-concettuali-principali">2. I componenti concettuali principali</h2>
+<p>Nel browser possiamo distinguere, senza entrare nei dettagli dei processi interni:</p>
+<table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Responsabilità</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Componente di rete</strong></td>
+<td>Esegue richieste, gestisce HTTP, cache, connessioni e aspetti di sicurezza</td>
+</tr>
+<tr>
+<td><strong>Parser HTML</strong></td>
+<td>Analizza il linguaggio di marcatura e costruisce una rappresentazione del documento</td>
+</tr>
+<tr>
+<td><strong>Motore CSS</strong></td>
+<td>Analizza le regole di stile per determinare l'aspetto degli elementi</td>
+</tr>
+<tr>
+<td><strong>Motore di rendering</strong></td>
+<td>Calcola posizioni e dimensioni, disegna gli elementi e li compone a schermo</td>
+</tr>
+<tr>
+<td><strong>Motore JavaScript</strong></td>
+<td>Esegue il codice JavaScript, anche mediante interpretazione e compilazione</td>
+</tr>
+<tr>
+<td><strong>Web API del browser</strong></td>
+<td>Espone funzioni standard per manipolare il documento, richiedere dati e interagire con funzioni consentite</td>
+</tr>
+</tbody>
+</table>
+<p>Sono <strong>responsabilità</strong>, non necessariamente sei programmi indipendenti. Nei browser reali il lavoro è distribuito fra processi, thread e componenti software, ma la distinzione qui è funzionale.</p>
+<h2 id="da-html-a-pagina-visibile">3. Da HTML a pagina visibile</h2>
+<p><strong>HTML</strong> (<em>HyperText Markup Language</em>) descrive contenuto e struttura tramite elementi. Per esempio, un titolo e un paragrafo non sono «disegnati» dal server: arrivano in una risposta e il browser li analizza.</p>
+<p>Il parser produce il <strong>DOM</strong>, <em>Document Object Model</em>: una rappresentazione ad albero della struttura del documento in memoria. Una porzione di documento:</p>
+<pre><code class="language-html">&lt;h1&gt;Biblioteca&lt;/h1&gt;
+&lt;p&gt;Libri disponibili: 12&lt;/p&gt;
+</code></pre>
+<p>può essere rappresentata concettualmente così:</p>
+<pre><code class="language-text">Documento
+  └── corpo
+       ├── h1 → «Biblioteca»
+       └── p  → «Libri disponibili: 12»
+</code></pre>
+<p>Il <strong>CSS</strong> (<em>Cascading Style Sheets</em>, fogli di stile a cascata) descrive le regole di presentazione: colori, spazi, dimensioni, layout. Il browser ne costruisce e gestisce una rappresentazione usata dal motore di rendering (spesso indicata come <strong>CSSOM</strong>, <em>CSS Object Model</em>). Da struttura e stili deriva ciò che verrà effettivamente rappresentato.</p>
+<p>Una semplificazione del processo è:</p>
+<pre><code class="language-text">HTML scaricato ──&gt; parsing ──&gt; DOM ───────────┐
+                                               ├─&gt; layout ─&gt; disegno ─&gt; composizione
+CSS scaricato  ──&gt; parsing ──&gt; regole di stile ┘               sullo schermo
+</code></pre>
+<p><strong>Layout</strong> significa decidere posizioni e dimensioni; <strong>painting/disegno</strong> produce istruzioni per rappresentare gli elementi; <strong>compositing/composizione</strong> unisce i risultati delle diverse superfici o livelli grafici. I browser moderni possono fare parte di questi passaggi in parallelo o aggiornarli solo dove necessario.</p>
+<p><strong>Precisazione lessicale:</strong> dire che il browser «interpreta HTML e CSS» è una semplificazione accettabile nel linguaggio comune, ma non equivale a dire che <strong>compila HTML e CSS in un programma eseguibile come fa con JavaScript</strong>. HTML e CSS sono analizzati e usati per costruire e rappresentare la pagina; JavaScript è un linguaggio di programmazione eseguito dal motore JavaScript.</p>
+<h2 id="e-javascript-un-programma-che-vive-dentro-il-browser">4. E JavaScript? Un programma che vive dentro il browser</h2>
+<p><strong>JavaScript</strong> è un linguaggio di programmazione usato, fra l'altro, per rendere interattive le pagine Web. Può reagire a clic, aggiornare contenuti, validare dati nell'interfaccia e richiedere informazioni a servizi remoti. A differenza di HTML e CSS, definisce <strong>istruzioni</strong>, condizioni, funzioni e oggetti da eseguire.</p>
+<p>Per esempio, un pulsante può incrementare un contatore mostrato nella pagina. Non serve che il server ridisegni il contatore a ogni clic: il browser può modificare direttamente il DOM usando le sue API. La possibilità di eseguire programmi nel browser ha trasformato il Web da una raccolta di documenti a una piattaforma per applicazioni interattive.</p>
+<p>Ma JavaScript <strong>non coincide con il browser</strong>. Il linguaggio è eseguito da un motore JavaScript; il browser aggiunge funzioni esterne al linguaggio, per esempio <code>document</code> e <code>fetch</code>, e impone un modello di sicurezza. Il motore JavaScript, da solo, non è responsabile di tutte le richieste di rete o del rendering della pagina.</p>
+<h2 id="v8-interpreta-o-compila-entrambe-le-cose-con-precisione">5. V8 «interpreta» o «compila»? Entrambe le cose, con precisione</h2>
+<p><strong>V8</strong> è il motore JavaScript usato, per esempio, da <strong>Google Chrome</strong>, da altri browser basati su Chromium e da <strong>Node.js</strong>. Il nome non significa «versione 8 di JavaScript». Esistono motori differenti: <strong>SpiderMonkey</strong> in Firefox e <strong>JavaScriptCore</strong> in Safari.</p>
+<p>Le principali fasi di esecuzione del codice JavaScript sono:</p>
+<ol>
+<li>Il motore analizza il testo JavaScript (<em>parsing</em>) e ne riconosce la struttura.</li>
+<li>Può produrre una rappresentazione intermedia, chiamata <strong>bytecode</strong>.</li>
+<li>Può eseguire il bytecode attraverso un <strong>interprete</strong>.</li>
+<li>Può <strong>compilare</strong> alcune parti in istruzioni macchina per migliorare l'esecuzione, anche durante il funzionamento.</li>
+</ol>
+<p><strong>JIT</strong> significa <em>Just-in-Time compilation</em>, compilazione effettuata mentre il programma viene utilizzato. Alcuni motori usano più stadi di compilazione e ottimizzazione. V8, per esempio, combina un interprete chiamato Ignition con compilatori, tra cui Sparkplug, Maglev e componenti ottimizzanti. Non è quindi esatto descrivere V8 come «un interprete puro che legge una riga alla volta e basta».</p>
+<pre><code class="language-text">Testo JavaScript
+       ↓ parsing
+Rappresentazione del programma
+       ↓
+Bytecode / rappresentazioni intermedie
+       ├──&gt; interpretazione
+       └──&gt; compilazione in codice macchina e ottimizzazione
+                         ↓
+                     esecuzione
+</code></pre>
+<p><strong>Concetto centrale:</strong> il browser contiene un motore che esegue JavaScript; durante questa attività il motore può interpretare il bytecode e compilare codice macchina. Chrome usa V8; altri browser possono usare motori differenti.</p>
+<h2 id="il-caricamento-della-pagina-chi-genera-le-richieste">6. Il caricamento della pagina: chi genera le richieste?</h2>
+<p>Ecco il punto su cui è più facile creare un'idea sbagliata. Consideriamo una pagina HTML che contiene:</p>
+<pre><code class="language-html">&lt;link rel=&quot;stylesheet&quot; href=&quot;stile.css&quot;&gt;
+&lt;img src=&quot;logo.png&quot; alt=&quot;Logo&quot;&gt;
+&lt;script src=&quot;app.js&quot; defer&gt;&lt;/script&gt;
+</code></pre>
+<p>Sequenza didattica semplificata:</p>
+<ol>
+<li>L'utente digita un <strong>URL</strong> (<em>Uniform Resource Locator</em>) o segue un link: il browser avvia una navigazione.</li>
+<li>Risolve il nome del server, se necessario, e gestisce le connessioni e la richiesta per il documento.</li>
+<li>Riceve l'HTML e comincia ad analizzarlo, anche prima che il file sia interamente arrivato.</li>
+<li>Scopre riferimenti a fogli di stile, immagini e script; <strong>il browser stesso</strong> richiede le risorse necessarie, secondo le sue regole di caricamento e cache.</li>
+<li>Analizza HTML e CSS, esegue gli script quando previsto, costruisce e aggiorna il documento e lo rappresenta.</li>
+<li>Il codice JavaScript in esecuzione può <strong>a sua volta</strong> avviare altre richieste, anche senza cambiare pagina.</li>
+</ol>
+<pre><code class="language-text">Utente apre URL
+      |
+      v
+Browser GET documento HTML
+      |
+      +--&gt; Browser richiede CSS, immagini, script (non serve JS per tutte)
+      |
+      +--&gt; Motore JS esegue il codice della pagina
+                |
+                +--&gt; JS può usare fetch() e chiedere dati a una Web API
+                |
+                +--&gt; JS può aggiornare il DOM e la vista
+</code></pre>
+<p>Il browser dunque <strong>non fa solo il primo GET</strong>. È sempre il software browser a fornire il servizio di rete richiesto dal contesto, mentre il codice JavaScript può comandare ulteriori operazioni tramite API. Inoltre, il browser può inviare richieste da form HTML anche <strong>senza JavaScript</strong>, e alcune navigazioni possono essere attivate con metodi diversi da GET.</p>
+<h2 id="perche-unifica-il-software-client">7. Perché «unifica» il software client?</h2>
+<p>La parola corretta è <strong>standardizza l'ambiente</strong>, non «rende tutti i client uguali». Lo sviluppatore crea una pagina o un'applicazione secondo standard come HTML, CSS, JavaScript e HTTP. Il browser implementa questi standard e offre molte funzionalità già pronte. L'applicazione Web può così raggiungere sistemi diversi senza che ogni utente installi un programma compilato appositamente per la propria piattaforma.</p>
+<p>Il browser è anche una <strong>sandbox</strong> (ambiente con limitazioni): per proteggere l'utente, il codice JavaScript della pagina non deve poter leggere liberamente i file del computer, controllare altri siti o utilizzare ogni dispositivo senza regole. Tecniche come la <strong>same-origin policy</strong> (politica della stessa origine, che limita alcune interazioni tra risorse provenienti da origini diverse) definiscono confini. <strong>CORS</strong> (<em>Cross-Origin Resource Sharing</em>) è un meccanismo del Web che regola alcune richieste e accessi tra origini differenti. Il principio essenziale è che una pagina non ha accesso indiscriminato a dati di ogni altro sito.</p>
+<h2 id="analisi-del-funzionamento-del-browser">8. Analisi del funzionamento del browser</h2>
+<p>Gli strumenti di sviluppo (<em>Developer Tools</em>) di Chrome e Firefox permettono di osservare tre aspetti distinti dello stesso programma:</p>
+<table>
+<thead>
+<tr>
+<th>Strumento</th>
+<th>Che cosa si osserva</th>
+<th>Che cosa dimostra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Network / Rete</strong></td>
+<td>Richieste HTTP, codici di stato, tipi di contenuti</td>
+<td>Il browser gestisce molte richieste, non solo la prima navigazione</td>
+</tr>
+<tr>
+<td><strong>Elements / Ispettore</strong></td>
+<td>DOM e stili della pagina; una modifica locale al titolo</td>
+<td>Il documento visualizzato ha una rappresentazione modificabile in memoria</td>
+</tr>
+<tr>
+<td><strong>Console</strong></td>
+<td>Valutazione di un'espressione JavaScript, per esempio <code>2 + 3</code></td>
+<td>Il browser dispone di un ambiente capace di eseguire codice</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Caso A — Titolo modificato nell'Ispettore.</strong> La modifica di <code>&lt;h1&gt;Biblioteca&lt;/h1&gt;</code> in <code>&lt;h1&gt;Catalogo&lt;/h1&gt;</code> altera automaticamente il file HTML salvato sul server? <em>No: viene modificata la rappresentazione locale del DOM. Un nuovo caricamento può recuperare nuovamente il contenuto originale.</em></p>
+<p><strong>Caso B — Pagina caricata senza un file JavaScript.</strong> Il browser può richiedere comunque immagini e CSS? <em>Sì: il caricatore di risorse opera anche in assenza del codice JavaScript della pagina.</em></p>
+<p><strong>Caso C — JavaScript eseguito.</strong> Il motore V8 realizza da solo una connessione di rete tramite la sintassi del linguaggio? <em>No: nell’ambiente browser, funzioni come <code>fetch()</code> sono fornite dalle Web API del browser, che gestisce l’operazione di rete.</em></p>
+<h2 id="domande-con-cui-verificare-la-comprensione">9. Domande con cui verificare la comprensione</h2>
+<ol>
+<li>Che differenza c'è tra browser e motore JavaScript? <em>Il browser è l'applicazione complessiva; il motore esegue JavaScript ed è uno dei suoi componenti.</em></li>
+<li>Chi trasforma HTML in un albero del documento? <em>Il parser HTML del browser, che produce il DOM.</em></li>
+<li>V8 è soltanto un interprete? <em>No, utilizza anche compilazione e ottimizzazione.</em></li>
+<li>Chi chiede <code>logo.png</code> quando compare in un tag <code>img</code>? <em>Il sistema di caricamento del browser, senza richiedere necessariamente una chiamata JavaScript.</em></li>
+<li>Perché il browser è una piattaforma per applicazioni? <em>Offre un ambiente standardizzato per rete, interfaccia ed esecuzione di JavaScript, con limiti di sicurezza.</em></li>
+<li>JavaScript può creare un file arbitrario nella cartella dei documenti dell'utente senza permesso? <em>Non con libero accesso: il browser limita e media le operazioni sensibili.</em></li>
+</ol>
+<p><strong>Passaggio:</strong> se il browser già sa richiedere e rappresentare pagine, perché a volte un programma JavaScript fa una richiesta supplementare e riceve solo dati? Entra in gioco l'idea di API.</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-08-lezione" rel="prev" href="08-lezione.html"><small>← Precedente</small><span>Lezione 8 — Dal socket al Web: protocollo HTTP e prime pagine</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>10 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-10-lezione" rel="next" href="10-lezione.html"><small>Successiva →</small><span>Lezione 10 — API: una pagina pu&amp;#242; chiedere dati invece di una pagina intera</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

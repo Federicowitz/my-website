@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 17 — Firma digitale e PEC: autenticit&amp;#224;, integrit&amp;#224; e prova della consegna — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 17 — Firma digitale e PEC: autenticit&#224;, integrit&#224; e prova della consegna"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/17-lezione.html"><meta property="og:title" content="Lezione 17 — Firma digitale e PEC: autenticit&amp;#224;, integrit&amp;#224; e prova della consegna — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/17-lezione.html"><meta property="og:description" content="Lezione 17 — Firma digitale e PEC: autenticit&amp;#224;, integrit&amp;#224; e prova della consegna. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-17-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-16-lezione" rel="prev" href="16-lezione.html"><small>← Precedente</small><span>Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>18 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-18-lezione" rel="next" href="18-lezione.html"><small>Successiva →</small><span>Lezione 18 — Caso conclusivo: progettare una piattaforma scolastica e spiegare le scelte</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-17-firma-digitale-e-pec-autenticita-integrita-e-prova-della-consegna">Lezione 17 — Firma digitale e PEC: autenticità, integrità e prova della consegna</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Se ricevo un documento per email, come posso verificare che sia stato sottoscritto dalla persona indicata? E come posso provare che un messaggio è stato consegnato?»</em></p>
+<h2 id="problemi-differenti-strumenti-differenti">1. Problemi differenti, strumenti differenti</h2>
+<p>Supponiamo che la scuola invii un contratto a un fornitore. Vorrebbe poter verificare:</p>
+<ol>
+<li><strong>Chi</strong> ha sottoscritto quel documento.</li>
+<li>Se il documento è stato <strong>modificato</strong> dopo la firma.</li>
+<li>Se il messaggio di invio è stato <strong>accettato e consegnato</strong> alla casella del destinatario.</li>
+</ol>
+<p>La <strong>firma digitale</strong> risponde ai primi due problemi e contribuisce al valore probatorio e al <strong>non ripudio</strong>, secondo il quadro tecnico e giuridico previsto. La <strong>PEC</strong> risponde principalmente al terzo: documenta l'accettazione e la consegna della comunicazione. Non sono sinonimi e non si sostituiscono automaticamente.</p>
+<h2 id="firma-elettronica-e-firma-digitale">2. Firma elettronica e firma digitale</h2>
+<p>Una <strong>firma elettronica</strong> è una categoria generale di mezzi elettronici collegati alla sottoscrizione di dati. Nel contesto normativo italiano ed europeo, la <strong>firma digitale</strong> è una particolare forma di firma elettronica qualificata basata su crittografia a chiave pubblica e certificati qualificati. Il quadro giuridico fa riferimento, fra l'altro, al regolamento <strong>eIDAS</strong> (<em>electronic IDentification, Authentication and trust Services</em>) e al <strong>CAD</strong>, <em>Codice dell'Amministrazione Digitale</em>.</p>
+<p>Si distinguono il <strong>meccanismo tecnico della firma</strong> e il <strong>riconoscimento giuridico</strong> di specifiche tipologie di firme e servizi di certificazione.</p>
+<h2 id="come-funziona-concettualmente-una-firma-digitale">3. Come funziona concettualmente una firma digitale</h2>
+<p>La firma usa la <strong>chiave privata</strong> del titolare, mentre la verifica impiega la <strong>chiave pubblica</strong> associata, insieme al certificato che permette di collegarla al soggetto.</p>
+<pre><code class="language-text">DOCUMENTO
+   │
+   ├──&gt; funzione hash → impronta ──&gt; firma con chiave privata
+   │                                         │
+   └──────────────────────────────────┐      │
+                                      ▼      ▼
+                              documento + firma + certificato
+                                              │
+                                              ▼
+                                verifica con chiave pubblica
+                                              │
+                                  esito e controlli di validità
+</code></pre>
+<p>La figura è concettuale: gli algoritmi e i formati reali possono trattare l'impronta e la firma secondo schemi specifici. Il verificatore deve controllare <strong>anche</strong> la validità del certificato, i suoi limiti e le condizioni pertinenti. Se il documento viene modificato dopo la firma, la verifica crittografica normalmente non riesce più.</p>
+<p><strong>Non ripudio:</strong> espressione che indica la difficoltà per il firmatario di disconoscere una sottoscrizione valida, nel quadro delle garanzie e delle regole applicabili. Non significa che sia matematicamente impossibile qualunque contestazione: contano anche protezione delle chiavi, identità, revoche, procedure e valutazioni giuridiche.</p>
+<p><strong>Punto chiave:</strong> <strong>firmare non significa cifrare il documento</strong>. Un documento può essere firmato e leggibile da chiunque, perché la firma attesta aspetti di autenticità e integrità; la cifratura è un'operazione distinta che mira alla riservatezza.</p>
+<h2 id="pec-posta-elettronica-certificata">4. PEC: Posta Elettronica Certificata</h2>
+<p><strong>PEC</strong> significa <em>Posta Elettronica Certificata</em>. È un sistema di posta elettronica che, nel circuito previsto, rilascia ricevute per documentare l'invio e la consegna del messaggio, con valore opponibile a terzi nei termini previsti dalle regole applicabili.</p>
+<p>Sequenza semplificata:</p>
+<pre><code class="language-text">Mittente PEC
+    |
+    v
+Gestore PEC mittente ---&gt; ricevuta di ACCETTAZIONE al mittente
+    |
+    v
+Gestore PEC destinatario ---&gt; ricevuta di AVVENUTA CONSEGNA al mittente
+    |
+    v
+Casella PEC destinataria
+</code></pre>
+<p>La <strong>ricevuta di accettazione</strong> indica che il gestore del mittente ha accettato il messaggio. La <strong>ricevuta di avvenuta consegna</strong> attesta la consegna alla casella del destinatario; la consegna non implica la lettura. Esistono anche casi di mancata accettazione o mancata consegna.</p>
+<p>In Italia, secondo le condizioni di legge e il funzionamento del circuito certificato, la PEC può avere valore legale equivalente a una raccomandata con avviso di ricevimento. Una normale email non offre automaticamente lo stesso sistema di certificazioni.</p>
+<h2 id="cosa-pec-non-fa">5. Cosa PEC non fa</h2>
+<p>È altrettanto importante distinguere ciò che questa tecnologia <strong>non</strong> dimostra:</p>
+<ul>
+<li>non prova necessariamente che una persona abbia <strong>letto</strong> o compreso il messaggio;</li>
+<li>non <strong>firma automaticamente</strong> gli allegati per conto del loro autore;</li>
+<li>non prova da sola la verità delle affermazioni inviate;</li>
+<li>non trasforma un documento non autentico in un documento autenticato;</li>
+<li>non sostituisce la conservazione documentale a lungo termine;</li>
+<li>l'intero ciclo di certificazione della consegna richiede il corretto funzionamento nel circuito PEC previsto.</li>
+</ul>
+<p>Esempio decisivo: posso inviare <strong>tramite PEC un documento firmato digitalmente</strong>. In tal caso la <strong>firma</strong> assiste la verifica del documento; la <strong>PEC</strong> documenta il percorso di invio e consegna. Le due garanzie si sommano perché rispondono a domande diverse.</p>
+<h2 id="riepilogo-attraverso-tre-domande">6. Riepilogo attraverso tre domande</h2>
+<table>
+<thead>
+<tr>
+<th>Domanda</th>
+<th>Tecnologia da prendere in considerazione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>«Chi può entrare nel gestionale?»</td>
+<td>Autenticazione e autorizzazione, insieme a misure di rete</td>
+</tr>
+<tr>
+<td>«La comunicazione Web è protetta durante il trasporto?»</td>
+<td>TLS / HTTPS</td>
+</tr>
+<tr>
+<td>«Il documento è autentico e non modificato?»</td>
+<td>Firma digitale e verifica valida</td>
+</tr>
+<tr>
+<td>«L'invio è stato accettato e consegnato?»</td>
+<td>PEC e relative ricevute</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Caso di analisi:</strong> «Ho inviato il contratto tramite PEC, quindi il contratto allegato è automaticamente firmato». L’affermazione è <strong>falsa</strong>: la PEC documenta accettazione e consegna secondo le regole del servizio, mentre la firma digitale riguarda l’autenticità e l’integrità del documento sottoscritto.</p>
+<h2 id="verifica">7. Verifica</h2>
+<ol>
+<li>Che cosa verifica una firma digitale? <em>Integrità e legame con il firmatario nell'ambito della verifica della firma e dei certificati.</em></li>
+<li>Firmare un file lo rende illeggibile agli altri? <em>No: non è automaticamente cifratura.</em></li>
+<li>La ricevuta PEC di consegna dimostra la lettura? <em>No.</em></li>
+<li>Perché firma digitale e PEC possono essere usate insieme? <em>Certificano aspetti differenti: documento e trasmissione.</em></li>
+</ol>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-16-lezione" rel="prev" href="16-lezione.html"><small>← Precedente</small><span>Lezione 16 — Proteggere il contenuto: crittografia, hash, certificati e HTTPS</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>18 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-18-lezione" rel="next" href="18-lezione.html"><small>Successiva →</small><span>Lezione 18 — Caso conclusivo: progettare una piattaforma scolastica e spiegare le scelte</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/03-lezione.html"><meta property="og:title" content="Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/03-lezione.html"><meta property="og:description" content="Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-03-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-02-lezione" rel="prev" href="02-lezione.html"><small>← Precedente</small><span>Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>4 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-04-lezione" rel="next" href="04-lezione.html"><small>Successiva →</small><span>Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-3-dal-privato-al-pubblico-gateway-nat-pat-e-cgnat">Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Se il server su Internet non può rispondere direttamente all'indirizzo privato <code>192.168.1.10</code>, come fa il mio computer a ricevere una risposta?»</em></p>
+<h2 id="il-problema-della-traduzione">1. Il problema della traduzione</h2>
+<p>Tre dispositivi della LAN hanno indirizzi privati; il router, lato Internet, possiede per esempio l'IPv4 pubblico <code>203.0.113.7</code> (indirizzo qui usato solo per documentazione). Il sito remoto è <code>198.51.100.20</code>. Il router deve permettere che le comunicazioni interne risultino compatibili con l'indirizzamento pubblico e deve capire a quale dispositivo interno inviare le risposte.</p>
+<p><strong>NAT</strong> significa <em>Network Address Translation</em>, traduzione degli indirizzi di rete: un dispositivo modifica gli indirizzi IP presenti nei pacchetti secondo regole di traduzione. Il caso domestico più familiare è il NAT in uscita, in cui viene modificato l'indirizzo sorgente privato. Ma il termine NAT è generale: esistono diverse forme e direzioni di traduzione.</p>
+<p><strong>PAT</strong> significa <em>Port Address Translation</em>, traduzione degli indirizzi di porta: nella situazione più comune si traducono <strong>indirizzi e porte</strong>, così connessioni diverse possono condividere lo stesso IPv4 pubblico. Questo meccanismo viene anche chiamato <strong>NAPT</strong> (<em>Network Address and Port Translation</em>) o, in molte spiegazioni divulgative, NAT overload.</p>
+<h2 id="perche-non-basta-sostituire-lindirizzo">2. Perché non basta sostituire l'indirizzo?</h2>
+<p>Supponiamo che due computer visitino lo stesso server Web usando la stessa porta remota. Se il router li facesse apparire entrambi con lo stesso IPv4 pubblico senza un modo per differenziare i flussi, non saprebbe sempre a chi consegnare le risposte. Con il PAT utilizza porte esterne differenti.</p>
+<table>
+<thead>
+<tr>
+<th>Prima del router: sorgente interna</th>
+<th>Dopo il router: sorgente pubblica</th>
+<th>Destinazione comune</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>192.168.1.10:51001</code></td>
+<td><code>203.0.113.7:40001</code></td>
+<td><code>198.51.100.20:443</code></td>
+</tr>
+<tr>
+<td><code>192.168.1.11:51001</code></td>
+<td><code>203.0.113.7:40002</code></td>
+<td><code>198.51.100.20:443</code></td>
+</tr>
+</tbody>
+</table>
+<p>La notazione <code>indirizzo:porta</code> identifica, nel contesto di TCP o UDP, un indirizzo IP e una porta. La porta <code>443</code> è comunemente usata da HTTPS. Le porte <code>40001</code> e <code>40002</code> sono esempi, non numeri obbligatori. Il router mantiene una <strong>tabella di traduzione</strong> che associa i flussi pubblici ai corrispondenti flussi interni.</p>
+<pre><code class="language-text">Client A 192.168.1.10:51001 ─┐
+                              ├─ router con PAT ─ 203.0.113.7:40001 ─┐
+Client B 192.168.1.11:51001 ─┘               └─ 203.0.113.7:40002 ───┴─&gt; Server
+</code></pre>
+<p>Quando arriva una risposta destinata a <code>203.0.113.7:40002</code>, il router consulta la tabella e la riassocia al client B. La mappatura riguarda una comunicazione precisa, non un semplice elenco permanente di computer.</p>
+<h2 id="che-cosa-cambia-per-le-connessioni-in-ingresso">3. Che cosa cambia per le connessioni in ingresso?</h2>
+<p>Il client interno avvia una connessione e il router crea lo stato necessario per la risposta. Se un host sconosciuto su Internet tenta invece di iniziare spontaneamente una nuova connessione verso un computer interno, in assenza di mappature o regole appropriate il router normalmente non sa a quale destinatario inoltrarla e la connessione non viene instaurata.</p>
+<p>Per pubblicare un servizio privato si può configurare una forma di inoltro, spesso chiamata <strong>port forwarding</strong>: per esempio una richiesta esterna a una data porta viene inoltrata al server interno. Farlo aumenta però l'esposizione e richiede scelte di sicurezza. Nel caso di un sito pubblico professionale vedremo che è preferibile ragionare su server separati, proxy e DMZ, non esporre casualmente computer della LAN.</p>
+<p><strong>Da non confondere:</strong></p>
+<ul>
+<li><strong>NAT/PAT</strong> risolvono problemi di <em>indirizzamento e condivisione</em>; non «cifrano» i dati.</li>
+<li>Un <strong>firewall</strong> applica una politica di autorizzazione del traffico.</li>
+<li>Le due funzioni possono convivere nello stesso router, ma rimangono concettualmente distinte.</li>
+</ul>
+<h2 id="che-cosa-accade-se-anche-loperatore-condivide-gli-indirizzi">4. Che cosa accade se anche l'operatore condivide gli indirizzi?</h2>
+<p>Alcuni ISP usano <strong>CGNAT</strong>, <em>Carrier-Grade Network Address Translation</em>: la traduzione avviene anche nella rete dell'operatore, dove più clienti condividono un indirizzo IPv4 pubblico. Un router domestico può quindi ricevere sul lato esterno un indirizzo non pubblico e non avere un IPv4 raggiungibile direttamente dall'Internet globale.</p>
+<p><strong>Conseguenza concreta:</strong> «ho aperto la porta sul router ma non riesco ad accedere al servizio da fuori». Potrebbe esserci un'altra traduzione a monte presso l'ISP. Non è necessariamente un errore di programmazione. Questo esempio consente di spiegare perché la progettazione di una rete coinvolga anche le scelte del fornitore di connettività.</p>
+<h2 id="la-porta-non-identifica-un-computer">5. La porta non identifica un computer</h2>
+<p>La porta indica un punto di comunicazione associato a un servizio o a un processo <strong>su un host</strong>, nel contesto di un protocollo di trasporto. Perciò <code>192.168.1.10:5000</code> e <code>192.168.1.11:5000</code> sono due destinazioni diverse. La stessa porta numerica può esistere in TCP e in UDP, perché i due protocolli gestiscono spazi di porte distinti.</p>
+<p>Alcune porte note permettono di riconoscere servizi frequenti: <code>80</code> HTTP, <code>443</code> HTTPS, <code>53</code> DNS (sia UDP sia TCP in diversi casi). La distinzione fra protocollo, indirizzo e porta verrà ripresa con i socket.</p>
+<h2 id="verifica">6. Verifica</h2>
+<p><strong>Problema di ragionamento:</strong> due PC di laboratorio aprono contemporaneamente lo stesso sito. Entrambi usano indirizzi privati. Che cosa deve conservare il router per inviare correttamente le risposte? <em>Associazioni tra flussi interni e flussi tradotti, comprese le porte.</em></p>
+<p><strong>Altre domande:</strong></p>
+<ol>
+<li>PAT e NAT sono identici? <em>PAT è una forma di traduzione che coinvolge anche le porte; NAT è il concetto più ampio.</em></li>
+<li>NAT garantisce la riservatezza delle richieste? <em>No.</em></li>
+<li>Perché CGNAT può rendere difficile ospitare un server a casa? <em>L'utente non controlla l'IPv4 pubblico condiviso a monte.</em></li>
+<li>Quale problema resta se tutti i computer si collegano alla stessa LAN, anche con NAT? <em>Gli accessi laterali tra dispositivi interni: servono segmentazione e controllo.</em></li>
+</ol>
+<p><strong>Passaggio alla lezione 4:</strong> il router collega interno ed esterno; ma dentro la stessa scuola come isoliamo segreteria, laboratorio e ospiti?</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-02-lezione" rel="prev" href="02-lezione.html"><small>← Precedente</small><span>Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>4 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-04-lezione" rel="next" href="04-lezione.html"><small>Successiva →</small><span>Lezione 4 — Segmentazione: VLAN, subnet, firewall e ACL</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

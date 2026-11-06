@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 11 — Il server non &amp;#232; un linguaggio: diverse tecnologie, stessa funzione — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 11 — Il server non &#232; un linguaggio: diverse tecnologie, stessa funzione"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/11-lezione.html"><meta property="og:title" content="Lezione 11 — Il server non &amp;#232; un linguaggio: diverse tecnologie, stessa funzione — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/11-lezione.html"><meta property="og:description" content="Lezione 11 — Il server non &amp;#232; un linguaggio: diverse tecnologie, stessa funzione. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-11-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-10-lezione" rel="prev" href="10-lezione.html"><small>← Precedente</small><span>Lezione 10 — API: una pagina pu&amp;#242; chiedere dati invece di una pagina intera</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>12 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-12-lezione" rel="next" href="12-lezione.html"><small>Successiva →</small><span>Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-11-il-server-non-e-un-linguaggio-diverse-tecnologie-stessa-funzione">Lezione 11 — Il server non è un linguaggio: diverse tecnologie, stessa funzione</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Per costruire un server Web bisogna usare Node.js? E un server deve necessariamente restituire una pagina HTML?»</em></p>
+<h2 id="prima-la-responsabilita-poi-la-tecnologia">1. Prima la responsabilità, poi la tecnologia</h2>
+<p>Un <strong>server</strong> è, nel nostro ragionamento, un programma che offre un servizio e risponde alle richieste di altri programmi. La parola può designare per estensione anche il computer che lo esegue. Il suo ruolo <strong>non è legato a un linguaggio di programmazione</strong>: un servizio HTTP può essere scritto in Python, JavaScript/TypeScript, Java, C#, PHP, Go, Rust e molti altri linguaggi, oppure essere gestito da un software server già pronto.</p>
+<p>La scelta tecnologica riguarda sviluppo, manutenzione, prestazioni, competenze del team e tipo di servizio. Non cambia i concetti di base: un client formula una richiesta conforme a un protocollo, un server la riceve e produce una risposta.</p>
+<h2 id="server-web-server-applicativo-e-backend">2. Server Web, server applicativo e backend</h2>
+<ul>
+<li><strong>Server Web:</strong> programma che gestisce richieste HTTP, può servire file statici, gestire connessioni sicure o inoltrare richieste. Esempi: <strong>Nginx</strong> e <strong>Apache HTTP Server</strong>.</li>
+<li><strong>Server applicativo / backend:</strong> programma che contiene la logica dell'applicazione, per esempio controllo dei prestiti, autorizzazioni e calcolo della disponibilità dei libri. Può esporre direttamente HTTP o essere raggiunto tramite un server Web/reverse proxy.</li>
+<li><strong>Database server:</strong> programma specializzato nella gestione persistente dei dati, per esempio <strong>PostgreSQL</strong> o <strong>MySQL</strong>. Non è un server Web e non dovrebbe essere esposto a tutti soltanto perché altri servizi dell'applicazione sono pubblici.</li>
+</ul>
+<p><strong>Backend</strong> è il nome collettivo delle componenti non visibili all'utente che elaborano richieste, applicano regole e accedono ai dati. <strong>Frontend</strong> è la parte con cui l'utente interagisce, frequentemente eseguita nel browser. Un server Web può svolgere anche attività applicative; la separazione dei ruoli è architetturale, non una legge che obbliga sempre a processi distinti.</p>
+<h2 id="alcuni-modi-per-realizzare-lo-stesso-endpoint">3. Alcuni modi per realizzare lo stesso endpoint</h2>
+<table>
+<thead>
+<tr>
+<th>Linguaggio / ambiente</th>
+<th>Esempi di strumenti</th>
+<th>Significato dell’esempio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Python</strong></td>
+<td>Flask, Django, FastAPI; modulo <code>http.server</code> per demo</td>
+<td>Un programma Python può ricevere richieste e rispondere via HTTP</td>
+</tr>
+<tr>
+<td><strong>JavaScript / TypeScript</strong></td>
+<td>Node.js con modulo <code>http</code> o framework Express; altri runtime come Deno e Bun</td>
+<td>JavaScript può funzionare anche fuori dal browser, in un ambiente server</td>
+</tr>
+<tr>
+<td><strong>Java</strong></td>
+<td>Spring Boot, Servlet container</td>
+<td>Un server applicativo può essere scritto in Java</td>
+</tr>
+<tr>
+<td><strong>C# / .NET</strong></td>
+<td>ASP.NET Core</td>
+<td>Un servizio HTTP può usare l'ecosistema .NET</td>
+</tr>
+<tr>
+<td><strong>PHP</strong></td>
+<td>PHP con server Web e framework come Laravel</td>
+<td>Il server può produrre HTML o dati tramite codice eseguito lato server</td>
+</tr>
+<tr>
+<td><strong>Go</strong></td>
+<td>libreria standard <code>net/http</code></td>
+<td>Lo stesso ruolo applicativo si implementa anche con linguaggi compilati</td>
+</tr>
+<tr>
+<td><strong>Software già pronti</strong></td>
+<td>Nginx, Apache HTTP Server</td>
+<td>Si possono servire file e inoltrare richieste senza inventare tutto da zero</td>
+</tr>
+</tbody>
+</table>
+<p>I diversi strumenti realizzano lo stesso ruolo generale. La nozione centrale è che <strong>Web e server HTTP non dipendono da Node.js né da uno specifico linguaggio di programmazione</strong>.</p>
+<h2 id="due-esempi-minimi-di-server-http-ad-alto-livello">4. Due esempi minimi di server HTTP ad alto livello</h2>
+<p>Un server HTTP può essere avviato anche dalla libreria standard di Python, senza scrivere manualmente la struttura delle risposte:</p>
+<pre><code class="language-bash">python -m http.server 8000 --bind 127.0.0.1
+</code></pre>
+<p>Il comando, eseguito in una cartella di materiale dimostrativo, avvia un server locale che può servire file su <code>http://127.0.0.1:8000</code>. Diversamente dal nostro socket scritto a mano, la libreria implementa la gestione essenziale di HTTP. <strong>Attenzione:</strong> è un server per dimostrazioni e sviluppo, non per pubblicare un sito su Internet senza ulteriori configurazioni e misure.</p>
+<p>Un secondo esempio usa <strong>Node.js</strong>, un ambiente che permette di eseguire JavaScript fuori dal browser:</p>
+<pre><code class="language-javascript">const http = require(&quot;node:http&quot;);
+http.createServer((richiesta, risposta) =&gt; {
+  risposta.writeHead(200, {&quot;Content-Type&quot;: &quot;text/plain; charset=utf-8&quot;});
+  risposta.end(&quot;Risposta dal server&quot;);
+}).listen(3000, &quot;127.0.0.1&quot;);
+</code></pre>
+<p>Il servizio risulta raggiungibile all’indirizzo <code>http://127.0.0.1:3000</code>. Come nel caso Python, il meccanismo è <strong>server in ascolto → richiesta del client → risposta HTTP</strong>. Il linguaggio e la libreria nascondono molti dettagli del formato dei byte.</p>
+<h2 id="che-cosa-cambia-fra-server-statico-e-dinamico">5. Che cosa cambia fra server statico e dinamico?</h2>
+<p><strong>Statico:</strong> per <code>GET /orari.html</code>, il server legge un file pronto e lo invia. È un caso molto utile: dimostra che non serve una sofisticata applicazione per pubblicare contenuti Web.</p>
+<p><strong>Dinamico:</strong> per <code>GET /api/disponibilita?libro=15</code>, il server esegue un ragionamento: consulta dati, controlla permessi e genera una risposta che può variare. Il contenuto può essere HTML o JSON. La distinzione «statico/dinamico» riguarda <strong>come viene prodotta la risposta</strong>, non il linguaggio di programmazione.</p>
+<p><strong>Esempio intuitivo:</strong> sul sito della scuola, il regolamento è un documento statico; la lista dei prestiti attualmente disponibili deriva da dati che cambiano e richiede logica applicativa.</p>
+<h2 id="da-qui-alle-architetture">6. Da qui alle architetture</h2>
+<p>Dopo aver visto un client che chiede qualcosa e un server che risponde, possiamo porre una domanda più generale: <strong>chi deve svolgere il calcolo?</strong> E <strong>dove conserviamo i dati?</strong> Una risposta non deve necessariamente coinvolgere un unico programma o una sola macchina. Può emergere una struttura con presentazione, logica di business e gestione dei dati.</p>
+<h2 id="verifica">7. Verifica</h2>
+<ol>
+<li>Node.js è indispensabile per creare un server HTTP? <em>No.</em></li>
+<li>La stessa Web API può essere implementata in Java e Python? <em>Sì, purché rispetti il contratto con i client.</em></li>
+<li>Un server Web e un database svolgono necessariamente lo stesso ruolo? <em>No.</em></li>
+<li>Un contenuto generato dinamicamente deve essere per forza HTML? <em>No, può essere JSON e altro.</em></li>
+</ol>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-10-lezione" rel="prev" href="10-lezione.html"><small>← Precedente</small><span>Lezione 10 — API: una pagina pu&amp;#242; chiedere dati invece di una pagina intera</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>12 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-12-lezione" rel="next" href="12-lezione.html"><small>Successiva →</small><span>Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

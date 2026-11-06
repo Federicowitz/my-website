@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/02-lezione.html"><meta property="og:title" content="Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/02-lezione.html"><meta property="og:description" content="Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-02-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-01-lezione" rel="prev" href="01-lezione.html"><small>← Precedente</small><span>Lezione 1 — Dalla comunicazione alla sicurezza delle reti</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>3 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-03-lezione" rel="next" href="03-lezione.html"><small>Successiva →</small><span>Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-2-ipv4-indirizzi-pubblici-privati-ed-esaurimento">Lezione 2 — IPv4: indirizzi pubblici, privati ed esaurimento</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Se il mio telefono, il portatile e la console sono collegati a Internet, perché il router di casa spesso usa un solo indirizzo IPv4 pubblico?»</em></p>
+<h2 id="un-indirizzo-per-comunicare-in-rete">1. Un indirizzo per comunicare in rete</h2>
+<p><strong>IP</strong> significa <em>Internet Protocol</em>, protocollo Internet. Un indirizzo IP serve a identificare un'interfaccia di rete nel contesto dell'instradamento dei pacchetti. In <strong>IPv4</strong> (<em>Internet Protocol version 4</em>) un indirizzo è lungo <strong>32 bit</strong>, cioè 4 gruppi di 8 bit (<em>ottetti</em>). Lo rappresentiamo spesso in <strong>notazione decimale puntata</strong>: <code>192.168.1.24</code>.</p>
+<pre><code class="language-text">11000000 . 10101000 . 00000001 . 00011000
+   192   .    168   .      1   .      24
+</code></pre>
+<p>Ogni ottetto va da 0 a 255. Esistono teoricamente <code>2^32 = 4.294.967.296</code> combinazioni; <strong>non tutte sono assegnabili come indirizzi pubblici di dispositivi</strong>: diversi blocchi sono riservati a impieghi speciali.</p>
+<p>Nell'incapsulamento studiato prima, il pacchetto IP contiene indirizzo sorgente e destinazione e viene inoltrato dai router. Un indirizzo IP non coincide con l'indirizzo <strong>MAC</strong> (<em>Media Access Control</em>), tipicamente usato per la consegna del frame su un singolo collegamento locale.</p>
+<h2 id="perche-sono-finiti-gli-ipv4">2. Perché sono «finiti» gli IPv4?</h2>
+<p>Quando fu progettato IPv4, uno spazio a 32 bit sembrava enorme. La diffusione di computer, telefoni, router, data center e dispositivi connessi ha fatto crescere la domanda di <strong>indirizzi globalmente univoci</strong>.</p>
+<p>Due date precise aiutano a non trasformare una frase giornalistica in un'affermazione scorretta:</p>
+<ul>
+<li><strong>3 febbraio 2011:</strong> la <strong>IANA</strong> (<em>Internet Assigned Numbers Authority</em>) ha esaurito il suo insieme centrale di blocchi IPv4 ancora disponibili per l'assegnazione ai registri regionali.</li>
+<li><strong>25 novembre 2019:</strong> <strong>RIPE NCC</strong> (<em>Réseaux IP Européens Network Coordination Centre</em>), registro regionale per Europa e altre aree, ha esaurito il suo pool ordinario di indirizzi IPv4 mai assegnati e applica procedure di lista d'attesa e recupero.</li>
+</ul>
+<p>Questo <strong>non</strong> significa che IPv4 abbia smesso di funzionare, né che non esista più alcun indirizzo liberabile. Gli indirizzi già assegnati continuano a essere usati; alcuni vengono trasferiti, recuperati e riassegnati. Significa che la risorsa «nuovi indirizzi pubblici IPv4 disponibili liberamente» è diventata scarsa e soggetta a politiche di gestione. Fonte: RIPE NCC e IANA, link nelle fonti finali.</p>
+<h2 id="chi-assegna-gli-indirizzi">3. Chi assegna gli indirizzi?</h2>
+<p>Una sintesi della catena organizzativa:</p>
+<pre><code class="language-text">IANA: gestione globale dello spazio IP
+    ↓
+RIR: registri Internet regionali (es. RIPE NCC)
+    ↓
+Operatori / organizzazioni / registri locali
+    ↓
+Reti e utenti finali
+</code></pre>
+<p>Un <strong>ISP</strong> (<em>Internet Service Provider</em>, fornitore di connettività Internet) può attribuire all'utente un IPv4 pubblico, oppure gestire diversamente la condivisione degli indirizzi. <em>Assegnare un indirizzo</em> non significa rendere automaticamente ogni servizio raggiungibile dall'esterno: contano routing, firewall e configurazioni.</p>
+<h2 id="indirizzi-pubblici-e-privati">4. Indirizzi pubblici e privati</h2>
+<p>L'idea risolutiva è che molti dispositivi comunicano soprattutto <strong>all'interno di una rete locale</strong> e non hanno bisogno di essere identificati con un indirizzo IPv4 pubblico distinto. Lo standard <strong>RFC 1918</strong> (<em>Request for Comments 1918</em>, documento tecnico che definisce l'uso privato) riserva tre intervalli:</p>
+<table>
+<thead>
+<tr>
+<th>Blocco privato</th>
+<th>Da… a…</th>
+<th>Esempio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>10.0.0.0/8</code></td>
+<td><code>10.0.0.0</code> – <code>10.255.255.255</code></td>
+<td><code>10.4.2.9</code></td>
+</tr>
+<tr>
+<td><code>172.16.0.0/12</code></td>
+<td><code>172.16.0.0</code> – <code>172.31.255.255</code></td>
+<td><code>172.20.5.8</code></td>
+</tr>
+<tr>
+<td><code>192.168.0.0/16</code></td>
+<td><code>192.168.0.0</code> – <code>192.168.255.255</code></td>
+<td><code>192.168.1.24</code></td>
+</tr>
+</tbody>
+</table>
+<p>La scrittura <code>/8</code>, <code>/12</code> o <code>/16</code> indica la lunghezza del prefisso di rete in bit, secondo la notazione <strong>CIDR</strong> (<em>Classless Inter-Domain Routing</em>). La notazione consente di riconoscere i blocchi privati anche senza calcolare numericamente tutte le possibili sottoreti.</p>
+<p>Questi indirizzi possono essere <strong>riutilizzati</strong> in reti private diverse. Il laptop di uno studente a casa può essere <code>192.168.1.20</code>, così come una stampante in un'altra abitazione, senza conflitto, purché i due indirizzi non debbano essere univoci nella medesima rete privata collegata. I router dell'Internet pubblico non inoltrano normalmente pacchetti destinati a questi intervalli privati.</p>
+<p><strong>Attenzione a due falsi ragionamenti:</strong></p>
+<ol>
+<li><em>«Tutti gli indirizzi che non sono privati sono pubblici»</em>: falso. Esistono indirizzi speciali, ad esempio <code>127.0.0.1</code> (loopback: questo stesso computer) e <code>169.254.x.x</code> (link-local IPv4, usato in determinate condizioni sulla rete locale).</li>
+<li><em>«Un indirizzo pubblico è sempre raggiungibile da chiunque»</em>: falso. Raggiungibilità effettiva e permessi di accesso dipendono dalla rete e dai filtri.</li>
+</ol>
+<h2 id="il-ruolo-della-rete-locale-e-del-gateway">5. Il ruolo della rete locale e del gateway</h2>
+<p>In una rete domestica potremmo avere:</p>
+<pre><code class="language-text">Notebook: 192.168.1.10 ──┐
+Telefono: 192.168.1.11 ──┼── Router / gateway ─── ISP ─── Internet
+Stampante:192.168.1.12 ──┘    LAN 192.168.1.1
+</code></pre>
+<p><strong>LAN</strong> significa <em>Local Area Network</em>, rete locale. Il <strong>gateway predefinito</strong> (<em>default gateway</em>) è il router a cui un dispositivo invia il traffico che non appartiene alla propria rete direttamente raggiungibile. Il router non è «la destinazione finale»: è il prossimo passaggio lungo il percorso.</p>
+<p>Un computer può comunicare con una stampante della stessa LAN senza attraversare Internet. Quando vuole raggiungere un server esterno, inoltra i pacchetti al gateway. A questo punto nasce la difficoltà: un indirizzo privato non può essere usato tale e quale come indirizzo sorgente del normale traffico sull'Internet pubblico. Vedremo la traduzione nella prossima lezione.</p>
+<h2 id="e-ipv6-la-soluzione-strutturale">6. E IPv6? La soluzione strutturale</h2>
+<p><strong>IPv6</strong> (<em>Internet Protocol version 6</em>) impiega <strong>128 bit</strong> per gli indirizzi, per un numero di combinazioni immensamente superiore a quello di IPv4. Un indirizzo IPv6 usa gruppi esadecimali separati da due punti, per esempio <code>2001:db8::1</code> (blocco di documentazione). IPv4 e IPv6 possono convivere mediante <strong>dual stack</strong> (dispositivi che supportano entrambi) e altre tecniche di transizione.</p>
+<p>Il nuovo spazio di indirizzamento permette di ridurre il bisogno della condivisione di indirizzi tramite NAT in molti scenari, ma <strong>non elimina la necessità dei firewall</strong>. Anche con IPv6 resta fondamentale stabilire quali connessioni consentire.</p>
+<p><strong>Sintesi:</strong> gli IPv4 non sono «spenti»: è esaurita la disponibilità ordinaria di nuovi blocchi pubblici. NAT e condivisione hanno attenuato la scarsità; IPv6 costituisce la risposta strutturale.</p>
+<h2 id="analisi-lo-stesso-indirizzo-privato-tre-abitazioni">7. Analisi: lo stesso indirizzo privato, tre abitazioni</h2>
+<p>Tre abitazioni non collegate direttamente fra loro utilizzano lo stesso schema interno:</p>
+<table>
+<thead>
+<tr>
+<th>Abitazione</th>
+<th>Indirizzo del portatile</th>
+<th>Gateway locale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td><code>192.168.1.10</code></td>
+<td><code>192.168.1.1</code></td>
+</tr>
+<tr>
+<td>B</td>
+<td><code>192.168.1.10</code></td>
+<td><code>192.168.1.1</code></td>
+</tr>
+<tr>
+<td>C</td>
+<td><code>192.168.1.10</code></td>
+<td><code>192.168.1.1</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Questione 1.</strong> Esiste un conflitto globale? <em>No: questi indirizzi sono privati e hanno significato nel rispettivo contesto di rete locale. Un indirizzo privato non identifica un destinatario univoco in tutto Internet.</em></p>
+<p><strong>Questione 2.</strong> Le tre reti possono utilizzare lo stesso IPv4 pubblico senza ulteriori meccanismi? <em>Non come indirizzo globale esclusivo di tre interfacce indipendenti nello stesso contesto di instradamento: occorrerebbe un meccanismo di condivisione gestito dall'operatore. Nelle reti locali, invece, NAT/PAT consente a più host di condividere l'indirizzo pubblico assegnato al collegamento.</em></p>
+<p><strong>Questione 3.</strong> Un indirizzo <code>172.25.4.8</code> è privato? <em>Sì: rientra nell’intervallo da <code>172.16.0.0</code> a <code>172.31.255.255</code>.</em></p>
+<p><strong>Questione 4.</strong> IPv6 elimina la necessità di controllare gli accessi? <em>No. Avere molti indirizzi non significa autorizzare qualunque connessione.</em></p>
+<h3 id="verifica">Verifica</h3>
+<ol>
+<li>Perché <code>192.168.1.10</code> può comparire in migliaia di abitazioni? <em>Il suo ambito di utilizzo è locale alla rete privata.</em></li>
+<li>Che cosa è successo il 3 febbraio 2011? <em>Si è esaurito il pool centrale IANA di blocchi IPv4 ancora non distribuiti ai registri regionali.</em></li>
+<li>Un host con indirizzo pubblico è automaticamente raggiungibile da chiunque? <em>No, routing, firewall e configurazione determinano l'accessibilità.</em></li>
+<li>Perché IPv6 costituisce una risposta più generale della sola traduzione NAT? <em>Aumenta enormemente lo spazio degli indirizzi invece di limitarsi a condividere quello IPv4 esistente.</em></li>
+</ol>
+<p><strong>Passaggio alla lezione 3:</strong> i nostri dispositivi hanno indirizzi privati, ma devono parlare con servizi pubblici. Come si collega il mondo interno a quello esterno?</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-01-lezione" rel="prev" href="01-lezione.html"><small>← Precedente</small><span>Lezione 1 — Dalla comunicazione alla sicurezza delle reti</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>3 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-03-lezione" rel="next" href="03-lezione.html"><small>Successiva →</small><span>Lezione 3 — Dal privato al pubblico: gateway, NAT, PAT e CGNAT</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

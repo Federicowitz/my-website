@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli — Federico Lelli</title><meta name="school-kind" content="lesson"><meta name="description" content="Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="reti.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/reti/12-lezione.html"><meta property="og:title" content="Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/reti/12-lezione.html"><meta property="og:description" content="Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli. Dalle reti alle applicazioni distribuite: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="reti-12-lezione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=reti" data-school-catalog="reti">Dalle reti alle applicazioni distribuite</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-11-lezione" rel="prev" href="11-lezione.html"><small>← Precedente</small><span>Lezione 11 — Il server non &amp;#232; un linguaggio: diverse tecnologie, stessa funzione</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>13 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-13-lezione" rel="next" href="13-lezione.html"><small>Successiva →</small><span>Lezione 13 — Persistenza: perch&amp;#233; i dati non possono vivere soltanto nella memoria del programma</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading reti-reading">
+<!-- RETI:CONTENT:START --><h1 id="lezione-12-client-server-sistemi-distribuiti-e-architettura-a-livelli">Lezione 12 — Client-server, sistemi distribuiti e architettura a livelli</h1>
+<p><strong>Domanda iniziale:</strong> <em>«Se il browser mostra i dati, il server applica le regole e un archivio conserva le informazioni, stiamo descrivendo tre programmi, tre computer o tre responsabilità?»</em></p>
+<h2 id="perche-dividere-il-lavoro">1. Perché dividere il lavoro?</h2>
+<p>Consideriamo un servizio che gestisce i prestiti della biblioteca. Se tutta l'applicazione, tutti i libri e tutte le regole fossero installati autonomamente su ogni computer della scuola, sarebbe difficile mantenere coerenti le informazioni. Se ogni programma aggiorna una sua copia dell'archivio, quale sarebbe quella giusta?</p>
+<p>La risposta comune è distribuire i compiti: alcuni componenti si occupano di <strong>interazione</strong>, altri di <strong>regole e controlli</strong>, altri di <strong>archiviazione e accesso ai dati</strong>. La distribuzione può essere logica, fra programmi diversi o su computer differenti.</p>
+<h2 id="modello-client-server">2. Modello client-server</h2>
+<p>Il <strong>client</strong> chiede un servizio; il <strong>server</strong> lo rende disponibile e risponde. I ruoli riguardano una comunicazione, non per forza l'identità permanente di una macchina. Un programma può essere client rispetto a un database e server rispetto a un browser.</p>
+<pre><code class="language-text">Browser (client) ---- richiesta HTTP ----&gt; Servizio (server)
+Browser (client) &lt;--- risposta HTTP ----- Servizio (server)
+</code></pre>
+<p><strong>Vantaggi:</strong> dati e regole possono essere gestiti centralmente; aggiornare una parte del sistema non richiede necessariamente di sostituire tutti i client; è più semplice applicare controlli coerenti. <strong>Criticità:</strong> il servizio centrale può essere un punto di guasto o congestione e richiede corretta progettazione di affidabilità e sicurezza.</p>
+<p>L'architettura <strong>peer-to-peer (P2P, «da pari a pari»)</strong> è diversa: i nodi possono fornire e consumare risorse fra loro, senza richiedere sempre un unico server centrale per tutte le funzioni. Non significa che ogni protocollo P2P sia necessariamente privo di qualunque componente centrale: dipende dal sistema.</p>
+<h2 id="che-cose-un-sistema-distribuito">3. Che cos'è un sistema distribuito?</h2>
+<p>Un <strong>sistema distribuito</strong> è composto da più componenti che collaborano, eseguendo in ambienti computazionali distinti e comunicando per fornire un servizio complessivo. Si può parlare di <strong>più processi o nodi che cooperano</strong>. La separazione fa emergere problemi ulteriori: tempi di rete, guasti parziali, coordinamento, autenticazione tra servizi e coerenza dei dati.</p>
+<p>Un browser sul PC e il server su un altro computer formano già una semplice applicazione distribuita. Quando aggiungiamo un database remoto e altri servizi, la struttura diventa più articolata.</p>
+<p><strong>Attenzione:</strong> non basta avere tre classi in un programma per avere un sistema distribuito. La distribuzione richiede componenti che dialogano attraverso confini di esecuzione, tipicamente di processo o di rete.</p>
+<h2 id="le-tre-responsabilita-logiche-presentation-business-logic-data">4. Le tre responsabilità logiche: presentation, business logic, data</h2>
+<h3 id="presentation-layer-livello-di-presentazione">Presentation layer (livello di presentazione)</h3>
+<p>È la parte responsabile della <strong>rappresentazione delle informazioni e dell'interazione</strong> con l'utente. In un'applicazione Web, comprende l'interfaccia HTML/CSS e il comportamento JavaScript nel browser. Può anche comprendere la preparazione dell'interfaccia svolta da un server: ciò che conta è la responsabilità, non il luogo in cui gira tutto il codice.</p>
+<h3 id="business-logic-layer-livello-di-logica-applicativa">Business logic layer (livello di logica applicativa)</h3>
+<p>È la parte che implementa <strong>le regole del problema</strong>: un libro non può essere prestato se è già impegnato; un utente non può prenotare più di un certo numero di volumi; il sistema verifica permessi e condizioni prima di accettare un'operazione. Il termine <em>business</em> non significa soltanto «commercio»: indica le regole del dominio applicativo, anche per una scuola.</p>
+<h3 id="data-layer-livello-dei-dati">Data layer (livello dei dati)</h3>
+<p>Gestisce <strong>memorizzazione, recupero e aggiornamento</strong> delle informazioni, oltre alla comunicazione con il sistema di persistenza. Nel caso più comune utilizza un database, ma il concetto di livello dati non obbliga di per sé a usare una specifica tecnologia.</p>
+<pre><code class="language-text">                 PRESENTATION
+          (interfaccia e interazione)
+                       │
+                       ▼
+                  BUSINESS LOGIC
+            (regole, controlli, calcoli)
+                       │
+                       ▼
+                       DATA
+            (accesso e gestione dei dati)
+</code></pre>
+<p><strong>Esempio completo — prenotazione di un libro:</strong></p>
+<ol>
+<li><strong>Presentazione:</strong> l'utente clicca «Prenota» sul sito.</li>
+<li><strong>Logica:</strong> controlla se è autenticato, se il libro è disponibile, se non ha superato il limite di prestiti.</li>
+<li><strong>Dati:</strong> legge disponibilità e prenotazioni già presenti, registra il nuovo prestito in modo coerente.</li>
+<li><strong>Logica:</strong> interpreta il risultato e produce un esito («Prenotazione riuscita»).</li>
+<li><strong>Presentazione:</strong> mostra il messaggio.</li>
+</ol>
+<p>In questo modo lo studente vede che la divisione in livelli non è semplicemente una tabella: ogni responsabilità risponde a una domanda diversa.</p>
+<h2 id="layer-e-tier-due-domande-diverse">5. Layer e tier: due domande diverse</h2>
+<p><strong>Layer</strong> significa <em>strato/livello logico</em>: <strong>quale responsabilità</strong> ha una parte del software? <strong>Tier</strong> significa <em>livello o zona di distribuzione/esecuzione</em>: <strong>dove e in quale ambiente</strong> viene eseguito un componente rispetto agli altri?</p>
+<p>In un'<strong>architettura three-layer</strong> distinguiamo per esempio presentazione, logica e dati, anche se l'intera applicazione è un solo programma. In una <strong>architettura three-tier</strong> parliamo di componenti o ambienti di distribuzione separati, spesso client, server applicativo e database. Nella letteratura pratica, i due termini vengono a volte usati con minore rigore: in classe è utile dichiarare sempre se stiamo parlando di <strong>responsabilità</strong> o <strong>collocazione</strong>.</p>
+<p>Non esiste una corrispondenza obbligatoria di una macchina per layer. E non tutti i tre tier richiedono necessariamente tre computer fisici: macchine virtuali e container possono far funzionare componenti separati sulla stessa macchina ospitante. Torneremo su questo tema con Docker nella lezione 14.</p>
+<h2 id="due-tier-e-tre-tier-un-confronto-utile">6. Due tier e tre tier: un confronto utile</h2>
+<p><strong>Esempio a due tier:</strong> un'applicazione desktop installata sui computer della biblioteca offre l'interfaccia e svolge parte della logica, collegandosi direttamente al database centrale.</p>
+<pre><code class="language-text">[Programma desktop: interfaccia + parte della logica] &lt;--&gt; [Database]
+</code></pre>
+<p><strong>Esempio a tre tier:</strong> un browser parla con un server applicativo che applica le regole, il quale parla con il database.</p>
+<pre><code class="language-text">[Browser] &lt;--&gt; [Backend / server applicativo] &lt;--&gt; [Database]
+</code></pre>
+<p>La seconda configurazione rende più facile centralizzare regole e controlli di accesso, e impedire che ogni browser debba conoscere le credenziali del database. Non garantisce da sola scalabilità o sicurezza: i dettagli dipendono dall'implementazione.</p>
+<h2 id="thin-client-e-fat-client">7. Thin client e fat client</h2>
+<p><strong>Thin client</strong>, «client leggero»: il client svolge soprattutto presentazione e interazione, mentre molte regole e operazioni vengono eseguite sul server. <strong>Fat client</strong> (anche <em>thick client</em>), «client ricco»: il client esegue una parte significativa di logica e gestisce più funzionalità in locale.</p>
+<p>Gli esempi non coincidono rigidamente con «browser = thin» e «programma installato = fat». Una moderna applicazione Web può eseguire molta logica JavaScript nel browser e quindi avere un frontend <em>ricco</em>; un programma installato può invece essere soprattutto un terminale sottile.</p>
+<table>
+<thead>
+<tr>
+<th>Scelta</th>
+<th>Possibile vantaggio</th>
+<th>Possibile criticità</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Thin client</td>
+<td>Aggiornamenti e regole centralizzati</td>
+<td>Dipendenza maggiore dal servizio remoto</td>
+</tr>
+<tr>
+<td>Fat client</td>
+<td>Elaborazioni locali, talvolta utilizzo offline</td>
+<td>Aggiornamenti e coerenza più complessi sui client</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scalare-unapplicazione">8. Scalare un'applicazione</h2>
+<p><strong>Scalabilità</strong> è la capacità di sostenere carichi crescenti. Possiamo aumentare le risorse disponibili a un componente (<em>scaling verticale</em>) oppure aggiungere più istanze di un servizio (<em>scaling orizzontale</em>). In entrambi i casi la progettazione dei dati e delle sessioni conta: non basta moltiplicare i server Web se tutti dipendono da un database incapace di gestire il carico.</p>
+<h2 id="verifica">9. Verifica</h2>
+<ol>
+<li>Un programma può essere server e client allo stesso tempo, rispetto a interlocutori diversi? <em>Sì.</em></li>
+<li>Layer e tier sono sinonimi esatti? <em>No: responsabilità logiche contro collocazione/distribuzione.</em></li>
+<li>Un browser è sempre un thin client? <em>No: può eseguire molta logica locale.</em></li>
+<li>Perché il browser non dovrebbe collegarsi direttamente al database di produzione? <em>È preferibile mediare accesso, regole, autorizzazioni e credenziali tramite un backend.</em></li>
+</ol>
+<p><strong>Passaggio alla lezione 13:</strong> abbiamo nominato molte volte il database. Ma perché non conservare semplicemente i dati in un file?</p>
+<hr />
+<!-- RETI:CONTENT:END -->
+
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="reti-11-lezione" rel="prev" href="11-lezione.html"><small>← Precedente</small><span>Lezione 11 — Il server non &amp;#232; un linguaggio: diverse tecnologie, stessa funzione</span></a><a class="lesson-catalog" href="../../index.html?course=reti" data-school-catalog="reti">Tutte le lezioni<span>13 / 20</span></a><a class="lesson-neighbor" data-school-link="reti-13-lezione" rel="next" href="13-lezione.html"><small>Successiva →</small><span>Lezione 13 — Persistenza: perch&amp;#233; i dati non possono vivere soltanto nella memoria del programma</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>
