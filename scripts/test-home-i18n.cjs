@@ -10,7 +10,7 @@ const normalize = text => text.trim().replace(/\s+/g, ' ');
 const decode = text => text.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 const unchanged = new Set([
   'Federico', 'Federico Lelli', 'Menu', 'Mobile', 'School', 'Email', 'Human Being.',
-  'Datafalco', 'SimpleShare', 'Remandio', 'Scribyx', 'File Stager', 'Timetable solver',
+  'Datafalco', 'SimpleShare', 'Remandio', 'genealogy3', 'Scribyx', 'File Stager', 'Timetable solver',
   'Playground', 'Hardware & bio', 'PoliMotion', 'Cloud', 'GitHub', 'YouTube', 'LinkedIn',
   'C++, C#, Node.js, Python', 'Debian, Docker, Nginx, UFW',
   'Oracle Cloud, GCP, Supabase, Render, Vercel, GitHub',

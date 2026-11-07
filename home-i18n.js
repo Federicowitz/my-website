@@ -2,6 +2,10 @@
 (function () {
   'use strict';
   const english = {
+    'Alberi genealogici interattivi, con gestione collaborativa.': 'Interactive family trees with collaborative editing.',
+    'Applicazione per costruire ed esplorare alberi genealogici: organizza persone e nuclei familiari, dispone automaticamente le generazioni e permette di seguire i legami di parentela. La versione cloud è ancora per uso familiare, per costruire e aggiornare insieme la storia della famiglia.': 'An app for building and exploring family trees: organize people and family units, automatically arrange generations and follow family relationships. The cloud version is still for family use, to build and update the family’s history together.',
+    'Una mappa della famiglia da costruire insieme: aggiungi persone, collega genitori, figli e partner e segui i rami per scoprire come siete imparentati.': 'Build a family map together: add people, connect parents, children and partners, and follow the branches to discover how you are related.',
+    'Apri genealogy3': 'Open genealogy3',
     'Federico Lelli — Ingegnere, sviluppo software, musicista': 'Federico Lelli — Engineer, software developer, musician',
     'Portfolio di Federico Lelli, ingegnere e docente a Milano: software full stack, sistemi, hardware embedded e automazione.': 'Portfolio of Federico Lelli, engineer and teacher in Milan: full-stack software, systems, embedded hardware and automation.',
     'Progetti: software, sistemi, hardware e automazione.': 'Projects: software, systems, hardware and automation.',
