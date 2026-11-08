@@ -324,6 +324,66 @@ window.schoolCatalog = {
       "description": "Capire cosa c’è sotto il codice."
     },
     {
+      "id": "routing",
+      "title": "Routing",
+      "symbol": "IP↗",
+      "description": "Dal viaggio del pacchetto a OSPF, RIP, EIGRP, IS-IS e BGP: 13 lezioni e 5 simulazioni interattive.",
+      "chapters": [
+        {
+          "id": "routing-01",
+          "title": "01 · Dal networking al pacchetto",
+          "description": "Livelli, dispositivi, indirizzi e servizi: ricostruisci il viaggio di una richiesta.",
+          "files": [
+            "mappa.html",
+            "01-fondamenti.html",
+            "02-indirizzi.html",
+            "03-viaggio-applicazione.html"
+          ]
+        },
+        {
+          "id": "routing-02",
+          "title": "02 · Decidere il prossimo hop",
+          "description": "Segui IP e MAC, consulta le tabelle e configura rotte di andata e ritorno.",
+          "files": [
+            "04-pacchetto.html",
+            "05-tabella.html",
+            "06-statico.html"
+          ]
+        },
+        {
+          "id": "routing-03",
+          "title": "03 · Apprendere le rotte",
+          "description": "Dijkstra, OSPF, RIP, EIGRP e IS-IS: confronta famiglie, metriche e convergenza.",
+          "files": [
+            "07-dinamico-dijkstra.html",
+            "08-ospf.html",
+            "09-rip-eigrp-isis.html"
+          ]
+        },
+        {
+          "id": "routing-04",
+          "title": "04 · BGP e routing tra AS",
+          "description": "Sessioni eBGP/iBGP, attributi, annunci e policy di Internet.",
+          "files": [
+            "10-bgp.html"
+          ]
+        },
+        {
+          "id": "routing-05",
+          "title": "05 · Osservare, provare e verificare",
+          "description": "Cinque simulazioni, troubleshooting, esercizi, glossario e verifica finale.",
+          "files": [
+            "11-diagnostica.html",
+            "12-esercizi.html",
+            "13-ripasso.html",
+            "laboratorio.html",
+            "fonti.html",
+            "test.html"
+          ]
+        }
+      ]
+    },
+    {
       "id": "reti",
       "title": "Dalle reti alle applicazioni distribuite",
       "symbol": "IP",
@@ -1243,6 +1303,159 @@ window.schoolCatalog = {
       "kind": "lesson",
       "path": "materials/lezioni/rappresentazione-interi.html",
       "description": "Lezione di approfondimento"
+    },
+    {
+      "id": "routing-mappa",
+      "course": "routing",
+      "title": "Routing",
+      "kind": "lesson",
+      "path": "materials/routing/mappa.html",
+      "description": "Dalle basi del networking al routing IP: 13 lezioni, cinque simulazioni e una verifica ragionata.",
+      "chapter": "routing-01"
+    },
+    {
+      "id": "routing-01-fondamenti",
+      "course": "routing",
+      "title": "01 · Reti, livelli e dispositivi",
+      "kind": "lesson",
+      "path": "materials/routing/01-fondamenti.html",
+      "description": "Distingui host, switch e router, poi segui l’incapsulamento di una richiesta.",
+      "chapter": "routing-01"
+    },
+    {
+      "id": "routing-02-indirizzi",
+      "course": "routing",
+      "title": "02 · IP, MAC, subnet e NAT",
+      "kind": "lesson",
+      "path": "materials/routing/02-indirizzi.html",
+      "description": "Capisci chi è locale, chi è remoto e perché ARP cerca il MAC del prossimo hop.",
+      "chapter": "routing-01"
+    },
+    {
+      "id": "routing-03-viaggio-applicazione",
+      "course": "routing",
+      "title": "03 · Dall’applicazione alla rete",
+      "kind": "lesson",
+      "path": "materials/routing/03-viaggio-applicazione.html",
+      "description": "DNS, DHCP, porte, trasporto e TLS nel viaggio completo di RideNow.",
+      "chapter": "routing-01"
+    },
+    {
+      "id": "routing-04-pacchetto",
+      "course": "routing",
+      "title": "04 · Il viaggio di un pacchetto",
+      "kind": "lesson",
+      "path": "materials/routing/04-pacchetto.html",
+      "description": "Leggi una topologia reale e separa gli IP end-to-end dai MAC di ogni collegamento.",
+      "chapter": "routing-02"
+    },
+    {
+      "id": "routing-05-tabella",
+      "course": "routing",
+      "title": "05 · Tabella di routing e Longest Prefix Match",
+      "kind": "lesson",
+      "path": "materials/routing/05-tabella.html",
+      "description": "Connected, Local, next hop e default: scegli sempre il prefisso compatibile più specifico.",
+      "chapter": "routing-02"
+    },
+    {
+      "id": "routing-06-statico",
+      "course": "routing",
+      "title": "06 · Routing statico, ritorno e backup",
+      "kind": "lesson",
+      "path": "materials/routing/06-statico.html",
+      "description": "Costruisci le rotte Cisco in entrambe le direzioni e distingui AD, metrica e specificità.",
+      "chapter": "routing-02"
+    },
+    {
+      "id": "routing-07-dinamico-dijkstra",
+      "course": "routing",
+      "title": "07 · Routing dinamico e Dijkstra",
+      "kind": "lesson",
+      "path": "materials/routing/07-dinamico-dijkstra.html",
+      "description": "Dalle famiglie dei protocolli al calcolo SPF: scopri un percorso a costo minimo un passo alla volta.",
+      "chapter": "routing-03"
+    },
+    {
+      "id": "routing-08-ospf",
+      "course": "routing",
+      "title": "08 · OSPF, link-state e convergenza",
+      "kind": "lesson",
+      "path": "materials/routing/08-ospf.html",
+      "description": "Hello, LSA, database, SPF e aree: come si costruiscono e aggiornano le rotte.",
+      "chapter": "routing-03"
+    },
+    {
+      "id": "routing-09-rip-eigrp-isis",
+      "course": "routing",
+      "title": "09 · RIP, EIGRP e IS-IS",
+      "kind": "lesson",
+      "path": "materials/routing/09-rip-eigrp-isis.html",
+      "description": "Confronta i principali IGP e usa RIP come caso di studio del distance vector.",
+      "chapter": "routing-03"
+    },
+    {
+      "id": "routing-10-bgp",
+      "course": "routing",
+      "title": "10 · BGP: routing tra sistemi autonomi",
+      "kind": "lesson",
+      "path": "materials/routing/10-bgp.html",
+      "description": "Annunci, AS_PATH, eBGP, iBGP e policy: perché Internet non sceglie solo il cammino più corto.",
+      "chapter": "routing-04"
+    },
+    {
+      "id": "routing-11-diagnostica",
+      "course": "routing",
+      "title": "11 · Guasti, IPv6 e troubleshooting",
+      "kind": "lesson",
+      "path": "materials/routing/11-diagnostica.html",
+      "description": "TTL, MTU, ritorno e strumenti: individua il punto in cui si interrompe una comunicazione.",
+      "chapter": "routing-05"
+    },
+    {
+      "id": "routing-12-esercizi",
+      "course": "routing",
+      "title": "12 · Laboratori ed esercizi guidati",
+      "kind": "exercise",
+      "path": "materials/routing/12-esercizi.html",
+      "description": "Configura, osserva e giustifica ogni hop prima di consultare le soluzioni.",
+      "chapter": "routing-05"
+    },
+    {
+      "id": "routing-13-ripasso",
+      "course": "routing",
+      "title": "13 · Errori comuni, glossario e ripasso",
+      "kind": "lesson",
+      "path": "materials/routing/13-ripasso.html",
+      "description": "Rimetti insieme il percorso e verifica le idee da ricordare.",
+      "chapter": "routing-05"
+    },
+    {
+      "id": "routing-laboratorio",
+      "course": "routing",
+      "title": "Laboratorio · Guarda come si scelgono le rotte",
+      "kind": "lab",
+      "path": "materials/routing/laboratorio.html",
+      "description": "Cinque modelli da esplorare con Avvia e Pausa oppure un passo alla volta. Nessuna animazione parte da sola.",
+      "chapter": "routing-05"
+    },
+    {
+      "id": "routing-fonti",
+      "course": "routing",
+      "title": "Fonti, integrazioni e modelli",
+      "kind": "lesson",
+      "path": "materials/routing/fonti.html",
+      "description": "La dispensa ricevuta è la base del percorso; gli approfondimenti sui protocolli rimandano alle specifiche primarie.",
+      "chapter": "routing-05"
+    },
+    {
+      "id": "routing-test",
+      "course": "routing",
+      "title": "Verifica · Networking e routing",
+      "kind": "test",
+      "path": "materials/routing/test.html",
+      "description": "Domande con correzione e spiegazione",
+      "chapter": "routing-05"
     },
     {
       "id": "reti-00-introduzione",

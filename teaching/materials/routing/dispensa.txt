@@ -1,0 +1,375 @@
+NETWORKING E ROUTING
+Dalle basi delle reti all’instradamento IP: guida ragionata con esempi e laboratori
+Livello: da introduttivo a intermedio (fondamenti utili anche per il percorso CCNA)
+Metodo: comprendere il viaggio di un pacchetto, osservare i router, poi studiare come le rotte vengono scelte e apprese.
+Come leggere questa dispensa. La Parte I costruisce il vocabolario minimo del networking. La Parte II approfondisce il routing in ordine progressivo. La Parte III traduce i concetti in configurazioni, verifiche ed esercizi. Sono stati rielaborati tutti e cinque i nuclei del materiale fornito (panoramica sulle reti, lezione sull’Internet Protocol, introduzione al routing dinamico/link state, routing fundamentals CCNA, static routing CCNA) e aggiunti raccordi ed esempi. Gli approfondimenti non esplicitamente presenti nelle trascrizioni sono indicati come Integrazione quando introducono un argomento nuovo.
+PARTE I — UNA VISIONE D’INSIEME DEL NETWORKING
+1. Perché esistono le reti e come ragionare su una comunicazione
+Una rete di calcolatori è un insieme di dispositivi collegati per scambiare informazioni. Gli host sono gli apparati terminali che inviano o ricevono dati: computer, smartphone, server e molte altre macchine. Una rete locale, o LAN (Local Area Network), collega tipicamente dispositivi in un ambiente limitato; una WAN (Wide Area Network) collega reti anche molto distanti. Internet è una rete di reti: non è un unico cavo e non richiede che tutti i dispositivi conoscano direttamente tutti gli altri.
+Useremo due fili conduttori. Il primo è RideNow, una ipotetica applicazione per richiedere un passaggio: lo smartphone del cliente deve raggiungere i servizi remoti. Il secondo è un laboratorio con PC1 → R1 → R3 → R4 → PC4: qui vedremo realmente come i router si scambiano i pacchetti. Le due storie rispondono alla stessa domanda: come fa un messaggio a raggiungere una destinazione che non appartiene alla nostra rete locale?
+I dati di un’applicazione non attraversano normalmente la rete in un unico blocco indistinto: vengono suddivisi e incapsulati in unità più piccole. Al livello di rete parliamo di pacchetti IP (o datagrammi IP); al livello Ethernet di frame; al livello TCP di segmenti. Questi nomi indicano livelli e funzioni differenti, non tre oggetti indipendenti che viaggiano ciascuno per conto proprio.
+2. I livelli: modelli OSI e TCP/IP
+Dividere la comunicazione in livelli serve a capire chi fa cosa. Il modello OSI è una mappa concettuale a sette livelli; nella pratica Internet viene spesso rappresentato con lo stack TCP/IP a quattro o cinque livelli.
+OSI	Funzione essenziale	Esempi / concetti
+7 — Applicazione	Servizi utilizzati dai programmi	HTTP, DNS, DHCP
+6 — Presentazione	Rappresentazione e codifica dei dati	Codifiche; funzioni crittografiche
+5 — Sessione	Gestione logica delle conversazioni	Concetti di sessione
+4 — Trasporto	Comunicazione tra processi	TCP, UDP, porte
+3 — Rete	Indirizzamento logico tra reti	IP, ICMP, routing
+2 — Collegamento	Consegna sul singolo collegamento	Ethernet, Wi-Fi, MAC, frame
+1 — Fisico	Trasmissione dei segnali	Cavi, fibra, radio
+Nel modello TCP/IP, applicazione e funzioni dei livelli OSI superiori sono normalmente riunite. La distinzione veramente importante per il seguito è questa: uno switch Ethernet inoltra frame all’interno di un dominio di livello 2; un router inoltra pacchetti IP tra reti di livello 3. Alcuni switch moderni svolgono anche funzioni di routing: è la funzione, non il nome commerciale del dispositivo, a determinare il livello.
+Incapsulamento, passo dopo passo
+Supponiamo che RideNow invii una richiesta HTTP. Il livello applicativo produce dati; TCP (quando usato) li trasporta in segmenti; IP aggiunge gli indirizzi di origine e destinazione; Ethernet o Wi-Fi costruiscono il frame adatto al collegamento locale. A destinazione avviene il percorso inverso, detto decapsulamento. L’header IP è usato dai router per decidere dove inoltrare il pacchetto; l’header Ethernet serve solo per quel tratto di collegamento.
+3. Host, interfacce, switch e router
+Un host non coincide necessariamente con un singolo indirizzo: uno stesso computer può avere più interfacce (Ethernet, Wi-Fi, interfacce virtuali) e più indirizzi IP. Un’interfaccia è il punto logico o fisico con cui un dispositivo si collega alla rete.
+    • Lo switch apprende quali indirizzi MAC siano raggiungibili dalle sue porte e inoltra frame sulla LAN. Quando non conosce la porta di un MAC unicast, normalmente effettua unknown-unicast flooding all’interno della VLAN.
+    • Il router collega reti IP distinte. Legge l’IP di destinazione e consulta una tabella di routing per decidere l’interfaccia d’uscita e, quando necessario, il next hop (prossimo router).
+    • Il default gateway è il router al quale un host invia il traffico destinato a reti diverse da quelle direttamente raggiungibili.
+Una regola da fissare subito: switch e router non prendono la stessa decisione. Il primo ragiona di norma sulla destinazione MAC; il secondo sull’indirizzo IP e sul prefisso di rete.
+4. Indirizzi MAC, IP e comunicazione locale
+L’indirizzo MAC identifica un’interfaccia a livello di collegamento, tipicamente su Ethernet o Wi-Fi. Di solito viene rappresentato con 48 bit, per esempio 02:11:22:33:44:55. Può essere assegnato o modificato dal software; i dispositivi moderni possono anche utilizzare MAC casuali per ragioni di privacy. Non è quindi corretto considerarlo sempre immutabile.
+L’indirizzo IP è un indirizzo logico assegnato a un’interfaccia e utilizzato per il recapito attraverso reti differenti. IPv4 usa 32 bit (esempio: 192.168.1.10), mentre IPv6 usa 128 bit (esempio: 2001:db8:1::10). Un indirizzo IP non è un’identità permanente: uno smartphone può cambiare IP passando dal Wi-Fi alla rete mobile.
+Per comunicare sulla stessa rete locale IPv4, un dispositivo deve tradurre l’IP del destinatario nel corrispondente indirizzo MAC. Lo fa con ARP (Address Resolution Protocol), conservando temporaneamente la risposta nella cache ARP. Per comunicare con una destinazione remota, l’host non cerca il MAC del server lontano: cerca quello del gateway locale. Questa differenza sarà decisiva nel capitolo sul routing. Con IPv6, la funzione equivalente di individuazione dei vicini è svolta da Neighbor Discovery, basato su ICMPv6, non da ARP.
+5. IPv4, prefissi, subnet mask e subnetting
+Un indirizzo come 192.168.1.10/24 contiene due informazioni: l’indirizzo dell’interfaccia (192.168.1.10) e la lunghezza del prefisso (/24). La notazione CIDR /24 indica che i primi 24 bit individuano la parte di rete. In notazione decimale la maschera corrisponde a 255.255.255.0.
+Esempio: 192.168.1.10/24 appartiene alla rete 192.168.1.0/24; nell’uso IPv4 tradizionale l’indirizzo di broadcast è 192.168.1.255 e gli indirizzi host ordinari vanno da .1 a .254. Un host nella stessa subnet può essere raggiunto direttamente; un host in una subnet differente richiede una decisione di instradamento.
+Prefisso IPv4	Maschera	Numero di indirizzi totali	Uso tipico
+/24	255.255.255.0	256	LAN semplice
+/26	255.255.255.192	64	Suddivisione di una LAN
+/30	255.255.255.252	4	Collegamento punto-punto tradizionale
+/31	255.255.255.254	2	Punto-punto IPv4, se supportato
+/32	255.255.255.255	1	Indirizzo singolo / rotta host
+Integrazione — Subnetting pratico. Dividere 192.168.1.0/24 in quattro subnet /26 produce 192.168.1.0/26, 192.168.1.64/26, 192.168.1.128/26 e 192.168.1.192/26. Ogni blocco contiene 64 indirizzi. L’operazione consente di isolare reparti, server e database e, soprattutto, di definire confini su cui applicare policy di routing e sicurezza.
+La vecchia distinzione in classi A/B/C è utile come nota storica, ma le reti moderne si descrivono con prefissi CIDR e subnet mask, non con regole del tipo “tutti gli IP che iniziano per 150 vanno nello stesso posto”. Due indirizzi possono avere lo stesso primo ottetto ed essere in reti completamente diverse.
+6. Indirizzi privati, pubblici e NAT
+In IPv4 esistono intervalli riservati alle reti private: 10.0.0.0/8, 172.16.0.0/12 e 192.168.0.0/16. Non sono instradati come normali destinazioni pubbliche su Internet. Un indirizzo pubblico è potenzialmente instradabile su Internet, ma essere pubblico non significa automaticamente essere accessibile: firewall e altri controlli possono bloccare il traffico.
+Il NAT (Network Address Translation) modifica indirizzi nei pacchetti quando attraversano un dispositivo che effettua la traduzione. Nelle reti domestiche è diffusissimo il PAT (NAT con traduzione anche delle porte): molti dispositivi privati condividono lo stesso IPv4 pubblico per le connessioni in uscita. Il router conserva uno stato di traduzione per associare le risposte alle connessioni corrette. NAT non equivale a un firewall: le due funzioni possono coesistere, ma hanno scopi diversi.
+Per RideNow: il telefono può avere 192.168.1.10, mentre le connessioni verso Internet possono apparire originate dall’indirizzo pubblico del router domestico. In una rete cloud, un gateway NAT può permettere a server privati di iniziare connessioni in uscita senza esporli direttamente alle connessioni entranti.
+7. I servizi che rendono praticabile una rete
+DNS — Domain Name System. Traduce nomi come api.ridenow.example in uno o più indirizzi IP. Le risposte possono essere conservate in cache per un tempo controllato dal TTL DNS (che non va confuso con il TTL dei pacchetti IP). DNS può utilizzare UDP oppure TCP e, nelle configurazioni moderne, anche trasporti cifrati. Il DNS individua dove contattare un servizio, ma non decide il percorso che i pacchetti seguiranno.
+DHCP — Dynamic Host Configuration Protocol. Distribuisce automaticamente, in IPv4, parametri quali indirizzo, subnet mask, default gateway e resolver DNS. Il modello didattico classico di assegnazione DHCPv4 è Discover → Offer → Request → Acknowledge (DORA). Non è l’unico meccanismo di configurazione possibile: gli indirizzi possono essere statici e in IPv6 esistono anche SLAAC e DHCPv6.
+Porte. IP identifica l’indirizzo della destinazione di rete, mentre una porta TCP/UDP contribuisce a individuare il processo o servizio che riceve il traffico. HTTP usa spesso 80/TCP, HTTPS spesso 443/TCP; DNS usa comunemente 53/UDP o 53/TCP. Un server può offrire molti servizi su indirizzi e porte differenti. Se un programma è in ascolto solo su 127.0.0.1, non è necessariamente accessibile dall’esterno anche se funziona localmente.
+TCP e UDP. TCP offre un flusso di byte affidabile, ordinato, con ritrasmissioni, controllo di flusso e congestione; normalmente avvia una connessione con la three-way handshake: SYN → SYN-ACK → ACK. UDP invia datagrammi senza promettere consegna o ordinamento: è utile quando l’applicazione gestisce la propria affidabilità o privilegia alcune caratteristiche di latenza. “UDP è più veloce” non è una regola universale: dipende dal protocollo applicativo e dalla rete. Integrazione: HTTP/3 usa QUIC sopra UDP, con affidabilità e cifratura implementate da QUIC.
+TLS, HTTPS, HTTP. HTTP descrive richieste e risposte applicative; HTTPS protegge HTTP mediante TLS, fornendo cifratura, integrità e autenticazione del server attraverso certificati. In molte architetture TLS termina su un load balancer o su un reverse proxy. Il protocollo HTTP non sostituisce IP o il routing: opera a un livello superiore.
+WebSocket. Consente una comunicazione persistente e bidirezionale, utile, per esempio, per inviare aggiornamenti in tempo reale sulla posizione di un autista. Non è l’unica scelta per il tempo reale: polling, Server-Sent Events e altri protocolli possono essere più appropriati in contesti differenti.
+Load balancer e reverse proxy. Un bilanciatore distribuisce richieste verso più backend; un reverse proxy riceve richieste per conto dei servizi interni e può gestire instradamento applicativo, terminazione TLS, cache e compressione. Si parla qui di routing applicativo solo in senso ampio: non è il routing IP delle tabelle dei router.
+Firewall. Filtra il traffico secondo regole: per esempio, il pubblico può raggiungere il frontend RideNow ma non il database. Può operare su diversi livelli. La segmentazione di rete organizza i confini; le regole di sicurezza decidono quali attraversamenti siano permessi.
+8. Un viaggio completo: dall’app RideNow al server
+    1. Lo smartphone si collega al Wi-Fi e ottiene, per esempio, 192.168.1.10/24, gateway 192.168.1.1 e DNS tramite DHCP.
+    2. L’app chiede al DNS l’indirizzo di api.ridenow.example; ottiene un IP di destinazione. I sistemi reali possono avere più indirizzi, CDN o sistemi di bilanciamento.
+    3. Il telefono confronta la destinazione con le reti direttamente raggiungibili. Se è remota, sceglie il default gateway.
+    4. Per spedire il primo frame, risolve tramite ARP il MAC del gateway; nel pacchetto IP rimane l’IP remoto del servizio.
+    5. Il router domestico può applicare PAT/NAT, poi scegliere un next hop verso il provider. I router successivi ripetono una decisione di inoltro sulla base delle proprie tabelle.
+    6. Il traffico arriva all’infrastruttura che ospita il servizio; firewall, load balancer e reverse proxy possono intervenire secondo l’architettura.
+    7. Il client e il servizio stabiliscono un trasporto appropriato e una sessione sicura; la richiesta HTTP viene elaborata e riceve una risposta.
+    8. Dopo l’assegnazione di un autista, un canale WebSocket può inviare gli aggiornamenti della posizione senza richiedere continui nuovi cicli di domanda/risposta.
+Punto di raccordo. IP, MAC, DNS, porte e TCP/UDP risolvono problemi diversi. Il routing entra in gioco nel momento in cui sappiamo a quale IP vogliamo inviare dati, ma occorre scegliere attraverso quali reti consegnarli.
+PARTE II — ROUTING: DAL CONCETTO AL MECCANISMO
+9. Che cos’è, esattamente, il routing?
+Il routing (instradamento) è il processo di individuazione dei percorsi per raggiungere le reti di destinazione. Il forwarding (inoltro) è l’azione concreta con cui un router, dopo avere ricevuto un pacchetto, lo invia sull’interfaccia e verso il next hop opportuni. I due termini sono strettamente legati, ma distinguerli aiuta: il routing costruisce o sceglie le informazioni; il forwarding le usa pacchetto per pacchetto.
+Pensiamo a un viaggio in auto. La destinazione finale è l’IP del server; la mappa del router è la tabella di instradamento; il next hop è il successivo incrocio o router verso cui procedere. Un router non deve conoscere l’intero cammino percorso dal pacchetto fino alla destinazione. Basta che conosca un prossimo passo valido. Router diversi possono avere viste e politiche differenti della rete.
+Il routing non seleziona necessariamente la strada più corta in chilometri, la meno congestionata in tempo reale o la più veloce in assoluto. La scelta dipende dalle rotte disponibili, dalle metriche dei protocolli, dalle preferenze amministrative e, soprattutto su Internet, dalle politiche di instradamento. Una rotta può anche non esistere: in quel caso il pacchetto viene scartato, salvo che sia presente una rotta predefinita utilizzabile.
+10. Topologia guida: quattro router e due LAN
+Useremo la seguente topologia, tratta dal materiale CCNA e normalizzata con gli indirizzi completi:
+LAN A                         rete di trasporto                            LAN B
+PC1 -- R1 -------- R2 -------- R4 -- PC4
+       |                        |
+       +---------- R3 ----------+
+Collegamento	Rete IPv4	Indirizzi delle estremità
+PC1 — R1	192.168.1.0/24	PC1: 192.168.1.10; R1: 192.168.1.1
+R1 — R2	192.168.12.0/24	R1: 192.168.12.1; R2: 192.168.12.2
+R1 — R3	192.168.13.0/24	R1: 192.168.13.1; R3: 192.168.13.3
+R2 — R4	192.168.24.0/24	R2: 192.168.24.2; R4: 192.168.24.4
+R3 — R4	192.168.34.0/24	R3: 192.168.34.3; R4: 192.168.34.4
+R4 — PC4	192.168.4.0/24	R4: 192.168.4.4; PC4: 192.168.4.10
+PC1 ha come gateway 192.168.1.1; PC4 ha come gateway 192.168.4.4. La topologia consente due percorsi principali tra le LAN: R1→R2→R4 e R1→R3→R4. Per il primo laboratorio sceglieremo il secondo. I prefissi /24 sui collegamenti fra router servono a semplificare i conti; in una progettazione reale potremmo preferire /31 o /30 su opportuni collegamenti punto-punto.
+11. Prima decisione: destinazione locale oppure remota?
+Immaginiamo che PC1 (192.168.1.10/24) debba inviare un pacchetto a PC4 (192.168.4.10). PC1 confronta l’indirizzo di destinazione con il proprio prefisso. La propria rete è 192.168.1.0/24; PC4 appartiene a 192.168.4.0/24. Sono reti diverse, quindi PC1 invia il traffico al gateway 192.168.1.1.
+È facile commettere un errore qui: il pacchetto IP continua ad avere IP sorgente = 192.168.1.10 e IP destinazione = 192.168.4.10. Nel primo frame Ethernet, invece, il MAC destinatario è quello dell’interfaccia di R1 nella LAN A. R1 riceve il frame, rimuove l’incapsulamento di livello 2, esamina il pacchetto IP e lo inoltra al router successivo. Per ogni collegamento, il frame viene ricostruito con MAC appropriati al nuovo tratto.
+Tratto 1: PC1 → R1       IP: PC1 → PC4 | MAC: PC1 → R1
+Tratto 2: R1  → R3       IP: PC1 → PC4 | MAC: R1  → R3
+Tratto 3: R3  → R4       IP: PC1 → PC4 | MAC: R3  → R4
+Tratto 4: R4  → PC4      IP: PC1 → PC4 | MAC: R4  → PC4
+Lo schema presuppone collegamenti Ethernet e assenza di NAT lungo il laboratorio. Se intervenisse NAT, anche uno o più campi IP (e spesso TCP/UDP) potrebbero essere modificati. In generale i router decrementano l’Hop Limit IPv6 o il TTL IPv4: se il valore arriva a zero, scartano il pacchetto, limitando la durata dei loop. In IPv4 il checksum dell’header viene aggiornato quando il TTL cambia.
+12. La tabella di routing: le istruzioni del router
+Ogni router mantiene un insieme di informazioni sulle destinazioni note. Una rotta, in forma semplificata, dice: “Per raggiungere il prefisso X, inoltra tramite l’interfaccia Y o il next hop Z.” Una tabella può contenere anche dettagli su origine, preferenza, metrica e stato della rotta.
+Campo	Significato	Esempio
+Prefisso destinazione	Insieme degli IP interessati	192.168.4.0/24
+Next hop	Router successivo	192.168.13.3
+Interfaccia d’uscita	Collegamento da utilizzare	GigabitEthernet0/0
+Origine	Come la rotta è stata appresa	C, L, S, O
+Preferenza / metrica	Criteri di selezione tra rotte candidate	[1/0] in alcune rotte statiche Cisco
+In Cisco IOS, show ip route presenta una legenda e le rotte installate. Le sigle principali incontrate nel materiale sono C (Connected), L (Local), S (Static) e, per OSPF, O. L’output varia secondo piattaforma e versione: occorre ragionare sul significato, non memorizzare una schermata specifica.
+Rotte Connected e Local: perché esistono entrambe?
+Se configuri 192.168.1.1/24 su un’interfaccia attiva di R1, nei classici esempi Cisco IPv4 appaiono due rotte:
+C 192.168.1.0/24 is directly connected, GigabitEthernet0/2
+L 192.168.1.1/32 is directly connected, GigabitEthernet0/2
+La rotta C indica che R1 può consegnare direttamente agli host della rete 192.168.1.0/24. La rotta L identifica l’IP 192.168.1.1 come indirizzo del router stesso. Se un pacchetto è indirizzato a tale IP, R1 lo riceve per elaborarlo localmente invece di inoltrarlo a un altro host. In questo scenario, a ogni interfaccia IPv4 attiva con un indirizzo corrisponde normalmente una rotta Connected e una Local. Se l’interfaccia non è operativa, le relative rotte non vengono normalmente installate.
+Distinzione importante: le rotte Connected e Local non sono né configurazioni statiche remote né rotte apprese da protocolli dinamici. Nascono dalla configurazione e dallo stato delle interfacce.
+13. Come si sceglie la rotta giusta: Longest Prefix Match
+Un router può avere più rotte compatibili con uno stesso IP di destinazione. La prima regola da applicare durante la ricerca nella tabella di inoltro è il Longest Prefix Match (corrispondenza con prefisso più lungo): tra tutte le rotte che includono l’IP di destinazione, vince quella con più bit di prefisso.
+Supponiamo che il router abbia queste rotte:
+Prefisso in tabella	Verso	Per 10.1.2.34 è compatibile?
+0.0.0.0/0	ISP	Sì
+10.0.0.0/8	R2	Sì
+10.1.0.0/16	R3	Sì
+10.1.2.0/24	R4	Sì: questa è la più specifica
+10.2.0.0/16	R5	No
+Per 10.1.2.34 viene selezionato 10.1.2.0/24, non /16, /8 o la default /0. Se esistesse anche una rotta 10.1.2.34/32, sarebbe ancora più specifica. È per lo stesso motivo che una rotta L /32 prevale sulla rotta C /24 dell’interfaccia quando il pacchetto è indirizzato al router.
+Ordine concettuale delle decisioni: prima si determina quale prefisso corrisponde meglio alla destinazione. Nella scelta tra candidati per la stessa destinazione/prefisso, i router possono usare una distanza amministrativa o preferenza (per scegliere tra sorgenti differenti), quindi le metriche definite dal protocollo e altri criteri. Non è corretto affermare che una rotta /8 con distanza amministrativa bassa batta automaticamente una /24 con distanza alta per una destinazione compresa nella /24: il prefisso più specifico rimane essenziale per l’inoltro.
+E se non c’è nessuna rotta?
+Se non esiste una rotta che corrisponda all’IP destinazione, e non esiste una default route, il router scarta il pacchetto. Un router IP non fa flooding indiscriminato di pacchetti sconosciuti come uno switch Ethernet può fare con i frame unknown unicast. I protocolli di routing possono invece usare messaggi di diffusione o flooding per distribuire informazioni di controllo: sono due operazioni diverse.
+14. Next hop, interfaccia d’uscita e risoluzione del vicino
+Una voce come 192.168.4.0/24 via 192.168.13.3 non dice soltanto “usa R3”: obbliga R1 a capire come raggiungere il next hop 192.168.13.3. R1 possiede già una rotta Connected verso 192.168.13.0/24, quindi identifica l’interfaccia di uscita e può risolvere, tramite ARP, il MAC di R3 su quel collegamento.
+Integrazione — Risoluzione ricorsiva. In altri casi il next hop può richiedere una ulteriore ricerca nella tabella (risoluzione ricorsiva) fino a trovare un’interfaccia e un vicino effettivamente raggiungibili. Un next hop indicato in configurazione non diventa magicamente raggiungibile: deve esserci un percorso utilizzabile per arrivarci.
+Control plane e data plane. Il control plane apprende e seleziona le rotte (configurazione, OSPF, BGP ecc.); il data plane inoltra i pacchetti usando strutture ottimizzate, spesso chiamate FIB (Forwarding Information Base) e tabelle delle adiacenze. La tabella mostrata dall’amministratore e quella usata per l’inoltro possono essere rappresentazioni diverse della stessa logica.
+15. La rotta di default: la strada quando non ne conosco una migliore
+La default route IPv4 è 0.0.0.0/0: avendo prefisso di lunghezza zero, corrisponde a qualsiasi destinazione IPv4, ma è meno specifica di qualunque altra rotta compatibile. Sui PC, il default gateway realizza normalmente proprio questa idea. Anche un router può avere una default route verso un altro router, ad esempio quello del provider.
+R1(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.2
+L’indirizzo 203.0.113.2 appartiene a un intervallo riservato alla documentazione; nel laboratorio si assume raggiungibile dal router. Un possibile output Cisco segnala S* come rotta statica candidata al default e indica il gateway of last resort. La default non sostituisce le rotte più specifiche: una destinazione interna 192.168.4.10 continuerà a utilizzare una rotta 192.168.4.0/24 se disponibile.
+Attenzione: la default route non garantisce l’accesso a tutta Internet. Il next hop deve essere raggiungibile e il resto del percorso, il ritorno e le policy di sicurezza devono funzionare.
+16. Routing statico: costruire manualmente la strada
+Il routing statico consiste nel configurare manualmente le rotte verso reti non direttamente connesse. È utile in reti piccole o stabili, in laboratori, per rotte di default e per percorsi espliciti. La sua semplicità è anche il suo limite: se la topologia cambia, l’amministratore deve aggiornare le configurazioni oppure predisporre meccanismi di ridondanza. Una rotta statica non “impara” automaticamente un nuovo percorso alternativo.
+16.1 Il problema iniziale: R1 non sa raggiungere PC4
+All’accensione, dopo avere configurato e attivato le interfacce, R1 conosce le reti direttamente connesse 192.168.1.0/24, 192.168.12.0/24 e 192.168.13.0/24, oltre alle proprie rotte Local. Ma non conosce automaticamente la rete remota 192.168.4.0/24. Se PC1 prova a comunicare con PC4, R1 non può proseguire senza una rotta adatta (salvo default utilizzabile).
+Decidiamo di usare il percorso R1 → R3 → R4. Sono necessarie rotte in entrambe le direzioni. Se configurassimo soltanto il percorso di andata, PC4 potrebbe ricevere il pacchetto, ma la risposta potrebbe non raggiungere PC1.
+Router	Rete da raggiungere	Next hop	Motivo
+R1	192.168.4.0/24	192.168.13.3	R3 è il prossimo router verso PC4
+R3	192.168.4.0/24	192.168.34.4	R4 possiede la LAN B
+R3	192.168.1.0/24	192.168.13.1	R1 possiede la LAN A
+R4	192.168.1.0/24	192.168.34.3	R3 è il prossimo router verso PC1
+Non serve configurare su R1 una rotta statica verso 192.168.1.0/24, perché la rete è Connected. Per lo stesso motivo R4 conosce già 192.168.4.0/24.
+16.2 Comandi Cisco IOS — esempio completo
+Assumiamo interfacce già indirizzate e abilitate. In modalità di configurazione globale:
+! R1 — rete remota di PC4
+R1(config)# ip route 192.168.4.0 255.255.255.0 192.168.13.3
+
+! R3 — rete remota di PC4 e rete remota di PC1
+R3(config)# ip route 192.168.4.0 255.255.255.0 192.168.34.4
+R3(config)# ip route 192.168.1.0 255.255.255.0 192.168.13.1
+
+! R4 — rete remota di PC1
+R4(config)# ip route 192.168.1.0 255.255.255.0 192.168.34.3
+La sintassi essenziale è ip route RETE_DESTINAZIONE MASCHERA NEXT_HOP. La maschera nelle forme Cisco IOS mostrate sopra è scritta esplicitamente (255.255.255.0), non nella notazione /24. Esistono anche forme che specificano l’interfaccia d’uscita o sia interfaccia sia next hop. Su collegamenti Ethernet multiaccesso, indicare solo l’interfaccia può produrre comportamenti indesiderati (ad esempio richieste ARP per le destinazioni e dipendenza dal Proxy ARP); è quindi spesso preferibile un next hop esplicito o una rotta completamente specificata secondo il caso.
+Per verificare:
+R1# show ip route
+R1# show ip route 192.168.4.10
+R1# show ip interface brief
+R1# ping 192.168.4.10
+R1# traceroute 192.168.4.10
+Nei risultati una rotta statica ha solitamente il codice S. Una voce come S 192.168.4.0/24 [1/0] via 192.168.13.3 contiene, tra parentesi quadre, distanza amministrativa (1, valore predefinito di molte rotte statiche Cisco) e metrica (qui 0 secondo la rappresentazione Cisco); questi dettagli possono cambiare in altri contesti e piattaforme.
+16.3 Seguiamo il pacchetto, senza saltare passaggi
+    1. PC1 prepara il pacchetto per 192.168.4.10; la destinazione non è nella sua /24, quindi lo manda a 192.168.1.1 (R1).
+    2. R1 legge l’IP di destinazione, trova la rotta statica 192.168.4.0/24 via 192.168.13.3, individua il collegamento R1–R3 e inoltra il pacchetto a R3.
+    3. R3 usa la propria rotta verso 192.168.4.0/24 via 192.168.34.4 e inoltra a R4.
+    4. R4 trova 192.168.4.0/24 come rete Connected e invia un frame direttamente verso il MAC di PC4, risolvendolo con ARP se necessario.
+    5. PC4 riceve il pacchetto e, per la risposta verso 192.168.1.10, utilizza il proprio gateway 192.168.4.4.
+    6. R4 usa la rotta di ritorno verso 192.168.1.0/24 via R3; R3 usa quella via R1; R1 consegna infine a PC1 nella sua rete direttamente connessa.
+Da ricordare: ping o una connessione TCP possono fallire anche se l’andata funziona. Per una comunicazione bidirezionale servono instradamento, raggiungibilità e permessi coerenti in entrambe le direzioni. Nelle reti reali il ritorno può seguire un cammino diverso dall’andata (routing asimmetrico), purché i dispositivi intermedi e le policy lo consentano.
+16.4 E se scegliessimo il percorso R1 → R2 → R4?
+Le rotte cambierebbero di conseguenza: su R1, 192.168.4.0/24 via 192.168.12.2; su R2, 192.168.4.0/24 via 192.168.24.4 e 192.168.1.0/24 via 192.168.12.1; su R4, 192.168.1.0/24 via 192.168.24.2. È lo stesso ragionamento applicato a un cammino diverso. Progettare le rotte significa sempre identificare prima quali reti sono remote da ciascun router.
+17. Distanza amministrativa, metrica e rotta di backup
+Integrazione — Tre domande differenti. Quando si osserva una tabella di routing è utile separare i livelli di selezione:
+    1. Quale prefisso comprende la destinazione ed è il più specifico? Longest Prefix Match, per il forwarding.
+    2. Se più fonti propongono una rotta verso lo stesso prefisso, quale fonte viene preferita? Su piattaforme come Cisco IOS conta la distanza amministrativa (AD): in generale un valore minore è preferito, nell’ambito delle regole del dispositivo.
+    3. Se un protocollo dinamico conosce più percorsi verso lo stesso prefisso, quale preferisce? Conta la metrica definita da quel protocollo: numero di hop, costo cumulativo, caratteristiche del link o altri parametri.
+Per fissare l’idea, nei tipici esempi Cisco IOS una rotta Connected ha AD 0, una statica 1 e una rotta intra-area OSPF 110. Questi sono valori predefiniti di Cisco, non costanti universali di Internet. Non si confrontano indiscriminatamente metriche numeriche di protocolli differenti: una metrica OSPF non è “più piccola e migliore” di una metrica RIP solo perché il numero è inferiore.
+Integrazione — Floating static route. Possiamo configurare una rotta statica di backup con distanza amministrativa maggiore di quella primaria. Quando la primaria cessa di essere installabile, la seconda può subentrare. Attenzione: se il solo collegamento fisico verso il next hop rimane attivo ma un guasto avviene più lontano, una semplice rotta statica può non rilevarlo; in reti reali si usano spesso tracking e altri meccanismi.
+Integrazione — ECMP. Se più percorsi di costo equivalente sono supportati e installati, il router può distribuirvi flussi di traffico (Equal-Cost Multi-Path). Non implica necessariamente alternare ogni singolo pacchetto; spesso la scelta preserva l’ordine dei pacchetti all’interno di un flusso.
+18. Perché introdurre il routing dinamico?
+Pensiamo alla rete con R1, R2, R3 e R4: se un collegamento si guasta, tutte le rotte statiche che lo attraversano devono essere riconsiderate. Immagina ora centinaia di router, numerose subnet e collegamenti che cambiano. Configurare tutto manualmente sarebbe laborioso e soggetto a errori.
+Con il routing dinamico, i router eseguono protocolli che scambiano informazioni di raggiungibilità, costruiscono una visione della rete appropriata al protocollo e aggiornano le rotte in risposta ai cambiamenti. Questo non significa che tutti conoscano la topologia globale di Internet o che reagiscano istantaneamente a qualsiasi problema: la diffusione degli aggiornamenti e la convergenza richiedono tempo.
+La classificazione più utile all’inizio è:
+Famiglia	Idea di base	Esempi
+Distance-vector	Annuncia ai vicini informazioni sulle destinazioni e distanze	RIP; EIGRP è spesso trattato come distance-vector avanzato
+Link-state	Diffonde lo stato dei collegamenti nell’area e calcola percorsi sulla topologia	OSPF, IS-IS
+Path-vector / routing tra AS	Scambia informazioni sui percorsi e applica politiche tra sistemi autonomi	BGP
+RIP sceglie in base al numero di hop (con limiti di scalabilità); OSPF usa una metrica di costo e un algoritmo SPF; BGP è centrale per la raggiungibilità tra grandi reti amministrate in modo indipendente. I protocolli per routing interno a un’azienda o dominio (IGP) non svolgono lo stesso compito del routing tra sistemi autonomi (EGP, principalmente BGP).
+19. Dal grafo alla rotta: l’algoritmo di Dijkstra
+Per capire OSPF partiamo dal suo ingrediente matematico: il calcolo del percorso a costo minimo con l’algoritmo di Dijkstra, chiamato anche Shortest Path First (SPF). Un grafo rappresenta i router come nodi e i collegamenti come archi. A ciascun arco è associato un costo. Non serve che tale costo rappresenti la distanza fisica: può riflettere una metrica configurata o derivata dalle caratteristiche del collegamento.
+Consideriamo questo grafo di esempio (costi didattici, non ricavati dalla nostra topologia CCNA):
+        2              4
+    A ------ B -------------- D
+     \        \                /
+      \ 5      \ 1         2 /
+       \        \           /
+        -------- C ---------
+I collegamenti sono A–B con costo 2, A–C con costo 5, B–C con costo 1, B–D con costo 4 e C–D con costo 2. Vogliamo andare da A a D. Ci sono almeno tre possibilità rilevanti:
+Percorso	Costo totale
+A → B → D	2 + 4 = 6
+A → C → D	5 + 2 = 7
+A → B → C → D	2 + 1 + 2 = 5
+L’algoritmo trova come percorso a costo minimo A → B → C → D, per costo 5. Dal punto di vista di A, tuttavia, nella tabella di routing non occorre salvare l’intera stringa A→B→C→D: per raggiungere la rete oltre D è sufficiente sapere che il primo next hop è B, insieme alle altre informazioni utili.
+19.1 Dijkstra spiegato iterativamente
+    1. Assegniamo al nodo di partenza A distanza 0; agli altri distanza provvisoria infinita.
+    2. Da A osserviamo i vicini: B diventa 2 e C diventa 5. Scegliamo il nodo non elaborato con distanza minore: B.
+    3. Attraverso B miglioriamo C da 5 a 3 (A→B→C) e registriamo D con distanza 6 (A→B→D). Scegliamo C, perché 3 è minore di 6.
+    4. Attraverso C miglioriamo D da 6 a 5 (A→B→C→D). Quando D è il nodo con valore minimo rimasto, la sua distanza migliore è determinata.
+    5. Conservando il predecessore di ogni nodo ricostruiamo il percorso: D ← C ← B ← A. Il primo salto da A è B.
+Questa procedura evita di provare alla cieca ogni possibile sequenza. Non è necessario eseguire a mano Dijkstra per ogni pacchetto: il protocollo aggiorna i percorsi quando necessario, mentre il forwarding usa tabelle già costruite.
+20. Come può OSPF conoscere la topologia? Link-state e flooding
+Il calcolo precedente presuppone che A disponga delle informazioni sui collegamenti e relativi costi. In una rete link-state i router condividono descrizioni dello stato dei collegamenti. In OSPF si parla di LSA (Link-State Advertisement), informazioni che vengono raccolte nella LSDB (Link-State Database). I router appartenenti alla stessa area, a convergenza avvenuta e nel rispetto delle regole di OSPF, costruiscono visioni coerenti della topologia di quell’area.
+Il flooding affidabile è la diffusione delle informazioni di link-state attraverso i vicini OSPF. Un router non inoltra all’infinito una descrizione già vista: le informazioni hanno identificatori, numeri di sequenza e meccanismi di età, verifica e conferma/ritrasmissione. Questa è una semplificazione dell’insieme di meccanismi di database synchronization e flooding di OSPF.
+Importante distinzione di vocabolo: il flooding di LSA serve a distribuire dati del control plane; non significa che un router, quando non conosce la destinazione di un normale pacchetto IP, lo inoltri indiscriminatamente a tutte le interfacce.
+20.1 Il ciclo completo di OSPF
+    1. Scoperta dei vicini. Router OSPF collegati e correttamente configurati si individuano attraverso messaggi Hello e formano adiacenze secondo le regole del tipo di rete.
+    2. Scambio delle informazioni. I router sincronizzano le informazioni link-state rilevanti e mantengono la LSDB.
+    3. Calcolo SPF. Ogni router calcola un albero dei cammini minimi a partire da sé, usando la topologia nota.
+    4. Installazione delle rotte. I percorsi risultanti vengono candidati alla tabella di routing, insieme a rotte Connected, Local, statiche o apprese da altre sorgenti.
+    5. Reazione alle variazioni. Se un collegamento o vicino cambia stato, nuove informazioni vengono propagate; i router aggiornano il database e ricalcolano quando opportuno.
+Integrazione — Il significato di convergenza. Una rete è convergente quando i router hanno completato l’elaborazione delle modifiche e le informazioni usate per inoltrare risultano coerenti con la topologia e le policy. Durante una variazione possono verificarsi perdita temporanea, percorsi subottimali e persino loop transitori.
+21. OSPF: aree e backbone Area 0
+Diffondere ogni dettaglio di ogni collegamento a ogni router del pianeta sarebbe impraticabile. OSPF è progettato per un dominio amministrativo ed è organizzabile in aree per limitare l’estensione di alcune informazioni link-state e migliorare la scalabilità.
+    • L’Area 0 è l’area backbone di OSPF.
+    • Un ABR (Area Border Router) collega aree OSPF e mantiene le informazioni necessarie alle aree cui appartiene.
+    • Un ASBR (Autonomous System Boundary Router) può introdurre nell’OSPF rotte provenienti da altre sorgenti/protocolli, secondo la configurazione.
+Nel modello OSPF standard multi-area, il backbone è il punto di transito logico del traffico inter-area. Dire semplicemente “ogni pacchetto deve sempre passare fisicamente per un router nella Area 0” è una semplificazione: occorre distinguere la struttura logica del protocollo, la scelta delle rotte e le specifiche topologie. Il flooding di molte LSA avviene entro la relativa area; la distribuzione di reachability tra aree segue meccanismi diversi dall’inondare l’intera LSDB ovunque.
+Perché le aree aiutano?
+Se un collegamento interno all’Area 2 cambia, non è necessario che ogni router di ogni altra area riceva tutti i dettagli della sua topologia come se facesse parte della stessa area. La suddivisione aiuta a contenere il lavoro di calcolo e il volume di informazioni. Non è però una soluzione automatica a ogni problema di scala: progettazione, summarization, numero di router, tipi di area e ridondanza vanno valutati.
+Mini-laboratorio concettuale OSPF
+R1, R2, R3 e R4 potrebbero eseguire OSPF in Area 0. Ognuno pubblica le informazioni sui collegamenti pertinenti; dopo la convergenza, R1 può conoscere automaticamente la rete 192.168.4.0/24 senza una rotta statica configurata manualmente verso quella LAN. Se il cammino tramite R3 si interrompe e il cammino tramite R2 rimane funzionante, OSPF può ricalcolare il percorso in base ai costi e alle altre condizioni. Non si può determinare il percorso effettivamente scelto senza conoscere le metriche e i dettagli di configurazione.
+22. Routing dinamico su Internet: perché non si usa un unico grande OSPF?
+Integrazione — Sistemi autonomi e BGP. Internet è composto da grandi reti gestite da aziende, operatori e organizzazioni diverse, chiamate Autonomous Systems (AS) quando partecipano alla struttura di routing interdominio. Ogni AS può usare protocolli interni come OSPF per il proprio routing; tra AS il protocollo dominante è BGP (Border Gateway Protocol).
+BGP non cerca semplicemente il percorso con il minor numero di hop fisici. Consente di applicare policy basate su accordi di transito, preferenze operative, attributi di percorso e scelte commerciali e tecniche. È uno dei motivi per cui un pacchetto Internet può non seguire il tragitto che sembrerebbe più breve guardando una carta geografica.
+Integrazione — Aggregazione delle rotte. Un router non può ragionevolmente conservare una rotta separata per ogni host del mondo. L’aggregazione (route summarization) rappresenta più reti tramite un prefisso comune quando il progetto lo consente: ad esempio quattro /26 contigue possono essere riassunte in una /24. Riassumere male può creare black hole di instradamento, quindi l’aggregazione richiede che la raggiungibilità reale delle subnet sia coerente.
+23. TTL, loop, pacchetti persi e perché un percorso può fallire
+Integrazione — I problemi non sono sempre “del codice”. Un’applicazione può restituire connection timed out per ragioni molto differenti: DNS errato, gateway mancante, rotta assente, next hop irraggiungibile, firewall, servizio in ascolto su una porta diversa, problemi di TLS o guasti applicativi. Il troubleshooting efficace separa le cause per livello.
+Un routing loop si verifica quando i router inoltrano un pacchetto in un circuito senza avvicinarlo utilmente alla destinazione. In IPv4 il campo TTL viene decrementato a ogni router; in IPv6 svolge il ruolo analogo l’Hop Limit. Quando il contatore si esaurisce, il pacchetto viene eliminato, spesso con un messaggio ICMP di tipo Time Exceeded se generato e non filtrato.
+Altri due concetti da distinguere:
+    • Packet loss: uno o più pacchetti vengono persi lungo il percorso. TCP può ritrasmettere dati mancanti, ma non elimina la causa della perdita.
+    • Latency: il tempo impiegato per attraversare la rete. Un percorso con meno hop non è necessariamente quello con minore latenza; contano tecnologia dei link, code, congestione e distanza.
+Integrazione — MTU. La Maximum Transmission Unit limita la dimensione di una unità trasmissibile su un collegamento. Differenze di MTU e problemi di Path MTU Discovery possono produrre connessioni apparentemente intermittenti (per esempio, piccoli pacchetti passano e richieste grandi si bloccano). Il routing sceglie dove inoltrare; la MTU condiziona quali dimensioni possono transitare correttamente.
+24. IPv6: gli stessi principi, indirizzi e meccanismi differenti
+Il routing concettualmente non cambia con IPv6: il dispositivo confronta l’indirizzo di destinazione con i prefissi, sceglie il percorso più specifico e inoltra verso un next hop. Cambiano l’indirizzamento e alcuni meccanismi:
+IPv4	IPv6
+Indirizzi di 32 bit	Indirizzi di 128 bit
+Rotta default 0.0.0.0/0	Rotta default ::/0
+Rotta host /32	Rotta host /128
+ARP per i vicini IPv4	NDP/ICMPv6 per i vicini IPv6
+NAT/PAT molto comune per scarsità IPv4	NAT non è requisito intrinseco della connettività IPv6
+Un router può mantenere tabelle IPv4 e IPv6 separate; avere un percorso IPv4 funzionante non implica automaticamente connettività IPv6. Le ACL e le policy possono differire. In IPv6 è fondamentale ricordare anche gli indirizzi link-local (tipicamente fe80::/10), impiegati in molte funzioni locali, compresi i next hop di protocolli di routing.
+PARTE III — VERIFICA, DEBUGGING ED ESERCIZI
+25. Metodo pratico di troubleshooting: dal vicino alla destinazione
+Quando qualcosa non funziona, chiediti prima quale passo specifico del viaggio si interrompe. Un ordine utile è questo:
+    1. Interfaccia: è attiva? Ha un indirizzo IP e il prefisso giusti? Su Cisco: show ip interface brief; su Linux: ip address e ip link.
+    2. Rete locale: il gateway è raggiungibile? La risoluzione ARP/NDP funziona? Su Linux: ip neigh.
+    3. Tabella di routing: esiste una rotta per il prefisso remoto? Qual è il next hop? Su Cisco: show ip route; su Linux: ip route get 192.168.4.10.
+    4. Percorso: a che punto si interrompe? traceroute o tracepath su Linux; traceroute su Cisco. Le risposte ICMP possono essere bloccate o limitate, quindi uno hop silenzioso non prova da solo un guasto.
+    5. Ritorno e policy: la rete di destinazione sa tornare all’origine? Firewall, ACL e security group permettono il traffico?
+    6. Trasporto e applicazione: una porta è aperta e un processo vi ascolta? Verifica con ss -lnt e curl -v https://... quando applicabili. DNS e TLS richiedono analisi distinta dal solo routing.
+Comandi essenziali da tenere vicini
+Obiettivo	Cisco IOS	Linux / ambiente comune
+Stato interfacce	show ip interface brief	ip addr, ip link
+Rotte IPv4	show ip route	ip route
+Ricerca di una destinazione	show ip route 192.168.4.10	ip route get 192.168.4.10
+Tabella ARP / vicini	show ip arp	ip neigh
+Test di raggiungibilità	ping 192.168.4.10	ping -c 4 192.168.4.10
+Percorso stimato	traceroute 192.168.4.10	traceroute 192.168.4.10
+Vicini OSPF	show ip ospf neighbor	Dipende dalla suite di routing
+Risoluzione DNS	—	dig example.org
+Prova applicativa	—	curl -v https://example.org
+Nota: i comandi possono differire tra router, versioni di sistemi operativi e distribuzioni Linux. ping non prova che un sito web funzioni; traceroute non dimostra da solo l’esatto percorso di ogni flusso; curl non sostituisce l’esame della tabella di routing.
+26. Tre laboratori guidati
+Laboratorio A — Leggere la tabella di un router
+R1 ha interfaccia LAN 192.168.1.1/24, un collegamento a R3 192.168.13.1/24 e una statica 192.168.4.0/24 via 192.168.13.3. Quale azione sceglie per ciascuna destinazione?
+Pacchetto destinato a	Scelta	Spiegazione
+192.168.1.1	Local /32	Il pacchetto è indirizzato a R1 stesso
+192.168.1.85	Connected 192.168.1.0/24	Host sulla LAN di R1
+192.168.13.3	Connected 192.168.13.0/24	Il next hop è direttamente raggiungibile
+192.168.4.10	Static 192.168.4.0/24	Inoltro a R3, 192.168.13.3
+8.8.8.8	Scarto, se manca una default	Nessuna rotta nota in questo scenario
+Laboratorio B — Aggiungere le rotte senza dimenticare il ritorno
+Configura la topologia di sezione 10. Parti con sole interfacce e rotte Connected/Local. Prova un ping PC1→PC4 e registra dove fallisce. Aggiungi le quattro rotte statiche della sezione 16, controlla show ip route su R1, R3 e R4 e ripeti il ping. Infine rimuovi la rotta di ritorno su R4: prova a spiegare perché una richiesta può arrivare a PC4 ma la risposta non completare il tragitto. Per osservare davvero questo comportamento, utilizza catture o controlli su ogni router; non dedurlo esclusivamente dal messaggio del ping.
+Laboratorio C — Un collegamento si guasta
+Nel laboratorio precedente disabilita il collegamento R3–R4. Osserva quali rotte statiche cessano di essere utilizzabili e se il traffico riesce a raggiungere PC4. Predisponi poi il cammino R1→R2→R4 e confronta il comportamento. In una simulazione separata, abilita un protocollo dinamico adeguato su tutti i collegamenti e confronta il modo in cui la rete converge. Obiettivo: comprendere perché “so chi è il next hop” non significa “la destinazione sarà sempre raggiungibile”.
+27. Esercizi di comprensione (prima di leggere le risposte)
+1. PC con 192.168.10.20/24 vuole contattare 192.168.11.20. A quale dispositivo invierà normalmente il primo frame e quale indirizzo MAC cercherà?
+2. Su R1 sono presenti 10.0.0.0/8 via R2, 10.1.0.0/16 via R3 e 0.0.0.0/0 via ISP. Quale rotta serve per 10.1.50.8? E per 10.2.50.8?
+3. Perché le rotte C e L possono coesistere per una stessa interfaccia senza creare un’ambiguità insolubile?
+4. PC1 riesce a raggiungere R1, ma non PC4. Indica almeno quattro verifiche da eseguire prima di modificare il codice dell’applicazione.
+5. Spiega con parole tue la differenza tra routing statico, routing dinamico, protocollo di routing e forwarding.
+6. Nel grafo della sezione 19, quale distanza e quale next hop da A sono associati alla destinazione D?
+7. Perché Dijkstra da solo non basta per costruire un protocollo di routing distribuito?
+8. LSA flooding e flooding Ethernet di un MAC sconosciuto sono la stessa operazione? Perché?
+9. Una default route basta a garantire che un server con IP privato sia raggiungibile da Internet?
+10. Qual è la differenza fra 0.0.0.0/0, 192.168.1.0/24, 192.168.1.1/32 e ::/0?
+Soluzioni ragionate
+1. La destinazione non appartiene alla LAN 192.168.10.0/24: il PC invierà il frame al default gateway, risolvendo via ARP il MAC del gateway, non quello dell’host remoto.
+2. Per 10.1.50.8 è più specifica 10.1.0.0/16 via R3; per 10.2.50.8 corrisponde 10.0.0.0/8 via R2 (la /16 non comprende quell’indirizzo).
+3. La C /24 rappresenta l’intera subnet; la L /32 un solo IP del router. Per i pacchetti diretti esattamente al router, /32 è più specifica e viene preferita.
+4. Verificare IP/prefisso e stato delle interfacce; tabella di R1; rotta via R3 o R2; ARP/next hop; rotta su R4 e ritorno verso PC1; firewall/ACL; test di ping/traceroute.
+5. Statico: rotte impostate manualmente. Dinamico: apprendimento tramite protocolli e aggiornamenti. Protocollo di routing: regole e messaggi con cui i router si scambiano informazioni. Forwarding: azione operativa di inoltro del pacchetto.
+6. Costo minimo 5 lungo A→B→C→D; il next hop è B.
+7. Dijkstra calcola percorsi a partire da un grafo noto. Serve anche distribuire in modo coerente e affidabile informazioni su nodi, link e costi, riconoscere modifiche e gestire la convergenza.
+8. No. Le LSA sono messaggi di controllo OSPF per distribuire informazioni sulla topologia; lo switch fa flooding di frame dati quando il MAC destinatario non è noto nella sua tabella.
+9. No. Servono raggiungibilità e possibili traduzioni/NAT o pubblicazione, regole di sicurezza e percorsi di ritorno coerenti. Una default route riguarda solo la scelta dell’inoltro verso destinazioni altrimenti sconosciute.
+10. /0 IPv4 è la rotta di default verso qualsiasi IPv4; /24 identifica una subnet IPv4; /32 un singolo indirizzo IPv4; ::/0 è la default route IPv6.
+28. Gli errori concettuali più comuni
+    • “MAC e IP sono due modi equivalenti per trovare un dispositivo.” No: MAC riguarda il singolo collegamento; IP dà un indirizzamento logico instradabile tra reti.
+    • “ARP trova il MAC del server remoto su Internet.” Normalmente no: per una destinazione remota risolve il MAC del prossimo dispositivo sul collegamento locale (spesso il gateway).
+    • “Il router deve conoscere tutti gli host.” No: conosce in genere prefissi, next hop e, se presente, una route di default.
+    • “Se un router non conosce una rete, diffonde il pacchetto a tutti.” No: lo scarta se nessuna rotta, nemmeno default, corrisponde.
+    • “Il numero di reti si deduce sempre dal primo ottetto IPv4.” No: il CIDR consente prefissi variabili; la vecchia visione classful è storica.
+    • “La rotta con AD più bassa batte ogni rotta più specifica.” No: la specificità del prefisso viene prima nella decisione di inoltro; AD e metriche hanno ruoli differenti.
+    • “Una statica di andata basta per la comunicazione.” Non per uno scambio bidirezionale: anche il ritorno richiede percorso e permessi.
+    • “Routing dinamico vuol dire percorsi sempre ottimali e aggiornamenti immediati.” No: ci sono metriche, policy, tempi di convergenza e possibili guasti.
+    • “NAT, firewall, load balancer e router fanno lo stesso lavoro.” No: possono convivere nello stesso apparato, ma traducono, filtrano, distribuiscono o inoltrano traffico secondo compiti diversi.
+    • “OSPF inonda tutti i router di Internet.” No: lavora entro un dominio amministrativo, con ambiti di distribuzione e suddivisione in aree.
+29. Glossario essenziale
+Termine	Significato sintetico
+Host	Dispositivo finale che invia/riceve traffico
+LAN / WAN	Rete locale / rete geografica
+Frame	Unità di livello 2, pertinente a un collegamento
+Packet / datagramma IP	Unità di livello 3 che contiene indirizzi IP
+Router	Dispositivo che inoltra pacchetti tra reti IP
+Switch	Dispositivo che inoltra frame a livello 2 (nel caso Ethernet classico)
+Gateway	Router/uscita predefinita per le destinazioni remote
+Subnet	Sottorete individuata da un prefisso
+CIDR	Notazione di prefisso IP, come /24
+Route / rotta	Istruzione di raggiungibilità verso un prefisso
+Next hop	Prossimo router o destinatario di livello 3
+C / L / S	Rotta Connected / Local / Static (legenda Cisco)
+Longest Prefix Match	Preferenza per il prefisso più specifico che coincide
+AD	Distanza amministrativa, preferenza tra fonti di rotte
+Metrica	Costo di un percorso secondo un protocollo
+Default route	Rotta generica 0.0.0.0/0 o ::/0
+Control plane	Meccanismi che apprendono/gestiscono le rotte
+Data plane	Meccanismi che inoltrano i pacchetti
+OSPF	Protocollo IGP link-state
+LSA / LSDB	Annuncio link-state / database topologico OSPF
+SPF	Calcolo dei cammini minimi con Dijkstra
+ABR / ASBR	Router tra aree OSPF / router che introduce rotte esterne
+BGP	Protocollo di routing tra sistemi autonomi
+Convergenza	Stabilizzazione delle informazioni di routing dopo cambiamenti
+ECMP	Uso di più percorsi di costo equivalente
+30. Schema mentale conclusivo e percorso di ripasso
+Un'applicazione vuole parlare con un server
+   ↓
+DNS individua uno o più IP di destinazione
+   ↓
+IP + prefisso: stessa subnet o rete remota?
+   ├── stessa subnet → risoluzione del vicino → frame diretto
+   └── remota → gateway → ARP/NDP del prossimo hop
+                     ↓
+               ogni router consulta le sue rotte
+                     ↓
+             Longest Prefix Match → next hop/uscita
+                     ↓
+            le rotte derivano da Connected, Local,
+            statiche o protocolli dinamici (es. OSPF)
+                     ↓
+               il pacchetto raggiunge l'ultima LAN
+                     ↓
+              consegna all'host → risposta di ritorno
+Se dovessi trattenere cinque idee da tutta la dispensa, sarebbero queste: (1) l’indirizzo IP identifica una destinazione logica; (2) il MAC permette la consegna sul singolo collegamento; (3) un router sceglie il prossimo passo, non deve conoscere l’intero cammino; (4) tra le rotte che coincidono con la destinazione vince la più specifica; (5) il routing statico richiede rotte impostate a mano, quello dinamico utilizza protocolli per apprenderle e aggiornarle, ma entrambi alimentano le decisioni di inoltro.
+Ordine consigliato per studiare: prima ripercorri RideNow (sezioni 1–8), poi ricostruisci senza guardare la topologia PC1→PC4 (sezioni 9–16); solo quando sai giustificare ogni hop passa a AD/metriche e ai protocolli dinamici (17–22). Infine esegui gli esercizi (25–27). Se ti blocchi su un percorso, domanda sempre: Quale IP è la destinazione? In quale subnet si trova? Che cosa sa il dispositivo attuale? Qual è il suo prossimo hop? Chi conosce la strada di ritorno?
+Nota sulle fonti e sulle integrazioni
+Nuclei del materiale ricevuto e loro collocazione in questa dispensa:
+Fonte presente nel testo incollato	Concetti recuperati e rielaborati
+I Bet Nobody Has Ever Explained the Networking Topics Like This Before	Storia RideNow, IP/MAC/ARP, DNS/DHCP, NAT, subnetting, porte, TCP/UDP, TLS/HTTP, WebSocket, firewall, load balancer, reverse proxy, OSI (Parte I)
+Comunicazione in rete – lezione 09 – Internet Protocol – routing	Host, IPv4, datagramma, router come nodi intermedi, next hop, default route, rete di reti (sezioni 4, 9–15)
+Understanding Routing! — ICT#8	Rotte statiche e dinamiche, grafi, link-state, flooding affidabile, Dijkstra, OSPF e aree (sezioni 18–21)
+Free CCNA – Routing Fundamentals – Day 11, part 1	Topologia dei quattro router, codici C/L, rotte Connected/Local, show ip route, Longest Prefix Match e confronto con switch (sezioni 10–13)
+Free CCNA – Static Routing – Day 11, part 2	Default gateway, rotte statiche, cammini via R3 o via R2, configurazione Cisco, S e route di default (sezioni 15–16)
+Integrazioni didattiche aggiunte: separazione control/data plane, subnetting con CIDR moderno, percorso dei MAC hop-by-hop, reverse path, differenza AD/metrica/prefisso, routing asimmetrico, ECMP, link failure e convergenza, Neighbor Discovery IPv6, BGP/AS, aggregazione, TTL/MTU, metodologia di troubleshooting, laboratori ed esercizi. Alcuni esempi delle trascrizioni erano abbreviati o riportavano IP non validi: qui gli indirizzi delle topologie sono stati espressi in forme IPv4 valide e coerenti. Le trascrizioni semplificavano anche il concetto di “percorso più efficiente” e il flooding di OSPF: nella rielaborazione sono state precisate metriche, policy e limiti di ambito.

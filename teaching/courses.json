@@ -370,6 +370,64 @@
       ]
     },
     {
+      "id": "routing",
+      "folder": "routing",
+      "title": "Routing",
+      "symbol": "IP↗",
+      "description": "Dal viaggio del pacchetto a OSPF, RIP, EIGRP, IS-IS e BGP: 13 lezioni e 5 simulazioni interattive.",
+      "order": [
+        "mappa.html",
+        "01-fondamenti.html",
+        "02-indirizzi.html",
+        "03-viaggio-applicazione.html",
+        "04-pacchetto.html",
+        "05-tabella.html",
+        "06-statico.html",
+        "07-dinamico-dijkstra.html",
+        "08-ospf.html",
+        "09-rip-eigrp-isis.html",
+        "10-bgp.html",
+        "11-diagnostica.html",
+        "12-esercizi.html",
+        "13-ripasso.html",
+        "laboratorio.html",
+        "fonti.html",
+        "test.html"
+      ],
+      "chapters": [
+        {
+          "id": "routing-01",
+          "title": "01 · Dal networking al pacchetto",
+          "description": "Livelli, dispositivi, indirizzi e servizi: ricostruisci il viaggio di una richiesta.",
+          "files": ["mappa.html", "01-fondamenti.html", "02-indirizzi.html", "03-viaggio-applicazione.html"]
+        },
+        {
+          "id": "routing-02",
+          "title": "02 · Decidere il prossimo hop",
+          "description": "Segui IP e MAC, consulta le tabelle e configura rotte di andata e ritorno.",
+          "files": ["04-pacchetto.html", "05-tabella.html", "06-statico.html"]
+        },
+        {
+          "id": "routing-03",
+          "title": "03 · Apprendere le rotte",
+          "description": "Dijkstra, OSPF, RIP, EIGRP e IS-IS: confronta famiglie, metriche e convergenza.",
+          "files": ["07-dinamico-dijkstra.html", "08-ospf.html", "09-rip-eigrp-isis.html"]
+        },
+        {
+          "id": "routing-04",
+          "title": "04 · BGP e routing tra AS",
+          "description": "Sessioni eBGP/iBGP, attributi, annunci e policy di Internet.",
+          "files": ["10-bgp.html"]
+        },
+        {
+          "id": "routing-05",
+          "title": "05 · Osservare, provare e verificare",
+          "description": "Cinque simulazioni, troubleshooting, esercizi, glossario e verifica finale.",
+          "files": ["11-diagnostica.html", "12-esercizi.html", "13-ripasso.html", "laboratorio.html", "fonti.html", "test.html"]
+        }
+      ]
+    },
+    {
       "id": "reti",
       "folder": "reti",
       "title": "Dalle reti alle applicazioni distribuite",

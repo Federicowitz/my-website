@@ -1,0 +1,10 @@
+[
+  {
+    "path": "playground/cards.json",
+    "existed": false
+  },
+  {
+    "path": "playground/index.html",
+    "existed": false
+  }
+]
