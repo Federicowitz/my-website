@@ -1179,7 +1179,7 @@ window.schoolCatalog = {
       "title": "06 · Crittografia simmetrica e cifratura autenticata",
       "kind": "lesson",
       "path": "materials/crittografia/06-simmetrica.html",
-      "description": "AES, DES e 3DES; blocchi e flussi, modalità ECB e GCM, nonce e tag. Un esempio concreto di protezione dei backup.",
+      "description": "XOR bit per bit, round AES-128 animati, S-box, MixColumns ed espansione della chiave. Dal contatore al tag AES-GCM, con calcoli verificabili.",
       "chapter": "crypto-03"
     },
     {
@@ -1188,7 +1188,7 @@ window.schoolCatalog = {
       "title": "07 · Hash, HMAC e protezione delle password",
       "kind": "lesson",
       "path": "materials/crittografia/07-hash-mac-password.html",
-      "description": "Impronte, collisioni, preimmagini e autenticazione con HMAC. Perché SHA-256 non basta per memorizzare password e a cosa servono salt e Argon2id.",
+      "description": "Dentro SHA-256 con 64 round animati, costruzione HMAC e memoria delle funzioni per password. Esempi numerici e prove passo per passo.",
       "chapter": "crypto-03"
     },
     {
@@ -1197,7 +1197,7 @@ window.schoolCatalog = {
       "title": "08 · Chiavi pubbliche e RSA, passo per passo",
       "kind": "lesson",
       "path": "materials/crittografia/08-asimmetrica-rsa.html",
-      "description": "Cifratura asimmetrica, chiave pubblica e privata, esempio RSA con numeri verificabili, padding e sistemi ibridi.",
+      "description": "Costruisci le chiavi RSA con Euclide, segui cifratura e decifratura animate e capisci perché funzionano potenze modulari, codifiche e sistemi ibridi.",
       "chapter": "crypto-04"
     },
     {
@@ -1206,7 +1206,7 @@ window.schoolCatalog = {
       "title": "09 · Diffie–Hellman, sistemi ibridi e TLS",
       "kind": "lesson",
       "path": "materials/crittografia/09-diffie-hellman-tls.html",
-      "description": "Un accordo di chiave numerico verificabile, attacco man-in-the-middle, forward secrecy e spiegazione dell’handshake TLS 1.3.",
+      "description": "Diffie–Hellman con esponenti modificabili, aritmetica delle curve ellittiche, derivazione delle chiavi e sequenza animata di una connessione TLS.",
       "chapter": "crypto-04"
     },
     {

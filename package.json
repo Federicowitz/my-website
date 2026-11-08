@@ -6,6 +6,6 @@
     "check": "node scripts/check.cjs",
     "routing": "node scripts/build-routing.cjs && npm run catalog",
     "preview": "node scripts/preview.cjs",
-    "test": "node scripts/test-home-i18n.cjs && node scripts/test-navigation.cjs && node scripts/test-landing.cjs && node scripts/test-curriculum.cjs && node scripts/test-cryptography.cjs && node scripts/test-node-lab.cjs && node scripts/test-cpp-labs.cjs && node scripts/test-routing.cjs"
+    "test": "node scripts/test-home-i18n.cjs && node scripts/test-navigation.cjs && node scripts/test-landing.cjs && node scripts/test-curriculum.cjs && node scripts/test-cryptography.cjs && node scripts/test-crypto-algorithms.cjs && node scripts/test-node-lab.cjs && node scripts/test-cpp-labs.cjs && node scripts/test-routing.cjs"
   }
 }
