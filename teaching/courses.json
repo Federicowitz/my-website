@@ -410,7 +410,7 @@
       "folder": "routing",
       "title": "Routing",
       "symbol": "IP↗",
-      "description": "Dal viaggio del pacchetto a OSPF, RIP, EIGRP, IS-IS e BGP: 13 lezioni e 5 simulazioni interattive.",
+      "description": "Segui il viaggio di un pacchetto e scopri come cambiano le rotte. Tredici lezioni con esercizi e simulazioni interattive.",
       "order": [
         "mappa.html",
         "01-fondamenti.html",
@@ -444,8 +444,8 @@
         },
         {
           "id": "routing-02",
-          "title": "02 · Decidere il prossimo hop",
-          "description": "Segui IP e MAC, consulta le tabelle e configura rotte di andata e ritorno.",
+          "title": "02 · Decidere il prossimo salto",
+          "description": "Segui il pacchetto, consulta le tabelle e costruisci rotte di andata e ritorno.",
           "files": [
             "04-pacchetto.html",
             "05-tabella.html",
@@ -455,7 +455,7 @@
         {
           "id": "routing-03",
           "title": "03 · Apprendere le rotte",
-          "description": "Dijkstra, OSPF, RIP, EIGRP e IS-IS: confronta famiglie, metriche e convergenza.",
+          "description": "Calcola il percorso a costo minimo e confrontalo con quello che usa meno salti.",
           "files": [
             "07-dinamico-dijkstra.html",
             "08-ospf.html",
@@ -464,8 +464,8 @@
         },
         {
           "id": "routing-04",
-          "title": "04 · BGP e routing tra AS",
-          "description": "Sessioni eBGP/iBGP, attributi, annunci e policy di Internet.",
+          "title": "04 · Collegare le reti di Internet",
+          "description": "Osserva come un’azienda sceglie da quale fornitore uscire.",
           "files": [
             "10-bgp.html"
           ]
@@ -473,7 +473,7 @@
         {
           "id": "routing-05",
           "title": "05 · Osservare, provare e verificare",
-          "description": "Cinque simulazioni, troubleshooting, esercizi, glossario e verifica finale.",
+          "description": "Diagnostica, tre laboratori integrativi e una verifica finale.",
           "files": [
             "11-diagnostica.html",
             "12-esercizi.html",

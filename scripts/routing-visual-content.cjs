@@ -1,17 +1,33 @@
-const visualLessons = {
- '04': ['packet', 'Un pacchetto attraverso una rete più grande', 'Segui andata e ritorno tra due host attraverso una rete di 12 router. Cambia TTL, interrompi un link o usa un ritorno asimmetrico.', 'Qui osservi rotte già installate. La prossima lezione mostra come ogni router sceglie una voce della tabella.'],
- '05': ['prefix', 'La tabella decide un solo prossimo hop', 'Cambia la destinazione: osserva prima le rotte compatibili, poi il prefisso vincente e la sua uscita.', 'Il Longest Prefix Match usa la tabella già costruita. AD e metriche intervengono nella selezione delle rotte da installare, non sostituiscono il prefisso più specifico.'],
- '06': ['static,packet', 'Un guasto remoto con rotte statiche', 'Interrompi E–H: il gateway A continua a raggiungere B, ma il percorso verso il server è spezzato. Passa al pacchetto per osservare anche il ritorno.', 'Una strada fisica alternativa non basta: serve una rotta. Ora vediamo come un algoritmo può calcolarla.'],
- '07': ['spf,rip', 'Stessa rete, due criteri di scelta', 'Avanza nel calcolo su 12 router: Dijkstra somma i costi, RIP conta i salti. Il collegamento C–L è breve in hop ma costoso.', 'Il calcolo SPF presuppone una mappa disponibile. OSPF spiega come i router la costruiscono e la aggiornano.'],
- '08': ['ospf,spf', 'Dal guasto alla nuova rotta OSPF', 'Osserva il guasto E–H, la diffusione dello stato, il ricalcolo e il nuovo percorso. Nel calcolo SPF puoi anche rimuovere altri link.', 'OSPF diffonde informazioni e usa SPF; algoritmo e protocollo sono due livelli diversi.'],
- '09': ['rip,eigrp,isis,spf', 'Guarda le differenze fra gli IGP', 'RIP propaga distanze per round; EIGRP verifica una possibile alternativa; IS-IS e OSPF calcolano SPF. Cambia esperimento dal menu.', 'La vista EIGRP isola la condizione di fattibilità, quella IS-IS il calcolo dentro un livello. Le metriche dei protocolli non sono direttamente confrontabili.'],
- '10': ['bgp', 'BGP: cambia la policy, cambia l’uscita', 'Sei AS e tre annunci verso lo stesso prefisso. Modifica LOCAL_PREF o filtra un annuncio e osserva la decisione e il percorso del traffico.', 'Le policy fra AS non sostituiscono la raggiungibilità interna dei next hop: BGP e IGP collaborano.'],
- '11': ['diagnostic,ospf', 'Visualizza dove si ferma il pacchetto', 'Riduci il TTL, togli il ritorno o interrompi E–H: il nodo di arresto e i campi mostrano cosa accade. Confronta poi la convergenza OSPF.', 'Il mancato arrivo di una risposta non identifica da solo un guasto all’andata. Questo modello mostra la causa nota; un vero traceroute può avere risposte mancanti o filtrate.'],
- '12': ['packet,spf,rip', 'Banco di prova: percorri, modifica, ricalcola', 'Sperimenta sulla rete estesa prima di passare alle configurazioni: modifica i costi o rimuovi un collegamento e osserva ogni passo.', 'Le configurazioni nella dispensa usano la topologia base R1–R4. La rete estesa A–L è un esperimento distinto.'],
- '13': ['packet,static,spf,ospf,rip,eigrp,isis,bgp,diagnostic', 'Laboratorio finale · una rete, diversi modi di instradare', 'Un banco di prova con 12 router, 20 collegamenti e due host nella vista pacchetto. Confronta inoltro, statiche, Dijkstra, convergenza OSPF, RIP, fattibilità EIGRP e SPF IS-IS. BGP apre la vista dedicata con sei sistemi autonomi e tre uscite.', 'Confronta SPF e RIP sulla rete iniziale: SPF sceglie più collegamenti a costo totale minore; RIP usa A → C → L. Poi porta E–H a costo 18 e osserva SPF. In BGP preferisci 64520 per vedere una policy prevalere sull’AS_PATH più corto.']
-};
-function visualPanel(key, id='esperimento-visuale') {
- const [modes,title,intro,bridge]=visualLessons[key];
- return `<section class="lab-panel" id="${id}" data-routing-visual="${modes}"><p class="eyebrow">SIMULAZIONE JS · PASSO PER PASSO</p><h2>${title}</h2><p>${intro}</p><noscript>Abilita JavaScript per esplorare la simulazione. Le spiegazioni e i diagrammi della lezione restano disponibili.</noscript></section><p class="visual-bridge">${bridge}</p>`;
+function visualPanel(id, modes, title, intro, level = 'base') {
+  return `<section class="lab-panel" id="${id}" data-routing-visual="${modes}" data-level="${level}">
+<h2>${title}</h2><p>${intro}</p>
+<noscript>Abilita JavaScript per usare i comandi della simulazione.</noscript>
+</section>`;
 }
-module.exports={visualLessons,visualPanel};
+
+const lessonPanels = {
+  '04': visualPanel('esperimento-visuale', 'packet', 'Segui il punto blu',
+    'Passiamo dai quattro router dell’esempio a una rete di dodici. A fa da gateway e L consegna al server. Premi Avanti e segui prima l’andata, poi il ritorno.', 'intro'),
+  '05': visualPanel('esperimento-visuale', 'prefix', 'Prova una destinazione',
+    'Qui vedi un solo router con le sue uscite. Scegli un indirizzo e avanza per vedere quali righe corrispondono e quale uscita viene usata.'),
+  '06': visualPanel('rotta-manuale', 'manual', 'Scegli la strada e prova il ritorno',
+    'Scegli R2 o R3 e imposta «Manca la rotta di ritorno». Avanza fino a quando la risposta si ferma a R4. Poi torna a «Rete operativa» per ripristinare la rotta e ripeti il viaggio.') +
+    visualPanel('esperimento-visuale', 'static', 'Lo stesso problema nella rete grande',
+      'Segui il percorso da A a L e osserva cosa succede quando si rompe il collegamento E–H.'),
+  '07': visualPanel('esperimento-visuale', 'spf', 'Guarda come Dijkstra aggiorna i costi',
+    'Nella rete di dodici router, A cerca il percorso meno costoso verso L. Avanza e osserva quali distanze cambiano. Poi aumenta il costo di E–H e ripeti.'),
+  '08': visualPanel('esperimento-visuale', 'ospf', 'Dal guasto alla nuova rotta',
+    'Segui la notizia del guasto E–H. Quando la mappa è aggiornata, confronta il vecchio percorso con quello nuovo.'),
+  '09': visualPanel('esperimento-visuale', 'rip,spf', 'Confronta i due percorsi',
+    'Segui come la distanza da L si propaga ai vicini. Poi passa a Dijkstra e confronta il percorso di costo minimo con quello di due salti.'),
+  '10': visualPanel('esperimento-visuale', 'bgp', 'Cambia la preferenza dell’azienda',
+    'Qui ogni nodo è un sistema autonomo. L’azienda è 64512 e vuole raggiungere la rete annunciata da 64540. Prova prima con preferenze uguali, poi dai priorità al fornitore 64520.'),
+  '11': visualPanel('esperimento-visuale', 'diagnostic', 'Segui il pacchetto fino al guasto',
+    'Scegli una rotta mancante, un guasto al collegamento o un ritorno interrotto. Individua il punto di arresto e confrontalo con la tabella della lezione.'),
+  '12': visualPanel('esperimento-visuale', 'static,ospf', 'Verifica il laboratorio 3',
+    'Avanza con le rotte statiche, poi ripeti con OSPF sullo stesso collegamento guasto.'),
+  '13': visualPanel('esperimento-visuale', 'packet,static,ospf,diagnostic', 'Ripercorri lo scenario',
+    'Segui il pacchetto a rete integra, poi confronta i due modi di reagire al guasto E–H. Nella diagnostica prova «Manca la rotta di andata» per vedere lo scarto al gateway A.', 'intro')
+};
+
+module.exports = { lessonPanels, visualPanel };

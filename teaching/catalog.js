@@ -337,7 +337,7 @@ window.schoolCatalog = {
       "id": "routing",
       "title": "Routing",
       "symbol": "IP↗",
-      "description": "Dal viaggio del pacchetto a OSPF, RIP, EIGRP, IS-IS e BGP: 13 lezioni e 5 simulazioni interattive.",
+      "description": "Segui il viaggio di un pacchetto e scopri come cambiano le rotte. Tredici lezioni con esercizi e simulazioni interattive.",
       "chapters": [
         {
           "id": "routing-01",
@@ -352,8 +352,8 @@ window.schoolCatalog = {
         },
         {
           "id": "routing-02",
-          "title": "02 · Decidere il prossimo hop",
-          "description": "Segui IP e MAC, consulta le tabelle e configura rotte di andata e ritorno.",
+          "title": "02 · Decidere il prossimo salto",
+          "description": "Segui il pacchetto, consulta le tabelle e costruisci rotte di andata e ritorno.",
           "files": [
             "04-pacchetto.html",
             "05-tabella.html",
@@ -363,7 +363,7 @@ window.schoolCatalog = {
         {
           "id": "routing-03",
           "title": "03 · Apprendere le rotte",
-          "description": "Dijkstra, OSPF, RIP, EIGRP e IS-IS: confronta famiglie, metriche e convergenza.",
+          "description": "Calcola il percorso a costo minimo e confrontalo con quello che usa meno salti.",
           "files": [
             "07-dinamico-dijkstra.html",
             "08-ospf.html",
@@ -372,8 +372,8 @@ window.schoolCatalog = {
         },
         {
           "id": "routing-04",
-          "title": "04 · BGP e routing tra AS",
-          "description": "Sessioni eBGP/iBGP, attributi, annunci e policy di Internet.",
+          "title": "04 · Collegare le reti di Internet",
+          "description": "Osserva come un’azienda sceglie da quale fornitore uscire.",
           "files": [
             "10-bgp.html"
           ]
@@ -381,7 +381,7 @@ window.schoolCatalog = {
         {
           "id": "routing-05",
           "title": "05 · Osservare, provare e verificare",
-          "description": "Cinque simulazioni, troubleshooting, esercizi, glossario e verifica finale.",
+          "description": "Diagnostica, tre laboratori integrativi e una verifica finale.",
           "files": [
             "11-diagnostica.html",
             "12-esercizi.html",
@@ -1168,7 +1168,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-04-vigenere-otp",
       "course": "crittografia",
-      "title": "04 · Cambiare alfabeto basta a nascondere le tracce?",
+      "title": "04 · Vigenère e one-time pad · Cambiare alfabeto basta a nascondere le tracce?",
       "kind": "lesson",
       "path": "materials/crittografia/04-vigenere-otp.html",
       "description": "Cambiare alfabeto basta a nascondere le tracce? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1177,7 +1177,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-05-enigma",
       "course": "crittografia",
-      "title": "05 · Come mandare un ordine via radio senza farlo leggere?",
+      "title": "05 · Enigma · Come mandare un ordine via radio senza farlo leggere?",
       "kind": "lesson",
       "path": "materials/crittografia/05-enigma.html",
       "description": "Come mandare un ordine via radio senza farlo leggere? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1186,7 +1186,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-06-simmetrica",
       "course": "crittografia",
-      "title": "06 · Un backup rubato deve restare illeggibile",
+      "title": "06 · Crittografia simmetrica · Un backup rubato deve restare illeggibile",
       "kind": "lesson",
       "path": "materials/crittografia/06-simmetrica.html",
       "description": "Un backup rubato deve restare illeggibile Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1195,7 +1195,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-07-hash-mac-password",
       "course": "crittografia",
-      "title": "07 · Il file è uguale? E chi lo ha mandato?",
+      "title": "07 · Hash e password · Il file è uguale? E chi lo ha mandato?",
       "kind": "lesson",
       "path": "materials/crittografia/07-hash-mac-password.html",
       "description": "Il file è uguale? E chi lo ha mandato? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1204,7 +1204,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-08-asimmetrica-rsa",
       "course": "crittografia",
-      "title": "08 · Come spedire un segreto a chi non hai mai incontrato?",
+      "title": "08 · Crittografia asimmetrica · Come spedire un segreto a chi non hai mai incontrato?",
       "kind": "lesson",
       "path": "materials/crittografia/08-asimmetrica-rsa.html",
       "description": "Come spedire un segreto a chi non hai mai incontrato? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1213,7 +1213,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-09-diffie-hellman-tls",
       "course": "crittografia",
-      "title": "09 · Come nasce una connessione protetta al sito?",
+      "title": "09 · TLS e accordo di chiave · Come nasce una connessione protetta al sito?",
       "kind": "lesson",
       "path": "materials/crittografia/09-diffie-hellman-tls.html",
       "description": "Come nasce una connessione protetta al sito? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1222,7 +1222,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-10-firme",
       "course": "crittografia",
-      "title": "10 · L’aggiornamento è davvero quello pubblicato dall’autore?",
+      "title": "10 · Firme digitali · L’aggiornamento è davvero quello pubblicato dall’autore?",
       "kind": "lesson",
       "path": "materials/crittografia/10-firme.html",
       "description": "L’aggiornamento è davvero quello pubblicato dall’autore? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1231,7 +1231,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-11-certificati",
       "course": "crittografia",
-      "title": "11 · La chiave funziona, ma appartiene al sito giusto?",
+      "title": "11 · Certificati · La chiave funziona, ma appartiene al sito giusto?",
       "kind": "lesson",
       "path": "materials/crittografia/11-certificati.html",
       "description": "La chiave funziona, ma appartiene al sito giusto? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1240,7 +1240,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-12-pec",
       "course": "crittografia",
-      "title": "12 · Ho spedito la domanda: quale prova mi resta?",
+      "title": "12 · PEC · Ho spedito la domanda: quale prova mi resta?",
       "kind": "lesson",
       "path": "materials/crittografia/12-pec.html",
       "description": "Ho spedito la domanda: quale prova mi resta? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1249,7 +1249,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-13-chiavi-attacchi",
       "course": "crittografia",
-      "title": "13 · Una chiave finisce online: che cosa cambia?",
+      "title": "13 · Sicurezza delle chiavi · Una chiave finisce online: che cosa cambia?",
       "kind": "lesson",
       "path": "materials/crittografia/13-chiavi-attacchi.html",
       "description": "Una chiave finisce online: che cosa cambia? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1258,7 +1258,7 @@ window.schoolCatalog = {
     {
       "id": "crittografia-14-casi-reali",
       "course": "crittografia",
-      "title": "14 · Scegliere gli strumenti per un servizio completo",
+      "title": "14 · Sicurezza applicata · Scegliere gli strumenti per un servizio completo",
       "kind": "lesson",
       "path": "materials/crittografia/14-casi-reali.html",
       "description": "Scegliere gli strumenti per un servizio completo Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
@@ -1347,7 +1347,7 @@ window.schoolCatalog = {
       "title": "Routing",
       "kind": "lesson",
       "path": "materials/routing/mappa.html",
-      "description": "Dalle basi del networking al routing IP: 13 lezioni, cinque simulazioni e una verifica ragionata.",
+      "description": "Come fa un pacchetto a raggiungere un computer in un’altra rete?",
       "chapter": "routing-01"
     },
     {
@@ -1383,25 +1383,25 @@ window.schoolCatalog = {
       "title": "04 · Il viaggio di un pacchetto",
       "kind": "lesson",
       "path": "materials/routing/04-pacchetto.html",
-      "description": "Leggi una topologia reale e separa gli IP end-to-end dai MAC di ogni collegamento.",
+      "description": "Segui una richiesta e la sua risposta. A ogni tappa, osserva che cosa cambia.",
       "chapter": "routing-02"
     },
     {
       "id": "routing-05-tabella",
       "course": "routing",
-      "title": "05 · Tabella di routing e Longest Prefix Match",
+      "title": "05 · Come leggere una tabella di routing",
       "kind": "lesson",
       "path": "materials/routing/05-tabella.html",
-      "description": "Connected, Local, next hop e default: scegli sempre il prefisso compatibile più specifico.",
+      "description": "Parti dall’indirizzo di destinazione e individua l’uscita giusta.",
       "chapter": "routing-02"
     },
     {
       "id": "routing-06-statico",
       "course": "routing",
-      "title": "06 · Routing statico, ritorno e backup",
+      "title": "06 · Routing statico e strada di ritorno",
       "kind": "lesson",
       "path": "materials/routing/06-statico.html",
-      "description": "Costruisci le rotte Cisco in entrambe le direzioni e distingui AD, metrica e specificità.",
+      "description": "Costruisci un percorso a mano, poi osserva come reagisce a un guasto.",
       "chapter": "routing-02"
     },
     {
@@ -1410,43 +1410,43 @@ window.schoolCatalog = {
       "title": "07 · Routing dinamico e Dijkstra",
       "kind": "lesson",
       "path": "materials/routing/07-dinamico-dijkstra.html",
-      "description": "Dalle famiglie dei protocolli al calcolo SPF: scopri un percorso a costo minimo un passo alla volta.",
+      "description": "Scopri come i router possono adattarsi a un cambiamento e come si calcola un percorso a costo minimo.",
       "chapter": "routing-03"
     },
     {
       "id": "routing-08-ospf",
       "course": "routing",
-      "title": "08 · OSPF, link-state e convergenza",
+      "title": "08 · Come OSPF aggiorna le rotte",
       "kind": "lesson",
       "path": "materials/routing/08-ospf.html",
-      "description": "Hello, LSA, database, SPF e aree: come si costruiscono e aggiornano le rotte.",
+      "description": "Segui il cambiamento di un collegamento fino al nuovo percorso.",
       "chapter": "routing-03"
     },
     {
       "id": "routing-09-rip-eigrp-isis",
       "course": "routing",
-      "title": "09 · RIP, EIGRP e IS-IS",
+      "title": "09 · RIP e il confronto con OSPF",
       "kind": "lesson",
       "path": "materials/routing/09-rip-eigrp-isis.html",
-      "description": "Confronta i principali IGP e usa RIP come caso di studio del distance vector.",
+      "description": "Impara una distanza dai vicini e confronta il risultato con quello ottenuto usando una mappa.",
       "chapter": "routing-03"
     },
     {
       "id": "routing-10-bgp",
       "course": "routing",
-      "title": "10 · BGP: routing tra sistemi autonomi",
+      "title": "10 · Come comunicano le reti di Internet",
       "kind": "lesson",
       "path": "materials/routing/10-bgp.html",
-      "description": "Annunci, AS_PATH, eBGP, iBGP e policy: perché Internet non sceglie solo il cammino più corto.",
+      "description": "Scopri come un’azienda con due fornitori sceglie da quale rete uscire.",
       "chapter": "routing-04"
     },
     {
       "id": "routing-11-diagnostica",
       "course": "routing",
-      "title": "11 · Guasti, IPv6 e troubleshooting",
+      "title": "11 · Diagnosticare un problema di routing",
       "kind": "lesson",
       "path": "materials/routing/11-diagnostica.html",
-      "description": "TTL, MTU, ritorno e strumenti: individua il punto in cui si interrompe una comunicazione.",
+      "description": "Individua l’ultimo punto in cui il pacchetto riesce a proseguire.",
       "chapter": "routing-05"
     },
     {
@@ -1455,7 +1455,7 @@ window.schoolCatalog = {
       "title": "12 · Laboratori ed esercizi guidati",
       "kind": "exercise",
       "path": "materials/routing/12-esercizi.html",
-      "description": "Configura, osserva e giustifica ogni hop prima di consultare le soluzioni.",
+      "description": "Fai una previsione, controllala nel simulatore e confronta il tuo ragionamento con la soluzione.",
       "chapter": "routing-05"
     },
     {
@@ -1464,25 +1464,25 @@ window.schoolCatalog = {
       "title": "13 · Errori comuni, glossario e ripasso",
       "kind": "lesson",
       "path": "materials/routing/13-ripasso.html",
-      "description": "Rimetti insieme il percorso e verifica le idee da ricordare.",
+      "description": "Ricostruisci un viaggio completo sulla rete A–L e spiega ogni decisione.",
       "chapter": "routing-05"
     },
     {
       "id": "routing-laboratorio",
       "course": "routing",
-      "title": "Laboratorio · Guarda come si scelgono le rotte",
+      "title": "Laboratorio · Come si scelgono le rotte",
       "kind": "lab",
       "path": "materials/routing/laboratorio.html",
-      "description": "Cinque modelli da esplorare con Avvia e Pausa oppure un passo alla volta. Nessuna animazione parte da sola.",
+      "description": "Riprendi gli esperimenti delle lezioni oppure confrontali sulla stessa rete.",
       "chapter": "routing-05"
     },
     {
       "id": "routing-fonti",
       "course": "routing",
-      "title": "Fonti, integrazioni e modelli",
+      "title": "Riferimenti di networking e routing",
       "kind": "lesson",
       "path": "materials/routing/fonti.html",
-      "description": "La dispensa ricevuta è la base del percorso; gli approfondimenti sui protocolli rimandano alle specifiche primarie.",
+      "description": "Documenti tecnici per approfondire dopo le lezioni.",
       "chapter": "routing-05"
     },
     {

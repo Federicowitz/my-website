@@ -82,7 +82,7 @@
         const forward = link[0] === from;
         const src = forward ? link[3] : link[4], dest = forward ? link[4] : link[3];
         const mac = ip => '02:00:' + ip.split('.').map(b => Number(b).toString(16).padStart(2,'0')).join(':');
-        const decision = from.startsWith('PC') ? 'Destinazione remota: frame al gateway.' : to.startsWith('PC') ? 'Rete Connected: consegna diretta tramite ARP.' : `Rotta per la LAN remota: prossimo hop ${dest}.`;
+        const decision = from.startsWith('PC') ? 'La destinazione è remota. Il frame va al gateway.' : to.startsWith('PC') ? 'La rete è collegata direttamente. Il router consegna al computer.' : `La rotta indica il prossimo salto ${dest}.`;
         frames.push({node:to,from,to,ttl:remaining,direction,macSource:mac(src),macDestination:mac(dest),nextHop:dest,
           message:`${from} → ${to}. ${decision} ${from.startsWith('R') ? 'Il router decrementa il TTL e costruisce un nuovo frame Ethernet.' : 'Il mittente non decrementa il TTL iniziale.'} ${to === 'PC4' ? 'PC4 riceve la richiesta e prepara la risposta con un nuovo TTL iniziale.' : to === 'PC1' ? 'PC1 riceve la risposta: scambio completato.' : ''}`});
       }
@@ -103,7 +103,7 @@
       }
       const stable = names.every(n => distances[n] === updated[n]);
       distances=updated;next=hops;
-      steps.push({distances:{...distances},next:{...next},message:stable ? `Nessuna distanza cambia: il modello è convergente verso ${target}. I costi scritti sui link non contano per RIP.` : `Round ${round}: ogni router usa gli annunci del round precedente e aggiunge 1 hop. Distanze massime utilizzabili: 15; 16 indica irraggiungibile.`});
+      steps.push({distances:{...distances},next:{...next},message:stable ? `Le distanze verso ${target} si sono stabilizzate. RIP conta i salti, quindi i numeri scritti sui collegamenti non entrano nel calcolo.` : `Turno ${round}. Ogni router legge le distanze annunciate dai vicini nel turno precedente e aggiunge un salto.`});
       if (stable) break;
     }
     return steps;

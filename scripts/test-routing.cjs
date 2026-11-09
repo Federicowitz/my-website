@@ -87,6 +87,8 @@ assert.equal(V.packet().at(-1).current,'PC');
 assert.match(V.packet({ttl:3}).at(-1).message,/TTL esaurito/);
 assert.equal(V.packet({ttl:3}).at(-1).current,'E');
 assert.equal(V.packet({noReturn:true}).at(-1).current,'L');
+assert.equal(V.packet({noRoute:true}).at(-1).current,'A');
+assert.ok(!V.packet({noRoute:true}).some(step=>step.current==='Server'));
 assert.equal(V.packet({failed:'E-H'}).at(-1).current,'E');
 assert.deepEqual(V.packet({asymmetric:true}).at(-1).path,['Server','L','J','G','D','A','PC']);
 assert.deepEqual(V.bgp('equal').at(-1).path,['64512','64550','64540']);
@@ -95,7 +97,15 @@ assert.deepEqual(V.bgp('filter').at(-1).path,['64512','64520','64530','64540']);
 assert.equal(V.feasible(9),true);assert.equal(V.feasible(10),false);
 assert.equal(V.simulate('eigrp',{strict:true}).at(-1).path.length,0);
 assert.notDeepEqual(V.simulate('ospf').at(-1).path,V.shortest());
-assert.deepEqual(V.simulate('static').at(-1).path,V.shortest());
+assert.deepEqual(V.simulate('static').at(-1).path,['A','B','E']);
+assert.deepEqual(V.simulate('spf-small').at(-1).path,['A','B','C','D']);
+assert.match(V.simulate('spf-small').at(-1).message,/Costo totale 5/);
+for (const [configuration,prefix,next] of [['missing',null,'R1'],['default','0.0.0.0/0','R2'],['specific','8.8.8.0/24','R3']]) {
+ const result = V.simulate('default',{configuration}).at(-1);
+ assert.equal(result.current,next);
+ if(prefix) assert.deepEqual(result.rows[0],['Prefisso scelto',prefix]);
+ else assert.deepEqual(result.rows,[['Esito','Scartato']]);
+}
 assert.equal(V.simulate('prefix',{ip:'10.1.2.34'}).at(-1).rows[1][1],'10.1.2.34/32');
 assert.equal(V.simulate('prefix',{ip:'203.0.113.10'}).at(-1).rows[1][1],'0.0.0.0/0');
 for(const file of fs.readdirSync(folder).filter(f=>/^(0[4-9]|1[0-3])-.*\.html$/.test(f))) {
@@ -105,11 +115,11 @@ for(const file of fs.readdirSync(folder).filter(f=>/^(0[4-9]|1[0-3])-.*\.html$/.
 }
 // Exercise the controller's events and render output without requiring a server.
 const browser={Routing:R,RoutingVisual:V,addEventListener(){}};
-const allModes='packet,prefix,static,spf,ospf,rip,eigrp,isis,bgp,diagnostic';
+const allModes='packet,prefix,default,manual,static,spf,spf-small,ospf,rip,eigrp,isis,bgp,diagnostic';
 const elements=new Map();
-const values={'[data-mode]':'packet','[data-ip]':'10.1.2.34','[data-ttl]':'8','[data-scenario]':'normal','[data-failed]':'','[data-expensive]':'no','[data-policy]':'equal','[data-strict]':'no'};
+const values={'[data-mode]':'packet','[data-configuration]':'missing','[data-ip]':'10.1.2.34','[data-ttl]':'8','[data-via]':'R3','[data-scenario]':'normal','[data-failed]':'','[data-expensive]':'no','[data-policy]':'equal','[data-strict]':'no'};
 function element(selector){if(!elements.has(selector))elements.set(selector,{value:values[selector]||'',dataset:{},innerHTML:'',textContent:'',events:{},addEventListener(name,fn){this.events[name]=fn;},setAttribute(){}});return elements.get(selector);}
-const options=['ttl','scenario','ip','failed','expensive','policy','strict'].map(name=>({dataset:{option:name}}));
+const options=['configuration','ttl','scenario','ip','failed','expensive','policy','strict','via'].map(name=>({dataset:{option:name}}));
 const panel={dataset:{routingVisual:allModes},innerHTML:'',querySelector:element,querySelectorAll(selector){return selector==='select'?Object.keys(values).map(element):options;}};
 let ticking;
 vm.runInNewContext(fs.readFileSync(path.join(folder,'visual-labs.js'),'utf8'),{window:browser,document:{querySelectorAll(){return [panel];},addEventListener(){}},setInterval(fn){ticking=fn;return 1;},clearInterval(){ticking=null;}});
@@ -124,4 +134,4 @@ for(const mode of allModes.split(',')) {
  element('[data-action="reset"]').events.click();
  assert.equal(element('[data-action="prev"]').disabled,true,mode);
 }
-console.log('OK: rete estesa, SPF/RIP, guasti, TTL, ritorno, BGP, EIGRP e controlli JS in 10 modalità.');
+console.log('OK: scelta della rotta predefinita, Dijkstra su 4 e 12 nodi, RIP, guasti, TTL, ritorno, BGP, EIGRP e controlli JS in 13 modalità.');
