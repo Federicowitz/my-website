@@ -1,24 +1,246 @@
-<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crittografia · Verifica finale ragionata — Federico Lelli</title><meta name="description" content="20 domande sulle garanzie della crittografia, con correzioni motivate su cifratura, hash, firme, TLS, password e PEC."><meta name="school-kind" content="test"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="crittografia.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/crittografia/test.html"><meta property="og:title" content="Crittografia · Verifica finale ragionata — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/crittografia/test.html"><meta property="og:description" content="Crittografia · Verifica finale ragionata. Crittografia: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="crittografia-test"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=crittografia" data-school-catalog="crittografia">Crittografia</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-fonti" rel="prev" href="fonti.html"><small>← Precedente</small><span>Fonti e riferimenti · Crittografia</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>19 / 19</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>Crittografia</span></span></nav></div><!-- SCHOOL:TOP:END --><main class="reading crypto-reading"><p class="eyebrow">VERIFICA · 20 DOMANDE</p><h1>Quale garanzia puoi davvero affermare?</h1><p class="lead">Scegli una risposta per ogni domanda. La correzione spiega il perché e ti indica quali distinzioni ripassare. Il risultato viene salvato solo nel browser, secondo il funzionamento di School.</p><form id="quiz"></form><p id="score" role="status" aria-live="polite"></p><button form="quiz" type="submit">Verifica le risposte</button> <button id="retry" type="button" class="secondary">Riprova</button><noscript>Per compilare questa verifica serve JavaScript. Gli <a href="esercizi.html">esercizi con soluzioni</a> restano consultabili senza script.</noscript></main><script>
-window.quizData={title:'Crittografia · Verifica finale ragionata',questions:[
-['Base64 protegge la riservatezza?', ['Sì, perché non mostra parole leggibili','No: è una codifica pubblicamente reversibile','Solo se il testo è lungo'],1,'Base64 cambia la rappresentazione, non richiede un segreto. Ripassa la lezione 02.'],
-['Un utente autenticato legge file che non gli spettano. Quale controllo manca?', ['Autorizzazione','Codifica UTF-8','Compressione'],0,'L’autenticazione non stabilisce automaticamente le operazioni consentite. Lezione 01.'],
-['Quanti spostamenti distinti ha Cesare su A–Z, incluso quello nullo?', ['25','52','26'],2,'Le chiavi sono classi modulo 26: 0–25; 29 equivale a 3. Lezione 03.'],
-['Perché molte chiavi non rendono sicura la sostituzione monoalfabetica?', ['Perché gli alfabeti sono pubblici','Perché conserva frequenze e schemi del linguaggio','Perché usa sempre la stessa lettera per tutte le lettere del chiaro'],1,'L’attaccante sfrutta strutture statistiche senza provare ogni permutazione. Lezione 03.'],
-['Quale requisito è indispensabile per un one-time pad?', ['Una chiave segreta uniforme, indipendente, lunga quanto il messaggio e mai riutilizzata','Una frase di un libro ripetuta','Una configurazione meccanica che cambia ogni giorno'],0,'Tutte le condizioni del pad contano. Enigma e una password temporanea non sono pad. Lezioni 04–05.'],
-['La sola cifratura garantisce sempre integrità?', ['Sì, perché un intruso non legge il messaggio','Sì, se la chiave è lunga','No: serve una protezione di integrità appropriata'],2,'Un cifrato può essere alterato senza conoscerne il chiaro. AEAD protegge anche l’integrità. Lezione 06.'],
-['AES-256 trasforma blocchi di quanti bit?', ['256','128','56'],1,'256 indica i bit della chiave; il blocco AES è sempre di 128 bit. Lezione 06.'],
-['In AES-GCM quale coppia non va ripetuta?', ['Chiave e nonce','Chiaro e lunghezza','Tag e nome del file'],0,'Ripetere il nonce con la stessa chiave compromette le garanzie di GCM. Lezione 06 e laboratorio.'],
-['Che cosa accade se cambiano i dati associati autenticati di GCM?', ['Il testo viene solo ricodificato','La verifica continua sempre a riuscire','Il controllo di autenticazione deve fallire'],2,'I dati associati non sono cifrati ma sono coperti dal controllo di integrità. Lezione 06.'],
-['Un hash allegato a un file su un canale compromesso prova l’autore?', ['Sempre','No: l’attaccante può sostituire file e hash','Sì, se è SHA-256'],1,'Serve un valore atteso affidabile o una firma verificata con una chiave fidata. Lezione 07.'],
-['Quale scelta protegge meglio un archivio di password?', ['SHA-256 senza salt','Base64 con una chiave pubblica','Una funzione per password con salt e costo calibrato'],2,'Le funzioni specifiche ostacolano le prove offline. Il salt è pubblico e distinto per utente. Lezione 07.'],
-['Alice e Bruno condividono una chiave HMAC. Un tag prova pubblicamente che ha scritto Alice?', ['No: anche Bruno può produrre tag validi','Sì, perché il tag è lungo','Solo se usano SHA-256'],0,'Un segreto condiviso non distingue pubblicamente quale possessore abbia generato il MAC. Lezione 07.'],
-['Per inviare un messaggio riservato a Bruno con uno schema a chiave pubblica, quale chiave si usa?', ['La privata di Alice per ogni tipo di algoritmo','La pubblica autentica di Bruno','La pubblica di qualunque CA'],1,'La pubblica deve essere quella del destinatario e deve essere autenticata. Lezione 08.'],
-['I bit del modulo RSA misurano la stessa sicurezza dei bit di una chiave AES?', ['Sì, in tutti i casi','Sì, se entrambi usano numeri primi','No: gli attacchi e le stime sono differenti'],2,'Non si applica la sola formula della ricerca esaustiva ai bit del modulo RSA. Lezioni 08 e 13.'],
-['Diffie–Hellman non autenticato impedisce un man-in-the-middle?', ['No: l’avversario può stabilire segreti diversi con le due parti','Sì, perché il segreto non viene spedito','Solo se la chiave pubblica è visibile'],0,'L’accordo di chiave non risolve da solo l’identità del corrispondente. Lezione 09.'],
-['Un certificato HTTPS valido garantisce che il sito sia onesto?', ['Sì, perché la CA controlla ogni pagina','No: bisogna distinguere nome autenticato e comportamento del sito','Sì, se il certificato non è autofirmato'],1,'Il certificato e TLS non certificano la veridicità del contenuto o l’intenzione del sito. Lezioni 09–11.'],
-['Che cosa prova una firma matematica valida nel laboratorio?', ['Che il testo è segreto','Che la firma è automaticamente qualificata','Che firma, dati e chiave pubblica soddisfano lo schema'],2,'Identificazione e requisiti giuridici sono ulteriori. Firmare non cifra il contenuto. Lezione 10.'],
-['Che cosa attesta la ricevuta PEC di avvenuta consegna?', ['L’arrivo nella casella del destinatario, non la lettura','L’approvazione del contenuto','La firma personale del mittente su ogni allegato'],0,'Trasporto, lettura e sottoscrizione del documento sono eventi diversi. Lezione 12.'],
-['Una richiesta con tag valido viene ripetuta. È sempre respinta?', ['Sì: un MAC è monouso per definizione','No: il protocollo deve verificare anche il riuso e il contesto','Sì, se arriva via HTTPS'],1,'Per bloccare il replay servono stato, identificativi, contatori o scadenze verificati. Lezione 13.'],
-['Quale descrizione di ML-KEM è corretta?', ['Una firma qualificata per PDF','Un formato per conservare ricevute PEC','Un meccanismo post-quantistico per incapsulare un segreto'],2,'ML-KEM stabilisce materiale segreto; ML-DSA e SLH-DSA sono schemi di firma. Lezione 14.']
-]};
-</script><script src="../../quiz.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-fonti" rel="prev" href="fonti.html"><small>← Precedente</small><span>Fonti e riferimenti · Crittografia</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>19 / 19</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>Crittografia</span></span></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crittografia · Verifica finale ragionata — Federico Lelli</title><meta name="description" content="24 domande sulle garanzie della crittografia, con correzioni motivate su cifratura, hash, firme, TLS, password e PEC."><meta name="school-kind" content="test"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="crittografia.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/crittografia/test.html"><meta property="og:title" content="Crittografia · Verifica finale ragionata — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/crittografia/test.html"><meta property="og:description" content="Crittografia · Verifica finale ragionata. Crittografia: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="crittografia-test"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=crittografia" data-school-catalog="crittografia">Crittografia</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-fonti" rel="prev" href="fonti.html"><small>← Precedente</small><span>Fonti e riferimenti · Crittografia</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>21 / 21</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>Crittografia</span></span></nav></div><!-- SCHOOL:TOP:END --><main class="reading crypto-reading"><p class="eyebrow">VERIFICA · 20 DOMANDE</p><h1>Quale garanzia puoi davvero affermare?</h1><p class="lead">Scegli una risposta per ogni domanda. La correzione spiega il perché e ti indica quali distinzioni ripassare. Il risultato viene salvato solo nel browser, secondo il funzionamento di School.</p><form id="quiz"></form><p id="score" role="status" aria-live="polite"></p><button form="quiz" type="submit">Verifica le risposte</button> <button id="retry" type="button" class="secondary">Riprova</button><noscript>Per compilare questa verifica serve JavaScript. Gli <a href="esercizi.html">esercizi con soluzioni</a> restano consultabili senza script.</noscript></main><script>
+window.quizData={
+  "title": "Crittografia · Verifica finale ragionata",
+  "questions": [
+    [
+      "Base64 protegge la riservatezza?",
+      [
+        "Sì, perché non mostra parole leggibili",
+        "No: è una codifica pubblicamente reversibile",
+        "Solo se il testo è lungo"
+      ],
+      1,
+      "Base64 cambia la rappresentazione, non richiede un segreto. Ripassa la lezione 02."
+    ],
+    [
+      "Un utente autenticato legge file che non gli spettano. Quale controllo manca?",
+      [
+        "Autorizzazione",
+        "Codifica UTF-8",
+        "Compressione"
+      ],
+      0,
+      "L’autenticazione non stabilisce automaticamente le operazioni consentite. Lezione 01."
+    ],
+    [
+      "Quanti spostamenti distinti ha Cesare su A–Z, incluso quello nullo?",
+      [
+        "25",
+        "52",
+        "26"
+      ],
+      2,
+      "Le chiavi sono classi modulo 26: 0–25; 29 equivale a 3. Lezione 03."
+    ],
+    [
+      "Perché molte chiavi non rendono sicura la sostituzione monoalfabetica?",
+      [
+        "Perché gli alfabeti sono pubblici",
+        "Perché conserva frequenze e schemi del linguaggio",
+        "Perché usa sempre la stessa lettera per tutte le lettere del chiaro"
+      ],
+      1,
+      "L’attaccante sfrutta strutture statistiche senza provare ogni permutazione. Lezione 03."
+    ],
+    [
+      "Quale requisito è indispensabile per un one-time pad?",
+      [
+        "Una chiave segreta uniforme, indipendente, lunga quanto il messaggio e mai riutilizzata",
+        "Una frase di un libro ripetuta",
+        "Una configurazione meccanica che cambia ogni giorno"
+      ],
+      0,
+      "Tutte le condizioni del pad contano. Enigma e una password temporanea non sono pad. Lezioni 04–05."
+    ],
+    [
+      "La sola cifratura garantisce sempre integrità?",
+      [
+        "Sì, perché un intruso non legge il messaggio",
+        "Sì, se la chiave è lunga",
+        "No: serve una protezione di integrità appropriata"
+      ],
+      2,
+      "Un cifrato può essere alterato senza conoscerne il chiaro. AEAD protegge anche l’integrità. Lezione 06."
+    ],
+    [
+      "Cifri due volte lo stesso backup con nonce nuovi. Devi ottenere lo stesso cifrato?",
+      [
+        "Sì, altrimenti il file è cambiato",
+        "No: possono cambiare i cifrati pur recuperando lo stesso testo",
+        "Sì, perché la chiave è la stessa"
+      ],
+      1,
+      "Il nonce distingue le operazioni di cifratura. Conta recuperare il testo e verificarne l’integrità, non ottenere byte cifrati identici. Lezione 06."
+    ],
+    [
+      "In AES-GCM quale coppia non va ripetuta?",
+      [
+        "Chiave e nonce",
+        "Chiaro e lunghezza",
+        "Tag e nome del file"
+      ],
+      0,
+      "Ripetere il nonce con la stessa chiave compromette le garanzie di GCM. Lezione 06 e laboratorio."
+    ],
+    [
+      "Nel backup cambi l’identificativo del contratto protetto insieme al messaggio. Che cosa ti aspetti?",
+      [
+        "Un controllo fallito",
+        "Solo un nome diverso senza conseguenze",
+        "Una firma personale del destinatario"
+      ],
+      0,
+      "I dati associati non sono nascosti ma sono autenticati: cambiarli deve far rifiutare il pacchetto. Lezione 06 e laboratorio."
+    ],
+    [
+      "Un hash allegato a un file su un canale compromesso prova l’autore?",
+      [
+        "Sempre",
+        "No: l’attaccante può sostituire file e hash",
+        "Sì, se è SHA-256"
+      ],
+      1,
+      "Serve un valore atteso affidabile o una firma verificata con una chiave fidata. Lezione 07."
+    ],
+    [
+      "Quale scelta protegge meglio un archivio di password?",
+      [
+        "SHA-256 senza salt",
+        "Base64 con una chiave pubblica",
+        "Una funzione per password con salt e costo calibrato"
+      ],
+      2,
+      "Le funzioni specifiche ostacolano le prove offline. Il salt è pubblico e distinto per utente. Lezione 07."
+    ],
+    [
+      "Alice e Bruno condividono una chiave HMAC. Un tag prova pubblicamente che ha scritto Alice?",
+      [
+        "No: anche Bruno può produrre tag validi",
+        "Sì, perché il tag è lungo",
+        "Solo se usano SHA-256"
+      ],
+      0,
+      "Un segreto condiviso non distingue pubblicamente quale possessore abbia generato il MAC. Lezione 07."
+    ],
+    [
+      "Per inviare un messaggio riservato a Bruno con uno schema a chiave pubblica, quale chiave si usa?",
+      [
+        "La privata di Alice per ogni tipo di algoritmo",
+        "La pubblica autentica di Bruno",
+        "La pubblica di qualunque CA"
+      ],
+      1,
+      "La pubblica deve essere quella del destinatario e deve essere autenticata. Lezione 08."
+    ],
+    [
+      "Alice cifra un file per Bruno usando una pubblica sostituita da Eva. Chi può recuperare la chiave del file?",
+      [
+        "Solo Bruno, perché è il destinatario scritto nel testo",
+        "Nessuno, perché le pubbliche sono visibili",
+        "Eva, con la privata corrispondente"
+      ],
+      2,
+      "La cifratura segue la chiave effettivamente usata, non il nome desiderato. Serve autenticare la pubblica. Lezione 08."
+    ],
+    [
+      "Diffie–Hellman non autenticato impedisce un man-in-the-middle?",
+      [
+        "No: l’avversario può stabilire segreti diversi con le due parti",
+        "Sì, perché il segreto non viene spedito",
+        "Solo se la chiave pubblica è visibile"
+      ],
+      0,
+      "L’accordo di chiave non risolve da solo l’identità del corrispondente. Lezione 09."
+    ],
+    [
+      "Un certificato HTTPS valido garantisce che il sito sia onesto?",
+      [
+        "Sì, perché la CA controlla ogni pagina",
+        "No: bisogna distinguere nome autenticato e comportamento del sito",
+        "Sì, se il certificato non è autofirmato"
+      ],
+      1,
+      "Il certificato e TLS non certificano la veridicità del contenuto o l’intenzione del sito. Lezioni 09–11."
+    ],
+    [
+      "Che cosa prova una firma matematica valida nel laboratorio?",
+      [
+        "Che il testo è segreto",
+        "Che la firma è automaticamente qualificata",
+        "Che firma, dati e chiave pubblica soddisfano lo schema"
+      ],
+      2,
+      "Identificazione e requisiti giuridici sono ulteriori. Firmare non cifra il contenuto. Lezione 10."
+    ],
+    [
+      "Che cosa attesta la ricevuta PEC di avvenuta consegna?",
+      [
+        "L’arrivo nella casella del destinatario, non la lettura",
+        "L’approvazione del contenuto",
+        "La firma personale del mittente su ogni allegato"
+      ],
+      0,
+      "Trasporto, lettura e sottoscrizione del documento sono eventi diversi. Lezione 12."
+    ],
+    [
+      "Una richiesta con tag valido viene ripetuta. È sempre respinta?",
+      [
+        "Sì: un MAC è monouso per definizione",
+        "No: il protocollo deve verificare anche il riuso e il contesto",
+        "Sì, se arriva via HTTPS"
+      ],
+      1,
+      "Per bloccare il replay servono stato, identificativi, contatori o scadenze verificati. Lezione 13."
+    ],
+    [
+      "La chiave di un vecchio backup è stata cancellata durante una rotazione. La nuova chiave apre automaticamente quel backup?",
+      [
+        "Sì, tutte le chiavi nuove sostituiscono le vecchie",
+        "No: occorre conservare un recupero valido o migrare i dati",
+        "Sì, se il file ha un hash"
+      ],
+      1,
+      "La rotazione non ricifra magicamente i vecchi file. Recupero e migrazione vanno pianificati. Lezione 13."
+    ],
+    [
+      "Visiti un sito HTTPS attraverso una VPN. Il gateway VPN legge automaticamente la pagina?",
+      [
+        "Sì, perché apre il tunnel",
+        "No: HTTPS può restare cifrato fino al sito",
+        "Sì, perché conosce il tuo indirizzo"
+      ],
+      1,
+      "Aprire il tunnel esterno non consegna le chiavi della connessione HTTPS interna. Lezione 15."
+    ],
+    [
+      "Un messaggio HTTP esce dal gateway VPN verso Internet. È ancora protetto da quel tunnel?",
+      [
+        "Sì, per sempre",
+        "Solo se il testo è corto",
+        "No: il tunnel è terminato al gateway"
+      ],
+      2,
+      "Va indicato il confine: oltre il gateway serve un’altra protezione se vuoi mantenere la riservatezza. Lezione 15."
+    ],
+    [
+      "Ricalcoli una catena di hash dopo aver modificato un trasferimento. Le impronte coerenti provano che sei autorizzato?",
+      [
+        "No: mancano i controlli sulle operazioni e sul consenso",
+        "Sì, ogni hash è una firma",
+        "Sì, la coerenza prova che la rete ha accettato"
+      ],
+      0,
+      "Una copia internamente coerente può raccontare una storia non autorizzata. Lezione 16 e laboratorio."
+    ],
+    [
+      "Alice firma due spese incompatibili dello stesso valore. Che cosa manca alla sola verifica delle firme?",
+      [
+        "Un alfabeto segreto",
+        "Un ordine condiviso e il controllo delle regole del registro",
+        "La cifratura di tutti gli indirizzi"
+      ],
+      1,
+      "La firma autorizza, ma non decide quale spesa viene prima né elimina la doppia spesa. Lezione 16."
+    ]
+  ]
+};</script><script src="../../quiz.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-fonti" rel="prev" href="fonti.html"><small>← Precedente</small><span>Fonti e riferimenti · Crittografia</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>21 / 21</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>Crittografia</span></span></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

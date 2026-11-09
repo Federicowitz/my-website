@@ -41,6 +41,17 @@ async function main() {
   await assert.rejects(() => api.decrypt(wrongKey, encrypted.iv, encrypted.data, 'contratto-001'));
   const empty = await api.encrypt(key, '');
   assert.equal(await api.decrypt(key, empty.iv, empty.data), '');
+  const alice = await api.newAgreementKeys(), bruno = await api.newAgreementKeys(), eve = await api.newAgreementKeys();
+  const salt = webcrypto.getRandomValues(new Uint8Array(32));
+  const aliceKey = await api.deriveTrafficKey(alice.privateKey, bruno.publicKey, salt);
+  const brunoKey = await api.deriveTrafficKey(bruno.privateKey, alice.publicKey, salt);
+  assert.equal(alice.privateKey.extractable, false); assert.equal(aliceKey.extractable, false);
+  const parcel = await api.encrypt(aliceKey, text);
+  assert.equal(await api.decrypt(brunoKey, parcel.iv, parcel.data), text);
+  const eveKey = await api.deriveTrafficKey(eve.privateKey, alice.publicKey, salt);
+  await assert.rejects(() => api.decrypt(eveKey, parcel.iv, parcel.data));
+  const differentContext = await api.deriveTrafficKey(bruno.privateKey, alice.publicKey, salt, 'other-protocol');
+  await assert.rejects(() => api.decrypt(differentContext, parcel.iv, parcel.data));
   const keys = await api.newSigningKeys(), otherKeys = await api.newSigningKeys();
   const signature = await api.sign(keys.privateKey, text);
   assert.equal(keys.privateKey.extractable, false);
@@ -63,7 +74,7 @@ async function main() {
   const quiz = {window: {}};
   const quizHTML = fs.readFileSync(path.join(folder, 'test.html'), 'utf8');
   vm.runInNewContext(quizHTML.match(/<script>\s*(window.quizData=[\s\S]*?)<\/script>/)[1], quiz);
-  assert.equal(quiz.window.quizData.questions.length, 20);
+  assert.equal(quiz.window.quizData.questions.length, 24);
   for (const [question, options, answer, explanation] of quiz.window.quizData.questions) {
     assert.ok(question && explanation); assert.ok(Number.isInteger(answer) && answer >= 0 && answer < options.length);
     assert.equal(new Set(options).size, options.length);
@@ -78,6 +89,51 @@ async function main() {
       assert.ok(target.includes(`id="${anchor}"`), `${filename}: missing ${file || filename}#${anchor}`);
     }
   }
-  console.log('OK: cifrari, vettore SHA-256, autenticazione GCM, firme, esempi RSA/DH, 20 domande e ancore del percorso.');
+  // Exercise actual hash-chain button handlers, including tampering and full rewrite.
+  const elements = {};
+  for (const id of ['block-one', 'block-two', 'block-three', 'chain-status', 'chain-values', 'chain-build', 'chain-check']) {
+    elements[id] = {value: id, textContent: '', children: [], handlers: {},
+      addEventListener(event, handler) { this.handlers[event] = handler; },
+      replaceChildren() { this.children = []; }, append(child) { this.children.push(child); }};
+  }
+  const chainContext = {TextEncoder, crypto: webcrypto, document: {
+    getElementById: id => elements[id], createElement: () => ({textContent: ''})
+  }};
+  vm.runInNewContext(fs.readFileSync(path.join(folder, 'catena.js'), 'utf8'), chainContext);
+  const build = () => elements['chain-build'].handlers.click();
+  const check = () => elements['chain-check'].handlers.click();
+  await check(); assert.match(elements['chain-status'].textContent, /Prima crea/);
+  await build(); assert.equal(elements['chain-values'].children.length, 3);
+  await check(); assert.match(elements['chain-status'].textContent, /Catena coerente/);
+  const firstHashes = elements['chain-values'].children.map(c => c.textContent);
+  elements['block-one'].value = 'Trasferimento alterato';
+  await check(); assert.match(elements['chain-status'].textContent, /Alterazione rilevata nei blocchi: 1/);
+  await build(); await check(); assert.match(elements['chain-status'].textContent, /Catena coerente/);
+  elements['chain-values'].children.forEach((c, i) => assert.notEqual(c.textContent, firstHashes[i]));
+  chainContext.crypto = {};
+  await build(); assert.match(elements['chain-status'].textContent, /contesto sicuro/);
+  assert.equal(elements['chain-build'].disabled, false);
+  const agreementElements = {};
+  for (const id of ['agreement-new', 'agreement-send', 'agreement-read', 'agreement-wrong', 'agreement-text', 'agreement-public', 'agreement-output']) {
+    agreementElements[id] = {value: 'Documento riservato', textContent: '', handlers: {}, addEventListener(event, handler) { this.handlers[event] = handler; }};
+  }
+  vm.runInNewContext(fs.readFileSync(path.join(folder, 'accordo.js'), 'utf8'), {
+    CryptoTeaching: api, crypto: webcrypto, document: {getElementById: id => agreementElements[id]}
+  });
+  const clickAgreement = id => agreementElements[id].handlers.click();
+  await clickAgreement('agreement-read');
+  assert.match(agreementElements['agreement-output'].textContent, /Prima prepara/);
+  await clickAgreement('agreement-new');
+  assert.match(agreementElements['agreement-public'].textContent, /Pubblica di Alice/);
+  await clickAgreement('agreement-send');
+  agreementElements['agreement-text'].value = 'Testo modificato dopo invio';
+  await clickAgreement('agreement-read');
+  assert.match(agreementElements['agreement-output'].textContent, /Documento riservato/);
+  await clickAgreement('agreement-wrong');
+  assert.match(agreementElements['agreement-output'].textContent, /Apertura rifiutata/);
+  await clickAgreement('agreement-new');
+  await clickAgreement('agreement-read');
+  assert.match(agreementElements['agreement-output'].textContent, /Prima prepara/);
+  console.log('OK: cifrari, SHA-256, GCM, firme, RSA/DH, 24 domande, ancore, catena e accordo ECDH/HKDF (calcoli e pulsanti).');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

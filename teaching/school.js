@@ -32,10 +32,10 @@
   history[replace?'replaceState':'pushState']({school:true},'',item?href(item):courseURL(id));
  }
  function selectCourse(){document.querySelectorAll('[data-course]').forEach(b=>{const selected=b.dataset.course===course;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',selected)})}
- $('#all-count').textContent=items.length;$('#catalog-stats').textContent=`${courses.length} percorsi · ${items.length} materiali`;
- $('.paths-section .subtle').textContent=`${String(courses.length).padStart(2,'0')} percorsi`;
+ $('#all-count').textContent=items.length;
+ $('#paths-count').textContent=`${courses.length} ${courses.length===1?'percorso':'percorsi'}`;
  $('#course-nav').innerHTML=courses.map(c=>`<button class="nav-item" data-course="${c.id}"><span class="course-glyph">${escape(c.symbol)}</span>${escape(c.title)}<span>${count(c.id)}</span></button>`).join('');
- $('#course-grid').innerHTML=courses.map(c=>`<button class="course-card" data-course="${c.id}"><span class="course-symbol">${escape(c.symbol)}</span><h3>${escape(c.title)}</h3><p>${escape(c.description)}</p><span class="card-count">${count(c.id)} ${count(c.id)===1?'materiale':'materiali'}</span><span class="card-arrow">↗</span></button>`).join('');
+ $('#course-grid').innerHTML=courses.map(c=>`<button class="course-card" data-course="${c.id}"><span class="course-symbol">${escape(c.symbol)}</span><span class="course-title">${escape(c.title)}</span><span class="course-description">${escape(c.description)}</span><span class="card-count">${count(c.id)} ${count(c.id)===1?'materiale':'materiali'}</span><span class="card-arrow" aria-hidden="true">↗</span></button>`).join('');
  function render(){
   const filtered=items.filter(i=>(course==='all'||i.course===course)&&(kind==='all'||i.kind===kind)&&normalize(i.title+' '+i.description+' '+courses.find(c=>c.id===i.course).title).includes(normalize(query)));
   $('#library-title').textContent=course==='all'?'Tutti i materiali':courses.find(c=>c.id===course).title;$('#library-eyebrow').textContent=course==='all'?'LA LIBRERIA':'IL PERCORSO';$('#result-count').textContent=`${filtered.length} ${filtered.length===1?'materiale':'materiali'}`;
@@ -67,6 +67,12 @@
  function route(){const params=new URLSearchParams(localFile?(location.hash.slice(1)||location.search):location.search);const item=items.find(i=>!localFile&&new URL(href(i)).pathname===location.pathname)||items.find(i=>i.id===params.get('lesson'));course=courses.some(c=>c.id===params.get('course'))?params.get('course'):(item?.course||'all');kind=Object.hasOwn(labels,params.get('kind'))?params.get('kind'):(item?.kind==='lab'?'lab':'all');showReader(item||null);if(item&&!localFile&&params.has('lesson'))updateLocation(item,item.course,true);if(params.has('lesson')&&!item)$('#result-count').textContent='Materiale non trovato. Scegli dal catalogo.'}
  document.addEventListener('click',e=>{if(e.defaultPrevented||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;const lesson=e.target.closest('[data-lesson]');if(lesson){const item=items.find(i=>i.id===lesson.dataset.lesson);if(item){e.preventDefault();openLesson(item)}return}const c=e.target.closest('[data-course]');if(c){showCourse(c.dataset.course);$('.library').scrollIntoView({behavior:'instant'});return}const k=e.target.closest('[data-kind]');if(k){kind=k.dataset.kind;updateLocation(null);render()}});
  $('#search').addEventListener('input',e=>{query=e.target.value.trim();render()});$('#back').onclick=()=>{showCourse(course);window.scrollTo({top:0,behavior:'instant'})};
+ const searchShortcut=$('#search-shortcut');
+ searchShortcut.addEventListener('click',()=>{
+  $('.library').scrollIntoView({behavior:'instant'});
+  $('#search').focus({preventScroll:true});
+ });
+ searchShortcut.hidden=false;
  viewBar.addEventListener('click',e=>{const button=e.target.closest('[data-view]');if(!button)return;view=button.dataset.view;try{localStorage.setItem('school:view',view)}catch{}render()});
  $('#completed').onchange=e=>{if(!active)return;const saved=getSaved();saved[active.id]=e.target.checked;try{localStorage.setItem('school:completed',JSON.stringify(saved))}catch{$('.reader-hint').textContent='Il browser non consente di salvare i progressi.'}};
  $('#menu').onclick=()=>{const opened=$('#sidebar').classList.toggle('open');$('#scrim').hidden=!opened;$('#menu').setAttribute('aria-expanded',opened)};$('#scrim').onclick=closeMenu;

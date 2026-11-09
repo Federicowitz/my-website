@@ -254,7 +254,7 @@ window.schoolCatalog = {
       "id": "crittografia",
       "title": "Crittografia",
       "symbol": "K↔",
-      "description": "Dai cifrari storici a TLS, firme e PEC: definizioni, casi concreti e laboratori.",
+      "description": "Problemi reali e soluzioni: cifratura, hash, firme, PEC, HTTPS, VPN e blockchain. Matematica negli approfondimenti.",
       "chapters": [
         {
           "id": "crypto-01",
@@ -279,7 +279,7 @@ window.schoolCatalog = {
         {
           "id": "crypto-03",
           "title": "03 · Dati, integrità e password",
-          "description": "Distingui cifratura, AEAD, hash, MAC e derivazione delle password.",
+          "description": "Proteggi un backup, confronta file e comprendi la custodia delle password.",
           "files": [
             "06-simmetrica.html",
             "07-hash-mac-password.html"
@@ -288,7 +288,7 @@ window.schoolCatalog = {
         {
           "id": "crypto-04",
           "title": "04 · Chiavi pubbliche e canali",
-          "description": "Segui i numeri di RSA e Diffie–Hellman, poi collegali a TLS.",
+          "description": "Dalle chiavi pubbliche agli accordi moderni e a HTTPS; RSA e calcoli negli approfondimenti.",
           "files": [
             "08-asimmetrica-rsa.html",
             "09-diffie-hellman-tls.html"
@@ -313,6 +313,16 @@ window.schoolCatalog = {
             "14-casi-reali.html",
             "laboratorio.html",
             "esercizi.html"
+          ]
+        },
+        {
+          "id": "crypto-07",
+          "title": "07 · Reti e registri condivisi",
+          "description": "Confronta HTTPS e VPN; sperimenta hash, firme e consenso nella blockchain.",
+          "files": [
+            "15-vpn.html",
+            "16-blockchain.html",
+            "laboratori-scenari.html"
           ]
         }
       ]
@@ -1125,7 +1135,7 @@ window.schoolCatalog = {
       "title": "Crittografia · La mappa del percorso",
       "kind": "lesson",
       "path": "materials/crittografia/mappa.html",
-      "description": "Un percorso dai cifrari storici a TLS, firme e PEC: 14 lezioni, laboratori, esercizi, glossario e verifica.",
+      "description": "Un percorso dai cifrari storici a TLS, firme e PEC: 16 lezioni, laboratori, esercizi, glossario e verifica.",
       "chapter": "crypto-01"
     },
     {
@@ -1158,101 +1168,128 @@ window.schoolCatalog = {
     {
       "id": "crittografia-04-vigenere-otp",
       "course": "crittografia",
-      "title": "04 · Vigenère, periodicità e one-time pad",
+      "title": "04 · Cambiare alfabeto basta a nascondere le tracce?",
       "kind": "lesson",
       "path": "materials/crittografia/04-vigenere-otp.html",
-      "description": "Sostituzione polialfabetica con esempio completo, attacco alla chiave ripetuta e condizioni rigorose della segretezza perfetta.",
+      "description": "Cambiare alfabeto basta a nascondere le tracce? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-02"
     },
     {
       "id": "crittografia-05-enigma",
       "course": "crittografia",
-      "title": "05 · Enigma: macchina, procedure e crittoanalisi",
+      "title": "05 · Come mandare un ordine via radio senza farlo leggere?",
       "kind": "lesson",
       "path": "materials/crittografia/05-enigma.html",
-      "description": "Come funzionano rotori, riflettore e pannello di Enigma; il contributo polacco e il lavoro di Turing e Welchman, oltre la narrazione cinematografica.",
+      "description": "Come mandare un ordine via radio senza farlo leggere? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-02"
     },
     {
       "id": "crittografia-06-simmetrica",
       "course": "crittografia",
-      "title": "06 · Crittografia simmetrica e cifratura autenticata",
+      "title": "06 · Un backup rubato deve restare illeggibile",
       "kind": "lesson",
       "path": "materials/crittografia/06-simmetrica.html",
-      "description": "XOR bit per bit, round AES-128 animati, S-box, MixColumns ed espansione della chiave. Dal contatore al tag AES-GCM, con calcoli verificabili.",
+      "description": "Un backup rubato deve restare illeggibile Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-03"
     },
     {
       "id": "crittografia-07-hash-mac-password",
       "course": "crittografia",
-      "title": "07 · Hash, HMAC e protezione delle password",
+      "title": "07 · Il file è uguale? E chi lo ha mandato?",
       "kind": "lesson",
       "path": "materials/crittografia/07-hash-mac-password.html",
-      "description": "Dentro SHA-256 con 64 round animati, costruzione HMAC e memoria delle funzioni per password. Esempi numerici e prove passo per passo.",
+      "description": "Il file è uguale? E chi lo ha mandato? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-03"
     },
     {
       "id": "crittografia-08-asimmetrica-rsa",
       "course": "crittografia",
-      "title": "08 · Chiavi pubbliche e RSA, passo per passo",
+      "title": "08 · Come spedire un segreto a chi non hai mai incontrato?",
       "kind": "lesson",
       "path": "materials/crittografia/08-asimmetrica-rsa.html",
-      "description": "Costruisci le chiavi RSA con Euclide, segui cifratura e decifratura animate e capisci perché funzionano potenze modulari, codifiche e sistemi ibridi.",
+      "description": "Come spedire un segreto a chi non hai mai incontrato? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-04"
     },
     {
       "id": "crittografia-09-diffie-hellman-tls",
       "course": "crittografia",
-      "title": "09 · Diffie–Hellman, sistemi ibridi e TLS",
+      "title": "09 · Come nasce una connessione protetta al sito?",
       "kind": "lesson",
       "path": "materials/crittografia/09-diffie-hellman-tls.html",
-      "description": "Diffie–Hellman con esponenti modificabili, aritmetica delle curve ellittiche, derivazione delle chiavi e sequenza animata di una connessione TLS.",
+      "description": "Come nasce una connessione protetta al sito? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-04"
     },
     {
       "id": "crittografia-10-firme",
       "course": "crittografia",
-      "title": "10 · Firme crittografiche e firma digitale",
+      "title": "10 · L’aggiornamento è davvero quello pubblicato dall’autore?",
       "kind": "lesson",
       "path": "materials/crittografia/10-firme.html",
-      "description": "Che cosa prova una firma, come si verifica e perché non cifra il documento. Firma elettronica, qualificata e digitale nel contesto italiano ed europeo.",
+      "description": "L’aggiornamento è davvero quello pubblicato dall’autore? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-05"
     },
     {
       "id": "crittografia-11-certificati",
       "course": "crittografia",
-      "title": "11 · Certificati, CA e catene di fiducia",
+      "title": "11 · La chiave funziona, ma appartiene al sito giusto?",
       "kind": "lesson",
       "path": "materials/crittografia/11-certificati.html",
-      "description": "Come X.509 collega una chiave a un’identità, che cosa fa una Certification Authority e quali verifiche deve fare un browser.",
+      "description": "La chiave funziona, ma appartiene al sito giusto? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-05"
     },
     {
       "id": "crittografia-12-pec",
       "course": "crittografia",
-      "title": "12 · PEC: percorso, ricevute e limiti",
+      "title": "12 · Ho spedito la domanda: quale prova mi resta?",
       "kind": "lesson",
       "path": "materials/crittografia/12-pec.html",
-      "description": "Mittente, gestori e destinatario: accettazione, presa in carico e consegna PEC. Errori, conservazione e differenza dalla firma digitale.",
+      "description": "Ho spedito la domanda: quale prova mi resta? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-05"
     },
     {
       "id": "crittografia-13-chiavi-attacchi",
       "course": "crittografia",
-      "title": "13 · Chiavi, attacchi e sicurezza concreta",
+      "title": "13 · Una chiave finisce online: che cosa cambia?",
       "kind": "lesson",
       "path": "materials/crittografia/13-chiavi-attacchi.html",
-      "description": "Entropia, forza bruta, gestione delle chiavi, rotazione, recupero e attacchi ai dispositivi. Un calcolo dei tempi con ipotesi esplicite.",
+      "description": "Una chiave finisce online: che cosa cambia? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-06"
     },
     {
       "id": "crittografia-14-casi-reali",
       "course": "crittografia",
-      "title": "14 · Casi reali e scelte di progettazione",
+      "title": "14 · Scegliere gli strumenti per un servizio completo",
       "kind": "lesson",
       "path": "materials/crittografia/14-casi-reali.html",
-      "description": "HTTPS, messaggistica end-to-end, backup, software firmato e crittografia post-quantistica: scegli gli strumenti in base alle garanzie richieste.",
+      "description": "Scegliere gli strumenti per un servizio completo Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-06"
+    },
+    {
+      "id": "crittografia-15-vpn",
+      "course": "crittografia",
+      "title": "15 · HTTPS, VPN e messaggi: dove finisce la protezione?",
+      "kind": "lesson",
+      "path": "materials/crittografia/15-vpn.html",
+      "description": "15 · HTTPS, VPN e messaggi: dove finisce la protezione?: problemi reali, passaggi guidati e attività con soluzioni.",
+      "chapter": "crypto-07"
+    },
+    {
+      "id": "crittografia-16-blockchain",
+      "course": "crittografia",
+      "title": "16 · Blockchain: concordare un registro senza un unico custode",
+      "kind": "lesson",
+      "path": "materials/crittografia/16-blockchain.html",
+      "description": "16 · Blockchain: concordare un registro senza un unico custode: problemi reali, passaggi guidati e attività con soluzioni.",
+      "chapter": "crypto-07"
+    },
+    {
+      "id": "crittografia-laboratori-scenari",
+      "course": "crittografia",
+      "title": "Laboratori · Enigma, reti e registri condivisi",
+      "kind": "lab",
+      "path": "materials/crittografia/laboratori-scenari.html",
+      "description": "Laboratori · Enigma, reti e registri condivisi: problemi reali, passaggi guidati e attività con soluzioni.",
+      "chapter": "crypto-07"
     },
     {
       "id": "crittografia-laboratorio",

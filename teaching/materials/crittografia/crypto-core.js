@@ -40,7 +40,14 @@
   const newSigningKeys = () => globalThis.crypto.subtle.generateKey({name: 'ECDSA', namedCurve: 'P-256'}, false, ['sign', 'verify']);
   const sign = async (privateKey, text) => new Uint8Array(await globalThis.crypto.subtle.sign({name: 'ECDSA', hash: 'SHA-256'}, privateKey, bytes(text)));
   const verify = (publicKey, signature, text) => globalThis.crypto.subtle.verify({name: 'ECDSA', hash: 'SHA-256'}, publicKey, signature, bytes(text));
-  const api = Object.freeze({hex, fromHex, caesar, frequencies, sha256, newAesKey, encrypt, decrypt, newSigningKeys, sign, verify});
+  const newAgreementKeys = () => globalThis.crypto.subtle.generateKey({name: 'ECDH', namedCurve: 'P-256'}, false, ['deriveBits']);
+  async function deriveTrafficKey(privateKey, publicKey, salt, context = 'school-agreement-v1') {
+    const secret = await globalThis.crypto.subtle.deriveBits({name: 'ECDH', public: publicKey}, privateKey, 256);
+    const material = await globalThis.crypto.subtle.importKey('raw', secret, 'HKDF', false, ['deriveKey']);
+    return globalThis.crypto.subtle.deriveKey({name: 'HKDF', hash: 'SHA-256', salt, info: bytes(context)}, material,
+      {name: 'AES-GCM', length: 256}, false, ['encrypt', 'decrypt']);
+  }
+  const api = Object.freeze({hex, fromHex, caesar, frequencies, sha256, newAesKey, encrypt, decrypt, newSigningKeys, sign, verify, newAgreementKeys, deriveTrafficKey});
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else globalThis.CryptoTeaching = api;
 })();

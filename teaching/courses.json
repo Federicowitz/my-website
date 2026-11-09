@@ -297,7 +297,7 @@
       "folder": "crittografia",
       "title": "Crittografia",
       "symbol": "K↔",
-      "description": "Dai cifrari storici a TLS, firme e PEC: definizioni, casi concreti e laboratori.",
+      "description": "Problemi reali e soluzioni: cifratura, hash, firme, PEC, HTTPS, VPN e blockchain. Matematica negli approfondimenti.",
       "order": [
         "mappa.html",
         "01-principi.html",
@@ -314,6 +314,9 @@
         "12-pec.html",
         "13-chiavi-attacchi.html",
         "14-casi-reali.html",
+        "15-vpn.html",
+        "16-blockchain.html",
+        "laboratori-scenari.html",
         "laboratorio.html",
         "esercizi.html",
         "glossario.html",
@@ -325,37 +328,70 @@
           "id": "crypto-01",
           "title": "01 · Linguaggio e contesto",
           "description": "Parti dai bisogni: minacce, garanzie e storia dei metodi.",
-          "files": ["mappa.html", "01-principi.html", "02-storia.html"]
+          "files": [
+            "mappa.html",
+            "01-principi.html",
+            "02-storia.html"
+          ]
         },
         {
           "id": "crypto-02",
           "title": "02 · Cifrari e crittoanalisi",
           "description": "Sperimenta Cesare e comprendi Vigenère, pad ed Enigma.",
-          "files": ["03-cesare.html", "04-vigenere-otp.html", "05-enigma.html"]
+          "files": [
+            "03-cesare.html",
+            "04-vigenere-otp.html",
+            "05-enigma.html"
+          ]
         },
         {
           "id": "crypto-03",
           "title": "03 · Dati, integrità e password",
-          "description": "Distingui cifratura, AEAD, hash, MAC e derivazione delle password.",
-          "files": ["06-simmetrica.html", "07-hash-mac-password.html"]
+          "description": "Proteggi un backup, confronta file e comprendi la custodia delle password.",
+          "files": [
+            "06-simmetrica.html",
+            "07-hash-mac-password.html"
+          ]
         },
         {
           "id": "crypto-04",
           "title": "04 · Chiavi pubbliche e canali",
-          "description": "Segui i numeri di RSA e Diffie–Hellman, poi collegali a TLS.",
-          "files": ["08-asimmetrica-rsa.html", "09-diffie-hellman-tls.html"]
+          "description": "Dalle chiavi pubbliche agli accordi moderni e a HTTPS; RSA e calcoli negli approfondimenti.",
+          "files": [
+            "08-asimmetrica-rsa.html",
+            "09-diffie-hellman-tls.html"
+          ]
         },
         {
           "id": "crypto-05",
           "title": "05 · Firme, fiducia e consegna",
           "description": "Separa firma, certificato e ricevuta PEC con esempi di documenti.",
-          "files": ["10-firme.html", "11-certificati.html", "12-pec.html"]
+          "files": [
+            "10-firme.html",
+            "11-certificati.html",
+            "12-pec.html"
+          ]
         },
         {
           "id": "crypto-06",
           "title": "06 · Progettazione e pratica",
           "description": "Gestisci chiavi, valuta scenari ed esegui prove di alterazione.",
-          "files": ["13-chiavi-attacchi.html", "14-casi-reali.html", "laboratorio.html", "esercizi.html"]
+          "files": [
+            "13-chiavi-attacchi.html",
+            "14-casi-reali.html",
+            "laboratorio.html",
+            "esercizi.html"
+          ]
+        },
+        {
+          "id": "crypto-07",
+          "title": "07 · Reti e registri condivisi",
+          "description": "Confronta HTTPS e VPN; sperimenta hash, firme e consenso nella blockchain.",
+          "files": [
+            "15-vpn.html",
+            "16-blockchain.html",
+            "laboratori-scenari.html"
+          ]
         }
       ]
     },
@@ -399,31 +435,53 @@
           "id": "routing-01",
           "title": "01 · Dal networking al pacchetto",
           "description": "Livelli, dispositivi, indirizzi e servizi: ricostruisci il viaggio di una richiesta.",
-          "files": ["mappa.html", "01-fondamenti.html", "02-indirizzi.html", "03-viaggio-applicazione.html"]
+          "files": [
+            "mappa.html",
+            "01-fondamenti.html",
+            "02-indirizzi.html",
+            "03-viaggio-applicazione.html"
+          ]
         },
         {
           "id": "routing-02",
           "title": "02 · Decidere il prossimo hop",
           "description": "Segui IP e MAC, consulta le tabelle e configura rotte di andata e ritorno.",
-          "files": ["04-pacchetto.html", "05-tabella.html", "06-statico.html"]
+          "files": [
+            "04-pacchetto.html",
+            "05-tabella.html",
+            "06-statico.html"
+          ]
         },
         {
           "id": "routing-03",
           "title": "03 · Apprendere le rotte",
           "description": "Dijkstra, OSPF, RIP, EIGRP e IS-IS: confronta famiglie, metriche e convergenza.",
-          "files": ["07-dinamico-dijkstra.html", "08-ospf.html", "09-rip-eigrp-isis.html"]
+          "files": [
+            "07-dinamico-dijkstra.html",
+            "08-ospf.html",
+            "09-rip-eigrp-isis.html"
+          ]
         },
         {
           "id": "routing-04",
           "title": "04 · BGP e routing tra AS",
           "description": "Sessioni eBGP/iBGP, attributi, annunci e policy di Internet.",
-          "files": ["10-bgp.html"]
+          "files": [
+            "10-bgp.html"
+          ]
         },
         {
           "id": "routing-05",
           "title": "05 · Osservare, provare e verificare",
           "description": "Cinque simulazioni, troubleshooting, esercizi, glossario e verifica finale.",
-          "files": ["11-diagnostica.html", "12-esercizi.html", "13-ripasso.html", "laboratorio.html", "fonti.html", "test.html"]
+          "files": [
+            "11-diagnostica.html",
+            "12-esercizi.html",
+            "13-ripasso.html",
+            "laboratorio.html",
+            "fonti.html",
+            "test.html"
+          ]
         }
       ]
     },

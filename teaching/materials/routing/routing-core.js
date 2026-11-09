@@ -39,7 +39,7 @@
     const distances = Object.fromEntries(names.map(n => [n,Infinity])), previous = {}, visited = [];
     distances[start] = 0;
     const snapshot = (current, message) => ({current, message, distances:{...distances},previous:{...previous},visited:[...visited]});
-    const steps = [snapshot(null, 'Inizializzazione: A = 0; tutti gli altri nodi hanno distanza infinita.')];
+    const steps = [snapshot(null, `Inizializzazione: ${start} = 0; tutti gli altri nodi hanno distanza infinita.`)];
     while (visited.length < names.length) {
       const current = names.filter(n => !visited.includes(n)).sort((a,b) => distances[a]-distances[b] || a.localeCompare(b))[0];
       if (distances[current] === Infinity) break;
@@ -92,7 +92,7 @@
   function distanceVector(edges = graph, target = 'D') {
     const names = [...new Set(edges.flatMap(e => e.slice(0,2)))].sort();
     let distances = Object.fromEntries(names.map(n => [n,n === target ? 0 : 16])), next = {};
-    const steps = [{distances:{...distances},next:{},message:'Solo D conosce la propria destinazione: distanza 0. Gli altri hanno 16, cioè irraggiungibile in RIP.'}];
+    const steps = [{distances:{...distances},next:{},message:`Solo ${target} conosce la propria destinazione: distanza 0. Gli altri hanno 16, cioè irraggiungibile in RIP.`}];
     for (let round=1; round<=names.length; round++) {
       const updated = {...distances}, hops = {...next};
       for (const node of names.filter(n => n !== target)) {
@@ -103,7 +103,7 @@
       }
       const stable = names.every(n => distances[n] === updated[n]);
       distances=updated;next=hops;
-      steps.push({distances:{...distances},next:{...next},message:stable ? 'Nessuna distanza cambia: il modello è convergente. Da A a D: 2 hop via B. I costi scritti sui link non contano per RIP.' : `Round ${round}: ogni router usa gli annunci del round precedente e aggiunge 1 hop. Distanze massime utilizzabili: 15; 16 indica irraggiungibile.`});
+      steps.push({distances:{...distances},next:{...next},message:stable ? `Nessuna distanza cambia: il modello è convergente verso ${target}. I costi scritti sui link non contano per RIP.` : `Round ${round}: ogni router usa gli annunci del round precedente e aggiunge 1 hop. Distanze massime utilizzabili: 15; 16 indica irraggiungibile.`});
       if (stable) break;
     }
     return steps;

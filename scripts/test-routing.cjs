@@ -68,3 +68,60 @@ vm.runInNewContext(fs.readFileSync(path.join(folder,'test.html'),'utf8').match(/
 assert.equal(quiz.window.quizData.questions.length,24);
 for(const [question,options,answer,explanation] of quiz.window.quizData.questions){assert.ok(question&&explanation);assert.ok(answer>=0&&answer<options.length);assert.equal(new Set(options).size,options.length);}
 console.log('OK: routing IPv4/LPM, andata/ritorno, scarti e TTL, Dijkstra, RIP, 30 sezioni, 17 pagine e 24 domande.');
+
+// Extended models: compare actual routes, failures and policy outcomes.
+const V = require('../teaching/materials/routing/visual-core.js');
+assert.equal(Object.keys(V.nodes).length,12);
+assert.equal(V.edges.length,20);
+assert.deepEqual(V.shortest(),['A','B','E','H','K','L']);
+assert.equal(V.cost(V.shortest()),10);
+assert.deepEqual(V.simulate('rip').at(-1).path,['A','C','L']);
+assert.equal(V.cost(V.simulate('rip').at(-1).path),28);
+assert.notDeepEqual(V.shortest(V.graph('',true)),V.shortest());
+for(const [a,b] of V.edges) {
+ const es=V.graph(`${a}-${b}`),route=V.shortest(es);
+ assert.ok(route.length>0);
+ assert.ok(!route.some((n,i)=>n===a&&route[i+1]===b||n===b&&route[i+1]===a));
+}
+assert.equal(V.packet().at(-1).current,'PC');
+assert.match(V.packet({ttl:3}).at(-1).message,/TTL esaurito/);
+assert.equal(V.packet({ttl:3}).at(-1).current,'E');
+assert.equal(V.packet({noReturn:true}).at(-1).current,'L');
+assert.equal(V.packet({failed:'E-H'}).at(-1).current,'E');
+assert.deepEqual(V.packet({asymmetric:true}).at(-1).path,['Server','L','J','G','D','A','PC']);
+assert.deepEqual(V.bgp('equal').at(-1).path,['64512','64550','64540']);
+assert.deepEqual(V.bgp('prefer').at(-1).path,['64512','64520','64530','64540']);
+assert.deepEqual(V.bgp('filter').at(-1).path,['64512','64520','64530','64540']);
+assert.equal(V.feasible(9),true);assert.equal(V.feasible(10),false);
+assert.equal(V.simulate('eigrp',{strict:true}).at(-1).path.length,0);
+assert.notDeepEqual(V.simulate('ospf').at(-1).path,V.shortest());
+assert.deepEqual(V.simulate('static').at(-1).path,V.shortest());
+assert.equal(V.simulate('prefix',{ip:'10.1.2.34'}).at(-1).rows[1][1],'10.1.2.34/32');
+assert.equal(V.simulate('prefix',{ip:'203.0.113.10'}).at(-1).rows[1][1],'0.0.0.0/0');
+for(const file of fs.readdirSync(folder).filter(f=>/^(0[4-9]|1[0-3])-.*\.html$/.test(f))) {
+ const html=fs.readFileSync(path.join(folder,file),'utf8');
+ assert.ok(html.includes('data-routing-visual='),file);
+ for(const asset of ['routing-core.js','visual-core.js','visual-labs.js'])assert.ok(html.includes(`src="${asset}"`),`${file}: ${asset}`);
+}
+// Exercise the controller's events and render output without requiring a server.
+const browser={Routing:R,RoutingVisual:V,addEventListener(){}};
+const allModes='packet,prefix,static,spf,ospf,rip,eigrp,isis,bgp,diagnostic';
+const elements=new Map();
+const values={'[data-mode]':'packet','[data-ip]':'10.1.2.34','[data-ttl]':'8','[data-scenario]':'normal','[data-failed]':'','[data-expensive]':'no','[data-policy]':'equal','[data-strict]':'no'};
+function element(selector){if(!elements.has(selector))elements.set(selector,{value:values[selector]||'',dataset:{},innerHTML:'',textContent:'',events:{},addEventListener(name,fn){this.events[name]=fn;},setAttribute(){}});return elements.get(selector);}
+const options=['ttl','scenario','ip','failed','expensive','policy','strict'].map(name=>({dataset:{option:name}}));
+const panel={dataset:{routingVisual:allModes},innerHTML:'',querySelector:element,querySelectorAll(selector){return selector==='select'?Object.keys(values).map(element):options;}};
+let ticking;
+vm.runInNewContext(fs.readFileSync(path.join(folder,'visual-labs.js'),'utf8'),{window:browser,document:{querySelectorAll(){return [panel];},addEventListener(){}},setInterval(fn){ticking=fn;return 1;},clearInterval(){ticking=null;}});
+for(const mode of allModes.split(',')) {
+ element('[data-mode]').value=mode;element('[data-mode]').events.change();
+ assert.ok(element('[data-diagram]').innerHTML.includes('<svg'),mode);
+ assert.ok(element('[data-status]').textContent.length>0,mode);
+ element('[data-action="play"]').events.click();
+ let guard=0;while(ticking&&guard++<100)ticking();
+ assert.ok(guard<100,mode);
+ assert.equal(element('[data-action="next"]').disabled,true,mode);
+ element('[data-action="reset"]').events.click();
+ assert.equal(element('[data-action="prev"]').disabled,true,mode);
+}
+console.log('OK: rete estesa, SPF/RIP, guasti, TTL, ritorno, BGP, EIGRP e controlli JS in 10 modalità.');

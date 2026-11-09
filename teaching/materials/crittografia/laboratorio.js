@@ -4,7 +4,7 @@
   const supported = !!(globalThis.crypto && globalThis.crypto.subtle && globalThis.TextEncoder);
   const controls = Array.from(document.querySelectorAll('[data-webcrypto]'));
   $('crypto-availability').textContent = supported
-    ? 'Web Crypto disponibile. Puoi eseguire tutti e tre gli esperimenti.'
+    ? 'Web Crypto disponibile. Puoi eseguire gli esperimenti.'
     : 'Web Crypto non disponibile in questo contesto. Apri la pagina con un browser aggiornato su HTTPS o su localhost. Puoi comunque leggere le procedure e i risultati attesi.';
   controls.forEach(button => button.disabled = !supported);
   let aesKey = null, signingKeys = null;
