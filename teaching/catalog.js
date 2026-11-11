@@ -282,7 +282,8 @@ window.schoolCatalog = {
           "description": "Proteggi un backup, confronta file e comprendi la custodia delle password.",
           "files": [
             "06-simmetrica.html",
-            "06-1-simmetrica.html",
+            "06-1-aes.html",
+            "06-2-modalita-aes-aggiornata.html",
             "07-hash-mac-password.html"
           ]
         },
@@ -1194,21 +1195,30 @@ window.schoolCatalog = {
       "chapter": "crypto-03"
     },
     {
-      "id": "crittografia-06-1-simmetrica",
+      "id": "crittografia-06-1-aes",
       "course": "crittografia",
-      "title": "06.1 · Crittografia simmetrica · Il caso del backup rubato",
+      "title": "06.1 · AES: che cosa succede ai 16 byte?",
       "kind": "lesson",
-      "path": "materials/crittografia/06-1-simmetrica.html",
-      "description": "Un backup rubato deve restare illeggibile Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
+      "path": "materials/crittografia/06-1-aes.html",
+      "description": "Lezione di approfondimento",
+      "chapter": "crypto-03"
+    },
+    {
+      "id": "crittografia-06-2-modalita-aes-aggiornata",
+      "course": "crittografia",
+      "title": "06.2 · AES: come cifrare un file intero?",
+      "kind": "lesson",
+      "path": "materials/crittografia/06-2-modalita-aes-aggiornata.html",
+      "description": "ECB, CBC e CTR spiegati su tre copie dello stesso blocco MESSAGGIOSEGRETO, con padding, IV, nonce e laboratorio guidato.",
       "chapter": "crypto-03"
     },
     {
       "id": "crittografia-07-hash-mac-password",
       "course": "crittografia",
-      "title": "07 · Hash e password · Il file è uguale? E chi lo ha mandato?",
+      "title": "07 · Password, salt e Argon2id",
       "kind": "lesson",
       "path": "materials/crittografia/07-hash-mac-password.html",
-      "description": "Il file è uguale? E chi lo ha mandato? Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
+      "description": "Come un sito verifica una password senza conservarla in chiaro: hash, tentativi di indovinare, salt, Argon2id, registrazione e login con laboratori sui byte.",
       "chapter": "crypto-03"
     },
     {

@@ -295,6 +295,7 @@
     {
       "id": "crittografia",
       "folder": "crittografia",
+      "excludeFiles": ["07-1-hash-mac-password.html"],
       "title": "Crittografia",
       "symbol": "K↔",
       "description": "Problemi reali e soluzioni: cifratura, hash, firme, PEC, HTTPS, VPN e blockchain. Matematica negli approfondimenti.",
@@ -306,7 +307,8 @@
         "04-vigenere-otp.html",
         "05-enigma.html",
         "06-simmetrica.html",
-        "06-1-simmetrica.html",
+        "06-1-aes.html",
+        "06-2-modalita-aes-aggiornata.html",
         "07-hash-mac-password.html",
         "08-asimmetrica-rsa.html",
         "09-diffie-hellman-tls.html",
@@ -351,7 +353,8 @@
           "description": "Proteggi un backup, confronta file e comprendi la custodia delle password.",
           "files": [
             "06-simmetrica.html",
-            "06-1-simmetrica.html",
+            "06-1-aes.html",
+            "06-2-modalita-aes-aggiornata.html",
             "07-hash-mac-password.html"
           ]
         },

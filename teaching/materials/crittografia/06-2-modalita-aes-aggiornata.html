@@ -1,0 +1,342 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>06.2 · AES: come cifrare un file intero? — Federico Lelli</title>
+<meta name="description" content="ECB, CBC e CTR spiegati su tre copie dello stesso blocco MESSAGGIOSEGRETO, con padding, IV, nonce e laboratorio guidato.">
+<meta name="school-kind" content="lesson"><link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="crittografia.css">
+
+<style>
+/* Stili confinati ai due laboratori della lezione 06.2. Il tema generale viene dai CSS del sito. */
+.aes62-lab {border:1px solid #c6cbd1; border-radius:12px; padding:1.15rem; margin:1.2rem 0; background:rgba(127,127,127,.035)}
+.aes62-controls {display:flex; gap:.75rem; flex-wrap:wrap; align-items:end; margin:1rem 0}
+.aes62-controls label {display:flex; flex-direction:column; gap:.3rem; font-weight:650}
+.aes62-controls select, .aes62-controls button {border:1px solid #858c96; border-radius:6px; padding:.5rem .7rem; background:transparent; color:inherit; font:inherit; cursor:pointer}
+.aes62-controls button[disabled] {opacity:.45; cursor:not-allowed}
+.aes62-slots {display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.65rem; margin:1rem 0}
+.aes62-slot {border:1px solid #adb2b9; border-radius:8px; background:transparent; color:inherit; text-align:left; padding:.7rem .65rem; cursor:pointer; font:inherit; overflow-wrap:anywhere}
+.aes62-slot[aria-pressed="true"] {border:2px solid currentColor; padding:calc(.7rem - 1px) calc(.65rem - 1px); background:rgba(127,127,127,.09)}
+.aes62-slot strong, .aes62-slot small, .aes62-slot code {display:block}
+.aes62-slot code {font-size:.85em; margin-top:.5rem}
+.aes62-slot small {font-size:.83em; opacity:.8}
+.aes62-flow {display:grid; grid-template-columns:minmax(0,1fr); gap:.5rem; margin:.8rem 0}
+.aes62-step {border:1px solid #b9bec5; border-radius:8px; padding:.65rem .85rem; background:rgba(127,127,127,.035)}
+.aes62-step strong {display:block; margin-bottom:.2rem}
+.aes62-step code {display:block; overflow-wrap:anywhere; word-break:break-word; line-height:1.8}
+.aes62-arrow {text-align:center; font-size:1.2rem; line-height:1; opacity:.75}
+.aes62-note {margin:.8rem 0 0; padding:.6rem .8rem; border-left:3px solid #878c93; background:rgba(127,127,127,.06)}
+.aes62-meter {margin:.25rem 0 0; font-size:.91em}
+.aes62-byte {display:inline-block; margin:.15rem .2rem .15rem 0; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; padding:.1rem .3rem; border:1px solid #aaa; border-radius:3px; font-size:.91em}
+.aes62-byte.aes62-padding {border-style:dashed; background:rgba(127,127,127,.13)}
+.aes62-screenreader {position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:640px){.aes62-slots{grid-template-columns:1fr}.aes62-controls{align-items:stretch}.aes62-controls label,.aes62-controls select{width:100%}}
+</style><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/crittografia/06-2-modalita-aes-aggiornata.html"><meta property="og:title" content="06.2 · AES: come cifrare un file intero? — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/crittografia/06-2-modalita-aes-aggiornata.html"><meta property="og:description" content="06.2 · AES: come cifrare un file intero?. Crittografia: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="crittografia-06-2-modalita-aes-aggiornata"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=crittografia" data-school-catalog="crittografia">Crittografia</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-06-1-aes" rel="prev" href="06-1-aes.html"><small>← Precedente</small><span>06.1 · AES: che cosa succede ai 16 byte?</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>9 / 23</span></a><a class="lesson-neighbor" data-school-link="crittografia-07-hash-mac-password" rel="next" href="07-hash-mac-password.html"><small>Successiva →</small><span>07 · Password, salt e Argon2id</span></a></nav></div><!-- SCHOOL:TOP:END -->
+<main class="reading crypto-reading">
+<p class="eyebrow">LEZIONE 06.2 · MODALITÀ OPERATIVE DI AES</p>
+<h1>AES: come cifrare un file intero?</h1>
+<p class="lead">AES trasforma 16 byte alla volta. Ma un file può contenere centinaia, migliaia o milioni di byte. Vediamo come trattare più blocchi senza lasciare visibili le ripetizioni, sempre usando <code>MESSAGGIOSEGRETO</code> e la stessa chiave della lezione 06.1.</p>
+<div class="lesson-outline"><p><strong>In questa lezione</strong></p><nav aria-label="Indice della lezione"><ol><li><a href="#problema">Dove finisce un blocco e comincia un file</a></li><li><a href="#ripetizioni">ECB e la ripetizione dei blocchi</a></li><li><a href="#cbc">CBC: collegare i blocchi</a></li><li><a href="#ctr">CTR: generare una maschera</a></li><li><a href="#laboratorio">Laboratorio sui tre blocchi</a></li><li><a href="#padding">E se il file non ha una lunghezza multipla di 16?</a></li><li><a href="#iv-nonce">IV e nonce: che cosa sono</a></li><li><a href="#decifrare">Come si decifra</a></li><li><a href="#verifica">Esercizi e punti da ricordare</a></li></ol></nav></div>
+
+<section aria-labelledby="problema">
+<h2 id="problema">1. Un blocco AES non è ancora un file cifrato</h2>
+<p>Nella lezione 06.1 abbiamo cifrato <code>MESSAGGIOSEGRETO</code>. Sono 16 lettere ASCII, quindi <strong>16 byte</strong>: un blocco AES completo. Con la chiave <code>CHIAVESEGRETA123</code> abbiamo ottenuto questo cifrato:</p>
+<pre><code>Messaggio:  MESSAGGIOSEGRETO
+Chiave:     CHIAVESEGRETA123
+Cifrato:    F4 B9 94 18 B2 BA E4 BC 79 BD 31 B1 D8 8E 38 53</code></pre>
+<p>Ora immaginiamo che un file contenga <strong>tre copie consecutive</strong> della stessa frase, senza spazi né a capo:</p>
+<pre><code>MESSAGGIOSEGRETO | MESSAGGIOSEGRETO | MESSAGGIOSEGRETO
+    blocco 1     |     blocco 2     |     blocco 3</code></pre>
+<p>In totale sono <strong>48 byte</strong>. AES sa trasformare ciascun blocco, ma dobbiamo decidere <em>come collegare i tre passaggi</em>. La regola che risponde a questa domanda si chiama <strong>modalità operativa</strong>.</p>
+</section>
+
+<section aria-labelledby="ripetizioni">
+<h2 id="ripetizioni">2. ECB: cifrare i blocchi uno per uno</h2>
+<p>La prima idea è dividere il file in blocchi da 16 byte e cifrare ciascuno con AES e la stessa chiave, indipendentemente dagli altri. Questa modalità si chiama <strong>ECB</strong> (<em>Electronic Codebook</em>).</p>
+<div class="worked-example"><p><strong>Cosa succede ai tre blocchi uguali?</strong></p>
+<pre><code>Blocco 1: MESSAGGIOSEGRETO  →  F4 B9 94 18 B2 BA E4 BC ...
+Blocco 2: MESSAGGIOSEGRETO  →  F4 B9 94 18 B2 BA E4 BC ...
+Blocco 3: MESSAGGIOSEGRETO  →  F4 B9 94 18 B2 BA E4 BC ...</code></pre>
+<p>I tre cifrati sono <strong>identici</strong>. Non è un errore di AES: a parità di blocco e di chiave, AES produce sempre lo stesso risultato. È il modo in cui stiamo usando AES a rivelare la ripetizione.</p></div>
+<p>Un osservatore senza chiave non legge la frase, ma riconosce che il file contiene tre blocchi uguali. Con file più grandi, ripetizioni e strutture possono rivelare informazioni sul contenuto. Per questo <strong>ECB non è una buona scelta per cifrare un file</strong>.</p>
+</section>
+
+<section aria-labelledby="cbc">
+<h2 id="cbc">3. CBC: un blocco dipende da quello precedente</h2>
+<p>La modalità <strong>CBC</strong> (<em>Cipher Block Chaining</em>) usa un'idea diversa: prima di cifrare ciascun blocco, lo combina con un altro blocco di 16 byte mediante <strong>XOR</strong>.</p>
+<p><strong>Che cosa significa IV?</strong> La sigla viene dall’inglese <em>Initialization Vector</em>, in italiano <strong>vettore di inizializzazione</strong>. È un valore iniziale di 16 byte che, in CBC, viene combinato con il primo blocco del messaggio mediante XOR. Serve a far partire la cifratura in modo diverso anche quando il messaggio e la chiave sono gli stessi. Non è una seconda chiave segreta.</p>
+<ol class="flow">
+<li><strong>Primo blocco:</strong> fai XOR tra i 16 byte del testo e un valore iniziale chiamato <strong>IV</strong>; poi applica AES.</li>
+<li><strong>Secondo blocco:</strong> fai XOR tra il testo del secondo blocco e il <em>cifrato del primo</em>; poi applica AES.</li>
+<li><strong>Terzo blocco:</strong> fai XOR tra il testo del terzo blocco e il <em>cifrato del secondo</em>; poi applica AES.</li>
+</ol>
+<p>Questo collegamento fa sì che due blocchi di testo uguali possano avere cifrati diversi, perché ciò che entra in AES non è più identico.</p>
+<div class="worked-example"><p><strong>Primo blocco: XOR prima di AES</strong></p>
+<pre><code>Testo:    4D 45 53 53 41 47 47 49 4F 53 45 47 52 45 54 4F
+IV:       00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF
+XOR:      4D 54 71 60 05 12 21 3E C7 CA EF FC 9E 98 BA B0
+Cifrato:  52 AB ED 6A 66 37 72 FF 99 7C DC 21 4C 00 A4 3F</code></pre>
+<p>Per esempio, il secondo byte è <code>45 XOR 11 = 54</code> (tutti i valori sono esadecimali). È <strong>il risultato dello XOR</strong>, non il testo iniziale, a entrare in AES.</p></div>
+<p>Nel secondo blocco al posto dell'IV entra il primo blocco cifrato, e così via. Il destinatario deve conoscere l'IV per recuperare il primo blocco: <strong>l'IV non è una chiave e non deve essere segreto</strong>.</p>
+</section>
+
+<section aria-labelledby="ctr">
+<h2 id="ctr">4. CTR: AES può generare una maschera per i byte</h2>
+<p>La modalità <strong>CTR</strong> (<em>Counter</em>, contatore) usa AES in un modo ancora diverso. Invece di cifrare direttamente i byte del messaggio, <strong>cifra un blocco contatore</strong> di 16 byte. Il risultato diventa una <strong>maschera di 16 byte</strong>, che viene combinata con il testo tramite XOR.</p>
+<ol class="flow">
+<li>Prepara un primo blocco contatore di 16 byte.</li>
+<li>Cifralo con AES e la chiave condivisa: ottieni 16 byte di maschera.</li>
+<li>Fai XOR tra quei 16 byte e i 16 byte del messaggio: ottieni il cifrato.</li>
+<li>Per il blocco successivo cambia il contatore, genera una nuova maschera e ripeti.</li>
+</ol>
+<div class="worked-example"><p><strong>Primo byte del primo blocco</strong></p>
+<pre><code>Primo byte del messaggio:   4D
+Primo byte della maschera: D3
+XOR:                       9E</code></pre>
+<p>Quindi il primo byte del cifrato CTR è <code>9E</code>. La maschera <code>D3 ...</code> non è inventata: è il risultato di AES applicato al primo contatore del nostro esempio.</p></div>
+<p><strong>Che cosa significa nonce?</strong> Il termine viene dall’inglese <em>number used once</em>, cioè <strong>numero usato una sola volta</strong>. È un valore che distingue una cifratura da un’altra quando si usa la stessa chiave. In CTR deve essere gestito in modo da non riutilizzare gli stessi blocchi contatore, altrimenti si rischia di generare due volte la stessa maschera. Il nonce non deve essere segreto.</p>
+<p>Nel nostro esperimento il contatore contiene una parte fissa di 12 byte, chiamata <strong>nonce</strong>, e un numero di 4 byte che aumenta: <code>00 00 00 01</code>, poi <code>00 00 00 02</code>, poi <code>00 00 00 03</code>. Sono costruzioni d'esempio: sistemi diversi possono organizzare diversamente i 16 byte del contatore.</p>
+<p>Il vantaggio pratico è che CTR può cifrare anche <strong>un ultimo pezzo più corto di 16 byte</strong>: basta usare tanti byte della maschera quanti sono quelli rimasti. Non serve aggiungere byte per riempire un blocco.</p>
+
+<h3>Se scopro un blocco, posso decifrare anche gli altri?</h3>
+
+<p>Supponiamo che un attaccante intercetti un file cifrato con AES-CTR. Riesce a scoprire il contenuto originale del primo blocco e possiede anche il corrispondente blocco cifrato.</p>
+
+<p>Conoscendo entrambi, può calcolare la maschera utilizzata per quel blocco:</p>
+
+<pre><code>P1 = Primo blocco originale
+C1 = Primo blocco cifrato
+S1 = Maschera del primo blocco
+
+C1 = P1 XOR S1
+
+Quindi:
+
+S1 = P1 XOR C1</code></pre>
+
+<p>L'attaccante ha ottenuto tutti i 16 byte della maschera del primo blocco. Significa che può ricavare anche il secondo?</p>
+
+<p><strong>No, perché la maschera non è la chiave AES.</strong></p>
+
+<p>Ricordiamo come funziona CTR: AES non cifra direttamente il testo, ma cifra un contatore utilizzando la chiave segreta. Il risultato diventa la maschera da combinare con il testo tramite XOR.</p>
+
+<pre><code>Contatore 1 + Chiave AES
+          |
+          v
+         AES
+          |
+          v
+       Maschera 1
+          |
+          v
+   Testo 1 XOR Maschera 1
+          |
+          v
+       Cifrato 1</code></pre>
+
+<p>Per il secondo blocco viene utilizzato un contatore diverso:</p>
+
+<pre><code>Contatore 2 + Stessa chiave AES
+          |
+          v
+         AES
+          |
+          v
+       Maschera 2
+          |
+          v
+   Testo 2 XOR Maschera 2
+          |
+          v
+       Cifrato 2</code></pre>
+
+<p>L'attaccante conosce la maschera 1 e conosce anche il contatore 1, ma non conosce la chiave segreta utilizzata da AES.</p>
+
+<p>Potrebbe tentare di eseguire AES al contrario? Certamente, ma per invertire AES deve conoscere la chiave. L'algoritmo inverso è pubblico e può essere eseguito velocemente, ma non permette di eliminare il segreto dai calcoli.</p>
+
+<p>Potrebbe allora provare tutte le chiavi possibili e verificare quale produce la maschera osservata. Il problema è che AES-128 utilizza una chiave di 128 bit, quindi esistono 2^128 chiavi candidate: una ricerca esaustiva è computazionalmente impraticabile con le tecnologie attuali.</p>
+
+<p><strong>Conoscere la maschera del primo blocco non permette quindi di calcolare direttamente quella del secondo.</strong> È una delle proprietà per cui AES può essere utilizzato per proteggere messaggi lunghi con una sola chiave segreta.</p>
+
+<p>Se invece l'attaccante riuscisse davvero a recuperare la chiave AES, allora potrebbe generare le maschere degli altri blocchi conoscendo i rispettivi contatori e decifrare il messaggio.</p>
+
+<p>È importante distinguere tre situazioni:</p>
+
+<ul>
+  <li><strong>Conoscere il testo originale di un blocco:</strong> non significa conoscere la chiave.</li>
+  <li><strong>Ricavare la maschera di un blocco CTR:</strong> permette di conoscere la maschera di quella posizione, ma non di generare automaticamente quelle successive.</li>
+  <li><strong>Recuperare la chiave AES:</strong> permette di generare tutte le maschere necessarie, conoscendo i contatori utilizzati.</li>
+</ul>
+
+<p>Questo ragionamento vale se i contatori vengono gestiti correttamente e non vengono riutilizzati con la stessa chiave. Se la stessa maschera viene riutilizzata, ricavarla da un blocco noto permette di decifrare altri dati protetti con quella maschera.</p>
+
+<p>Infine, non è GCM a impedire di ricavare le maschere successive. È la costruzione basata su AES e contatori diversi. GCM aggiunge anche un controllo di autenticazione, che permette al destinatario di rilevare alterazioni non autorizzate.</p>
+</section>
+
+<section aria-labelledby="laboratorio">
+<h2 id="laboratorio">5. Laboratorio: gli stessi tre blocchi, tre modalità diverse</h2>
+<p>Seleziona ECB, CBC o CTR e passa da un blocco all'altro. Ogni risultato è stato calcolato davvero con <strong>AES-128</strong>, usando sempre <code>MESSAGGIOSEGRETO</code> e <code>CHIAVESEGRETA123</code>. IV e contatore sono fissati qui soltanto per rendere ripetibili i calcoli.</p>
+<div id="aes62-lab" class="aes62-lab">
+<div class="aes62-controls">
+<label for="aes62-mode">Modalità
+<select id="aes62-mode"><option value="ECB">ECB · blocchi indipendenti</option><option value="CBC">CBC · blocchi collegati</option><option value="CTR">CTR · maschera e XOR</option></select></label>
+<button type="button" id="aes62-prev" disabled>← Blocco precedente</button>
+<button type="button" id="aes62-next">Blocco successivo →</button>
+<button type="button" id="aes62-play" aria-pressed="false">Avvia animazione</button>
+</div>
+<div class="aes62-slots" id="aes62-slots" aria-label="Scegli uno dei tre blocchi">
+<button type="button" class="aes62-slot" aria-pressed="true" data-index="0"><strong>Blocco 1</strong><small>MESSAGGIOSEGRETO</small><code>F4B99418...</code></button>
+<button type="button" class="aes62-slot" aria-pressed="false" data-index="1"><strong>Blocco 2</strong><small>MESSAGGIOSEGRETO</small><code>F4B99418...</code></button>
+<button type="button" class="aes62-slot" aria-pressed="false" data-index="2"><strong>Blocco 3</strong><small>MESSAGGIOSEGRETO</small><code>F4B99418...</code></button>
+</div>
+<p id="aes62-caption" class="aes62-meter">Modalità ECB · blocco 1 di 3</p>
+<div class="aes62-flow" id="aes62-flow" aria-live="polite" aria-atomic="true">
+<div class="aes62-step"><strong>Testo del blocco 1 (16 byte)</strong><code>4D455353414747494F5345475245544F</code></div>
+<div class="aes62-arrow" aria-hidden="true">↓</div>
+<div class="aes62-step"><strong>AES con la stessa chiave</strong><code>CHIAVESEGRETA123</code></div>
+<div class="aes62-arrow" aria-hidden="true">↓</div>
+<div class="aes62-step"><strong>Cifrato (16 byte)</strong><code>F4B99418B2BAE4BC79BD31B1D88E3853</code></div>
+</div>
+<p class="aes62-note" id="aes62-explain">ECB: ogni blocco entra in AES senza essere collegato agli altri. Per questo le tre uscite coincidono.</p>
+<noscript><p>Attiva JavaScript per selezionare le modalità e i blocchi. Gli esempi spiegati nel testo restano consultabili.</p></noscript>
+</div>
+<p><strong>Che cosa devi osservare:</strong> in ECB i tre riquadri mostrano lo stesso cifrato. In CBC e CTR i tre risultati sono diversi, nonostante la frase e la chiave rimangano uguali. Cambia il modo in cui AES viene impiegato.</p>
+</section>
+
+<section aria-labelledby="padding">
+<h2 id="padding">6. E se il file non fosse multiplo di 16 byte?</h2>
+<p>Finora avevamo 48 byte: esattamente tre blocchi. Ma un file può terminare con soli 4 byte, per esempio con <code>MESS</code>, l'inizio della nostra stessa frase. AES, se usato in CBC, ha comunque bisogno di <strong>16 byte completi</strong>.</p>
+<p>Un metodo comune per riempire l'ultimo blocco si chiama <strong>padding PKCS#7</strong>. Aggiunge tanti byte quanti ne mancano; ciascuno contiene il <em>numero</em> di byte aggiunti.</p>
+<div class="worked-example"><p><strong>Quattro byte: MESS</strong></p>
+<pre><code>Byte presenti:       4D 45 53 53
+Byte mancanti:       12
+Padding aggiunto:    0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C
+Blocco completato:   4D 45 53 53 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C</code></pre>
+<p><code>0C</code> è il numero 12 scritto in esadecimale.</p></div>
+<p>Se l'ultimo blocco contiene già 16 byte, PKCS#7 aggiunge <strong>un intero blocco nuovo</strong> di 16 byte, ciascuno con valore <code>10</code> (16 in esadecimale). In questo modo, dopo la decifratura, il destinatario riconosce senza ambiguità quanti byte togliere.</p>
+<div class="aes62-lab" id="aes62-pad-lab">
+<div class="aes62-controls"><label for="aes62-pad-size">Quante lettere della nostra frase mettiamo nell'ultimo pezzo?
+<select id="aes62-pad-size"><option value="4">4 byte · MESS</option><option value="15">15 byte · MESSAGGIOSEGRET</option><option value="16">16 byte · MESSAGGIOSEGRETO</option></select></label></div>
+<p id="aes62-pad-message">Testo: <code>MESS</code> · 4 byte presenti, 12 byte di padding</p>
+<div id="aes62-pad-bytes" aria-live="polite"><span class="aes62-byte">4D</span> <span class="aes62-byte">45</span> <span class="aes62-byte">53</span> <span class="aes62-byte">53</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span> <span class="aes62-byte aes62-padding">0C</span></div>
+<p class="aes62-meter">Bordo continuo = byte del testo; bordo tratteggiato = padding.</p>
+</div>
+<p>Con <strong>CTR</strong> questo riempimento non serve: la modalità genera una maschera e ne usa soltanto i byte necessari. Il padding qui non è un metodo per nascondere il contenuto: serve a ottenere blocchi della lunghezza richiesta.</p>
+</section>
+
+<section aria-labelledby="iv-nonce">
+<h2 id="iv-nonce">7. IV e nonce: non sono chiavi segrete</h2>
+<p>Conservare la stessa chiave per più cifrature non significa dover ripartire ogni volta dagli stessi valori iniziali.</p>
+<table><caption>Tre valori con funzioni diverse</caption><thead><tr><th>Valore</th><th>Che cosa fa</th><th>È segreto?</th></tr></thead><tbody>
+<tr><td><strong>Chiave AES</strong></td><td>Determina la trasformazione crittografica.</td><td><strong>Sì</strong></td></tr>
+<tr><td><strong>IV in CBC</strong></td><td>È il blocco iniziale con cui si fa XOR prima di cifrare il primo blocco.</td><td>No</td></tr>
+<tr><td><strong>Nonce in CTR</strong></td><td>Distingue una cifratura dall'altra; insieme al contatore evita di riutilizzare gli stessi blocchi d'ingresso di AES.</td><td>No</td></tr>
+</tbody></table>
+<p>Per CBC, quando si cifra con la stessa chiave, l'IV deve essere scelto in modo <strong>nuovo e imprevedibile</strong>. Per CTR, non si deve mai riutilizzare lo stesso blocco contatore con la stessa chiave; per questo il nonce deve essere gestito in modo da non ripetersi. Il destinatario può ricevere IV o nonce <strong>insieme al file cifrato</strong>, perché non devono rimanere segreti.</p>
+<p>Se in CTR riutilizzassimo la stessa chiave e gli stessi contatori per due messaggi, produrremmo la stessa maschera. Confrontando i due cifrati, un osservatore potrebbe ricavare relazioni tra i due testi. È un errore serio.</p>
+</section>
+
+<section aria-labelledby="decifrare">
+<h2 id="decifrare">8. Come si torna al file originale?</h2>
+<p>Il destinatario conserva la chiave e legge anche i dati necessari alla modalità (come l'IV o il nonce). Poi inverte i passaggi:</p>
+<ul>
+<li><strong>ECB:</strong> decifra ogni blocco AES separatamente. Resta insicura per i motivi visti.</li>
+<li><strong>CBC:</strong> decifra il blocco AES e fa XOR con il cifrato precedente; per il primo usa l'IV.</li>
+<li><strong>CTR:</strong> genera di nuovo la stessa maschera cifrando i contatori con AES, poi applica XOR ai byte cifrati. XOR con la stessa maschera recupera i byte originali.</li>
+</ul>
+<p>Se si è aggiunto padding PKCS#7, il destinatario lo rimuove dopo la decifratura. I byte ottenuti possono essere salvati nuovamente come file: che fossero lettere, una foto o un archivio, AES li ha trattati semplicemente come byte.</p>
+<p><strong>Limite da non dimenticare:</strong> ECB, CBC e CTR, da sole, si occupano di nascondere il contenuto. Non garantiscono che un file modificato venga sempre riconosciuto e rifiutato. La riservatezza e il controllo delle alterazioni sono due problemi distinti.</p>
+</section>
+
+<section aria-labelledby="verifica">
+<h2 id="verifica">9. Verifica la comprensione</h2>
+<details class="checkpoint"><summary>Perché tre copie di MESSAGGIOSEGRETO danno tre cifrati identici in ECB?</summary><p>Perché ECB applica AES separatamente a ogni blocco. AES, con la stessa chiave e lo stesso blocco di ingresso, produce sempre lo stesso blocco cifrato.</p></details>
+<details class="checkpoint"><summary>In CBC, che cosa viene cifrato da AES nel secondo blocco?</summary><p>Il risultato dello XOR tra il secondo blocco del testo e il <strong>primo blocco cifrato</strong>. AES non riceve direttamente il secondo blocco originale.</p></details>
+<details class="checkpoint"><summary>In CTR, AES cifra direttamente MESSAGGIOSEGRETO?</summary><p>No. Cifra i blocchi contatore e genera una maschera. Poi il programma fa XOR tra la maschera e i byte di MESSAGGIOSEGRETO.</p></details>
+<details class="checkpoint"><summary>MESS è lungo 4 byte. Quanti byte di padding PKCS#7 si aggiungono per completare un blocco?</summary><p>12 byte, ciascuno di valore esadecimale <code>0C</code>. In totale il blocco arriva a 16 byte.</p></details>
+<details class="checkpoint"><summary>Perché CBC richiede un IV, mentre CTR richiede contatori che non si ripetano?</summary><p>In CBC l'IV rende diverso l'ingresso al primo blocco, anche quando il testo iniziale si ripete. In CTR ogni contatore deve produrre una nuova maschera: riusare la stessa maschera su messaggi diversi espone informazioni sui testi.</p></details>
+</section>
+<section aria-labelledby="caso-reale"><h2 id="caso-reale">Caso reale: BitLocker protegge i dati di un computer Windows</h2>
+<p><strong>Il bisogno.</strong> Un portatile viene perso e qualcuno tenta di leggerne il disco su un altro computer. BitLocker, la funzione di cifratura delle unità di Windows, usa AES per proteggere i dati memorizzati. Non è necessario che il proprietario cifri manualmente ogni documento: la protezione è applicata al volume.</p>
+<p><strong>Il funzionamento da riconoscere.</strong> Microsoft documenta modalità come XTS-AES, progettate per la cifratura delle unità. XTS è una modalità per questo contesto: non è GCM e non va presentata come lo stesso schema autenticato del laboratorio. Il caso mostra perché due sistemi che usano AES possano avere formati e garanzie differenti.</p>
+<p><strong>Il limite.</strong> Quando il volume è sbloccato, i programmi autorizzati possono leggere i file. La cifratura non rende innocuo un malware nella sessione aperta. Anche il recupero va pianificato: la protezione dei dati e l’accesso autorizzato devono funzionare insieme.</p>
+<p>Fonte: <a href="https://learn.microsoft.com/en-us/windows/security/book/operating-system-security-encryption-and-data-protection">Microsoft, cifratura e protezione dei dati in Windows</a>. Qui studiamo la cifratura simmetrica del disco; chiavi pubbliche e private saranno introdotte nella <a href="08-asimmetrica-rsa.html">lezione 08</a>.</p></section>
+
+<section class="callout" aria-labelledby="concetti-da-ricordare"><h2 id="concetti-da-ricordare">Che cosa portare con sé</h2>
+<p><strong>AES</strong> trasforma blocchi di 16 byte. Una <strong>modalità operativa</strong> stabilisce come impiegarlo su un messaggio lungo. <strong>ECB</strong> lascia visibili le ripetizioni; <strong>CBC</strong> collega ogni blocco al precedente; <strong>CTR</strong> usa AES per generare maschere che vengono combinate con il testo tramite XOR. Alcune modalità richiedono <strong>padding</strong>; altre no. IV e nonce sono valori pubblici che devono essere gestiti correttamente.</p>
+<p>Cifrare non equivale automaticamente a riconoscere manomissioni. La verifica delle modifiche richiede un meccanismo ulteriore.</p>
+</section>
+<p class="source-note">Riferimento tecnico: <a href="https://csrc.nist.gov/pubs/sp/800/38/a/final">NIST SP 800-38A — modalità ECB, CBC e CTR</a>. I valori esadecimali dei tre esempi sono calcolati con AES-128 usando la chiave della lezione 06.1. Gli IV e i contatori fissati sono soltanto esempi riproducibili, non parametri da riutilizzare in un'applicazione reale.</p>
+<script>
+(()=>{
+  "use strict";
+  const examples = {"ECB":[{"source":"testo","aesInput":"4D455353414747494F5345475245544F","aesOutput":"F4B99418B2BAE4BC79BD31B1D88E3853","cipher":"F4B99418B2BAE4BC79BD31B1D88E3853","index":1,"plain":"4D455353414747494F5345475245544F"},{"source":"testo","aesInput":"4D455353414747494F5345475245544F","aesOutput":"F4B99418B2BAE4BC79BD31B1D88E3853","cipher":"F4B99418B2BAE4BC79BD31B1D88E3853","index":2,"plain":"4D455353414747494F5345475245544F"},{"source":"testo","aesInput":"4D455353414747494F5345475245544F","aesOutput":"F4B99418B2BAE4BC79BD31B1D88E3853","cipher":"F4B99418B2BAE4BC79BD31B1D88E3853","index":3,"plain":"4D455353414747494F5345475245544F"}],"CBC":[{"source":"IV","mix":"00112233445566778899AABBCCDDEEFF","aesInput":"4D5471600512213EC7CAEFFC9E98BAB0","aesOutput":"52ABED6A663772FF997CDC214C00A43F","cipher":"52ABED6A663772FF997CDC214C00A43F","index":1,"plain":"4D455353414747494F5345475245544F"},{"source":"cifrato del blocco 1","mix":"52ABED6A663772FF997CDC214C00A43F","aesInput":"1FEEBE39277035B6D62F99661E45F070","aesOutput":"403F9651431CE94883EB3BBFD3524948","cipher":"403F9651431CE94883EB3BBFD3524948","index":2,"plain":"4D455353414747494F5345475245544F"},{"source":"cifrato del blocco 2","mix":"403F9651431CE94883EB3BBFD3524948","aesInput":"0D7AC502025BAE01CCB87EF881171D07","aesOutput":"3BA159F2D0C0D86F5FFDF557794AA819","cipher":"3BA159F2D0C0D86F5FFDF557794AA819","index":3,"plain":"4D455353414747494F5345475245544F"}],"CTR":[{"source":"blocco contatore","aesInput":"A0A1A2A3A4A5A6A7A8A9AAAB00000001","aesOutput":"D3DC52CF46BFF658B239E6CB429A7852","cipher":"9E99019C07F8B111FD6AA38C10DF2C1D","index":1,"plain":"4D455353414747494F5345475245544F"},{"source":"blocco contatore","aesInput":"A0A1A2A3A4A5A6A7A8A9AAAB00000002","aesOutput":"CC33422314FE90399C878A7B8670E87E","cipher":"8176117055B9D770D3D4CF3CD435BC31","index":2,"plain":"4D455353414747494F5345475245544F"},{"source":"blocco contatore","aesInput":"A0A1A2A3A4A5A6A7A8A9AAAB00000003","aesOutput":"CDA668793DECAE0314D8126E30E8BCFE","cipher":"80E33B2A7CABE94A5B8B572962ADE8B1","index":3,"plain":"4D455353414747494F5345475245544F"}]};
+  const modeSel = document.getElementById('aes62-mode');
+  const prev = document.getElementById('aes62-prev');
+  const next = document.getElementById('aes62-next');
+  const play = document.getElementById('aes62-play');
+  const slots = Array.from(document.querySelectorAll('#aes62-slots .aes62-slot'));
+  const caption = document.getElementById('aes62-caption');
+  const flow = document.getElementById('aes62-flow');
+  const explain = document.getElementById('aes62-explain');
+  const padSize = document.getElementById('aes62-pad-size');
+  const padMsg = document.getElementById('aes62-pad-message');
+  const padBytes = document.getElementById('aes62-pad-bytes');
+  let active=0, timer=null;
+  const hexSpaced=(s)=>s.match(/.{1,2}/g).join(' ');
+  function makeStep(title, hex, detail='') {
+    const box=document.createElement('div'); box.className='aes62-step';
+    const h=document.createElement('strong');h.textContent=title;box.append(h);
+    const c=document.createElement('code');c.textContent=hexSpaced(hex);box.append(c);
+    if(detail){const p=document.createElement('small');p.textContent=detail;box.append(p)}
+    return box;
+  }
+  function addArrow(){const el=document.createElement('div');el.className='aes62-arrow';el.setAttribute('aria-hidden','true');el.textContent='↓';flow.append(el)}
+  function repaint(){
+    const mode=modeSel.value, rows=examples[mode], row=rows[active];
+    slots.forEach((button,i)=>{
+      button.setAttribute('aria-pressed',String(i===active));
+      button.querySelector('code').textContent=rows[i].cipher.slice(0,8)+'…';
+    });
+    caption.textContent=`Modalità ${mode} · blocco ${active+1} di 3`;
+    prev.disabled=active===0;next.disabled=active===2;
+    flow.replaceChildren();
+    if(mode==='ECB'){
+      flow.append(makeStep(`Testo del blocco ${active+1}`,row.plain,'Sempre MESSAGGIOSEGRETO'));
+      addArrow();flow.append(makeStep('Ingresso di AES',row.aesInput,'Il blocco entra direttamente in AES.'));
+      addArrow();flow.append(makeStep('Uscita di AES = cifrato',row.cipher));
+      explain.textContent='In ECB ogni blocco viene cifrato separatamente: le tre uscite coincidono, perché tutti i blocchi in ingresso sono identici.';
+    }else if(mode==='CBC'){
+      flow.append(makeStep(`Testo del blocco ${active+1}`,row.plain,'Sempre MESSAGGIOSEGRETO'));
+      addArrow();flow.append(makeStep(row.source==='IV'?'IV iniziale':'Cifrato precedente',row.mix,'Si combina al testo tramite XOR.'));
+      addArrow();flow.append(makeStep('Risultato dello XOR = ingresso di AES',row.aesInput));
+      addArrow();flow.append(makeStep('Uscita di AES = cifrato',row.cipher));
+      explain.textContent=active===0?'Per il primo blocco CBC usa l’IV. Anche se il testo è lo stesso, questo valore cambia l’ingresso di AES.':`Per il blocco ${active+1}, CBC usa il cifrato del blocco ${active}. È diverso dall’IV e dal testo, quindi cambia anche l’ingresso di AES.`;
+    }else{
+      flow.append(makeStep(`Testo del blocco ${active+1}`,row.plain,'Sempre MESSAGGIOSEGRETO'));
+      addArrow();flow.append(makeStep('Blocco contatore = ingresso di AES',row.aesInput,'Stesso nonce e contatore progressivo entro questa cifratura.'));
+      addArrow();flow.append(makeStep('Uscita di AES = maschera',row.aesOutput));
+      addArrow();flow.append(makeStep('Testo XOR maschera = cifrato',row.cipher));
+      explain.textContent='In CTR, AES non cifra direttamente il testo. Cifra un contatore; la maschera ottenuta viene combinata al testo con XOR.';
+    }
+  }
+  function stop(){if(timer!==null){window.clearInterval(timer);timer=null;}play.textContent='Avvia animazione';play.setAttribute('aria-pressed','false')}
+  modeSel.addEventListener('change',()=>{stop();active=0;repaint()});
+  prev.addEventListener('click',()=>{stop();active=Math.max(0,active-1);repaint()});
+  next.addEventListener('click',()=>{stop();active=Math.min(2,active+1);repaint()});
+  slots.forEach((button,i)=>button.addEventListener('click',()=>{stop();active=i;repaint()}));
+  play.addEventListener('click',()=>{
+    if(timer!==null){stop();return}
+    active=0;repaint();play.textContent='Ferma animazione';play.setAttribute('aria-pressed','true');
+    timer=window.setInterval(()=>{if(active<2){active++;repaint()}else{stop()}},1900)
+  });
+  function renderPadding(){
+    const count=Number(padSize.value);
+    const text='MESSAGGIOSEGRETO'.slice(0,count);
+    const missing=16-count===0?16:16-count;
+    padMsg.textContent=`Testo: ${text} · ${count} byte presenti, ${missing} byte di padding`;
+    padBytes.replaceChildren();
+    for(const ch of text){const span=document.createElement('span');span.className='aes62-byte';span.textContent=ch.charCodeAt(0).toString(16).toUpperCase().padStart(2,'0');padBytes.append(span)}
+    for(let i=0;i<missing;i++){const span=document.createElement('span');span.className='aes62-byte aes62-padding';span.textContent=missing.toString(16).toUpperCase().padStart(2,'0');padBytes.append(span)}
+  }
+  padSize.addEventListener('change',renderPadding);
+  repaint();renderPadding();
+})();
+</script>
+</main><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-06-1-aes" rel="prev" href="06-1-aes.html"><small>← Precedente</small><span>06.1 · AES: che cosa succede ai 16 byte?</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>9 / 23</span></a><a class="lesson-neighbor" data-school-link="crittografia-07-hash-mac-password" rel="next" href="07-hash-mac-password.html"><small>Successiva →</small><span>07 · Password, salt e Argon2id</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

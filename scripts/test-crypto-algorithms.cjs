@@ -44,6 +44,14 @@ for(const file of fs.readdirSync(folder).filter(f=>/^(0[6-9]|1[0-4])-.*\.html$/.
     for(const id of ['text-input','utf-output','plain-byte','key-byte','xor-result','aes-step','aes-state']){
       assert.ok(html.includes(`id="${id}"`),'Missing interactive control: '+id);
     }
+  }else if(file==='06-2-modalita-aes-aggiornata.html'){
+    for(const id of ['aes62-mode','aes62-prev','aes62-next','aes62-play','aes62-flow','aes62-pad-size']){
+      assert.ok(html.includes(`id="${id}"`),'Missing interactive control: '+id);
+    }
+  }else if(file==='07-hash-mac-password.html'){
+    for(const id of ['pass07-sha-lab','pass07-attack-btn','pass07-argon-lab','pass07-login-btn']){
+      assert.ok(html.includes(`id="${id}"`),'Missing interactive control: '+id);
+    }
   }else{
     assert.ok(html.includes('data-crypto-demo='),'Missing interactive explanation: '+file);
   }

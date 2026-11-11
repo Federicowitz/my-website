@@ -1,0 +1,175 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>06.1 · AES: che cosa succede ai 16 byte? — Federico Lelli</title><meta content="Come AES-128 cifra un messaggio di 16 caratteri: byte, stato, round, quattro operazioni e visualizzatore interattivo." name="description"/><meta content="lesson" name="school-kind"/><link href="../../reader.css" rel="stylesheet"/><link href="crittografia.css" rel="stylesheet"/><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/crittografia/06-1-aes.html"><meta property="og:title" content="06.1 · AES: che cosa succede ai 16 byte? — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/crittografia/06-1-aes.html"><meta property="og:description" content="06.1 · AES: che cosa succede ai 16 byte?. Crittografia: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="crittografia-06-1-aes"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=crittografia" data-school-catalog="crittografia">Crittografia</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-06-simmetrica" rel="prev" href="06-simmetrica.html"><small>← Precedente</small><span>06 · Crittografia simmetrica · Un backup rubato deve restare illeggibile</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>8 / 23</span></a><a class="lesson-neighbor" data-school-link="crittografia-06-2-modalita-aes-aggiornata" rel="next" href="06-2-modalita-aes-aggiornata.html"><small>Successiva →</small><span>06.2 · AES: come cifrare un file intero?</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading crypto-reading">
+<p class="eyebrow">LEZIONE 06.1 · AES-128</p>
+<h1>AES: che cosa succede ai 16 byte?</h1>
+<p class="lead">Un messaggio di 16 lettere entra nell’algoritmo AES e diventa un blocco di 16 byte cifrati. La trasformazione non avviene in un solo passaggio: AES ripete una serie ordinata di operazioni, chiamate <strong>round</strong>.</p>
+<div class="lesson-outline"><p><strong>In questa lezione</strong></p>
+<nav aria-label="Indice della lezione"><ol>
+<li><a href="#un-messaggio">Il messaggio e la chiave</a></li>
+<li><a href="#stato">Come AES organizza i 16 byte</a></li>
+<li><a href="#round">Che cos’è un round</a></li>
+<li><a href="#operazioni">Le quattro operazioni</a></li>
+<li><a href="#esempio">Il primo round del nostro messaggio</a></li>
+<li><a href="#animazione">Animazione di tutti i round</a></li>
+<li><a href="#decifratura">Come si recupera il messaggio</a></li>
+<li><a href="#verifica">Verifica la comprensione</a></li>
+</ol></nav></div>
+
+<section aria-labelledby="un-messaggio">
+<h2 id="un-messaggio">1. Un messaggio di esattamente 16 lettere</h2>
+<p>Il testo da cifrare è <strong><code>MESSAGGIOSEGRETO</code></strong>. Sono 16 lettere senza spazi né accenti. In UTF-8 ciascuna di queste lettere occupa un byte: il messaggio occupa quindi <strong>16 byte</strong>, cioè 128 bit. È esattamente la dimensione di un blocco AES.</p>
+<p>Una lettera è un carattere leggibile, un byte è il dato sul quale lavora il computer, e due cifre esadecimali sono un modo comodo per <em>scrivere</em> quel byte. Per esempio la lettera <code>M</code> corrisponde al byte <code>4D</code> in esadecimale.</p>
+<table><caption>Lo stesso messaggio, visto come lettere e come byte</caption>
+<thead><tr><th>Parte del messaggio</th><th>Caratteri</th><th>Byte esadecimali</th></tr></thead><tbody>
+<tr><td>1</td><td><code>MESS</code></td><td><code>4D 45 53 53</code></td></tr>
+<tr><td>2</td><td><code>AGGI</code></td><td><code>41 47 47 49</code></td></tr>
+<tr><td>3</td><td><code>OSEG</code></td><td><code>4F 53 45 47</code></td></tr>
+<tr><td>4</td><td><code>RETO</code></td><td><code>52 45 54 4F</code></td></tr>
+</tbody></table>
+<p>Per cifrarlo usiamo AES-128, cioè AES con una chiave di 128 bit, anche lei lunga <strong>16 byte</strong>. Nell’esempio la chiave è <code>CHIAVESEGRETA123</code>. È una chiave didattica, scelta perché si possa leggere: nei sistemi reali le chiavi si generano in modo imprevedibile, non scegliendo una frase.</p>
+<div class="worked-example"><p><strong>I due ingressi di AES-128</strong></p>
+<pre><code>Testo:   MESSAGGIOSEGRETO
+Byte:    4D 45 53 53 41 47 47 49 4F 53 45 47 52 45 54 4F
+
+Chiave:  CHIAVESEGRETA123
+Byte:    43 48 49 41 56 45 53 45 47 52 45 54 41 31 32 33</code></pre>
+<p>Il testo e la chiave hanno entrambi 16 byte, ma hanno ruoli diversi: il testo è ciò che vogliamo proteggere; la chiave è il segreto che determina la trasformazione.</p></div>
+
+<h3>Perché non usare semplicemente XOR con una chiave di 16 byte?</h3>
+
+<p>Abbiamo un messaggio di 16 byte e una chiave di 16 byte. Perché utilizzare tutte le trasformazioni di AES? Non sarebbe sufficiente fare XOR tra i byte del messaggio e quelli della chiave?</p>
+
+<p><strong>Per un solo messaggio di 16 byte, in determinate condizioni, sì.</strong> Se la chiave fosse generata in modo completamente casuale, mantenuta segreta e utilizzata una sola volta, XOR sarebbe sufficiente a nascondere perfettamente il messaggio. Questo metodo si chiama <strong>One-Time Pad (OTP)</strong>, cioè cifrario a chiave monouso.</p>
+
+<p>Il One-Time Pad richiede che la chiave sia casuale, lunga almeno quanto il messaggio e mai riutilizzata. Non basta scegliere una parola di 16 caratteri, come la nostra chiave didattica.</p>
+
+<p>Il problema compare quando vogliamo cifrare un file più lungo utilizzando sempre gli stessi 16 byte di chiave.</p>
+
+<p>Supponiamo che un attaccante conosca un blocco originale P e il suo cifrato C. Se abbiamo utilizzato una semplice XOR, può calcolare:</p>
+
+<pre><code>C = P XOR K
+
+K = P XOR C</code></pre>
+
+<p>Ha così recuperato la chiave di 16 byte. Se l'abbiamo ripetuta sugli altri blocchi, può decifrare anche quelli.</p>
+
+<p><strong>AES è progettato proprio per evitare una debolezza di questo tipo.</strong> Conoscere un blocco originale e il corrispondente cifrato AES non permette di ricavare direttamente la chiave tramite una semplice XOR.</p>
+
+<p>I round di AES combinano sostituzioni, spostamenti, mescolamenti e operazioni con chiavi derivate dal segreto iniziale. Queste trasformazioni rendono difficile trovare relazioni matematiche sfruttabili per recuperare la chiave.</p>
+
+<p>Chi conosce la chiave può invertire velocemente tutte le operazioni. Chi non la conosce può provare delle chiavi candidate, ma AES-128 offre 2^128 chiavi possibili e non sono noti attacchi praticabili che permettano di recuperare una chiave casuale partendo da una semplice coppia di testo originale e cifrato.</p>
+
+<p><strong>Il vantaggio di AES non è rendere lenta la decifratura, ma permettere di utilizzare una chiave relativamente corta senza esporla attraverso relazioni semplici tra testo originale e cifrato.</strong></p>
+</section>
+
+<section aria-labelledby="stato">
+<h2 id="stato">2. Come AES organizza i 16 byte</h2>
+<p>AES dispone i byte in una tabella di <strong>4 righe e 4 colonne</strong>, chiamata <strong>stato</strong>. Riempie prima la prima colonna dall’alto in basso, poi la seconda e così via. Non è un nuovo modo di cifrare: è soltanto il modo in cui AES organizza il blocco per lavorarci.</p>
+<div class="worked-example"><p><strong>Stato iniziale: MESSAGGIOSEGRETO</strong></p><table><tbody><tr><td><code>4D</code></td><td><code>41</code></td><td><code>4F</code></td><td><code>52</code></td></tr><tr><td><code>45</code></td><td><code>47</code></td><td><code>53</code></td><td><code>45</code></td></tr><tr><td><code>53</code></td><td><code>47</code></td><td><code>45</code></td><td><code>54</code></td></tr><tr><td><code>53</code></td><td><code>49</code></td><td><code>47</code></td><td><code>4F</code></td></tr></tbody></table></div>
+<p>La prima colonna <code>4D 45 53 53</code> è <code>MESS</code>; la seconda <code>41 47 47 49</code> è <code>AGGI</code>. La tabella non si legge per righe come un normale testo: i byte originali sono stati inseriti <strong>per colonne</strong>.</p>
+</section>
+
+<section aria-labelledby="round">
+<h2 id="round">3. Che cos’è un round?</h2>
+<p>Un <strong>round</strong> è un giro di trasformazioni applicate allo stato, cioè a questa tabella di 16 byte. Un giro modifica i valori e le posizioni dei byte. Il giro successivo lavora sul risultato del precedente, non ricomincia dal messaggio originale.</p>
+<p>Con <strong>AES-128</strong> il percorso è questo:</p>
+<ol class="flow">
+<li><strong>Passo iniziale:</strong> si combina subito il blocco con la chiave (<em>AddRoundKey</em>).</li>
+<li><strong>Round da 1 a 9:</strong> si eseguono quattro operazioni, sempre nello stesso ordine: SubBytes, ShiftRows, MixColumns e AddRoundKey.</li>
+<li><strong>Round 10:</strong> si fanno SubBytes, ShiftRows e AddRoundKey. L’ultimo round <strong>non</strong> esegue MixColumns.</li>
+</ol>
+<p>Il risultato del decimo round è il blocco cifrato. Come il testo iniziale, occupa sempre 16 byte, ma non si presenta più come una sequenza leggibile di lettere.</p>
+</section>
+
+<section aria-labelledby="operazioni">
+<h2 id="operazioni">4. Le quattro operazioni: che cosa fanno?</h2>
+<h3>SubBytes · Cambia il valore dei byte</h3>
+<p>AES consulta una tabella fissa, chiamata <strong>S-box</strong>, e sostituisce ogni byte con un altro. Ad esempio, nella nostra cifratura il byte <code>0E</code> diventa <code>AB</code>. Non è un alfabeto segreto: la tabella è pubblica. Il suo compito è rendere la trasformazione più difficile da ricondurre a semplici relazioni tra bit.</p>
+<h3>ShiftRows · Sposta i byte</h3>
+<p>AES lascia ferma la prima riga della tabella, sposta la seconda di una posizione verso sinistra, la terza di due e la quarta di tre. <strong>I valori non cambiano:</strong> cambiano soltanto le posizioni. In questo modo i byte che erano nella stessa colonna si ritrovano distribuiti in colonne diverse.</p>
+<h3>MixColumns · Mescola i byte di ogni colonna</h3>
+<p>AES prende i quattro byte di una colonna e li combina matematicamente per ottenere quattro byte nuovi. Ogni nuovo byte dipende da più byte della colonna originale: se ne cambiamo uno, può cambiare il risultato di tutta la colonna.</p>
+<p>Non è una semplice somma e non è necessario memorizzarne la formula per capire il ruolo di questa fase. Il punto importante è che <strong>SubBytes cambia i valori, ShiftRows cambia le posizioni e MixColumns mescola le informazioni</strong>.</p>
+<h3>AddRoundKey · Combina il risultato con il segreto</h3>
+<p>AES usa XOR, l’operazione sui bit vista nella lezione 06, per combinare ciascun byte dello stato con il byte corrispondente di una <strong>chiave di round</strong>. All’inizio usa la chiave originale; nei giri successivi usa chiavi diverse, calcolate automaticamente a partire dalla stessa chiave iniziale. Non dobbiamo inventare dieci nuove password.</p>
+<p>L’ordine dei round completi è <strong>SubBytes → ShiftRows → MixColumns → AddRoundKey</strong>. Esiste inoltre l’AddRoundKey iniziale, prima del round 1.</p>
+</section>
+
+<section aria-labelledby="esempio">
+<h2 id="esempio">5. Seguiamo il primo round di MESSAGGIOSEGRETO</h2>
+<p>Ora osserviamo le quattro operazioni <strong>sui byte del nostro messaggio</strong>. La chiave è sempre <code>CHIAVESEGRETA123</code>; non cambiamo esempio a metà spiegazione.</p>
+<h3>Passo iniziale · AddRoundKey</h3>
+<p>La prima lettera è <code>M</code>, cioè <code>4D</code>. Il primo byte della chiave è <code>C</code>, cioè <code>43</code>. Facendo XOR tra i due byte si ottiene <code>0E</code>:</p>
+<pre><code>  4D = 01001101
+  43 = 01000011
+ XOR = 00001110 = 0E</code></pre>
+<p>AES fa la stessa cosa per tutti i 16 byte. Il risultato iniziale è:</p>
+<div class="worked-example"><p><strong>Dopo AddRoundKey iniziale</strong></p><table><tbody><tr><td><code>0E</code></td><td><code>17</code></td><td><code>08</code></td><td><code>13</code></td></tr><tr><td><code>0D</code></td><td><code>02</code></td><td><code>01</code></td><td><code>74</code></td></tr><tr><td><code>1A</code></td><td><code>14</code></td><td><code>00</code></td><td><code>66</code></td></tr><tr><td><code>12</code></td><td><code>0C</code></td><td><code>13</code></td><td><code>7C</code></td></tr></tbody></table></div>
+<h3>Round 1 · SubBytes</h3>
+<p>Il primo byte <code>0E</code> viene sostituito con <code>AB</code>. Tutti gli altri byte vengono sostituiti usando la stessa tabella S-box:</p>
+<div class="worked-example"><p><strong>Dopo SubBytes</strong></p><table><tbody><tr><td><code>AB</code></td><td><code>F0</code></td><td><code>30</code></td><td><code>7D</code></td></tr><tr><td><code>D7</code></td><td><code>77</code></td><td><code>7C</code></td><td><code>92</code></td></tr><tr><td><code>A2</code></td><td><code>FA</code></td><td><code>63</code></td><td><code>33</code></td></tr><tr><td><code>C9</code></td><td><code>FE</code></td><td><code>7D</code></td><td><code>10</code></td></tr></tbody></table></div>
+<h3>Round 1 · ShiftRows</h3>
+<p>Osserva la seconda riga: prima era <code>D7 77 7C 92</code>, dopo lo spostamento diventa <code>77 7C 92 D7</code>. I quattro valori sono identici, ma cambiano posizione.</p>
+<div class="worked-example"><p><strong>Dopo ShiftRows</strong></p><table><tbody><tr><td><code>AB</code></td><td><code>F0</code></td><td><code>30</code></td><td><code>7D</code></td></tr><tr><td><code>77</code></td><td><code>7C</code></td><td><code>92</code></td><td><code>D7</code></td></tr><tr><td><code>63</code></td><td><code>33</code></td><td><code>A2</code></td><td><code>FA</code></td></tr><tr><td><code>10</code></td><td><code>C9</code></td><td><code>FE</code></td><td><code>7D</code></td></tr></tbody></table></div>
+<h3>Round 1 · MixColumns</h3>
+<p>La prima colonna <code>AB 77 63 10</code> diventa <code>A7 F0 2A D2</code>. AES sta combinando i quattro byte, non semplicemente spostandoli. Lo fa anche per le altre tre colonne:</p>
+<div class="worked-example"><p><strong>Dopo MixColumns</strong></p><table><tbody><tr><td><code>A7</code></td><td><code>85</code></td><td><code>91</code></td><td><code>1F</code></td></tr><tr><td><code>F0</code></td><td><code>94</code></td><td><code>0C</code></td><td><code>A0</code></td></tr><tr><td><code>2A</code></td><td><code>AA</code></td><td><code>E4</code></td><td><code>C2</code></td></tr><tr><td><code>D2</code></td><td><code>CD</code></td><td><code>87</code></td><td><code>50</code></td></tr></tbody></table></div>
+<h3>Round 1 · AddRoundKey</h3>
+<p>Per il primo round, AES ricava dalla chiave originale una chiave di round. Il suo primo byte è <code>85</code>; quindi il primo byte dello stato diventa <code>A7 XOR 85 = 22</code>. Ecco come termina il round 1:</p>
+<div class="worked-example"><p><strong>Dopo AddRoundKey del round 1</strong></p><table><tbody><tr><td><code>22</code></td><td><code>56</code></td><td><code>05</code></td><td><code>CA</code></td></tr><tr><td><code>9B</code></td><td><code>BA</code></td><td><code>70</code></td><td><code>ED</code></td></tr><tr><td><code>A0</code></td><td><code>73</code></td><td><code>78</code></td><td><code>6C</code></td></tr><tr><td><code>10</code></td><td><code>4A</code></td><td><code>54</code></td><td><code>B0</code></td></tr></tbody></table></div>
+<p>Questo <strong>non è ancora il cifrato finale</strong>: AES prosegue con gli altri nove round, applicandoli ai 16 byte appena ottenuti.</p>
+<div class="worked-example"><p><strong>Alla fine del round 10</strong></p>
+<pre><code>Testo:       MESSAGGIOSEGRETO
+Chiave:      CHIAVESEGRETA123
+Cifrato hex: F4 B9 94 18 B2 BA E4 BC 79 BD 31 B1 D8 8E 38 53</code></pre>
+<p>Il cifrato è mostrato in esadecimale perché molti dei suoi byte non corrispondono a caratteri stampabili. Resta una sequenza di <strong>16 byte</strong>.</p></div>
+</section>
+
+<section aria-labelledby="animazione">
+<h2 id="animazione">6. Guarda tutti i round nell’animazione</h2>
+<p>Il visualizzatore mostra lo stato dopo ogni operazione. Parti dal blocco originale, osserva l’AddRoundKey iniziale e poi percorri i round fino al decimo. I valori caricati nei campi sono proprio quelli del messaggio e della chiave usati sopra.</p>
+<div class="crypto-demo" data-crypto-demo="aes">
+<h3>AES-128 · Tutti i passaggi sullo stesso messaggio</h3>
+<p>Scorri i passaggi dell’esecuzione e confrontali con il primo round spiegato sopra. L’animazione mostra 41 stati, compreso il blocco originale.</p>
+<form>
+<label>Blocco di 16 byte (32 cifre esadecimali)<input type="text" name="plain" value="4d455353414747494f5345475245544f" maxlength="32" pattern="[0-9a-fA-F]{32}" required spellcheck="false"></label>
+<label>Chiave AES-128 (32 cifre esadecimali)<input type="text" name="key" value="43484941564553454752455441313233" maxlength="32" pattern="[0-9a-fA-F]{32}" required spellcheck="false"></label>
+<button type="submit">Aggiorna i calcoli</button>
+</form>
+<p class="trace-error" role="alert"></p>
+<div class="crypto-stage"><p>Per visualizzare i passaggi è necessario il JavaScript del sito.</p></div>
+<noscript><p>Il primo round e il risultato finale sono descritti negli esempi qui sopra.</p></noscript>
+</div>
+<p>In questa sequenza, i 16 byte d’ingresso sono sempre quelli di <code>MESSAGGIOSEGRETO</code>. I valori esadecimali che appaiono dopo i vari passaggi rappresentano <em>lo stesso blocco mentre viene trasformato</em>.</p>
+</section>
+
+<details class="crypto-deep">
+<summary>Approfondimento</summary>
+<div class="crypto-demo" data-crypto-demo="aes"><h3>Dentro AES-128: ogni operazione, tutti i dieci round</h3><p>Questo è il calcolo effettivo di un blocco AES-128, con 41 stati. Le chiavi sono visibili perché sono dati didattici pubblici. I valori iniziali seguono l’esempio di riferimento dello standard; il risultato è 69c4e0d86a7b0430d8cdb78070b4c55a.</p><form><label>Blocco: 32 cifre esadecimali<input name="plain" value="00112233445566778899aabbccddeeff" type="text" pattern="[0-9a-fA-F]{32}" maxlength="32" required spellcheck="false"></label><label>Chiave: 32 cifre esadecimali<input name="key" value="000102030405060708090a0b0c0d0e0f" type="text" pattern="[0-9a-fA-F]{32}" maxlength="32" required spellcheck="false"></label><button type="submit">Aggiorna i calcoli</button></form><p class="trace-error" role="alert"></p><div class="crypto-stage"><p>Attiva JavaScript per esplorare i passaggi. I calcoli e le spiegazioni sono riportati anche nel testo della lezione.</p></div><noscript>Puoi seguire l’esempio numerico nel testo anche senza animazione.</noscript></div>
+</details>
+
+<section aria-labelledby="decifratura">
+<h2 id="decifratura">7. Come fa il destinatario a tornare al testo?</h2>
+<p>Il destinatario possiede la <strong>stessa chiave segreta</strong>, <code>CHIAVESEGRETA123</code>. AES può allora applicare il processo inverso ai byte cifrati: esegue le operazioni inverse nell’ordine corretto e usa le chiavi di round in ordine inverso.</p>
+<p>Per esempio, uno spostamento a sinistra si annulla spostando nella direzione opposta; una sostituzione tramite S-box si annulla con la tabella inversa; XOR con un byte di chiave si annulla ripetendo XOR con quello stesso byte. Anche MixColumns è costruita per essere invertibile.</p>
+<p>Per questo due blocchi diversi, cifrati con AES e la stessa chiave, non possono produrre lo stesso blocco cifrato: altrimenti il destinatario non potrebbe recuperare con certezza il blocco originale.</p>
+<p>Il destinatario ottiene di nuovo i 16 byte <code>4D 45 53 53 41 47 47 49 4F 53 45 47 52 45 54 4F</code> e, interpretandoli come testo UTF-8, legge <strong><code>MESSAGGIOSEGRETO</code></strong>.</p>
+</section>
+
+<section aria-labelledby="verifica">
+<h2 id="verifica">8. Verifica la comprensione</h2>
+<details class="checkpoint"><summary>Perché MESSAGGIOSEGRETO è un blocco AES completo?</summary><p>Contiene 16 lettere ASCII: ciascuna occupa un byte in UTF-8. Quindi il messaggio è formato da 16 byte, esattamente la dimensione del blocco AES.</p></details>
+<details class="checkpoint"><summary>ShiftRows modifica i valori dei byte?</summary><p>No. Sposta i byte nelle righe, ma i valori restano gli stessi. Il compito di sostituire i valori è di SubBytes; MixColumns poi combina più byte tra loro.</p></details>
+<details class="checkpoint"><summary>Se nell’esempio cambia una lettera del messaggio, si modifica soltanto il byte cifrato corrispondente?</summary><p>No. I round ripetuti diffondono gli effetti della variazione attraverso il blocco. Dopo vari passaggi, la modifica può influenzare molti byte del cifrato finale.</p></details>
+<details class="checkpoint"><summary>Perché non occorre condividere dieci chiavi diverse?</summary><p>Il mittente e il destinatario condividono soltanto la chiave iniziale. Le chiavi dei round sono ricavate da quella chiave secondo regole fisse di AES.</p></details>
+<details class="checkpoint"><summary>Perché il round 10 è diverso dai precedenti?</summary><p>Nell’ultimo round AES-128 applica SubBytes, ShiftRows e AddRoundKey, ma salta MixColumns. Questo fa parte della definizione dell’algoritmo.</p></details>
+</section>
+<section class="callout" aria-labelledby="concetti-da-ricordare"><h2 id="concetti-da-ricordare">Che cosa portare con sé</h2>
+<p>AES-128 prende un blocco di 16 byte e lo trasforma usando una chiave di 16 byte. Prima combina il blocco con la chiave; poi esegue dieci round. Ogni round modifica i byte e la loro disposizione attraverso operazioni reversibili. La chiave originale determina tutte le chiavi dei round. La decifratura recupera i byte iniziali applicando le trasformazioni inverse.</p>
+<p>Quando un file contiene più di 16 byte, resta un altro problema: come utilizzare AES su tutti i blocchi senza rivelare le ripetizioni. È il tema delle modalità operative.</p>
+</section>
+<p class="source-note">Riferimento tecnico: <a href="https://csrc.nist.gov/pubs/fips/197/final">NIST FIPS 197 — Advanced Encryption Standard</a>. Il visualizzatore AES è ripreso dal componente già utilizzato nella lezione 06.</p>
+</main>
+<script src="crypto-core.js"></script>
+<script src="algoritmi.js"></script>
+<script src="animazioni.js"></script>
+<!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-06-simmetrica" rel="prev" href="06-simmetrica.html"><small>← Precedente</small><span>06 · Crittografia simmetrica · Un backup rubato deve restare illeggibile</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>8 / 23</span></a><a class="lesson-neighbor" data-school-link="crittografia-06-2-modalita-aes-aggiornata" rel="next" href="06-2-modalita-aes-aggiornata.html"><small>Successiva →</small><span>06.2 · AES: come cifrare un file intero?</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

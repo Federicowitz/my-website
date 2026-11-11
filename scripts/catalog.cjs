@@ -6,7 +6,7 @@ const items=[];
 function walk(folder,course){for(const entry of fs.readdirSync(folder,{withFileTypes:true})){
  const absolute=path.join(folder,entry.name);
  if(entry.isDirectory()){if(!['soluzioni_html_js_dom_bom','css','js'].includes(entry.name))walk(absolute,course);continue}
- if(!entry.name.endsWith('.html'))continue;
+ if(!entry.name.endsWith('.html')||course.excludeFiles?.includes(entry.name))continue;
  const html=fs.readFileSync(absolute,'utf8').replace(/<!-- SCHOOL:HEAD:START -->[\s\S]*?<!-- SCHOOL:HEAD:END -->/g,'');
  const relative=path.relative(school,absolute).split(path.sep).join('/');
  const title=strip((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]||entry.name.replace(/\.html$/,'')).replace(/ — Federico Lelli$/,'');
@@ -18,7 +18,7 @@ function walk(folder,course){for(const entry of fs.readdirSync(folder,{withFileT
 }}
 for(const c of config.courses)walk(path.join(materials,c.folder),c);
 items.sort((a,b)=>config.courses.findIndex(c=>c.id===a.course)-config.courses.findIndex(c=>c.id===b.course)||a.sort-b.sort||a.title.localeCompare(b.title,'it'));
-const result={courses:config.courses.map(({folder,order,...c})=>c),items:items.map(({sort,...item})=>{
+const result={courses:config.courses.map(({folder,order,excludeFiles,...c})=>c),items:items.map(({sort,...item})=>{
  const c=config.courses.find(c=>c.id===item.course),file=decodeURIComponent(item.path).split('/').pop();
  const chapter=c.chapters?.find(ch=>ch.files.includes(file));
  return {...item,...(chapter?{chapter:chapter.id}:{}),...(c.id==='cpp'?{title:item.title.replace(/^(\d+) · /,'$1 | ')}:{})};
