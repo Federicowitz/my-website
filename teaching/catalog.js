@@ -282,6 +282,7 @@ window.schoolCatalog = {
           "description": "Proteggi un backup, confronta file e comprendi la custodia delle password.",
           "files": [
             "06-simmetrica.html",
+            "06-1-simmetrica.html",
             "07-hash-mac-password.html"
           ]
         },
@@ -1135,7 +1136,7 @@ window.schoolCatalog = {
       "title": "Crittografia · La mappa del percorso",
       "kind": "lesson",
       "path": "materials/crittografia/mappa.html",
-      "description": "Un percorso dai cifrari storici a TLS, firme e PEC: 16 lezioni, laboratori, esercizi, glossario e verifica.",
+      "description": "Un percorso dai cifrari storici a TLS, firme e PEC: 16 lezioni, un approfondimento, laboratori, esercizi, glossario e verifica.",
       "chapter": "crypto-01"
     },
     {
@@ -1189,6 +1190,15 @@ window.schoolCatalog = {
       "title": "06 · Crittografia simmetrica · Un backup rubato deve restare illeggibile",
       "kind": "lesson",
       "path": "materials/crittografia/06-simmetrica.html",
+      "description": "Crittografia simmetrica: bit, byte, binario, esadecimale, chiave, XOR e funzionamento interno di AES, con esempi numerici e laboratori.",
+      "chapter": "crypto-03"
+    },
+    {
+      "id": "crittografia-06-1-simmetrica",
+      "course": "crittografia",
+      "title": "06.1 · Crittografia simmetrica · Il caso del backup rubato",
+      "kind": "lesson",
+      "path": "materials/crittografia/06-1-simmetrica.html",
       "description": "Un backup rubato deve restare illeggibile Un caso guidato, matematica graduale, attività e approfondimenti facoltativi.",
       "chapter": "crypto-03"
     },

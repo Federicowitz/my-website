@@ -40,7 +40,13 @@ for(let a=1;a<=21;a++)for(let b=1;b<=21;b++){
 const folder=path.resolve(__dirname,'../teaching/materials/crittografia');
 for(const file of fs.readdirSync(folder).filter(f=>/^(0[6-9]|1[0-4])-.*\.html$/.test(f))){
   const html=fs.readFileSync(path.join(folder,file),'utf8');
-  assert.ok(html.includes('data-crypto-demo='),'Missing interactive explanation: '+file);
+  if(file==='06-simmetrica.html'){
+    for(const id of ['text-input','utf-output','plain-byte','key-byte','xor-result','aes-step','aes-state']){
+      assert.ok(html.includes(`id="${id}"`),'Missing interactive control: '+id);
+    }
+  }else{
+    assert.ok(html.includes('data-crypto-demo='),'Missing interactive explanation: '+file);
+  }
   for(const [,json] of html.matchAll(/<script type="application\/json">([\s\S]*?)<\/script>/g)){
     const steps=JSON.parse(json);assert.ok(steps.length>1);for(const step of steps)assert.ok(step.title&&step.text);
   }
