@@ -1,40 +1,151 @@
 <!doctype html>
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>05 · Come leggere una tabella di routing — Federico Lelli</title><meta name="description" content="Parti dall’indirizzo di destinazione e individua l’uscita giusta."><meta name="school-kind" content="lesson">
+<title>05 · Come leggere una tabella di routing — Federico Lelli</title><meta name="description" content="Come fa R1 a scegliere dove inoltrare un pacchetto? Leggi la sua tabella, confronta i prefissi e individua il prossimo salto."><meta name="school-kind" content="lesson">
 <link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="routing.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/routing/05-tabella.html"><meta property="og:title" content="05 · Come leggere una tabella di routing — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/routing/05-tabella.html"><meta property="og:description" content="05 · Come leggere una tabella di routing. Routing: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head>
 <body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="routing-05-tabella"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=routing" data-school-catalog="routing">Routing</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="routing-04-pacchetto" rel="prev" href="04-pacchetto.html"><small>← Precedente</small><span>04 · Il viaggio di un pacchetto</span></a><a class="lesson-catalog" href="../../index.html?course=routing" data-school-catalog="routing">Tutte le lezioni<span>6 / 16</span></a><a class="lesson-neighbor" data-school-link="routing-06-statico" rel="next" href="06-statico.html"><small>Successiva →</small><span>06 · Routing statico e strada di ritorno</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading routing-reading">
-<p class="eyebrow">ROUTING · DALLE RETI AI PERCORSI</p><h1>05 · Come leggere una tabella di routing</h1><p class="lead">Parti dall’indirizzo di destinazione e individua l’uscita giusta.</p>
+<p class="eyebrow">ROUTING · DALLE RETI AI PERCORSI</p><h1>05 · Come leggere una tabella di routing</h1><p class="lead">Come fa R1 a scegliere dove inoltrare un pacchetto? Leggi la sua tabella, confronta i prefissi e individua il prossimo salto.</p>
 
-<section id="sezione-12"><h2>Una tabella indica dove mandare il pacchetto</h2>
-<table><thead><tr><th scope="col">Destinazione</th><th scope="col">Azione del router</th></tr></thead><tbody>
-<tr><td>192.168.1.0/24</td><td>Consegna direttamente sulla rete collegata</td></tr>
-<tr><td>192.168.4.0/24</td><td>Passa il pacchetto a R3</td></tr>
-<tr><td>0.0.0.0/0</td><td>Usa il router verso Internet</td></tr></tbody></table>
-<p>192.168.1.25 appartiene alla prima rete, mentre 192.168.4.25 appartiene alla seconda. Se la destinazione è proprio un indirizzo del router, per esempio 192.168.1.1, il router riceve il pacchetto localmente.</p>
-<h3>Come entrano le rotte nella tabella?</h3>
-<ul><li><strong>Rete direttamente collegata.</strong> Se R1 ha un’interfaccia attiva con indirizzo 192.168.1.1/24, conosce la rete 192.168.1.0/24 e può consegnare direttamente ai dispositivi che vi appartengono.</li>
-<li><strong>Rotta inserita a mano.</strong> Un amministratore può indicare a R1 che per 192.168.4.0/24 deve inviare a R3. Vedrai come nella lezione 06.</li>
-<li><strong>Rotta appresa.</strong> Un protocollo dinamico permette ai router di scambiarsi informazioni e ricavare rotte. Partiremo dal problema che risolve nella lezione 07.</li></ul>
-<p>La tabella raccoglie le destinazioni che il router conosce in questi modi. Può anche contenere una rotta predefinita, inserita a mano o appresa, che copre le destinazioni prive di una corrispondenza più specifica.</p></section>
-<section id="sezione-13"><h2>Quando due righe corrispondono</h2>
-<p>Considera 10.1.2.35. Appartiene sia a 10.1.0.0/16 sia a 10.1.2.0/24. La seconda rete è più specifica perché richiede 24 bit in comune invece di 16. Fra le rotte compatibili, il router sceglie il prefisso più lungo. Questa regola si chiama <strong>Longest Prefix Match</strong>.</p>
-<p>Immagina una tabella con 192.168.1.0/24, 10.1.0.0/16 e 10.1.2.0/24. Prova a elencare le corrispondenze prima di scegliere.</p>
-<details><summary>192.168.1.25 · Una sola corrispondenza</summary><p>Corrisponde soltanto a 192.168.1.0/24. R1 usa la rete direttamente collegata.</p></details>
-<details><summary>10.1.2.35 · Due prefissi compatibili</summary><p>Corrispondono 10.1.0.0/16 e 10.1.2.0/24. Vince la /24.</p></details>
-<details><summary>8.8.8.8 · Nessuna rete specifica</summary><p>Nessuna riga corrisponde. Se aggiungi 0.0.0.0/0, sarà l’unica corrispondenza.</p></details></section>
-<section id="sezione-14"><h2>La tabella decide la prossima tappa</h2><p>Se la riga scelta indica R4, il router passa il pacchetto a R4. Da quel punto la decisione spetta a R4 e alla sua tabella.</p></section>
-<section id="sezione-15"><h2>Se nessuna rete specifica corrisponde</h2>
-<p>A R1 arriva un pacchetto per 8.8.8.8. Supponi che la tabella contenga solo le due reti 192.168.1.0/24 e 192.168.4.0/24. Nessuna corrisponde, quindi R1 scarta il pacchetto. Inviarlo a tutti i vicini non è una regola di inoltro.</p>
-<p>Con una <strong>rotta predefinita</strong> (default) verso R2, R1 ha invece un’uscita. Il prefisso 0.0.0.0/0 richiede zero bit in comune, quindi corrisponde a qualunque destinazione IPv4. È il prefisso più corto. Se aggiungi 8.8.8.0/24 verso R3, per 8.8.8.8 vince quella riga e l’uscita cambia.</p>
-<details><summary>Verifica · Quale riga vince per 10.1.2.35?</summary><p>Fra /16, /24 e /0 compatibili vince la /24. Una rotta /32 per 10.1.2.34 riguarda un altro indirizzo e quindi non entra nel confronto.</p></details></section>
+<section id="sezione-12">
+<h2>1. Dal routing al forwarding</h2>
+<p>Nella <a href="04-pacchetto.html">lezione 04</a> abbiamo seguito un pacchetto da PC1 a PC4. Quando riceve il frame, R1 estrae il pacchetto IP e legge l’indirizzo di destinazione. Ora deve decidere dove farlo proseguire.</p>
+<p>Il <strong>routing</strong> costruisce e aggiorna le informazioni sui percorsi disponibili. Il <strong>forwarding</strong>, o inoltro, usa quelle informazioni per far avanzare ogni pacchetto di una tappa.</p>
+
+<h2>2. Che cosa contiene una tabella di routing?</h2>
+<p>R1 potrebbe ricevere pacchetti per <code>192.168.1.25</code>, <code>192.168.4.10</code> o <code>8.8.8.8</code>. La tabella raggruppa le destinazioni in <strong>prefissi</strong> e indica come raggiungere gli indirizzi coperti da ciascuno.</p>
+<table>
+<thead><tr><th scope="col">Destinazione</th><th scope="col">Prossimo passo</th></tr></thead>
+<tbody>
+<tr><th scope="row"><code>192.168.1.0/24</code></th><td>Rete direttamente collegata</td></tr>
+<tr><th scope="row"><code>192.168.4.0/24</code></th><td>Router R3</td></tr>
+<tr><th scope="row"><code>0.0.0.0/0</code></th><td>Router R2</td></tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Destinazione.</strong> Il prefisso che R1 confronta con l’indirizzo IP del pacchetto.</li>
+<li><strong>Prossimo salto (next hop).</strong> Il router vicino a cui affidare il pacchetto quando la rotta passa per un altro router. Qui usiamo i nomi R2 e R3. In una tabella reale si vede normalmente l’indirizzo IP dell’interfaccia del vicino.</li>
+<li><strong>Interfaccia di uscita.</strong> L’interfaccia collegata alla rete di destinazione o al collegamento attraverso cui raggiungere il prossimo salto.</li>
+</ul>
+</section>
+
+<section id="tabelle-reali">
+<h2>3. Leggere le tabelle di Windows e Linux</h2>
+<p>Anche un computer consulta una tabella di routing per scegliere se consegnare un pacchetto sul collegamento locale oppure passarlo a un gateway.</p>
+<h3>Windows</h3>
+<p>Il comando <code>route print</code> mostra, tra le altre informazioni, le rotte attive IPv4.</p>
+<table>
+<thead><tr><th scope="col">Network Destination</th><th scope="col">Netmask</th><th scope="col">Gateway</th><th scope="col">Interface</th><th scope="col">Metric</th></tr></thead>
+<tbody>
+<tr><td>0.0.0.0</td><td>0.0.0.0</td><td>192.168.122.1</td><td>192.168.122.128</td><td>261</td></tr>
+<tr><td>192.168.122.0</td><td>255.255.255.0</td><td>On-link</td><td>192.168.122.128</td><td>261</td></tr>
+<tr><td>192.168.122.128</td><td>255.255.255.255</td><td>On-link</td><td>192.168.122.128</td><td>261</td></tr>
+</tbody>
+</table>
+<p class="legend">Estratto delle rotte attive IPv4 dalla <a href="https://lia.disi.unibo.it/Courses/AmmSistemi1819/ARP-Forwarding-Walter-Cerroni.pdf#page=29">schermata di <code>route print</code> dell’Università di Bologna</a>.</p>
+<ul>
+<li>La maschera <code>0.0.0.0</code> equivale a <code>/0</code>. La prima riga indica il gateway predefinito <code>192.168.122.1</code>.</li>
+<li>La maschera <code>255.255.255.0</code> equivale a <code>/24</code>. <code>On-link</code> indica che la rete <code>192.168.122.0/24</code> è sul collegamento locale.</li>
+<li>La maschera <code>255.255.255.255</code> equivale a <code>/32</code>. La riga copre un solo indirizzo, quello del computer stesso.</li>
+</ul>
+<p><code>Interface</code> mostra l’indirizzo locale dell’interfaccia. <code>Metric</code> contiene un valore usato nella valutazione delle rotte.</p>
+<h3>Linux</h3>
+<p>Il comando <code>ip -4 route show</code> mostra le rotte IPv4. In questo esempio il computer usa <code>eth0</code> per entrambe le rotte.</p>
+<pre><code>$ ip -4 route show
+default via 172.26.36.1 dev eth0
+172.26.36.0/22 dev eth0 proto kernel scope link src 172.26.39.198</code></pre>
+<ul>
+<li><code>default via 172.26.36.1</code> indica il gateway predefinito.</li>
+<li><code>172.26.36.0/22 dev eth0</code> senza <code>via</code> indica una rete direttamente collegata a <code>eth0</code>. In questa riga <code>scope link</code> descrive il collegamento locale.</li>
+<li><code>src 172.26.39.198</code> è l’indirizzo sorgente preferito per il traffico generato dal computer che usa questa rotta.</li>
+</ul>
+<p>Per la sintassi dei campi, consulta il <a href="https://www.man7.org/linux/man-pages/man8/ip-route.8.html">manuale di <code>ip route</code></a>.</p>
+</section>
+
+<section id="sezione-14">
+<h2>4. Come decide R1?</h2>
+<p>Torniamo alla tabella semplificata. PC1 ha indirizzo <code>192.168.1.10</code> e usa R1 come gateway. Quando la destinazione è fuori dalla rete locale, PC1 consegna il frame a R1. R1 legge l’indirizzo IP di destinazione e consulta la propria tabella.</p>
+<dl>
+<dt><strong><code>192.168.4.10</code> · R3</strong></dt>
+<dd>È l’indirizzo di PC4. Corrisponde a <code>192.168.4.0/24</code> e a <code>0.0.0.0/0</code>. R1 usa la rotta più specifica, la <code>/24</code>, e affida il pacchetto a R3. R3 farà una nuova ricerca nella propria tabella.</dd>
+<dt><strong><code>192.168.1.25</code> · Consegna diretta</strong></dt>
+<dd>La rotta più specifica è <code>192.168.1.0/24</code>. R1 può individuare il destinatario sul collegamento e consegnargli il pacchetto attraverso l’interfaccia locale.</dd>
+<dt><strong><code>8.8.8.8</code> · R2</strong></dt>
+<dd>L’unico prefisso compatibile è <code>0.0.0.0/0</code>. R1 inoltra il pacchetto al prossimo router, R2.</dd>
+</dl>
+</section>
+
+<section id="sezione-13">
+<h2>5. Come si sceglie fra più rotte compatibili?</h2>
+<p>Aggiungiamo a R1 una rotta per <code>192.168.4.128/25</code> attraverso R2. Questa sottorete copre solo la metà superiore della <code>/24</code>. Vediamo quali rotte corrispondono a due pacchetti.</p>
+<table>
+<caption>Confronto delle destinazioni <code>192.168.4.200</code> e <code>192.168.4.90</code></caption>
+<thead><tr><th scope="col">Destinazione della rotta</th><th scope="col">Prossimo passo</th><th scope="col">Corrisponde a <code>.200</code>?</th><th scope="col">Corrisponde a <code>.90</code>?</th></tr></thead>
+<tbody>
+<tr><th scope="row"><code>192.168.1.0/24</code></th><td>Consegna diretta</td><td>No</td><td>No</td></tr>
+<tr><th scope="row"><code>192.168.4.0/24</code></th><td>R3</td><td>Sì</td><td><strong>Sì, scelta</strong></td></tr>
+<tr><th scope="row"><code>192.168.4.128/25</code></th><td>R2</td><td><strong>Sì, scelta</strong></td><td>No</td></tr>
+<tr><th scope="row"><code>0.0.0.0/0</code></th><td>R2</td><td>Sì</td><td>Sì</td></tr>
+</tbody>
+</table>
+<p class="callout"><strong>Longest Prefix Match.</strong> Prima R1 individua i prefissi che corrispondono all’indirizzo IP di destinazione. Poi sceglie il più lungo fra quelli compatibili. Un prefisso più lungo richiede che coincidano più bit iniziali dell’indirizzo.</p>
+<h3>Perché <code>.200</code> va a R2 e <code>.90</code> va a R3?</h3>
+<p>La rete <code>192.168.4.0/24</code> copre tutto l’intervallo da <code>192.168.4.0</code> a <code>192.168.4.255</code>. Il bit in più della <code>/25</code> divide l’ultimo ottetto in due metà.</p>
+<table>
+<thead><tr><th scope="col">Ultimo ottetto da 0 a 127</th><th scope="col">Ultimo ottetto da 128 a 255</th></tr></thead>
+<tbody><tr><td><strong><code>.90</code> è qui.</strong> Corrisponde alla <code>/24</code> e alla <code>/0</code>. Vince la <code>/24</code> e R1 inoltra a <strong>R3</strong>.</td><td><strong><code>.200</code> è qui.</strong> Corrisponde anche alla <code>192.168.4.128/25</code>. Vince la <code>/25</code> e R1 inoltra a <strong>R2</strong>.</td></tr></tbody>
+</table>
+<p>Gli intervalli comprendono gli indirizzi di rete e di broadcast perché qui stiamo verificando la corrispondenza con il prefisso.</p>
+</section>
+
+<section id="sezione-15">
+<h2>6. Quando si usa la rotta predefinita?</h2>
+<p><code>0.0.0.0/0</code> richiede zero bit iniziali in comune, quindi corrisponde a qualsiasi indirizzo IPv4. R1 la usa quando nessun prefisso più specifico corrisponde.</p>
+<p>Se togliamo la <code>/0</code> e arriva un pacchetto per <code>8.8.8.8</code>, nessuna rotta corrisponde. R1 scarta il pacchetto e può inviare al mittente un messaggio ICMP di destinazione irraggiungibile.</p>
+<p>Con la <code>/0</code>, R1 può affidare il pacchetto a R2. La consegna dipende anche dalle rotte e dai collegamenti delle tappe successive.</p>
+</section>
 <section class="lab-panel" id="rotta-predefinita" data-routing-visual="default" data-level="base">
 <h2>Un pacchetto per 8.8.8.8 arriva a R1</h2><p>Cambia le rotte disponibili. Premi Avanti per vedere prima le corrispondenze, poi la decisione di R1.</p>
 <noscript>Abilita JavaScript per usare i comandi della simulazione.</noscript>
 </section>
-<section><h2>Gateway del computer e rotta predefinita del router</h2>
-<p>PC1 usa R1 come <strong>gateway predefinito</strong>. Quando la destinazione è fuori dalla rete locale, PC1 consegna il primo frame a R1. R1 fa una nuova ricerca nella propria tabella. Se nessuna rotta più specifica corrisponde, può usare la sua <strong>rotta predefinita</strong> e consegnare il pacchetto a R2.</p>
-<p>R2 deve ancora decidere come proseguire. Se si ferma per una rotta mancante o un guasto, la scelta di R1 è avvenuta correttamente ma il pacchetto non arriva. Per uno scambio completo serve anche una strada di ritorno.</p></section><section class="lab-panel" id="esperimento-visuale" data-routing-visual="prefix" data-level="base">
-<h2>Prova una destinazione</h2><p>Qui vedi un solo router con le sue uscite. Scegli un indirizzo e avanza per vedere quali righe corrispondono e quale uscita viene usata.</p>
+
+<section id="origine-rotte">
+<h2>7. Da dove arrivano le rotte?</h2>
+<ul>
+<li><strong>Direttamente collegata.</strong> Il router conosce il prefisso della rete associata a un’interfaccia attiva e configurata.</li>
+<li><strong>Statica.</strong> Un amministratore configura manualmente la rotta.</li>
+<li><strong>Dinamica.</strong> Il router apprende la rotta attraverso un protocollo di routing che scambia informazioni con altri router.</li>
+</ul>
+<p>Anche la rotta predefinita può essere configurata manualmente o appresa.</p>
+</section><section class="lab-panel" id="esperimento-visuale" data-routing-visual="prefix" data-level="base">
+<h2>Prova il prefisso più lungo su un’altra tabella</h2><p>Qui il router A usa prefissi diversi da quelli di R1. Scegli un indirizzo e avanza per vedere quali righe corrispondono e quale uscita viene usata.</p>
 <noscript>Abilita JavaScript per usare i comandi della simulazione.</noscript>
 </section>
-<p class="source-note"><a href="mappa.html">Mappa del percorso</a> · <a href="fonti.html">Riferimenti</a></p></main><script src="routing-core.js"></script><script src="visual-core.js"></script><script src="visual-labs.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="routing-04-pacchetto" rel="prev" href="04-pacchetto.html"><small>← Precedente</small><span>04 · Il viaggio di un pacchetto</span></a><a class="lesson-catalog" href="../../index.html?course=routing" data-school-catalog="routing">Tutte le lezioni<span>6 / 16</span></a><a class="lesson-neighbor" data-school-link="routing-06-statico" rel="next" href="06-statico.html"><small>Successiva →</small><span>06 · Routing statico e strada di ritorno</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>
+<section id="verifica">
+<h2>8. E se cambiassimo la destinazione?</h2>
+<p>Usa la tabella di R1 con le quattro rotte della sezione sul <a href="#sezione-13">Longest Prefix Match</a>. Per ogni pacchetto, elenca i prefissi compatibili e scegli l’uscita. Nell’ultima domanda rimuovi la rotta predefinita.</p>
+<form id="quiz"><div class="actions"><button type="submit">Verifica risposte</button><button type="button" class="secondary" id="retry">Ricomincia</button></div></form>
+<p id="score" role="status"></p>
+<noscript>Abilita JavaScript per usare il quiz. Puoi aprire gli esempi qui sotto anche senza JavaScript.</noscript>
+
+<h3>Altri esempi da ragionare</h3>
+<details><summary><code>192.168.4.127</code> · Quale prefisso vince appena sotto il confine?</summary>
+<p><code>.127</code> è fuori dall’intervallo della <code>192.168.4.128/25</code>. Fra <code>/24</code> e <code>/0</code> vince la <code>/24</code>, quindi R1 inoltra a <strong>R3</strong>.</p></details>
+<details><summary><code>192.168.4.129</code> · Che cosa cambia appena sopra il confine?</summary>
+<p><code>.129</code> è compreso fra <code>.128</code> e <code>.255</code>. Corrisponde a <code>/25</code>, <code>/24</code> e <code>/0</code>. Vince la <code>/25</code>, quindi R1 inoltra a <strong>R2</strong>.</p></details>
+<details><summary><code>11.23.54.253</code> · Quale riga rimane?</summary>
+<p>La <code>0.0.0.0/0</code> è l’unica corrispondenza, quindi R1 inoltra a <strong>R2</strong>. Se la togli dalla tabella, R1 <strong>scarta il pacchetto</strong>.</p></details>
+
+<h3>Domande di ragionamento</h3>
+<ol>
+<li>Come può R1 conoscere una rotta per un’intera rete senza memorizzare un indirizzo per ogni dispositivo?</li>
+<li>Se R1 inoltra un pacchetto a R3, che cosa deve succedere perché il pacchetto raggiunga PC4?</li>
+<li>Che cosa fa R1 quando la rotta scelta indica una rete direttamente collegata? Che cosa fa quando indica un prossimo router?</li>
+</ol>
+</section>
+
+<section id="dalla-lettura-alla-configurazione">
+<h2>9. Dalla lettura alla configurazione</h2>
+<p>Per <code>192.168.4.10</code>, R1 sceglie la rotta <code>192.168.4.0/24</code> via R3. In questa riga il prefisso indica gli indirizzi a cui si applica la rotta. R3 è il prossimo salto e riceve un pacchetto che ha ancora <code>192.168.4.10</code> come destinazione IP.</p>
+<details><summary>Se R3 conosce solo le sue reti direttamente collegate, dove si ferma il pacchetto?</summary><p>Si ferma a R3. R1 ha raggiunto il suo prossimo salto, ma R3 deve consultare la propria tabella. La rete di PC4 è collegata a R4, quindi R3 scarta il pacchetto se non dispone di una rotta compatibile.</p></details>
+<p>Come inseriamo la rotta mancante su R3? Quali rotte servono perché anche la risposta di PC4 arrivi a PC1? Nella <a href="06-statico.html">lezione 06</a> configureremo andata e ritorno un router alla volta.</p>
+</section>
+<p class="source-note"><a href="mappa.html">Mappa del percorso</a> · <a href="fonti.html">Riferimenti</a></p></main><script src="routing-core.js"></script><script src="visual-core.js"></script><script src="visual-labs.js"></script><script>window.quizData={"questions":[["Destinazione 192.168.4.10",["Rete direttamente collegata","Router R2","Router R3","Scarta il pacchetto"],2,"Corrispondono /24 e /0. Vince 192.168.4.0/24, quindi R1 inoltra a R3."],["Destinazione 192.168.4.200",["Rete direttamente collegata","Router R2","Router R3","Scarta il pacchetto"],1,"Corrispondono /25, /24 e /0. Vince 192.168.4.128/25, quindi R1 inoltra a R2."],["Destinazione 192.168.1.50",["Rete direttamente collegata","Router R2","Router R3","Scarta il pacchetto"],0,"Vince 192.168.1.0/24, che indica una rete direttamente collegata a R1."],["Destinazione 11.23.54.253",["Rete direttamente collegata","Router R2","Router R3","Scarta il pacchetto"],1,"L’unico prefisso compatibile è 0.0.0.0/0, quindi R1 inoltra a R2."],["Destinazione 11.23.54.253 (senza la rotta predefinita)",["Rete direttamente collegata","Router R2","Router R3","Scarta il pacchetto"],3,"Senza la /0, la tabella non contiene alcun prefisso compatibile. R1 scarta il pacchetto."]]};</script><script src="../../quiz.js"></script><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="routing-04-pacchetto" rel="prev" href="04-pacchetto.html"><small>← Precedente</small><span>04 · Il viaggio di un pacchetto</span></a><a class="lesson-catalog" href="../../index.html?course=routing" data-school-catalog="routing">Tutte le lezioni<span>6 / 16</span></a><a class="lesson-neighbor" data-school-link="routing-06-statico" rel="next" href="06-statico.html"><small>Successiva →</small><span>06 · Routing statico e strada di ritorno</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

@@ -38,7 +38,7 @@ const basics = [
   ['02-indirizzi.html', '02 · IP, MAC, subnet e NAT'],
   ['03-viaggio-applicazione.html', '03 · Dall’applicazione alla rete']
 ];
-for (const { file, title, lead, body, extra = '' } of lessons) {
+for (const { file, title, lead, body, extra = '', scripts = '' } of lessons) {
   const key = file.slice(0,2);
   let content = body;
   if (key === '04') {
@@ -51,7 +51,7 @@ for (const { file, title, lead, body, extra = '' } of lessons) {
       'A–B costa 2, A–C costa 5, B–C costa 1, B–D costa 4 e C–D costa 2.');
     content = body.replace(/<pre class="diagram-code".*?<\/pre>/, graph);
   }
-  page(file, title, lead, content + lessonPanels[key] + extra, key === '12' ? 'exercise' : 'lesson', visualScripts);
+  page(file, title, lead, content + lessonPanels[key] + extra, key === '12' ? 'exercise' : 'lesson', visualScripts + scripts);
 }
 
 const roadmap = [...basics, ...lessons.map(({file,title}) => [file,title])];

@@ -1412,7 +1412,7 @@ window.schoolCatalog = {
       "title": "05 · Come leggere una tabella di routing",
       "kind": "lesson",
       "path": "materials/routing/05-tabella.html",
-      "description": "Parti dall’indirizzo di destinazione e individua l’uscita giusta.",
+      "description": "Come fa R1 a scegliere dove inoltrare un pacchetto? Leggi la sua tabella, confronta i prefissi e individua il prossimo salto.",
       "chapter": "routing-02"
     },
     {
@@ -1421,7 +1421,7 @@ window.schoolCatalog = {
       "title": "06 · Routing statico e strada di ritorno",
       "kind": "lesson",
       "path": "materials/routing/06-statico.html",
-      "description": "Costruisci un percorso a mano, poi osserva come reagisce a un guasto.",
+      "description": "Configura le rotte da PC1 a PC4, prepara il ritorno e osserva che cosa succede quando un collegamento si guasta.",
       "chapter": "routing-02"
     },
     {

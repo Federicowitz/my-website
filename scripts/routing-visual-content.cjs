@@ -8,8 +8,8 @@ function visualPanel(id, modes, title, intro, level = 'base') {
 const lessonPanels = {
   '04': visualPanel('esperimento-visuale', 'packet', 'Segui il punto blu',
     'Passiamo dai quattro router dell’esempio a una rete di dodici. A fa da gateway e L consegna al server. Premi Avanti e segui prima l’andata, poi il ritorno.', 'intro'),
-  '05': visualPanel('esperimento-visuale', 'prefix', 'Prova una destinazione',
-    'Qui vedi un solo router con le sue uscite. Scegli un indirizzo e avanza per vedere quali righe corrispondono e quale uscita viene usata.'),
+  '05': visualPanel('esperimento-visuale', 'prefix', 'Prova il prefisso più lungo su un’altra tabella',
+    'Qui il router A usa prefissi diversi da quelli di R1. Scegli un indirizzo e avanza per vedere quali righe corrispondono e quale uscita viene usata.'),
   '06': visualPanel('rotta-manuale', 'manual', 'Scegli la strada e prova il ritorno',
     'Scegli R2 o R3 e imposta «Manca la rotta di ritorno». Avanza fino a quando la risposta si ferma a R4. Poi torna a «Rete operativa» per ripristinare la rotta e ripeti il viaggio.') +
     visualPanel('esperimento-visuale', 'static', 'Lo stesso problema nella rete grande',
