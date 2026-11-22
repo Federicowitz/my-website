@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Indici, cache e distribuzione dei contenuti — Federico Lelli</title><meta name="description" content="Riduci i tempi di lettura e gestisci le copie obsolete.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/cache.html"><meta property="og:title" content="Indici, cache e distribuzione dei contenuti — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/cache.html"><meta property="og:description" content="Indici, cache e distribuzione dei contenuti. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-cache"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-dati" rel="prev" href="dati.html"><small>← Precedente</small><span>Dati, transazioni e concorrenza</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>7 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-repliche" rel="next" href="repliche.html"><small>Successiva →</small><span>Disponibilità e dati distribuiti</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Indici, cache e distribuzione dei contenuti</h1>
+<h2 id="database-indexing-velocizzare-le-ricerche">Database Indexing: velocizzare le ricerche</h2>
+<p>Immaginiamo che EventiScuola contenga milioni di prenotazioni.</p>
+<p>Quando un utente apre la pagina <em>Le mie prenotazioni</em>, il sistema deve trovare soltanto quelle associate al suo account.</p>
+<p>Senza un indice adeguato, il database potrebbe dover esaminare un numero molto elevato di record.</p>
+<p>Un <strong>indice</strong> è una struttura dati che consente di individuare più velocemente le informazioni.</p>
+<p>È simile all'indice analitico di un libro: invece di sfogliare ogni pagina, si cerca l'argomento e si raggiunge direttamente la parte interessata.</p>
+<p>Per esempio:</p>
+<pre><code>CREATE INDEX idx_prenotazioni_utente
+ON Prenotazioni(utente_id);
+</code></pre>
+<p>L'indice può aiutare il database a trovare rapidamente le prenotazioni appartenenti a uno specifico utente.</p>
+<p>Molti database relazionali utilizzano strutture come i B-tree per questo scopo.</p>
+<h3 id="perche-non-creare-un-indice-per-ogni-colonna"><strong>Perché non creare un indice per ogni colonna?</strong></h3>
+<p>Gli indici hanno un costo:</p>
+<ul>
+<li>occupano spazio;</li>
+<li>devono essere mantenuti quando i dati cambiano;</li>
+<li>possono rallentare inserimenti e aggiornamenti;</li>
+<li>non risultano utili allo stesso modo per tutte le query.</li>
+</ul>
+<p>La scelta degli indici deve derivare dalle interrogazioni effettivamente eseguite e dall'analisi delle loro prestazioni.</p>
+<h2 id="cache-evitare-operazioni-ripetute">Cache: evitare operazioni ripetute</h2>
+<p>Anche con gli indici, un database può essere sovraccaricato quando moltissimi utenti chiedono continuamente le stesse informazioni.</p>
+<p>Supponiamo che un evento molto popolare venga consultato centinaia di migliaia di volte.</p>
+<p>Il titolo, il luogo e la descrizione cambiano raramente. Interrogare il database per recuperare continuamente gli stessi dati può essere uno spreco di risorse.</p>
+<p>Una soluzione è la <strong>cache</strong>.</p>
+<p>La cache conserva copie di informazioni che possono essere recuperate rapidamente.</p>
+<p>Nella strategia <em>cache-aside</em>, l'applicazione cerca prima il dato nella cache.</p>
+<p>Se lo trova, si verifica un <strong>cache hit</strong>.</p>
+<p>Se non lo trova, si verifica un <strong>cache miss</strong>: l'applicazione recupera il dato dal database e può inserirlo in cache per le richieste successive.</p>
+<p>Un software molto utilizzato per realizzare cache è Redis.</p>
+<h3 id="ttl-e-invalidazione"><strong>TTL e invalidazione</strong></h3>
+<p>La cache introduce un nuovo problema: il dato copiato potrebbe diventare obsoleto.</p>
+<p>Per esempio, un evento cambia orario, ma la cache contiene ancora quello precedente.</p>
+<p>Il <strong>TTL (Time To Live)</strong> indica per quanto tempo un elemento può rimanere nella cache prima di scadere.</p>
+<p>Un'altra strategia è l'<strong>invalidazione attiva</strong>, con cui l'applicazione elimina o aggiorna la copia quando il dato originale cambia.</p>
+<p>Per i dati poco critici può essere accettabile un breve ritardo.</p>
+<p>Per informazioni come autorizzazioni, disponibilità effettiva dei posti e risultati dei pagamenti, è invece necessario adottare controlli più rigorosi.</p>
+<p>La cache non dovrebbe essere considerata automaticamente la fonte definitiva della verità.</p>
+<h3 id="cache-stampede"><strong>Cache Stampede</strong></h3>
+<p>Se un elemento molto richiesto scade improvvisamente, migliaia di richieste potrebbero interrogare contemporaneamente il database per ricostruirlo.</p>
+<p>Il fenomeno si chiama <strong>cache stampede</strong>.</p>
+<p>Si può mitigare coordinando l'aggiornamento dell'elemento, anticipando il refresh oppure evitando scadenze simultanee di molti elementi popolari.</p>
+<h2 id="cdn-avvicinare-i-contenuti-agli-utenti">CDN: avvicinare i contenuti agli utenti</h2>
+<p>Una cache applicativa può ridurre il lavoro del database, ma non risolve necessariamente il problema della distanza geografica.</p>
+<p>Se il server principale si trova in Europa e un utente accede dall'Australia, immagini e file potrebbero dover attraversare collegamenti molto lunghi.</p>
+<p>Una <strong>CDN (Content Delivery Network)</strong> utilizza una rete di server distribuiti geograficamente per fornire contenuti da posizioni più vicine agli utenti.</p>
+<p>I server edge mantengono copie dei contenuti e possono servirli agli utenti più vicini.</p>
+<p>Quando un utente richiede un'immagine, la CDN verifica se il contenuto è disponibile sul server edge appropriato.</p>
+<p>Se è presente, viene consegnato direttamente. Altrimenti, il server può recuperarlo dall'origine e conservarne una copia.</p>
+<h3 id="cache-e-cdn-non-sono-la-stessa-cosa"><strong>Cache e CDN non sono la stessa cosa</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Cache applicativa</th>
+<th>CDN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Riduce soprattutto il lavoro ripetuto dei servizi e del database</td>
+<td>Riduce soprattutto la distanza e il carico di distribuzione dei contenuti</td>
+</tr>
+<tr>
+<td>Può memorizzare risultati di query o dati applicativi</td>
+<td>Memorizza comunemente immagini, video, CSS, JavaScript e contenuti web</td>
+</tr>
+<tr>
+<td>Può trovarsi vicino al backend</td>
+<td>Utilizza numerosi server geograficamente distribuiti</td>
+</tr>
+</tbody>
+</table>
+<p>Entrambe sfruttano il riutilizzo di dati, ma rispondono a esigenze differenti.</p>
+<h2 id="object-storage-dove-salvare-i-file">Object Storage: dove salvare i file?</h2>
+<p>Un'applicazione può contenere molte immagini, video e documenti.</p>
+<p>Memorizzare ogni file direttamente sul disco locale di un server applicativo crea problemi quando si utilizzano più server.</p>
+<p>Se un utente carica un'immagine sul server A e la richiesta successiva raggiunge il server B, il file potrebbe non essere presente.</p>
+<p>Una soluzione è utilizzare un servizio di <strong>Object Storage</strong>.</p>
+<p>In questo modello i file vengono memorizzati come oggetti accessibili tramite identificatori.</p>
+<p>Il database può conservare le informazioni relative al file e il riferimento all'oggetto.</p>
+<pre><code>DATABASE
+Evento: 42
+Titolo: Concerto di primavera
+Poster: posters/evento42.jpg
+
+OBJECT STORAGE
+posters/evento42.jpg → contenuto immagine
+</code></pre>
+<p>Un esempio di servizio di object storage è Amazon S3.</p>
+<p>La CDN può successivamente distribuire copie dei file conservati nell'object storage.</p>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-dati" rel="prev" href="dati.html"><small>← Precedente</small><span>Dati, transazioni e concorrenza</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>7 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-repliche" rel="next" href="repliche.html"><small>Successiva →</small><span>Disponibilità e dati distribuiti</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

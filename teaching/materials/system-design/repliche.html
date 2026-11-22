@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Disponibilità e dati distribuiti — Federico Lelli</title><meta name="description" content="Valuta repliche, consistenza e suddivisione dei dati.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/repliche.html"><meta property="og:title" content="Disponibilità e dati distribuiti — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/repliche.html"><meta property="og:description" content="Disponibilità e dati distribuiti. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-repliche"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-cache" rel="prev" href="cache.html"><small>← Precedente</small><span>Indici, cache e distribuzione dei contenuti</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>8 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-servizi" rel="next" href="servizi.html"><small>Successiva →</small><span>Messaggi e servizi</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Disponibilità e dati distribuiti</h1>
+<h2 id="single-point-of-failure-e-ridondanza">Single Point of Failure e ridondanza</h2>
+<p>Immaginiamo di avere tre server applicativi dietro un load balancer.</p>
+<p>I server utilizzano tutti lo stesso database.</p>
+<p>Se uno dei tre server applicativi si guasta, gli altri possono continuare a rispondere.</p>
+<p>Se però il database è uno solo e si guasta, tutte le funzionalità che dipendono da esso potrebbero smettere di funzionare.</p>
+<p>Questo componente rappresenta un <strong>Single Point of Failure (SPOF)</strong>, cioè un punto singolo di guasto.</p>
+<p>Un sistema possiede un SPOF quando il malfunzionamento di un unico elemento può rendere indisponibile una funzione essenziale.</p>
+<p>Anche un load balancer unico può diventare un punto di guasto.</p>
+<p>Una strategia per mitigare questo rischio è la <strong>ridondanza</strong>, cioè predisporre componenti alternativi che possano assumere il lavoro di quelli non disponibili.</p>
+<p>La ridondanza deve essere progettata con attenzione: due server alimentati dallo stesso dispositivo elettrico potrebbero guastarsi contemporaneamente se quel dispositivo smettesse di funzionare.</p>
+<h2 id="database-replication">Database Replication</h2>
+<p>Per aumentare disponibilità e capacità di lettura, un database può essere replicato.</p>
+<p>In una configurazione frequente, si utilizza un database primario e una o più repliche.</p>
+<p>Nel modello primary-replica:</p>
+<ul>
+<li>le scritture vengono effettuate sul primario;</li>
+<li>le modifiche vengono propagate alle repliche;</li>
+<li>alcune letture possono essere distribuite tra primario e repliche;</li>
+<li>in caso di guasto del primario, una replica può essere promossa a nuovo primario.</li>
+</ul>
+<p>La promozione di una replica prende il nome di <strong>failover</strong>.</p>
+<h3 id="replicazione-sincrona-e-asincrona"><strong>Replicazione sincrona e asincrona</strong></h3>
+<p>Nella <strong>replicazione sincrona</strong>, una scrittura può richiedere la conferma di una o più repliche prima di essere considerata completata.</p>
+<p>Questo può migliorare determinate garanzie di durabilità, al prezzo di maggiore latenza e possibili problemi di disponibilità.</p>
+<p>Nella <strong>replicazione asincrona</strong>, il primario può confermare la scrittura prima che essa raggiunga le repliche.</p>
+<p>Questa modalità può essere più rapida, ma introduce un intervallo durante il quale le repliche potrebbero essere arretrate.</p>
+<h3 id="replication-lag"><strong>Replication Lag</strong></h3>
+<p>Il ritardo con cui una replica riceve gli aggiornamenti prende il nome di <em>replication lag</em>.</p>
+<p>Supponiamo che un utente prenoti un biglietto e aggiorni immediatamente la pagina.</p>
+<p>La scrittura è stata completata sul primario, ma la lettura raggiunge una replica non ancora aggiornata.</p>
+<p>Il biglietto potrebbe non comparire subito.</p>
+<p>Una possibile strategia è effettuare le letture immediatamente successive alla scrittura su una fonte che garantisca la visualizzazione del dato aggiornato.</p>
+<h3 id="replication-non-significa-backup"><strong>Replication non significa Backup</strong></h3>
+<p>Le repliche non sostituiscono i backup.</p>
+<p>Se un amministratore cancella erroneamente dati importanti sul primario, la cancellazione potrebbe essere propagata anche alle repliche.</p>
+<p>Un <strong>backup</strong> conserva una copia recuperabile dei dati, possibilmente isolata dal sistema operativo principale e protetta da modifiche accidentali.</p>
+<p>Il disaster recovery comprende l'insieme delle procedure necessarie per ripristinare il servizio dopo incidenti gravi.</p>
+<h2 id="consistenza-dei-dati-e-teorema-cap">Consistenza dei dati e teorema CAP</h2>
+<p>Quando esistono più copie di un'informazione nasce una domanda:</p>
+<p><strong>Come si garantisce che tutti i server vedano dati corretti?</strong></p>
+<h3 id="strong-consistency"><strong>Strong Consistency</strong></h3>
+<p>Un modello di consistenza forte può garantire che le letture osservino le scritture già completate, secondo regole precise.</p>
+<p>È particolarmente importante quando operazioni concorrenti non devono produrre risultati incompatibili.</p>
+<h3 id="eventual-consistency"><strong>Eventual Consistency</strong></h3>
+<p>Con la consistenza eventuale, le copie possono essere temporaneamente differenti.</p>
+<p>Se non arrivano ulteriori aggiornamenti e i meccanismi di sincronizzazione funzionano, le repliche convergono progressivamente verso uno stato coerente.</p>
+<p>La consistenza eventuale non garantisce che la convergenza avvenga entro un tempo fisso.</p>
+<h3 id="cap-theorem"><strong>CAP Theorem</strong></h3>
+<p>Il teorema CAP riguarda i sistemi distribuiti e il comportamento durante una partizione di rete.</p>
+<p>Le tre proprietà sono:</p>
+<table>
+<thead>
+<tr>
+<th>Proprietà</th>
+<th>Significato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consistency</td>
+<td>Le operazioni osservano una vista coerente secondo il modello del teorema</td>
+</tr>
+<tr>
+<td>Availability</td>
+<td>Ogni richiesta ricevuta da un nodo operativo ottiene una risposta</td>
+</tr>
+<tr>
+<td>Partition Tolerance</td>
+<td>Il sistema affronta interruzioni della comunicazione tra parti della rete</td>
+</tr>
+</tbody>
+</table>
+<p>Quando si verifica una partizione, un sistema non può garantire contemporaneamente la consistenza definita dal teorema e la disponibilità di tutte le operazioni sui nodi raggiungibili.</p>
+<p>Per esempio, se due datacenter non riescono a comunicare, entrambi potrebbero ricevere una richiesta per acquistare lo stesso posto.</p>
+<p>Accettare entrambe le richieste aumenta la disponibilità, ma potrebbe produrre un conflitto.</p>
+<p>Rifiutare o sospendere temporaneamente una delle operazioni tutela la correttezza, ma sacrifica disponibilità per quella richiesta.</p>
+<p>La scelta dipende dalle esigenze.</p>
+<p>Un conteggio dei visitatori può tollerare temporanee differenze; l'assegnazione esclusiva di un posto richiede garanzie più rigorose.</p>
+<h2 id="sharding-quando-il-database-diventa-troppo-grande">Sharding: quando il database diventa troppo grande</h2>
+<p>La replicazione mantiene copie dello stesso insieme di dati.</p>
+<p>Se il database principale contiene 5 TB, anche una replica completa deve poter conservare quegli stessi 5 TB.</p>
+<p>Quando la quantità di dati o il carico di scrittura diventano eccessivi per una singola istanza, una possibile soluzione è lo <strong>sharding</strong>.</p>
+<p>Lo sharding divide orizzontalmente i dati tra più database, chiamati <em>shard</em>.</p>
+<p>Un modo semplice è dividere i dati per intervalli.</p>
+<p>Per esempio, i primi mille utenti nello shard 1, i successivi mille nello shard 2 e così via.</p>
+<p>Un'altra possibilità consiste nel selezionare lo shard mediante una funzione hash.</p>
+<p>La proprietà utilizzata per decidere dove collocare il record si chiama <strong>shard key</strong>.</p>
+<p>Per EventiScuola potrebbe essere l'identificatore dell'evento o dell'utente, a seconda delle operazioni che il sistema deve effettuare più spesso.</p>
+<h3 id="replica-e-shard-differenza-fondamentale"><strong>Replica e Shard: differenza fondamentale</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Replicazione</th>
+<th>Sharding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Crea copie dello stesso insieme di dati</td>
+<td>Suddivide i dati in parti</td>
+</tr>
+<tr>
+<td>Migliora ridondanza e può distribuire letture</td>
+<td>Distribuisce capacità di memorizzazione e carico</td>
+</tr>
+<tr>
+<td>Le repliche contengono dati corrispondenti</td>
+<td>Gli shard contengono porzioni differenti</td>
+</tr>
+<tr>
+<td>Non risolve da sola il limite di dimensione del primario</td>
+<td>Introduce complessità nella distribuzione e nelle query</td>
+</tr>
+</tbody>
+</table>
+<p>Lo sharding non è gratuito: operazioni che coinvolgono più shard possono richiedere comunicazioni aggiuntive.</p>
+<h3 id="consistent-hashing"><strong>Consistent Hashing</strong></h3>
+<p>Se i dati sono assegnati agli shard mediante una regola semplice come <code>ID % numero_shard</code>, aggiungere un nuovo shard può modificare la destinazione di moltissimi record.</p>
+<p>Il <strong>consistent hashing</strong> è una tecnica che permette, in determinate configurazioni, di limitare la quantità di dati da riassegnare quando cambia il numero di nodi.</p>
+<p>Viene utilizzato in diversi sistemi distribuiti, tra cui architetture di caching e memorizzazione distribuita.</p>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-cache" rel="prev" href="cache.html"><small>← Precedente</small><span>Indici, cache e distribuzione dei contenuti</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>8 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-servizi" rel="next" href="servizi.html"><small>Successiva →</small><span>Messaggi e servizi</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

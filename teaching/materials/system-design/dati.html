@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dati, transazioni e concorrenza — Federico Lelli</title><meta name="description" content="Proteggi un posto conteso da due studenti.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/dati.html"><meta property="og:title" content="Dati, transazioni e concorrenza — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/dati.html"><meta property="og:description" content="Dati, transazioni e concorrenza. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-dati"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-scalabilita" rel="prev" href="scalabilita.html"><small>← Precedente</small><span>Dal server unico al bilanciamento</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>6 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-cache" rel="next" href="cache.html"><small>Successiva →</small><span>Indici, cache e distribuzione dei contenuti</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Dati, transazioni e concorrenza</h1>
+<h2 id="dal-server-unico-al-database">Dal server unico al database</h2>
+<p>All'inizio EventiScuola potrebbe essere eseguito interamente su un solo computer.</p>
+<pre><code>             UTENTI
+                |
+                v
+       +-----------------+
+       |     SERVER      |
+       |-----------------|
+       | Applicazione    |
+       | Database        |
+       | File e immagini |
+       +-----------------+
+</code></pre>
+<p>Questa architettura è semplice da configurare e mantenere, ma presenta alcuni limiti.</p>
+<p>Se il computer si guasta, il servizio smette di funzionare. Se vengono eseguite troppe operazioni, applicazione e database competono per le stesse risorse.</p>
+<p>Una possibile evoluzione consiste nel separare il server applicativo dal database.</p>
+<pre><code>   CLIENT
+      |
+      v
++----------------+
+| SERVER WEB /   |
+| APPLICATIVO    |
++----------------+
+      |
+      v
++----------------+
+| SERVER         |
+| DATABASE       |
++----------------+
+</code></pre>
+<p>I due componenti svolgono funzioni differenti:</p>
+<p><strong>Server applicativo:</strong> esegue le regole del servizio.</p>
+<p><strong>Database server:</strong> memorizza i dati ed esegue le operazioni necessarie per recuperarli o modificarli.</p>
+<p>La separazione consente anche di potenziare i due sistemi indipendentemente.</p>
+<h2 id="progettazione-dei-dati-data-modeling">Progettazione dei dati: Data Modeling</h2>
+<p>Prima di scegliere un database bisogna stabilire quali informazioni memorizzare e quali relazioni esistono tra esse.</p>
+<p>Per EventiScuola possiamo individuare queste entità:</p>
+<table>
+<thead>
+<tr>
+<th>Entità</th>
+<th>Dati principali</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Utenti</td>
+<td>ID, nome, email</td>
+</tr>
+<tr>
+<td>Eventi</td>
+<td>ID, titolo, data, luogo</td>
+</tr>
+<tr>
+<td>Posti</td>
+<td>ID, evento associato, numero</td>
+</tr>
+<tr>
+<td>Prenotazioni</td>
+<td>ID, utente, posto, stato</td>
+</tr>
+<tr>
+<td>Pagamenti</td>
+<td>ID, prenotazione, importo, stato</td>
+</tr>
+</tbody>
+</table>
+<p>La tabella Prenotazioni collega un utente a un posto.</p>
+<p>Per esempio:</p>
+<table>
+<thead>
+<tr>
+<th>ID prenotazione</th>
+<th>ID utente</th>
+<th>ID posto</th>
+<th>Stato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>103</td>
+<td>42</td>
+<td>Confermata</td>
+</tr>
+<tr>
+<td>2</td>
+<td>105</td>
+<td>47</td>
+<td>Confermata</td>
+</tr>
+</tbody>
+</table>
+<p>È importante assegnare identificatori alle entità, perché permettono di collegare informazioni senza doverle duplicare inutilmente.</p>
+<h3 id="sql-e-database-relazionali"><strong>SQL e database relazionali</strong></h3>
+<p>I database relazionali organizzano le informazioni in tabelle composte da righe e colonne.</p>
+<p>Utilizzano SQL (Structured Query Language) per interrogare e modificare i dati.</p>
+<p>Tra gli esempi più diffusi ci sono PostgreSQL, MySQL e SQLite.</p>
+<p>Un vantaggio importante è la possibilità di rappresentare relazioni tra entità differenti e recuperare informazioni mediante operazioni come le JOIN.</p>
+<p>Per esempio:</p>
+<pre><code>SELECT Utenti.nome, Prenotazioni.id
+FROM Utenti
+JOIN Prenotazioni
+ON Utenti.id = Prenotazioni.utente_id;
+</code></pre>
+<p>La query collega le prenotazioni agli utenti che le hanno effettuate.</p>
+<h3 id="nosql"><strong>NoSQL</strong></h3>
+<p>NoSQL identifica una famiglia di database che utilizzano modelli differenti da quello relazionale tradizionale.</p>
+<p>Alcune categorie sono:</p>
+<table>
+<thead>
+<tr>
+<th>Categoria</th>
+<th>Modello</th>
+<th>Esempio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documentale</td>
+<td>Documenti simili a JSON</td>
+<td>MongoDB</td>
+</tr>
+<tr>
+<td>Chiave-valore</td>
+<td>Associazione chiave e valore</td>
+<td>Redis</td>
+</tr>
+<tr>
+<td>Wide-column</td>
+<td>Dati organizzati per partizioni e colonne</td>
+<td>Cassandra</td>
+</tr>
+<tr>
+<td>A grafo</td>
+<td>Nodi e relazioni</td>
+<td>Neo4j</td>
+</tr>
+</tbody>
+</table>
+<p>Un database documentale potrebbe memorizzare un evento e alcune informazioni correlate all'interno di un unico documento.</p>
+<p>Un database chiave-valore potrebbe invece associare un identificatore di sessione alle informazioni necessarie per riconoscere un utente.</p>
+<p>La scelta non dipende semplicemente dal fatto che i dati siano strutturati o meno. Bisogna considerare anche le operazioni richieste, le relazioni, i vincoli di integrità, il volume dei dati e le esigenze di scalabilità.</p>
+<p>I database SQL moderni possono inoltre gestire documenti JSON e grandi quantità di dati; alcuni database NoSQL offrono transazioni.</p>
+<h2 id="transazioni-e-proprieta-acid">Transazioni e proprietà ACID</h2>
+<p>Consideriamo un problema fondamentale per EventiScuola.</p>
+<p>Il posto B12 è libero. Due utenti tentano di acquistarlo nello stesso momento.</p>
+<p>Se entrambe le richieste leggono che il posto è libero e poi registrano due prenotazioni, il sistema vende due volte lo stesso posto.</p>
+<p>Per evitare situazioni simili sono necessari controlli di concorrenza, vincoli e transazioni.</p>
+<p>Una <strong>transazione</strong> è un insieme di operazioni che il database gestisce come un'unità logica.</p>
+<p>Le proprietà fondamentali sono rappresentate dall'acronimo ACID.</p>
+<table>
+<thead>
+<tr>
+<th>Proprietà</th>
+<th>Significato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A — Atomicity</strong></td>
+<td>Tutte le operazioni della transazione vengono confermate oppure annullate</td>
+</tr>
+<tr>
+<td><strong>C — Consistency</strong></td>
+<td>La transazione rispetta i vincoli di integrità definiti</td>
+</tr>
+<tr>
+<td><strong>I — Isolation</strong></td>
+<td>Le transazioni concorrenti vengono controllate secondo un livello di isolamento</td>
+</tr>
+<tr>
+<td><strong>D — Durability</strong></td>
+<td>I dati confermati sopravvivono ai guasti previsti dal sistema di persistenza</td>
+</tr>
+</tbody>
+</table>
+<p>Per la prenotazione del posto B12:</p>
+<ol>
+<li>Il database verifica che il posto possa essere assegnato.</li>
+<li>Registra la prenotazione.</li>
+<li>Segna il posto come occupato.</li>
+<li>Conferma le modifiche come una singola transazione.</li>
+</ol>
+<p>In alternativa, un vincolo di unicità sul posto prenotato può impedire la creazione di due prenotazioni attive per lo stesso posto.</p>
+<p>Le operazioni concorrenti devono essere coordinate: non basta eseguire una semplice lettura e poi una scrittura senza controlli.</p>
+<p>Questo è un esempio di come <strong>la correttezza del sistema sia importante quanto la velocità</strong>.</p>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-scalabilita" rel="prev" href="scalabilita.html"><small>← Precedente</small><span>Dal server unico al bilanciamento</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>6 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-cache" rel="next" href="cache.html"><small>Successiva →</small><span>Indici, cache e distribuzione dei contenuti</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

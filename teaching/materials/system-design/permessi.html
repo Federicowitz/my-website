@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Identità e permessi — Federico Lelli</title><meta name="description" content="Decidi chi può leggere o cancellare una prenotazione.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/permessi.html"><meta property="og:title" content="Identità e permessi — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/permessi.html"><meta property="og:description" content="Identità e permessi. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-permessi"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-sessioni-jwt" rel="prev" href="sessioni-jwt.html"><small>← Precedente</small><span>Come fa il server a ricordare il login?</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>4 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-scalabilita" rel="next" href="scalabilita.html"><small>Successiva →</small><span>Dal server unico al bilanciamento</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Identità e permessi</h1>
+<h2 id="authentication-e-authorization">Authentication e Authorization</h2>
+<p>Due concetti fondamentali della sicurezza sono l'autenticazione e l'autorizzazione.</p>
+<p><strong>Authentication:</strong> verifica l'identità del soggetto.</p>
+<p>Risponde alla domanda: <em>Chi sei?</em></p>
+<p><strong>Authorization:</strong> determina le operazioni che quel soggetto può compiere.</p>
+<p>Risponde alla domanda: <em>Che cosa puoi fare?</em></p>
+<p>Per esempio, uno studente può effettuare il login su EventiScuola, ma non deve poter modificare il prezzo di un evento.</p>
+<p>È autenticato, ma non autorizzato a eseguire quell'operazione.</p>
+<h2 id="metodi-e-tecnologie-di-autenticazione">Metodi e tecnologie di autenticazione</h2>
+<h3 id="sessioni-e-cookie"><strong>Sessioni e cookie</strong></h3>
+<p>Una tecnica tradizionale prevede che il server crei una sessione dopo il login.</p>
+<p>Il browser conserva un identificatore di sessione, spesso attraverso un cookie.</p>
+<p>Nelle richieste successive, il server utilizza tale identificatore per riconoscere l'utente.</p>
+<p>I cookie possono essere configurati con proprietà di sicurezza come <code>Secure</code>, <code>HttpOnly</code> e <code>SameSite</code>.</p>
+<h3 id="api-key"><strong>API Key</strong></h3>
+<p>Una API key è una chiave associata a un client o a un'applicazione.</p>
+<p>Può essere usata per identificare e controllare l'accesso alle API, ma non sempre rappresenta un'identità utente individuale.</p>
+<h3 id="bearer-token-e-jwt"><strong>Bearer Token e JWT</strong></h3>
+<p>Con l'autenticazione basata su token, il client invia una credenziale a ogni richiesta.</p>
+<p>Un formato utilizzato è JWT (JSON Web Token).</p>
+<p>Un JWT può contenere informazioni come identificatore dell'utente, scadenza e altri attributi.</p>
+<p>Un JWT firmato consente di verificare che il contenuto non sia stato modificato senza autorizzazione. <strong>Non è però necessariamente cifrato</strong>: le informazioni contenute possono essere leggibili.</p>
+<h3 id="access-token-e-refresh-token"><strong>Access Token e Refresh Token</strong></h3>
+<p>Un access token viene utilizzato per accedere alle risorse ed è generalmente di durata relativamente breve.</p>
+<p>Un refresh token permette di richiedere nuove credenziali di accesso senza ripetere ogni volta il login completo.</p>
+<p>La conservazione sicura di questi token è importante. I cookie HttpOnly possono mitigare determinati rischi legati all'accesso dei token tramite JavaScript, ma richiedono adeguate protezioni anche contro CSRF.</p>
+<h3 id="oauth-2.0"><strong>OAuth 2.0</strong></h3>
+<p>OAuth 2.0 è un framework di autorizzazione delegata.</p>
+<p>Permette, per esempio, di concedere a un'applicazione l'accesso limitato a determinate risorse senza comunicarle direttamente la password principale.</p>
+<h3 id="openid-connect"><strong>OpenID Connect</strong></h3>
+<p>OpenID Connect (OIDC) aggiunge un livello di identità a OAuth 2.0.</p>
+<p>È utilizzato in molte soluzioni di accesso federato.</p>
+<h3 id="single-sign-on"><strong>Single Sign-On</strong></h3>
+<p>Il Single Sign-On (SSO) permette di autenticarsi presso un sistema di identità e accedere successivamente a più applicazioni senza ripetere ogni volta l'intero processo di login.</p>
+<p>In contesti aziendali vengono utilizzati anche protocolli come SAML.</p>
+<h2 id="modelli-di-autorizzazione">Modelli di autorizzazione</h2>
+<p>Dopo aver riconosciuto l'utente, bisogna stabilire a quali risorse possa accedere.</p>
+<table>
+<thead>
+<tr>
+<th>Modello</th>
+<th>Funzionamento</th>
+<th>Esempio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RBAC</td>
+<td>Permessi assegnati in base ai ruoli</td>
+<td>Amministratore, organizzatore, studente</td>
+</tr>
+<tr>
+<td>ABAC</td>
+<td>Permessi basati su attributi e condizioni</td>
+<td>Un organizzatore modifica solo eventi della propria scuola</td>
+</tr>
+<tr>
+<td>ACL</td>
+<td>Elenco di autorizzazioni associato alla risorsa</td>
+<td>Uno specifico documento condiviso con determinati utenti</td>
+</tr>
+</tbody>
+</table>
+<p>I sistemi possono combinare questi modelli.</p>
+<p>Una regola generale è il <strong>principio del minimo privilegio</strong>: ogni soggetto deve ricevere soltanto le autorizzazioni necessarie a svolgere le proprie attività.</p>
+<h2 id="proteggere-le-api">Proteggere le API</h2>
+<p>Un'applicazione accessibile da Internet deve gestire tentativi di abuso e attacco.</p>
+<h3 id="rate-limiting"><strong>Rate Limiting</strong></h3>
+<p>Il rate limiting limita il numero di richieste consentite in un determinato intervallo.</p>
+<p>Un'API potrebbe consentire, ad esempio, 100 richieste al minuto per utente.</p>
+<p>Una tecnica comune è il <em>token bucket</em>, che permette brevi picchi mantenendo controllata la frequenza media.</p>
+<h3 id="injection"><strong>Injection</strong></h3>
+<p>Gli attacchi di injection sfruttano input non gestiti correttamente per alterare l'interpretazione di comandi o query.</p>
+<p>Per prevenirli si utilizzano, tra le altre misure, query parametrizzate, validazione degli input e privilegi minimi.</p>
+<h3 id="cors"><strong>CORS</strong></h3>
+<p>CORS (Cross-Origin Resource Sharing) è un meccanismo del browser che regola quando una pagina web può leggere risposte provenienti da origini differenti.</p>
+<p>Non è un sistema generale di autenticazione né una barriera valida contro qualsiasi client HTTP.</p>
+<h3 id="csrf"><strong>CSRF</strong></h3>
+<p>CSRF (Cross-Site Request Forgery) consiste nell'indurre il browser di un utente autenticato a inviare richieste indesiderate.</p>
+<p>Si contrasta con opportune protezioni, tra cui token anti-CSRF e configurazioni adeguate dei cookie.</p>
+<h3 id="waf-e-vpn"><strong>WAF e VPN</strong></h3>
+<p>Un <strong>WAF (Web Application Firewall)</strong> analizza traffico HTTP e può bloccare determinate richieste malevole.</p>
+<p>Una <strong>VPN (Virtual Private Network)</strong> può permettere di limitare l'accesso a servizi interni a utenti o dispositivi autorizzati.</p>
+<p>Queste misure sono complementari: nessuna, da sola, rende automaticamente sicura l'intera applicazione.</p>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-sessioni-jwt" rel="prev" href="sessioni-jwt.html"><small>← Precedente</small><span>Come fa il server a ricordare il login?</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>4 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-scalabilita" rel="next" href="scalabilita.html"><small>Successiva →</small><span>Dal server unico al bilanciamento</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

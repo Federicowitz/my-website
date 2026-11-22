@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Messaggi e servizi — Federico Lelli</title><meta name="description" content="Segui conferme e notifiche tra code, webhook e servizi.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/servizi.html"><meta property="og:title" content="Messaggi e servizi — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/servizi.html"><meta property="og:description" content="Messaggi e servizi. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-servizi"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-repliche" rel="prev" href="repliche.html"><small>← Precedente</small><span>Disponibilità e dati distribuiti</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>9 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-progetto" rel="next" href="progetto.html"><small>Successiva →</small><span>Una prenotazione completa</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Messaggi e servizi</h1>
+<h2 id="polling-e-websocket">Polling e WebSocket</h2>
+<p>Torniamo alla pagina di prenotazione.</p>
+<p>Gli utenti vedono una mappa con i posti disponibili.</p>
+<p>Quando qualcuno acquista il posto B12, sarebbe utile aggiornare immediatamente la schermata degli altri utenti.</p>
+<p>Con il normale modello richiesta-risposta, una soluzione consiste nel far interrogare ripetutamente il server.</p>
+<p>Questa tecnica prende il nome di <strong>polling</strong>.</p>
+<pre><code>Client → Server: Ci sono aggiornamenti?
+Server → Client: No
+
+Client → Server: Ci sono aggiornamenti?
+Server → Client: No
+
+Client → Server: Ci sono aggiornamenti?
+Server → Client: Sì, B12 è occupato
+</code></pre>
+<p>Con migliaia di utenti, le richieste ripetute possono generare un carico considerevole.</p>
+<h3 id="websocket"><strong>WebSocket</strong></h3>
+<p>WebSocket permette una comunicazione bidirezionale persistente tra client e server.</p>
+<p>Una volta stabilita la connessione, il server può inviare messaggi al client senza aspettare ogni volta una nuova richiesta HTTP.</p>
+<pre><code>CLIENT                 SERVER
+   |                      |
+   |---- Connessione ----&gt;|
+   |&lt;--- Conferma --------|
+   |                      |
+   |&lt;--- B12 occupato ----|
+   |&lt;--- B13 occupato ----|
+   |                      |
+</code></pre>
+<p>È utile per:</p>
+<ul>
+<li>chat;</li>
+<li>giochi multiplayer;</li>
+<li>notifiche in tempo reale;</li>
+<li>aggiornamenti dei posti;</li>
+<li>dashboard con dati aggiornati frequentemente.</li>
+</ul>
+<p>La connessione WebSocket consente aggiornamenti rapidi, ma la disponibilità visualizzata resta informativa: l'effettiva assegnazione di un posto deve essere verificata dal backend tramite operazioni atomiche.</p>
+<h2 id="comunicazione-sincrona-e-asincrona">Comunicazione sincrona e asincrona</h2>
+<p>Immaginiamo che, dopo una prenotazione, EventiScuola debba:</p>
+<ol>
+<li>registrare l'operazione;</li>
+<li>generare un biglietto PDF;</li>
+<li>inviare un'email;</li>
+<li>aggiornare le statistiche.</li>
+</ol>
+<p>Non tutte le operazioni devono necessariamente terminare prima di rispondere all'utente.</p>
+<p><strong>Comunicazione sincrona:</strong> un componente attende il completamento dell'operazione richiesta.</p>
+<p><strong>Comunicazione asincrona:</strong> un componente avvia o registra un'attività che potrà essere eseguita successivamente.</p>
+<p>Per esempio, la prenotazione può essere confermata senza attendere la conclusione dell'invio email.</p>
+<h2 id="message-queue-le-code-di-messaggi">Message Queue: le code di messaggi</h2>
+<p>Le <strong>message queue</strong> permettono di separare chi produce un'attività da chi la esegue.</p>
+<p>Il <strong>producer</strong> genera un messaggio.</p>
+<p>Il <strong>message broker</strong> riceve e gestisce i messaggi, che possono essere conservati in code o instradati verso diversi destinatari.</p>
+<p>Il <strong>consumer</strong>, spesso chiamato anche <em>worker</em>, elabora i messaggi.</p>
+<p>Se arrivano mille richieste di invio email, i messaggi possono accumularsi nella coda e i worker li elaborano secondo la capacità disponibile.</p>
+<h3 id="amqp"><strong>AMQP</strong></h3>
+<p>AMQP (Advanced Message Queuing Protocol) è un protocollo per sistemi di messaggistica, utilizzato in prodotti come RabbitMQ.</p>
+<p>Supporta diversi modelli di instradamento dei messaggi.</p>
+<h3 id="pubsub"><strong>Pub/Sub</strong></h3>
+<p>Nel modello <em>Publish/Subscribe</em> un componente pubblica un evento, mentre diversi servizi possono sottoscriverlo e riceverlo.</p>
+<p>Per esempio, quando viene confermata una prenotazione, diversi componenti possono reagire allo stesso evento:</p>
+<pre><code>         PRENOTAZIONE CONFERMATA
+                     |
+                     v
+                 EVENT BUS
+                /    |    \
+               v     v     v
+            Email  Notifica Statistiche
+</code></pre>
+<p>Le code di lavoro e il modello Pub/Sub non sono identici: nel primo caso un'attività può essere assegnata a un worker, mentre nel secondo uno stesso evento può essere distribuito a più sottoscrittori.</p>
+<h3 id="problemi-introdotti-dalle-code"><strong>Problemi introdotti dalle code</strong></h3>
+<p>Anche una coda affidabile introduce nuovi problemi.</p>
+<p>Un messaggio potrebbe essere elaborato, ma il worker potrebbe interrompersi prima di confermarne il completamento. Il messaggio potrebbe quindi essere consegnato nuovamente.</p>
+<p>Per questo le operazioni eseguite dai worker devono spesso essere <strong>idempotenti</strong>, oppure progettate per gestire duplicati.</p>
+<p>I messaggi che falliscono ripetutamente possono essere spostati in una <em>Dead Letter Queue</em>, destinata all'analisi dei problemi.</p>
+<h2 id="webhook">Webhook</h2>
+<p>Un <strong>webhook</strong> è un meccanismo che permette a un servizio di notificare un altro servizio tramite una richiesta HTTP quando si verifica un evento.</p>
+<p>Per esempio, un provider di pagamento potrebbe notificare EventiScuola che un pagamento è stato completato.</p>
+<p>Il server riceve la notifica, ne verifica l'autenticità e aggiorna lo stato della prenotazione.</p>
+<p>Il webhook evita che il sistema debba continuamente interrogare il servizio esterno per sapere se ci sono novità.</p>
+<h3 id="idempotenza-nei-pagamenti"><strong>Idempotenza nei pagamenti</strong></h3>
+<p>Immaginiamo che un utente prema <em>Paga</em>, il pagamento vada a buon fine, ma la risposta non raggiunga il browser.</p>
+<p>L'utente potrebbe riprovare.</p>
+<p>Senza protezioni, potrebbe essere addebitato due volte.</p>
+<p>Una soluzione consiste nell'utilizzare una <strong>idempotency key</strong>, cioè un identificatore univoco associato alla stessa operazione logica.</p>
+<p>Se una richiesta viene ripetuta con la stessa chiave, il server può riconoscerla e riutilizzare il risultato precedente invece di creare una seconda operazione.</p>
+<p>Servono anche controlli di concorrenza per impedire che richieste simultanee con la stessa chiave vengano elaborate entrambe.</p>
+<h2 id="monolite-e-microservizi">Monolite e microservizi</h2>
+<p>Finora abbiamo parlato di più server, ma non necessariamente di più applicazioni.</p>
+<p>Un unico programma può essere eseguito su numerosi server.</p>
+<p>Questa distinzione è essenziale per comprendere la differenza tra monoliti e microservizi.</p>
+<h3 id="architettura-monolitica"><strong>Architettura monolitica</strong></h3>
+<p>In un'architettura monolitica le funzionalità principali appartengono a un'unica applicazione distribuita come unità.</p>
+<p>Per esempio, gestione utenti, eventi, prenotazioni e notifiche potrebbero appartenere allo stesso programma.</p>
+<p>Il monolite offre generalmente maggiore semplicità di sviluppo, test e distribuzione iniziale.</p>
+<p>Un monolite può comunque essere replicato su più server.</p>
+<h3 id="microservizi"><strong>Microservizi</strong></h3>
+<p>In un'architettura a microservizi l'applicazione è suddivisa in servizi autonomi, ciascuno responsabile di specifiche funzionalità.</p>
+<p>Per EventiScuola:</p>
+<pre><code>                 API GATEWAY
+                      |
+           +----------+----------+
+           |          |          |
+           v          v          v
+       UTENTI      EVENTI    PRENOTAZIONI
+       SERVICE     SERVICE      SERVICE
+                                  |
+                                  v
+                              PAGAMENTI
+                               SERVICE
+</code></pre>
+<p>Ogni servizio può essere sviluppato, distribuito e, quando possibile, dimensionato indipendentemente.</p>
+<h3 id="confronto"><strong>Confronto</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Monolite</th>
+<th>Microservizi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Una principale unità applicativa</td>
+<td>Più servizi autonomi</td>
+</tr>
+<tr>
+<td>Comunicazione interna spesso diretta</td>
+<td>Comunicazione frequentemente via rete</td>
+</tr>
+<tr>
+<td>Distribuzione iniziale più semplice</td>
+<td>Distribuzione più complessa</td>
+</tr>
+<tr>
+<td>Debugging generalmente più concentrato</td>
+<td>Necessario seguire operazioni tra servizi</td>
+</tr>
+<tr>
+<td>Può essere replicato orizzontalmente</td>
+<td>Consente scaling indipendente dei singoli servizi</td>
+</tr>
+<tr>
+<td>Adatto anche a sistemi importanti</td>
+<td>Utile quando esistono esigenze reali di autonomia</td>
+</tr>
+</tbody>
+</table>
+<p>I microservizi non sono automaticamente migliori: aumentano le esigenze di monitoraggio, coordinamento, gestione degli errori e consistenza dei dati.</p>
+<p>Spesso una buona strategia è partire con un monolite ben strutturato e separare i componenti quando emergono motivazioni concrete.</p>
+<h2 id="api-gateway">API Gateway</h2>
+<p>Quando un'applicazione è composta da molti servizi, non è conveniente che il client debba conoscere gli indirizzi di tutti.</p>
+<p>Un <strong>API Gateway</strong> costituisce un punto d'ingresso comune.</p>
+<p>Può svolgere diverse attività:</p>
+<ul>
+<li>inoltrare le richieste ai servizi corretti;</li>
+<li>verificare autenticazione e autorizzazioni preliminari;</li>
+<li>applicare rate limiting;</li>
+<li>raccogliere dati da più servizi;</li>
+<li>gestire logging e controlli condivisi.</li>
+</ul>
+<p>Il gateway non sostituisce necessariamente il load balancer.</p>
+<p>Il <strong>load balancer</strong> distribuisce il traffico tra istanze di un servizio.</p>
+<p>L'<strong>API gateway</strong> coordina l'accesso a API e servizi differenti.</p>
+<p>Le due funzioni possono coesistere e, in alcuni prodotti, essere implementate dallo stesso componente.</p>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-repliche" rel="prev" href="repliche.html"><small>← Precedente</small><span>Disponibilità e dati distribuiti</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>9 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-progetto" rel="next" href="progetto.html"><small>Successiva →</small><span>Una prenotazione completa</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

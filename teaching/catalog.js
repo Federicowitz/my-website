@@ -429,6 +429,12 @@ window.schoolCatalog = {
           ]
         }
       ]
+    },
+    {
+      "id": "system-design",
+      "title": "System Design",
+      "symbol": "SD",
+      "description": "Progetta EventiScuola, dalla prima richiesta web a un sistema distribuito affidabile."
     }
   ],
   "items": [
@@ -1693,6 +1699,86 @@ window.schoolCatalog = {
       "path": "materials/reti/19-appendice.html",
       "description": "Appendice — Glossario, collegamenti e fonti di riferimento",
       "chapter": "reti-01"
+    },
+    {
+      "id": "system-design-fondamenti",
+      "course": "system-design",
+      "title": "Dal requisito alla richiesta web",
+      "kind": "lesson",
+      "path": "materials/system-design/fondamenti.html",
+      "description": "Segui uno studente dal dominio alla pagina degli eventi."
+    },
+    {
+      "id": "system-design-api",
+      "course": "system-design",
+      "title": "Il contratto delle API",
+      "kind": "lesson",
+      "path": "materials/system-design/api.html",
+      "description": "Progetta le richieste per consultare eventi e prenotare posti."
+    },
+    {
+      "id": "system-design-sessioni-jwt",
+      "course": "system-design",
+      "title": "Come fa il server a ricordare il login?",
+      "kind": "lesson",
+      "path": "materials/system-design/sessioni-jwt.html",
+      "description": "Confronta cookie, sessioni condivise e JWT firmati."
+    },
+    {
+      "id": "system-design-permessi",
+      "course": "system-design",
+      "title": "Identità e permessi",
+      "kind": "lesson",
+      "path": "materials/system-design/permessi.html",
+      "description": "Decidi chi può leggere o cancellare una prenotazione."
+    },
+    {
+      "id": "system-design-scalabilita",
+      "course": "system-design",
+      "title": "Dal server unico al bilanciamento",
+      "kind": "lesson",
+      "path": "materials/system-design/scalabilita.html",
+      "description": "Misura le prestazioni e segui una sessione tra due server."
+    },
+    {
+      "id": "system-design-dati",
+      "course": "system-design",
+      "title": "Dati, transazioni e concorrenza",
+      "kind": "lesson",
+      "path": "materials/system-design/dati.html",
+      "description": "Proteggi un posto conteso da due studenti."
+    },
+    {
+      "id": "system-design-cache",
+      "course": "system-design",
+      "title": "Indici, cache e distribuzione dei contenuti",
+      "kind": "lesson",
+      "path": "materials/system-design/cache.html",
+      "description": "Riduci i tempi di lettura e gestisci le copie obsolete."
+    },
+    {
+      "id": "system-design-repliche",
+      "course": "system-design",
+      "title": "Disponibilità e dati distribuiti",
+      "kind": "lesson",
+      "path": "materials/system-design/repliche.html",
+      "description": "Valuta repliche, consistenza e suddivisione dei dati."
+    },
+    {
+      "id": "system-design-servizi",
+      "course": "system-design",
+      "title": "Messaggi e servizi",
+      "kind": "lesson",
+      "path": "materials/system-design/servizi.html",
+      "description": "Segui conferme e notifiche tra code, webhook e servizi."
+    },
+    {
+      "id": "system-design-progetto",
+      "course": "system-design",
+      "title": "Una prenotazione completa",
+      "kind": "lesson",
+      "path": "materials/system-design/progetto.html",
+      "description": "Ricostruisci il sistema, individua i guasti e verifica le tue scelte."
     }
   ]
 };

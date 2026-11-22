@@ -547,6 +547,25 @@
           ]
         }
       ]
+    },
+    {
+      "id": "system-design",
+      "folder": "system-design",
+      "title": "System Design",
+      "symbol": "SD",
+      "description": "Progetta EventiScuola, dalla prima richiesta web a un sistema distribuito affidabile.",
+      "order": [
+        "fondamenti.html",
+        "api.html",
+        "sessioni-jwt.html",
+        "permessi.html",
+        "scalabilita.html",
+        "dati.html",
+        "cache.html",
+        "repliche.html",
+        "servizi.html",
+        "progetto.html"
+      ]
     }
   ]
 }

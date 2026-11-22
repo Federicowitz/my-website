@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Come fa il server a ricordare il login? — Federico Lelli</title><meta name="description" content="Confronta cookie, sessioni condivise e JWT firmati.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/sessioni-jwt.html"><meta property="og:title" content="Come fa il server a ricordare il login? — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/sessioni-jwt.html"><meta property="og:description" content="Come fa il server a ricordare il login?. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-sessioni-jwt"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-api" rel="prev" href="api.html"><small>← Precedente</small><span>Il contratto delle API</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>3 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-permessi" rel="next" href="permessi.html"><small>Successiva →</small><span>Identità e permessi</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Come fa il server a ricordare il login?</h1>
+<p>Quando inseriamo username e password, il server verifica le credenziali.</p>
+<p>Ma che cosa succede dopo?</p>
+<p>Se apriamo un'altra pagina del sito, non dobbiamo effettuare nuovamente il login. Eppure HTTP è un protocollo stateless: una richiesta non conserva automaticamente la memoria delle precedenti.</p>
+<p>Come fa quindi il server a sapere chi siamo?</p>
+<p>Esistono diverse soluzioni, tra cui le sessioni lato server e l'utilizzo di token JWT.</p>
+<h3 id="soluzione-a-autenticazione-basata-su-sessioni"><strong>Soluzione A — Autenticazione basata su sessioni</strong></h3>
+<p>Seguiamo il login di uno studente.</p>
+<ol>
+<li>L'utente effettua il login.</li>
+<li>Il server verifica le credenziali e crea una sessione.</li>
+<li>La sessione viene registrata in un archivio.</li>
+<li>Il browser riceve un cookie contenente un identificatore casuale della sessione.</li>
+<li>A ogni richiesta successiva, il browser invia il cookie.</li>
+<li>Il server consulta l'archivio per verificare a chi appartiene la sessione e se è ancora valida.</li>
+</ol>
+<p>Il server deve conservare informazioni relative alle sessioni, ma queste possono stare in un archivio condiviso come Redis.</p>
+<p>Questo si collega direttamente alla lezione sui server stateless: <strong>non è necessario memorizzare le sessioni nella memoria locale di ciascun server applicativo</strong>.</p>
+<h3 id="soluzione-b-autenticazione-con-jwt"><strong>Soluzione B — Autenticazione con JWT</strong></h3>
+<p>In questo caso:</p>
+<ol>
+<li>L'utente effettua il login.</li>
+<li>Il server verifica le credenziali e genera un JWT firmato.</li>
+<li>Il client riceve il token.</li>
+<li>Alle richieste successive presenta il token.</li>
+<li>Il server verifica la firma, la scadenza e le altre condizioni di validità.</li>
+<li>Se i controlli hanno esito positivo, la richiesta può proseguire.</li>
+</ol>
+<p>Il JWT contiene delle informazioni chiamate <em>claims</em>, come l'identificatore dell'utente, la scadenza e l'emittente.</p>
+<p>Il vantaggio è che <strong>il server può verificare il token senza consultare ogni volta un archivio di sessioni</strong>.</p>
+<p>Ma c'è uno svantaggio importante: se si vuole revocare immediatamente un JWT già emesso, la gestione può diventare più complessa.</p>
+<h3 id="il-confronto-che-gli-studenti-devono-ricordare"><strong>Il confronto che gli studenti devono ricordare</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Aspetto</th>
+<th>Sessione lato server</th>
+<th>JWT autonomamente verificabile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cosa riceve il client?</td>
+<td>ID di sessione</td>
+<td>Token firmato</td>
+</tr>
+<tr>
+<td>Dove si trova lo stato dell'accesso?</td>
+<td>In un archivio lato server</td>
+<td>In parte nelle informazioni del token</td>
+</tr>
+<tr>
+<td>Verifica della richiesta</td>
+<td>Consultazione sessione</td>
+<td>Verifica della firma e dei claims</td>
+</tr>
+<tr>
+<td>Logout e revoca</td>
+<td>Si può eliminare la sessione</td>
+<td>Può richiedere strategie aggiuntive</td>
+</tr>
+<tr>
+<td>Più server applicativi</td>
+<td>Archivio condiviso</td>
+<td>Verifica locale possibile</td>
+</tr>
+<tr>
+<td>Caso comune</td>
+<td>Applicazioni web tradizionali</td>
+<td>API e architetture distribuite, quando appropriato</td>
+</tr>
+</tbody>
+</table>
+<p><strong>JWT e cookie non sono alternative dirette</strong>. JWT è un formato di token; cookie è un meccanismo con cui il browser conserva e trasmette informazioni. Anche un JWT può essere trasportato in un cookie.</p>
+<p>Con un JWT trasmesso tramite Authorization: Bearer &lt;token&gt;, il possesso del token consente di presentarlo. La API controlla firma, algoritmo previsto, emittente, destinatario e scadenza. Il payload firmato è leggibile. Per cancellare una prenotazione occorre anche verificare che appartenga allo studente o che il suo ruolo consenta di intervenire.</p>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-api" rel="prev" href="api.html"><small>← Precedente</small><span>Il contratto delle API</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>3 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-permessi" rel="next" href="permessi.html"><small>Successiva →</small><span>Identità e permessi</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

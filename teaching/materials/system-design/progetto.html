@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Una prenotazione completa — Federico Lelli</title><meta name="description" content="Ricostruisci il sistema, individua i guasti e verifica le tue scelte.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/progetto.html"><meta property="og:title" content="Una prenotazione completa — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/progetto.html"><meta property="og:description" content="Una prenotazione completa. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-progetto"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-servizi" rel="prev" href="servizi.html"><small>← Precedente</small><span>Messaggi e servizi</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>10 / 10</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>System Design</span></span></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Una prenotazione completa</h1>
+<h2 id="osservabilita">Osservabilità</h2>
+<p>Un sistema complesso deve permettere di capire che cosa sta succedendo al suo interno.</p>
+<p>L'osservabilità si basa comunemente su tre elementi.</p>
+<p><strong>Metrics:</strong> misure numeriche come CPU utilizzata, richieste al secondo, errori e tempi di risposta.</p>
+<p><strong>Logs:</strong> registrazioni di eventi e operazioni che avvengono nei componenti.</p>
+<p><strong>Traces:</strong> informazioni che permettono di seguire una richiesta attraverso più servizi, individuando dove trascorre tempo o dove si verificano errori.</p>
+<p>Se una prenotazione impiega cinque secondi, un trace può aiutare a capire se il ritardo deriva dal gateway, dal servizio prenotazioni, dal database o da un servizio esterno.</p>
+<h3 id="disponibilita-e-obiettivi-di-servizio"><strong>Disponibilità e obiettivi di servizio</strong></h3>
+<p>La disponibilità può essere espressa come percentuale del tempo durante il quale un servizio risulta operativo.</p>
+<p>Si distinguono spesso:</p>
+<ul>
+<li><strong>SLI (Service Level Indicator):</strong> indicatore misurabile delle prestazioni o dell'affidabilità.</li>
+<li><strong>SLO (Service Level Objective):</strong> obiettivo interno relativo a quell'indicatore.</li>
+<li><strong>SLA (Service Level Agreement):</strong> accordo formale sui livelli di servizio, spesso con conseguenze contrattuali.</li>
+</ul>
+<p>Per esempio, un SLO potrebbe stabilire che il 99,9% delle richieste valide debba essere completato con successo in un determinato periodo.</p>
+<h2 id="gestione-dei-guasti">Gestione dei guasti</h2>
+<p>In un sistema distribuito gli errori non sono eventi eccezionali da ignorare: devono essere previsti.</p>
+<p>Alcune tecniche utilizzate sono:</p>
+<table>
+<thead>
+<tr>
+<th>Tecnica</th>
+<th>Scopo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Timeout</td>
+<td>Evitare attese indefinite</td>
+</tr>
+<tr>
+<td>Retry</td>
+<td>Ripetere operazioni temporaneamente fallite</td>
+</tr>
+<tr>
+<td>Exponential Backoff</td>
+<td>Aumentare progressivamente il tempo tra tentativi</td>
+</tr>
+<tr>
+<td>Circuit Breaker</td>
+<td>Interrompere temporaneamente richieste verso un servizio che fallisce ripetutamente</td>
+</tr>
+<tr>
+<td>Health Checks</td>
+<td>Verificare lo stato dei componenti</td>
+</tr>
+<tr>
+<td>Failover</td>
+<td>Attivare una risorsa alternativa</td>
+</tr>
+<tr>
+<td>Backup</td>
+<td>Consentire il ripristino dei dati</td>
+</tr>
+<tr>
+<td>Monitoring e Alerting</td>
+<td>Individuare e segnalare anomalie</td>
+</tr>
+</tbody>
+</table>
+<p>Un retry non è sempre sicuro. Ripetere un'operazione non idempotente può produrre duplicazioni.</p>
+<p>Per questo la strategia di gestione degli errori deve essere coerente con il tipo di operazione.</p>
+<h2 id="architettura-complessiva-di-eventiscuola">Architettura complessiva di EventiScuola</h2>
+<p>Dopo aver introdotto i componenti principali, possiamo osservare come potrebbero essere organizzati in una piattaforma sufficientemente grande.</p>
+<p>Non si tratta di un'architettura obbligatoria per ogni applicazione, ma di una possibile organizzazione dei componenti studiati.</p>
+<p>In un sistema reale andrebbero progettate anche la ridondanza dei punti d'ingresso, la gestione delle credenziali, la protezione della rete, la persistenza della coda e le procedure di recupero.</p>
+<h2 id="esempio-completo-un-utente-prenota-un-posto">Esempio completo: un utente prenota un posto</h2>
+<p>Seguiamo ora l'intero percorso di una prenotazione.</p>
+<h3 id="fase-1-accesso-alla-piattaforma"><strong>Fase 1 — Accesso alla piattaforma</strong></h3>
+<p>L'utente digita l'indirizzo del sito.</p>
+<p>Il browser utilizza il DNS per ottenere le informazioni necessarie a raggiungere il servizio.</p>
+<h3 id="fase-2-connessione-protetta"><strong>Fase 2 — Connessione protetta</strong></h3>
+<p>Il client stabilisce una connessione e utilizza HTTPS per proteggere la comunicazione.</p>
+<h3 id="fase-3-caricamento-della-pagina"><strong>Fase 3 — Caricamento della pagina</strong></h3>
+<p>La CDN può distribuire immagini, CSS e JavaScript.</p>
+<p>Il browser invia richieste alle API per ottenere le informazioni sugli eventi.</p>
+<h3 id="fase-4-distribuzione-della-richiesta"><strong>Fase 4 — Distribuzione della richiesta</strong></h3>
+<p>Il load balancer indirizza la richiesta verso un server applicativo disponibile.</p>
+<h3 id="fase-5-controllo-dellidentita"><strong>Fase 5 — Controllo dell'identità</strong></h3>
+<p>Il sistema verifica la credenziale dell'utente e controlla che abbia il permesso di prenotare.</p>
+<h3 id="fase-6-verifica-dei-dati"><strong>Fase 6 — Verifica dei dati</strong></h3>
+<p>Il server verifica l'esistenza dell'evento e la disponibilità del posto.</p>
+<p>Le informazioni non critiche potrebbero essere già disponibili nella cache.</p>
+<h3 id="fase-7-prenotazione-atomica"><strong>Fase 7 — Prenotazione atomica</strong></h3>
+<p>Il database esegue una transazione che impedisce l'assegnazione dello stesso posto a due utenti.</p>
+<p>Se il posto è già occupato, la prenotazione viene rifiutata.</p>
+<h3 id="fase-8-pagamento"><strong>Fase 8 — Pagamento</strong></h3>
+<p>Il sistema avvia il pagamento utilizzando identificatori che consentono di gestire eventuali tentativi ripetuti.</p>
+<h3 id="fase-9-conferma"><strong>Fase 9 — Conferma</strong></h3>
+<p>Quando il pagamento viene verificato, la prenotazione assume lo stato corretto.</p>
+<p>Il sistema può pubblicare un messaggio per attivare l'invio dell'email di conferma.</p>
+<h3 id="fase-10-aggiornamento-degli-altri-utenti"><strong>Fase 10 — Aggiornamento degli altri utenti</strong></h3>
+<p>L'applicazione comunica che il posto non è più disponibile, eventualmente attraverso WebSocket.</p>
+<h3 id="fase-11-monitoraggio"><strong>Fase 11 — Monitoraggio</strong></h3>
+<p>Log, metriche e trace consentono di controllare che l'operazione si sia svolta correttamente e di individuare eventuali anomalie.</p>
+<p>In questa singola operazione collaborano quindi molti dei concetti studiati.</p>
+<h2 id="mappa-riassuntiva-problema-soluzione-e-compromesso">Mappa riassuntiva: problema, soluzione e compromesso</h2>
+<table>
+<thead>
+<tr>
+<th>Esigenza</th>
+<th>Tecnologia o concetto</th>
+<th>Compromesso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Trovare un servizio</td>
+<td>DNS</td>
+<td>Dipendenza dalla corretta risoluzione</td>
+</tr>
+<tr>
+<td>Comunicare con il server</td>
+<td>HTTP/HTTPS</td>
+<td>Latenza di rete e costo della comunicazione</td>
+</tr>
+<tr>
+<td>Definire le operazioni disponibili</td>
+<td>API REST, GraphQL, gRPC</td>
+<td>Scelte di complessità e compatibilità</td>
+</tr>
+<tr>
+<td>Memorizzare dati correlati</td>
+<td>Database relazionale</td>
+<td>Vincoli e gestione delle transazioni</td>
+</tr>
+<tr>
+<td>Gestire dati con modelli alternativi</td>
+<td>NoSQL</td>
+<td>Differenti capacità di query e garanzie</td>
+</tr>
+<tr>
+<td>Velocizzare interrogazioni</td>
+<td>Indici</td>
+<td>Spazio e manutenzione delle strutture</td>
+</tr>
+<tr>
+<td>Aumentare la potenza di una macchina</td>
+<td>Scaling verticale</td>
+<td>Limiti hardware</td>
+</tr>
+<tr>
+<td>Aggiungere capacità di elaborazione</td>
+<td>Scaling orizzontale</td>
+<td>Coordinamento dei server</td>
+</tr>
+<tr>
+<td>Distribuire richieste</td>
+<td>Load Balancer</td>
+<td>Nuovo componente da rendere affidabile</td>
+</tr>
+<tr>
+<td>Rendere i server sostituibili</td>
+<td>Stateless</td>
+<td>Necessità di gestire lo stato altrove</td>
+</tr>
+<tr>
+<td>Ridurre le letture ripetute</td>
+<td>Cache</td>
+<td>Possibile obsolescenza dei dati</td>
+</tr>
+<tr>
+<td>Ridurre la distanza di distribuzione</td>
+<td>CDN</td>
+<td>Invalidazione e gestione delle copie</td>
+</tr>
+<tr>
+<td>Conservare file di grandi dimensioni</td>
+<td>Object Storage</td>
+<td>Dipendenza dal servizio di storage</td>
+</tr>
+<tr>
+<td>Evitare un punto singolo di guasto</td>
+<td>Ridondanza</td>
+<td>Maggiori costi e complessità</td>
+</tr>
+<tr>
+<td>Distribuire le letture</td>
+<td>Database Replication</td>
+<td>Ritardo di sincronizzazione</td>
+</tr>
+<tr>
+<td>Suddividere dati molto grandi</td>
+<td>Sharding</td>
+<td>Query e transazioni più complesse</td>
+</tr>
+<tr>
+<td>Comunicare in tempo reale</td>
+<td>WebSocket</td>
+<td>Connessioni persistenti da gestire</td>
+</tr>
+<tr>
+<td>Elaborare attività successivamente</td>
+<td>Message Queue</td>
+<td>Consegne duplicate e gestione degli errori</td>
+</tr>
+<tr>
+<td>Notificare eventi ad altri sistemi</td>
+<td>Webhook</td>
+<td>Verifica e affidabilità della consegna</td>
+</tr>
+<tr>
+<td>Separare responsabilità applicative</td>
+<td>Microservizi</td>
+<td>Complessità della comunicazione distribuita</td>
+</tr>
+<tr>
+<td>Controllare gli accessi</td>
+<td>Authentication / Authorization</td>
+<td>Gestione delle identità e delle credenziali</td>
+</tr>
+<tr>
+<td>Limitare gli abusi</td>
+<td>Rate Limiting / WAF</td>
+<td>Regole da configurare e monitorare</td>
+</tr>
+<tr>
+<td>Individuare problemi</td>
+<td>Metrics, Logs, Traces</td>
+<td>Raccolta e gestione delle informazioni</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verifica-della-comprensione">Verifica della comprensione</h2>
+<p>Le seguenti domande permettono di collegare tra loro i concetti.</p>
+<ol>
+<li>Qual è la differenza tra progettare le funzionalità di un'applicazione e progettare la sua architettura?</li>
+<li>Perché il DNS non deve essere considerato il sistema che trasporta le pagine web?</li>
+<li>Che differenza esiste tra un router IP, un reverse proxy e un load balancer?</li>
+<li>Perché un sistema con tre server applicativi potrebbe diventare indisponibile quando si guasta il database?</li>
+<li>Qual è la differenza tra scaling verticale e scaling orizzontale?</li>
+<li>Perché una cache può migliorare le prestazioni ma anche mostrare informazioni non aggiornate?</li>
+<li>In che cosa differiscono la replica di un database e lo sharding?</li>
+<li>Perché due utenti potrebbero vedere contemporaneamente libero lo stesso posto? Come si impedisce che lo acquistino entrambi?</li>
+<li>Perché WebSocket non può sostituire automaticamente un database o una transazione?</li>
+<li>In quali circostanze una coda di messaggi rende un'applicazione più efficiente?</li>
+<li>Perché un monolite può essere eseguito su più server senza diventare un'architettura a microservizi?</li>
+<li>Qual è la differenza tra autenticazione e autorizzazione?</li>
+<li>Perché HTTPS non è sufficiente a garantire la sicurezza dell'intera applicazione?</li>
+<li>Perché le repliche non sostituiscono un sistema di backup?</li>
+<li>Perché ogni scelta architetturale deve partire dai requisiti e non dalla popolarità di una tecnologia?</li>
+</ol>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-servizi" rel="prev" href="servizi.html"><small>← Precedente</small><span>Messaggi e servizi</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>10 / 10</span></a><span class="lesson-neighbor lesson-boundary"><small>Fine del percorso</small><span>System Design</span></span></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

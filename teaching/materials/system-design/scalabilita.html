@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dal server unico al bilanciamento — Federico Lelli</title><meta name="description" content="Misura le prestazioni e segui una sessione tra due server.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/scalabilita.html"><meta property="og:title" content="Dal server unico al bilanciamento — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/scalabilita.html"><meta property="og:description" content="Dal server unico al bilanciamento. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-scalabilita"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-permessi" rel="prev" href="permessi.html"><small>← Precedente</small><span>Identità e permessi</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>5 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-dati" rel="next" href="dati.html"><small>Successiva →</small><span>Dati, transazioni e concorrenza</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Dal server unico al bilanciamento</h1>
+<h2 id="come-si-misurano-le-prestazioni">Come si misurano le prestazioni?</h2>
+<p>Prima di migliorare un sistema bisogna capire che cosa lo rallenta.</p>
+<p>Tre concetti fondamentali sono latenza, throughput e bandwidth.</p>
+<h3 id="latenza"><strong>Latenza</strong></h3>
+<p>La <strong>latenza</strong> indica il tempo impiegato da un'operazione, per esempio quanto passa tra l'invio di una richiesta e il ricevimento della risposta.</p>
+<p>Una richiesta che impiega 200 ms ha una latenza inferiore rispetto a una che richiede 3 secondi.</p>
+<h3 id="throughput"><strong>Throughput</strong></h3>
+<p>Il <strong>throughput</strong> misura la quantità di lavoro completata nell'unità di tempo.</p>
+<p>Per un server si potrebbe misurare in richieste completate al secondo.</p>
+<p>Un sistema in grado di rispondere a 1.000 richieste al secondo ha un throughput superiore a uno che ne completa 100, se confrontato nello stesso contesto.</p>
+<h3 id="bandwidth"><strong>Bandwidth</strong></h3>
+<p>La <strong>larghezza di banda</strong> rappresenta la capacità di trasmissione del collegamento, tipicamente misurata in bit al secondo.</p>
+<p>Non va confusa con il throughput applicativo.</p>
+<p>Un collegamento molto veloce non rende necessariamente veloce un'applicazione, perché la richiesta potrebbe essere rallentata dal database o dalle elaborazioni del server.</p>
+<h3 id="il-bottleneck"><strong>Il bottleneck</strong></h3>
+<p>Un <em>bottleneck</em> è un collo di bottiglia, cioè il componente che limita le prestazioni complessive.</p>
+<p>Per esempio, potrebbe essere il processore del server, il database o un collegamento di rete.</p>
+<p>La soluzione dipende da dove si trova il problema: potenziare la CPU non risolve una query SQL particolarmente inefficiente.</p>
+<p>Nell'analisi delle prestazioni si usano anche i percentili. Il <strong>P99</strong> indica un valore di latenza entro cui si conclude circa il 99% delle richieste osservate.</p>
+<h2 id="scalabilita-verticale-e-orizzontale">Scalabilità verticale e orizzontale</h2>
+<p>Immaginiamo che EventiScuola possa gestire 500 richieste al secondo, ma durante l'apertura delle prenotazioni ne arrivino molte di più.</p>
+<p>Una possibile soluzione è aumentare la capacità di elaborazione.</p>
+<p>Esistono due strategie principali.</p>
+<h3 id="scaling-verticale"><strong>Scaling verticale</strong></h3>
+<p>Un server più potente</p>
+<p>Aumento di CPU, RAM e altre risorse</p>
+<h3 id="scaling-orizzontale"><strong>Scaling orizzontale</strong></h3>
+<p>Più server</p>
+<p>Distribuzione del lavoro tra più macchine</p>
+<p><strong>Scaling verticale (scale up):</strong> si potenzia una macchina aggiungendo risorse.</p>
+<p>È relativamente semplice, ma ogni server ha limiti hardware ed economici.</p>
+<p><strong>Scaling orizzontale (scale out):</strong> si aggiungono altre macchine che collaborano per gestire il carico.</p>
+<p>Questa soluzione può fornire maggiore capacità e ridondanza, ma richiede coordinamento.</p>
+<p>Le due tecniche possono essere combinate. Lo scaling orizzontale non elimina automaticamente ogni problema di disponibilità: occorre verificare anche database, reti e componenti condivisi.</p>
+<h2 id="il-load-balancer-distribuire-le-richieste">Il Load Balancer: distribuire le richieste</h2>
+<p>Supponiamo che EventiScuola utilizzi tre server applicativi identici.</p>
+<p>Quando arriva una richiesta, quale server deve occuparsene?</p>
+<p>Serve un componente che distribuisca il traffico: il <strong>Load Balancer</strong>.</p>
+<p>Il load balancer riceve il traffico e lo inoltra ai server applicativi disponibili.</p>
+<p>Il load balancer permette di distribuire le richieste su più server e, se opportunamente configurato, evita di inviarne di nuove a quelli non funzionanti.</p>
+<h3 id="algoritmi-di-bilanciamento"><strong>Algoritmi di bilanciamento</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Algoritmo</th>
+<th>Funzionamento</th>
+<th>Quando è utile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Round Robin</td>
+<td>Distribuisce le richieste a rotazione</td>
+<td>Server simili</td>
+</tr>
+<tr>
+<td>Least Connections</td>
+<td>Sceglie il server con meno connessioni attive</td>
+<td>Connessioni di durata variabile</td>
+</tr>
+<tr>
+<td>Least Response Time</td>
+<td>Considera i tempi di risposta, spesso insieme al carico</td>
+<td>Server con prestazioni differenti</td>
+</tr>
+<tr>
+<td>Weighted Round Robin</td>
+<td>Distribuisce in base a pesi assegnati</td>
+<td>Server di diversa capacità</td>
+</tr>
+<tr>
+<td>IP Hash</td>
+<td>Associa un client a un server usando l'IP</td>
+<td>Affinità di sessione</td>
+</tr>
+<tr>
+<td>Geografico</td>
+<td>Seleziona infrastrutture in base alla posizione</td>
+<td>Servizi distribuiti globalmente</td>
+</tr>
+<tr>
+<td>Consistent Hashing</td>
+<td>Utilizza uno spazio hash per assegnare elementi ai nodi</td>
+<td>Distribuzione con cambiamenti relativamente limitati delle assegnazioni</td>
+</tr>
+</tbody>
+</table>
+<p>Per esempio, con Round Robin:</p>
+<pre><code>Richiesta 1 → Server A
+Richiesta 2 → Server B
+Richiesta 3 → Server C
+Richiesta 4 → Server A
+Richiesta 5 → Server B
+</code></pre>
+<p>Il sistema non controlla necessariamente quale server sia meno occupato: segue una rotazione.</p>
+<h3 id="health-check"><strong>Health Check</strong></h3>
+<p>Come può il load balancer sapere se un server funziona?</p>
+<p>Può eseguire controlli periodici detti <em>health checks</em>.</p>
+<p>Se il server B non risponde correttamente, viene temporaneamente escluso dalle nuove richieste.</p>
+<p>Quando torna disponibile, può essere reinserito.</p>
+<p>Questo meccanismo migliora la tolleranza ai guasti, ma non garantisce che una richiesta già in corso non venga interrotta.</p>
+<h3 id="load-balancer-e-reverse-proxy"><strong>Load Balancer e Reverse Proxy</strong></h3>
+<p>Un <strong>reverse proxy</strong> riceve richieste per conto dei server posti dietro di esso.</p>
+<p>Può occuparsi, ad esempio, di terminazione HTTPS, inoltro delle richieste, controllo degli accessi o cache.</p>
+<p>Un load balancer può operare come reverse proxy, ma i due concetti non sono sinonimi: il reverse proxy è un ruolo più generale.</p>
+<p>Esempi di software utilizzati per queste funzioni sono Nginx e HAProxy; esistono anche servizi gestiti dai provider cloud.</p>
+<p>È importante non confondere il load balancing applicativo con il routing IP.</p>
+<p>Il router decide come inoltrare i pacchetti verso reti di destinazione. Il load balancer decide come distribuire traffico o richieste tra risorse che forniscono un servizio.</p>
+<h2 id="stateful-e-stateless-che-cosa-succede-alle-sessioni">Stateful e Stateless: che cosa succede alle sessioni?</h2>
+<p>Aggiungere più server introduce un problema meno evidente.</p>
+<p>Immaginiamo che un utente effettui il login e che la richiesta venga gestita dal server A.</p>
+<p>Se A memorizza la sessione nella propria memoria, una richiesta successiva indirizzata al server B potrebbe non essere riconosciuta.</p>
+<p>Il risultato sarebbe un utente che viene disconnesso casualmente.</p>
+<h3 id="server-stateful"><strong>Server stateful</strong></h3>
+<p>Un server è <em>stateful</em> quando conserva informazioni necessarie a interpretare le interazioni successive.</p>
+<p>Per esempio, una sessione utente salvata soltanto nella RAM del server.</p>
+<h3 id="server-stateless"><strong>Server stateless</strong></h3>
+<p>Un server applicativo è <em>stateless</em> rispetto alle richieste quando non dipende da uno stato conversazionale custodito esclusivamente nella propria memoria locale.</p>
+<p>Le informazioni necessarie possono essere contenute nella richiesta oppure archiviate in un sistema condiviso.</p>
+<p>Una soluzione consiste nel salvare le sessioni in uno store accessibile a tutti i server.</p>
+<pre><code>                 CLIENT
+                    |
+                    v
+             LOAD BALANCER
+               /       \
+              v         v
+          SERVER A   SERVER B
+              \         /
+               v       v
+              SESSION STORE
+                 condiviso
+</code></pre>
+<p>A questo punto entrambi i server possono verificare la sessione, indipendentemente da quale abbia gestito il login.</p>
+<p>Una possibile alternativa sono le <strong>sticky sessions</strong>, che cercano di indirizzare lo stesso utente allo stesso server.</p>
+<p>Le sticky sessions possono essere pratiche in alcuni casi, ma creano dipendenze dall'istanza assegnata e possono rendere più difficile la distribuzione del carico.</p>
+<p>Il principio generale è separare, quando opportuno, lo stato persistente dai server applicativi.</p>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-permessi" rel="prev" href="permessi.html"><small>← Precedente</small><span>Identità e permessi</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>5 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-dati" rel="next" href="dati.html"><small>Successiva →</small><span>Dati, transazioni e concorrenza</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

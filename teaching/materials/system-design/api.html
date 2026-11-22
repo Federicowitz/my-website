@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Il contratto delle API — Federico Lelli</title><meta name="description" content="Progetta le richieste per consultare eventi e prenotare posti.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/api.html"><meta property="og:title" content="Il contratto delle API — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/api.html"><meta property="og:description" content="Il contratto delle API. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-api"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-fondamenti" rel="prev" href="fondamenti.html"><small>← Precedente</small><span>Dal requisito alla richiesta web</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>2 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-sessioni-jwt" rel="next" href="sessioni-jwt.html"><small>Successiva →</small><span>Come fa il server a ricordare il login?</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Il contratto delle API</h1>
+<h2 id="che-cose-unapi">Che cos'è un'API?</h2>
+<p>Un'<strong>API (Application Programming Interface)</strong> definisce un insieme di regole che consentono a un programma di utilizzare le funzionalità di un altro programma.</p>
+<p>Nel caso delle API web, queste regole specificano generalmente:</p>
+<ul>
+<li>quali operazioni sono disponibili;</li>
+<li>quali indirizzi o endpoint utilizzare;</li>
+<li>quali dati inviare;</li>
+<li>quale struttura avrà la risposta;</li>
+<li>come vengono segnalati gli errori.</li>
+</ul>
+<p>Si può immaginare un'API come il menu di un ristorante: indica ciò che può essere richiesto, senza dover conoscere come viene preparato.</p>
+<p>Quando EventiScuola mostra un evento, il frontend non ha bisogno di conoscere come il backend memorizza le informazioni. Deve soltanto sapere quale richiesta inviare e quale risposta aspettarsi.</p>
+<h3 id="rest-risorse-e-metodi-http"><strong>REST: risorse e metodi HTTP</strong></h3>
+<p>REST (Representational State Transfer) è uno stile architetturale molto diffuso per realizzare API web.</p>
+<p>Le risorse sono identificate tramite URL e le operazioni vengono rappresentate attraverso metodi HTTP.</p>
+<table>
+<thead>
+<tr>
+<th>Metodo</th>
+<th>Operazione tipica</th>
+<th>Esempio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Leggere</td>
+<td><code>GET /eventi</code></td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Creare</td>
+<td><code>POST /prenotazioni</code></td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>Sostituire</td>
+<td><code>PUT /eventi/42</code></td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>Modificare parzialmente</td>
+<td><code>PATCH /eventi/42</code></td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>Eliminare</td>
+<td><code>DELETE /prenotazioni/15</code></td>
+</tr>
+</tbody>
+</table>
+<p>I metodi permettono di realizzare le operazioni CRUD: Create, Read, Update, Delete.</p>
+<p>In REST si preferiscono URL basati sui nomi delle risorse.</p>
+<p>È preferibile <code>GET /eventi</code> rispetto a <code>/getEventi</code>, perché il metodo HTTP esprime già l'azione da compiere.</p>
+<h3 id="filtraggio-ordinamento-e-paginazione"><strong>Filtraggio, ordinamento e paginazione</strong></h3>
+<p>Un'applicazione con migliaia di eventi non dovrebbe restituirli necessariamente tutti in una sola risposta.</p>
+<p>Le API possono fornire meccanismi per selezionare i dati:</p>
+<pre><code>GET /eventi?citta=Milano
+</code></pre>
+<p>Restituisce soltanto gli eventi di Milano.</p>
+<pre><code>GET /eventi?sort=data
+</code></pre>
+<p>Richiede l'ordinamento per data, secondo le convenzioni stabilite dall'API.</p>
+<pre><code>GET /eventi?page=2&amp;limit=10
+</code></pre>
+<p>Richiede una pagina di risultati contenente, al massimo, dieci eventi.</p>
+<p>La paginazione riduce la quantità di informazioni trasferite ed evita di elaborare grandi elenchi non necessari.</p>
+<h3 id="codici-di-stato-http"><strong>Codici di stato HTTP</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Codice</th>
+<th>Significato</th>
+<th>Esempio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>OK</td>
+<td>Evento restituito correttamente</td>
+</tr>
+<tr>
+<td>201</td>
+<td>Created</td>
+<td>Prenotazione creata</td>
+</tr>
+<tr>
+<td>204</td>
+<td>No Content</td>
+<td>Eliminazione riuscita senza contenuto di risposta</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Bad Request</td>
+<td>Dati inviati non validi</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Unauthorized</td>
+<td>Autenticazione assente o non valida</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Forbidden</td>
+<td>Operazione non autorizzata</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Not Found</td>
+<td>Evento inesistente</td>
+</tr>
+<tr>
+<td>409</td>
+<td>Conflict</td>
+<td>Posto già prenotato</td>
+</tr>
+<tr>
+<td>429</td>
+<td>Too Many Requests</td>
+<td>Troppe richieste</td>
+</tr>
+<tr>
+<td>500</td>
+<td>Internal Server Error</td>
+<td>Errore interno del server</td>
+</tr>
+<tr>
+<td>503</td>
+<td>Service Unavailable</td>
+<td>Servizio temporaneamente non disponibile</td>
+</tr>
+</tbody>
+</table>
+<h3 id="il-principio-di-idempotenza"><strong>Il principio di idempotenza</strong></h3>
+<p>Un'operazione è <strong>idempotente</strong> quando eseguirla più volte produce lo stesso effetto sullo stato del sistema che eseguirla una sola volta.</p>
+<p>Una richiesta GET è progettata per essere sicura e idempotente, pur potendo restituire dati diversi se il contenuto cambia nel frattempo.</p>
+<p>Una richiesta PUT che imposta ripetutamente lo stesso valore è idempotente.</p>
+<p>Una richiesta POST che crea una nuova prenotazione a ogni esecuzione, normalmente, non lo è.</p>
+<p>Questa distinzione diventerà importante quando analizzeremo i pagamenti e i tentativi automatici di ripetere le richieste.</p>
+<h2 id="rest-graphql-e-grpc">REST, GraphQL e gRPC</h2>
+<p>REST non è l'unico modo di progettare API.</p>
+<h3 id="rest"><strong>REST</strong></h3>
+<p>Espone risorse tramite URL e utilizza comunemente JSON come formato di risposta.</p>
+<p>È adatto a numerose applicazioni web e mobile, grazie alla semplicità e all'integrazione con HTTP.</p>
+<h3 id="graphql"><strong>GraphQL</strong></h3>
+<p>GraphQL permette al client di specificare esattamente quali dati desidera ricevere.</p>
+<p>Per esempio:</p>
+<pre><code>query {
+  evento(id: 42) {
+    titolo
+    data
+    luogo
+  }
+}
+</code></pre>
+<p>Il server restituisce soltanto i campi richiesti, se previsti dallo schema e consentiti all'utente.</p>
+<p>Questo può ridurre il trasferimento di informazioni superflue e, in determinate architetture, il numero di richieste necessarie.</p>
+<p>GraphQL introduce però una maggiore complessità nella gestione delle query, delle autorizzazioni e della cache.</p>
+<h3 id="grpc"><strong>gRPC</strong></h3>
+<p>gRPC è un framework di comunicazione remota, utilizzato soprattutto per le comunicazioni tra servizi.</p>
+<p>Utilizza comunemente Protocol Buffers per serializzare i dati e HTTP/2 come trasporto.</p>
+<p>Può offrire comunicazioni efficienti, contratti fortemente tipizzati e funzionalità di streaming.</p>
+<table>
+<thead>
+<tr>
+<th>Caratteristica</th>
+<th>REST</th>
+<th>GraphQL</th>
+<th>gRPC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Modello</td>
+<td>Risorse</td>
+<td>Query e schema</td>
+<td>Chiamate a procedure remote</td>
+</tr>
+<tr>
+<td>Formato tipico</td>
+<td>JSON</td>
+<td>JSON</td>
+<td>Protocol Buffers</td>
+</tr>
+<tr>
+<td>Utilizzo frequente</td>
+<td>Web e mobile</td>
+<td>Interfacce con esigenze di dati articolate</td>
+<td>Comunicazioni interne tra servizi</td>
+</tr>
+<tr>
+<td>Vantaggio principale</td>
+<td>Semplicità</td>
+<td>Selezione precisa dei dati</td>
+<td>Efficienza e contratti tipizzati</td>
+</tr>
+<tr>
+<td>Difficoltà</td>
+<td>Gestire risorse e versioni</td>
+<td>Controllare query complesse</td>
+<td>Tooling e compatibilità con i client</td>
+</tr>
+</tbody>
+</table>
+<p>La scelta dipende dalle esigenze. Non esiste una tecnologia migliore in assoluto.</p>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="system-design-fondamenti" rel="prev" href="fondamenti.html"><small>← Precedente</small><span>Dal requisito alla richiesta web</span></a><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>2 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-sessioni-jwt" rel="next" href="sessioni-jwt.html"><small>Successiva →</small><span>Come fa il server a ricordare il login?</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>

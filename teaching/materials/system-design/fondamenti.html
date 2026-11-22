@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dal requisito alla richiesta web — Federico Lelli</title><meta name="description" content="Segui uno studente dal dominio alla pagina degli eventi.">
+<link rel="stylesheet" href="../../reader.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/system-design/fondamenti.html"><meta property="og:title" content="Dal requisito alla richiesta web — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/system-design/fondamenti.html"><meta property="og:description" content="Dal requisito alla richiesta web. System Design: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head><body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="system-design-fondamenti"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=system-design" data-school-catalog="system-design">System Design</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><span class="lesson-neighbor lesson-boundary"><small>Inizio del percorso</small><span>System Design</span></span><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>1 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-api" rel="next" href="api.html"><small>Successiva →</small><span>Il contratto delle API</span></a></nav></div><!-- SCHOOL:TOP:END --><article class="reading">
+<div class="eyebrow">System Design · EventiScuola</div><h1>Dal requisito alla richiesta web</h1>
+<h2 id="introduzione-che-cosa-significa-progettare-un-sistema-informatico">Introduzione: che cosa significa progettare un sistema informatico?</h2>
+<p>Quando utilizziamo un'applicazione come Instagram, Netflix, Amazon o un servizio di prenotazione online, vediamo soltanto la sua interfaccia: pagine, immagini, pulsanti e informazioni.</p>
+<p>Dietro quell'interfaccia esiste però un insieme di componenti che collaborano per fornire il servizio.</p>
+<p>Un'applicazione deve infatti essere in grado di:</p>
+<ul>
+<li>ricevere le richieste degli utenti;</li>
+<li>elaborarle;</li>
+<li>memorizzare e recuperare dati;</li>
+<li>comunicare con altri servizi;</li>
+<li>rispondere velocemente;</li>
+<li>gestire numerosi utenti contemporaneamente;</li>
+<li>continuare a funzionare anche in presenza di guasti;</li>
+<li>proteggere le informazioni.</li>
+</ul>
+<p>La disciplina che studia come organizzare questi componenti prende il nome di <strong>System Design</strong>, ovvero progettazione dell'architettura di un sistema informatico.</p>
+<p>Programmare e progettare un sistema non sono esattamente la stessa cosa.</p>
+<p><strong>Programmare</strong> significa realizzare le funzionalità di un'applicazione, scrivendo istruzioni che svolgono determinate operazioni.</p>
+<p><strong>Progettare l'architettura</strong> significa stabilire dove e come tali funzionalità devono essere eseguite, quali componenti devono collaborare e quali soluzioni adottare per soddisfare i requisiti del sistema.</p>
+<h3 id="un-esempio"><strong>Un esempio</strong></h3>
+<p>Immaginiamo di sviluppare una piattaforma chiamata <strong>EventiScuola</strong>, che permette di consultare eventi, prenotare posti, acquistare biglietti e ricevere conferme.</p>
+<p>All'inizio potrebbe essere sufficiente un computer che ospita sia l'applicazione sia il database.</p>
+<p>Se però il servizio diventasse molto popolare, potrebbero presentarsi diversi problemi.</p>
+<table>
+<thead>
+<tr>
+<th>Problema</th>
+<th>Possibile soluzione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Troppi utenti contemporanei</td>
+<td>Aggiungere server e distribuire il traffico</td>
+</tr>
+<tr>
+<td>Richieste molto lente</td>
+<td>Ottimizzare database e utilizzare una cache</td>
+</tr>
+<tr>
+<td>Immagini lente da scaricare</td>
+<td>Utilizzare una CDN</td>
+</tr>
+<tr>
+<td>Guasto del server principale</td>
+<td>Introdurre sistemi ridondanti</td>
+</tr>
+<tr>
+<td>Database troppo grande</td>
+<td>Suddividere i dati mediante sharding</td>
+</tr>
+<tr>
+<td>Notifiche che rallentano le prenotazioni</td>
+<td>Utilizzare code di messaggi</td>
+</tr>
+<tr>
+<td>Due utenti acquistano lo stesso posto</td>
+<td>Utilizzare transazioni e vincoli di integrità</td>
+</tr>
+<tr>
+<td>Accessi non autorizzati</td>
+<td>Autenticazione, autorizzazione e protezione delle API</td>
+</tr>
+</tbody>
+</table>
+<p>Queste tecnologie non vengono introdotte tutte obbligatoriamente: <strong>ogni soluzione deve rispondere a un'esigenza reale</strong>.</p>
+<h2 id="da-dove-si-comincia-i-requisiti-del-sistema">Da dove si comincia? I requisiti del sistema</h2>
+<p>Prima di scegliere server, database o linguaggi di programmazione, bisogna stabilire che cosa deve fare l'applicazione e come deve comportarsi.</p>
+<p>Esistono due categorie fondamentali di requisiti.</p>
+<h3 id="requisiti-funzionali"><strong>Requisiti funzionali</strong></h3>
+<p>Descrivono <strong>quali operazioni il sistema deve consentire</strong>.</p>
+<p>Per EventiScuola:</p>
+<ul>
+<li>registrare un account;</li>
+<li>effettuare il login;</li>
+<li>visualizzare gli eventi;</li>
+<li>consultare i posti disponibili;</li>
+<li>prenotare un posto;</li>
+<li>pagare un biglietto;</li>
+<li>ricevere una conferma.</li>
+</ul>
+<p>Se un utente non può prenotare un posto, manca una funzionalità richiesta.</p>
+<h3 id="requisiti-non-funzionali"><strong>Requisiti non funzionali</strong></h3>
+<p>Descrivono <strong>le caratteristiche qualitative del sistema</strong>.</p>
+<p>Ad esempio:</p>
+<table>
+<thead>
+<tr>
+<th>Requisito</th>
+<th>Significato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prestazioni</td>
+<td>Le pagine devono caricarsi rapidamente</td>
+</tr>
+<tr>
+<td>Scalabilità</td>
+<td>Il sistema deve gestire un numero crescente di utenti</td>
+</tr>
+<tr>
+<td>Disponibilità</td>
+<td>Il servizio deve essere accessibile il più possibile</td>
+</tr>
+<tr>
+<td>Affidabilità</td>
+<td>Le operazioni devono funzionare correttamente</td>
+</tr>
+<tr>
+<td>Durabilità</td>
+<td>I dati salvati non devono scomparire dopo un guasto</td>
+</tr>
+<tr>
+<td>Sicurezza</td>
+<td>I dati devono essere protetti</td>
+</tr>
+<tr>
+<td>Manutenibilità</td>
+<td>Il sistema deve poter essere aggiornato e corretto</td>
+</tr>
+<tr>
+<td>Costo</td>
+<td>Le risorse utilizzate devono essere economicamente sostenibili</td>
+</tr>
+</tbody>
+</table>
+<p>Due applicazioni potrebbero offrire esattamente le stesse funzionalità, ma avere architetture molto differenti.</p>
+<p>Una piattaforma utilizzata da 30 persone potrebbe funzionare perfettamente su un solo server. La stessa piattaforma, utilizzata da milioni di persone, potrebbe richiedere numerosi server, database distribuiti e sistemi di bilanciamento.</p>
+<h3 id="due-livelli-di-progettazione"><strong>Due livelli di progettazione</strong></h3>
+<p>Si distinguono inoltre:</p>
+<p><strong>High-Level Design (HLD):</strong> descrive i componenti principali e le loro interazioni. Per esempio, server applicativi, database, cache, load balancer e CDN.</p>
+<p><strong>Low-Level Design (LLD):</strong> descrive i dettagli interni di una funzionalità, come classi, metodi, strutture dati e algoritmi.</p>
+<p>In questa lezione ci concentreremo soprattutto sull'High-Level Design.</p>
+<h2 id="larchitettura-client-server">L'architettura client-server</h2>
+<p>La maggior parte delle applicazioni web utilizza il modello <strong>client-server</strong>.</p>
+<p>Il client è il dispositivo o programma che richiede un servizio. Il server è il sistema che riceve la richiesta, la elabora e restituisce una risposta.</p>
+<p>Il client richiede una risorsa; il server elabora la richiesta e invia il risultato.</p>
+<p>Immaginiamo che uno studente apra:</p>
+<p><code>https://eventiscuola.example/eventi</code></p>
+<p>Il browser invia una richiesta per ottenere l'elenco degli eventi. Il server riceve la richiesta, recupera le informazioni necessarie e restituisce una risposta.</p>
+<p>Il server potrebbe inviare una pagina HTML oppure dati JSON che il browser utilizzerà per costruire l'interfaccia.</p>
+<h3 id="frontend-e-backend"><strong>Frontend e backend</strong></h3>
+<p>All'interno di un'applicazione web si distinguono spesso due parti.</p>
+<table>
+<thead>
+<tr>
+<th>Frontend</th>
+<th>Backend</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>È la parte con cui interagisce l'utente</td>
+<td>È la parte che gestisce le operazioni dell'applicazione</td>
+</tr>
+<tr>
+<td>Mostra pagine, pulsanti e moduli</td>
+<td>Controlla dati, autorizzazioni e regole</td>
+</tr>
+<tr>
+<td>Utilizza spesso HTML, CSS e JavaScript</td>
+<td>Può utilizzare Java, Python, JavaScript, PHP ecc.</td>
+</tr>
+<tr>
+<td>Esegue codice nel browser</td>
+<td>Esegue codice sui server</td>
+</tr>
+</tbody>
+</table>
+<p>Per esempio, quando si preme il pulsante <strong>Prenota</strong>, il frontend invia una richiesta al backend. Quest'ultimo verifica la disponibilità del posto e registra la prenotazione.</p>
+<p>Un server non è necessariamente una macchina fisica dedicata: il software può essere eseguito anche su una macchina virtuale, in un container o tramite un servizio cloud.</p>
+<h2 id="come-fa-il-client-a-trovare-il-server-ip-e-dns">Come fa il client a trovare il server? IP e DNS</h2>
+<p>I dispositivi che comunicano su una rete utilizzano indirizzi IP.</p>
+<p>Un indirizzo IP identifica un'interfaccia di rete a livello IP e permette alla rete di instradare i pacchetti verso la destinazione.</p>
+<p>Gli esseri umani, tuttavia, preferiscono ricordare nomi come <code>eventiscuola.example</code> piuttosto che indirizzi numerici.</p>
+<p>Per questo esiste il <strong>DNS (Domain Name System)</strong>, un sistema distribuito che consente di risolvere i nomi di dominio in informazioni di rete, tra cui gli indirizzi IP.</p>
+<h3 id="come-avviene-una-risoluzione-dns"><strong>Come avviene una risoluzione DNS?</strong></h3>
+<p>Il procedimento, semplificato, è questo:</p>
+<ol>
+<li>L'utente digita il dominio.</li>
+<li>Il dispositivo consulta il resolver DNS, eventualmente utilizzando una risposta già presente nella cache.</li>
+<li>Il resolver ottiene l'indirizzo IP associato al nome.</li>
+<li>Il client utilizza l'indirizzo per comunicare con la destinazione.</li>
+<li>La richiesta viene trasportata attraverso la rete fino al sistema che dovrà gestirla.</li>
+</ol>
+<p>Il DNS <strong>non trasporta le pagine web</strong>: aiuta a individuare la destinazione.</p>
+<p>È inoltre importante osservare che il dominio non deve necessariamente corrispondere direttamente all'indirizzo di un server applicativo. In architetture più complesse potrebbe corrispondere a un load balancer o a un'infrastruttura CDN.</p>
+<h2 id="dai-pacchetti-di-rete-alle-richieste-web">Dai pacchetti di rete alle richieste web</h2>
+<p>Per comprendere come viaggiano le informazioni è utile ricordare che la comunicazione in rete è organizzata in livelli.</p>
+<table>
+<thead>
+<tr>
+<th>Livello OSI</th>
+<th>Esempi</th>
+<th>Funzione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7 — Applicazione</td>
+<td>HTTP, DNS, protocolli applicativi</td>
+<td>Definisce i servizi di comunicazione per le applicazioni</td>
+</tr>
+<tr>
+<td>4 — Trasporto</td>
+<td>TCP, UDP</td>
+<td>Gestisce la comunicazione tra processi</td>
+</tr>
+<tr>
+<td>3 — Rete</td>
+<td>IP</td>
+<td>Gestisce l'indirizzamento e l'instradamento</td>
+</tr>
+<tr>
+<td>2 — Collegamento</td>
+<td>Ethernet, Wi-Fi</td>
+<td>Trasferisce i dati sul collegamento locale</td>
+</tr>
+<tr>
+<td>1 — Fisico</td>
+<td>Cavi, fibre, segnali radio</td>
+<td>Trasmette i segnali</td>
+</tr>
+</tbody>
+</table>
+<p>I livelli 5 e 6 del modello OSI sono stati omessi dalla tabella per concentrarsi su quelli più direttamente coinvolti negli esempi.</p>
+<p>Il concetto fondamentale è che <strong>HTTP non sostituisce TCP, UDP o IP</strong>: questi protocolli svolgono funzioni differenti e collaborano.</p>
+<h3 id="tcp-e-udp"><strong>TCP e UDP</strong></h3>
+<p>TCP e UDP sono protocolli di trasporto.</p>
+<p><strong>TCP (Transmission Control Protocol)</strong> fornisce una comunicazione orientata alla connessione, con consegna ordinata e affidabile dei dati finché la connessione rimane operativa.</p>
+<p>Prima dello scambio dei dati viene stabilita una connessione mediante il <em>three-way handshake</em>:</p>
+<pre><code>CLIENT                         SERVER
+
+   -------- SYN --------------&gt;
+   &lt;----- SYN + ACK -----------
+   -------- ACK --------------&gt;
+
+       Connessione stabilita
+</code></pre>
+<p>TCP rileva le perdite, ritrasmette i dati necessari e li consegna all'applicazione nell'ordine corretto.</p>
+<p><strong>UDP (User Datagram Protocol)</strong> è invece privo di connessione e non implementa autonomamente meccanismi di ritrasmissione o ordinamento.</p>
+<p>La minore complessità lo rende utile per applicazioni che gestiscono autonomamente la trasmissione o richiedono bassa latenza.</p>
+<table>
+<thead>
+<tr>
+<th>TCP</th>
+<th>UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Orientato alla connessione</td>
+<td>Senza connessione</td>
+</tr>
+<tr>
+<td>Consegna ordinata</td>
+<td>Nessuna garanzia di ordine</td>
+</tr>
+<tr>
+<td>Ritrasmissioni e controllo di flusso</td>
+<td>Non offre questi meccanismi autonomamente</td>
+</tr>
+<tr>
+<td>Maggiore overhead</td>
+<td>Minore overhead di base</td>
+</tr>
+<tr>
+<td>Utilizzato da molti servizi web</td>
+<td>Utilizzato in DNS, comunicazioni in tempo reale e altri servizi</td>
+</tr>
+</tbody>
+</table>
+<p>Non è corretto affermare che UDP sia sempre più veloce di TCP. Le prestazioni dipendono anche dal protocollo applicativo e dalla rete.</p>
+<p>Un esempio importante è <strong>HTTP/3</strong>, che utilizza QUIC, costruito sopra UDP, ma implementa comunque meccanismi di affidabilità e controllo della connessione.</p>
+<h3 id="http-e-https"><strong>HTTP e HTTPS</strong></h3>
+<p>HTTP (Hypertext Transfer Protocol) è il protocollo applicativo utilizzato per scambiare richieste e risposte web.</p>
+<p>Una richiesta potrebbe essere:</p>
+<pre><code>GET /api/v1/eventi/42 HTTP/1.1
+Host: eventiscuola.example
+Accept: application/json
+</code></pre>
+<p>La risposta:</p>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  &quot;id&quot;: 42,
+  &quot;titolo&quot;: &quot;Concerto di primavera&quot;,
+  &quot;luogo&quot;: &quot;Auditorium&quot;,
+  &quot;postiDisponibili&quot;: 57
+}
+</code></pre>
+<p>La richiesta indica quale risorsa si desidera ottenere; la risposta fornisce il risultato e un codice di stato.</p>
+<p><strong>HTTPS</strong> è HTTP protetto tramite TLS, un protocollo crittografico che fornisce cifratura, integrità e autenticazione della controparte tramite certificati.</p>
+<p>HTTPS protegge i dati durante il trasporto, ma non sostituisce il controllo degli accessi dell'applicazione.</p>
+
+</article><!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><span class="lesson-neighbor lesson-boundary"><small>Inizio del percorso</small><span>System Design</span></span><a class="lesson-catalog" href="../../index.html?course=system-design" data-school-catalog="system-design">Tutte le lezioni<span>1 / 10</span></a><a class="lesson-neighbor" data-school-link="system-design-api" rel="next" href="api.html"><small>Successiva →</small><span>Il contratto delle API</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body></html>
