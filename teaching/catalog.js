@@ -1421,16 +1421,16 @@ window.schoolCatalog = {
       "title": "06 · Routing statico e strada di ritorno",
       "kind": "lesson",
       "path": "materials/routing/06-statico.html",
-      "description": "Configura le rotte da PC1 a PC4, prepara il ritorno e osserva che cosa succede quando un collegamento si guasta.",
+      "description": "Come si configura una rete affinché due computer possano comunicare? Come si prepara un percorso alternativo quando un router si guasta?",
       "chapter": "routing-02"
     },
     {
       "id": "routing-07-dinamico-dijkstra",
       "course": "routing",
-      "title": "07 · Routing dinamico e Dijkstra",
+      "title": "07 · Routing dinamico e algoritmo di Dijkstra",
       "kind": "lesson",
       "path": "materials/routing/07-dinamico-dijkstra.html",
-      "description": "Scopri come i router possono adattarsi a un cambiamento e come si calcola un percorso a costo minimo.",
+      "description": "Come fanno i router a conoscere i cambiamenti della rete e a scegliere automaticamente il percorso migliore?",
       "chapter": "routing-03"
     },
     {

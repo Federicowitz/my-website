@@ -88,6 +88,7 @@ default via 172.26.36.1 dev eth0
 </table>
 <p class="callout"><strong>Longest Prefix Match.</strong> Prima R1 individua i prefissi che corrispondono all’indirizzo IP di destinazione. Poi sceglie il più lungo fra quelli compatibili. Un prefisso più lungo richiede che coincidano più bit iniziali dell’indirizzo.</p>
 <h3>Perché <code>.200</code> va a R2 e <code>.90</code> va a R3?</h3>
+<p>Per <code>192.168.4.200</code> corrispondono tre rotte, <code>/0</code>, <code>/24</code> e <code>/25</code>. Vince <code>192.168.4.128/25</code> perché <code>.200</code> è nel suo intervallo e i suoi 25 bit di prefisso coincidono con quelli della destinazione. R1 inoltra quindi a R2. Il router controlla le rotte disponibili e sceglie quella con il maggior numero di bit iniziali corrispondenti.</p>
 <p>La rete <code>192.168.4.0/24</code> copre tutto l’intervallo da <code>192.168.4.0</code> a <code>192.168.4.255</code>. Il bit in più della <code>/25</code> divide l’ultimo ottetto in due metà.</p>
 <table>
 <thead><tr><th scope="col">Ultimo ottetto da 0 a 127</th><th scope="col">Ultimo ottetto da 128 a 255</th></tr></thead>

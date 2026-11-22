@@ -21,15 +21,47 @@ ${body}
 `);
 }
 
-function diagram(points, edges, label) {
+function diagram(points, edges, label, { failed = [], route = [] } = {}) {
   return `<div class="network-scroll"><svg class="network-svg" viewBox="0 0 840 365" role="img" aria-label="${label}">
 ${edges.map(([from, to, cost]) => {
     const [x1, y1] = points[from], [x2, y2] = points[to];
-    return `<line class="edge" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>` +
-      (cost === undefined ? '' : `<text class="link-label" x="${(x1+x2)/2+18}" y="${(y1+y2)/2-12}">${cost}</text>`);
+    const broken = failed.includes(`${from}-${to}`) || failed.includes(`${to}-${from}`);
+    const active = route.some((node, index) => index > 0 &&
+      (route[index - 1] === from && node === to || route[index - 1] === to && node === from));
+    return `<line class="edge${broken ? ' failed' : active ? ' active' : ''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>` +
+      (cost === undefined && !broken ? '' : `<text class="link-label" x="${(x1+x2)/2+18}" y="${(y1+y2)/2-12}">${broken ? '×' : cost}</text>`);
   }).join('')}
 ${Object.entries(points).map(([node, [x,y]]) => `<g class="node"><circle cx="${x}" cy="${y}" r="28"/><text x="${x}" y="${y+6}">${node}</text></g>`).join('')}
 </svg></div>`;
+}
+
+function lessonDiagram(name) {
+  const networkEdges = R.links.map(link => link.slice(0, 2));
+  const costs = { 'R1-R3': 2, 'R3-R4': 2, 'R1-R2': 3, 'R2-R4': 3 };
+  const weightedEdges = networkEdges.map(([from, to]) => [from, to, costs[`${from}-${to}`]]);
+  switch (name) {
+    case 'network':
+      return diagram(R.nodes, networkEdges, 'PC1 e PC4 collegati attraverso R1 e R4. R3 è sul percorso superiore e R2 su quello inferiore.');
+    case 'network-failed':
+      return diagram(R.nodes, networkEdges, 'Il collegamento R3–R4 è guasto, indicato con una linea tratteggiata e una croce.', { failed: ['R3-R4'] });
+    case 'network-backup':
+      return diagram(R.nodes, networkEdges, 'R3 è fuori servizio. Il percorso alternativo evidenziato passa da PC1 a R1, R2, R4 e PC4.',
+        { failed: ['R1-R3', 'R3-R4'], route: ['PC1', 'R1', 'R2', 'R4', 'PC4'] });
+    case 'network-costs':
+      return diagram(R.nodes, weightedEdges, 'I collegamenti via R3 costano 2 ciascuno, quelli via R2 costano 3 ciascuno.',
+        { route: ['R1', 'R3', 'R4'] });
+    case 'network-rerouted':
+      return diagram(R.nodes, weightedEdges, 'Con R3–R4 guasto, il nuovo percorso evidenziato passa attraverso R2 e costa 6.',
+        { failed: ['R3-R4'], route: ['PC1', 'R1', 'R2', 'R4', 'PC4'] });
+    case 'triangle':
+      return diagram({ A: [140, 260], B: [420, 65], C: [700, 260] }, [['A', 'B', 2], ['B', 'C', 2], ['A', 'C', 8]],
+        'A–C costa 8. Il percorso A–B–C evidenziato costa 2 più 2, cioè 4.', { route: ['A', 'B', 'C'] });
+    case 'dijkstra':
+      return diagram({ A: [140, 180], B: [380, 65], C: [380, 300], D: [670, 180] }, R.graph,
+        'A–B costa 2, A–C costa 5, B–C costa 1, B–D costa 4 e C–D costa 2.');
+    default:
+      throw new Error(`Schema di routing sconosciuto: ${name}`);
+  }
 }
 
 // The introductory lessons are maintained as standalone pages.
@@ -46,11 +78,8 @@ for (const { file, title, lead, body, extra = '', scripts = '' } of lessons) {
       'PC1 è collegato a R1. Da R1 si raggiunge R4 attraverso R2 oppure R3. R4 è collegato a PC4.');
     content = body.replace('<p class="callout"><strong>Andata', network + '<p class="callout"><strong>Andata');
   }
-  if (key === '07') {
-    const graph = diagram({ A:[140,180], B:[380,65], C:[380,300], D:[670,180] }, R.graph,
-      'A–B costa 2, A–C costa 5, B–C costa 1, B–D costa 4 e C–D costa 2.');
-    content = body.replace(/<pre class="diagram-code".*?<\/pre>/, graph);
-  }
+  content = content.replace(/<div data-routing-diagram="([\w-]+)"><\/div>/g,
+    (_, name) => lessonDiagram(name));
   page(file, title, lead, content + lessonPanels[key] + extra, key === '12' ? 'exercise' : 'lesson', visualScripts + scripts);
 }
 

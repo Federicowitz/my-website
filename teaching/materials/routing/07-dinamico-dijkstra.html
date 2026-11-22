@@ -1,37 +1,699 @@
 <!doctype html>
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>07 · Routing dinamico e Dijkstra — Federico Lelli</title><meta name="description" content="Scopri come i router possono adattarsi a un cambiamento e come si calcola un percorso a costo minimo."><meta name="school-kind" content="lesson">
-<link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="routing.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/routing/07-dinamico-dijkstra.html"><meta property="og:title" content="07 · Routing dinamico e Dijkstra — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/routing/07-dinamico-dijkstra.html"><meta property="og:description" content="07 · Routing dinamico e Dijkstra. Routing: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head>
+<title>07 · Routing dinamico e algoritmo di Dijkstra — Federico Lelli</title><meta name="description" content="Come fanno i router a conoscere i cambiamenti della rete e a scegliere automaticamente il percorso migliore?"><meta name="school-kind" content="lesson">
+<link rel="stylesheet" href="../../reader.css"><link rel="stylesheet" href="routing.css"><!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/routing/07-dinamico-dijkstra.html"><meta property="og:title" content="07 · Routing dinamico e algoritmo di Dijkstra — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/routing/07-dinamico-dijkstra.html"><meta property="og:description" content="07 · Routing dinamico e algoritmo di Dijkstra. Routing: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head>
 <body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="routing-07-dinamico-dijkstra"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=routing" data-school-catalog="routing">Routing</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="routing-06-statico" rel="prev" href="06-statico.html"><small>← Precedente</small><span>06 · Routing statico e strada di ritorno</span></a><a class="lesson-catalog" href="../../index.html?course=routing" data-school-catalog="routing">Tutte le lezioni<span>8 / 16</span></a><a class="lesson-neighbor" data-school-link="routing-08-ospf" rel="next" href="08-ospf.html"><small>Successiva →</small><span>08 · Come OSPF aggiorna le rotte</span></a></nav></div><!-- SCHOOL:TOP:END --><main class="reading routing-reading">
-<p class="eyebrow">ROUTING · DALLE RETI AI PERCORSI</p><h1>07 · Routing dinamico e Dijkstra</h1><p class="lead">Scopri come i router possono adattarsi a un cambiamento e come si calcola un percorso a costo minimo.</p>
+<p class="eyebrow">ROUTING · DALLE RETI AI PERCORSI</p><h1>07 · Routing dinamico e algoritmo di Dijkstra</h1><p class="lead">Come fanno i router a conoscere i cambiamenti della rete e a scegliere automaticamente il percorso migliore?</p>
 
-<section id="sezione-18"><h2>Quando cambiare le rotte a mano diventa difficile</h2>
-<p>Riprendi il guasto E–H della lezione precedente. In una rete grande, aggiornare manualmente tutte le rotte coinvolte richiede tempo. Nel <strong>routing dinamico</strong> i router si scambiano informazioni e aggiornano le rotte sulla base di quello che apprendono.</p>
-<p>E e H devono prima accorgersi del guasto. La notizia deve poi raggiungere A, che può ancora inoltrare come prima durante l’attesa. Quando i router coinvolti hanno aggiornato le proprie decisioni e le rotte si stabilizzano, la rete ha raggiunto la <strong>convergenza</strong>.</p></section>
-<section><h2>Che cosa rappresenta un costo?</h2>
-<p>Il costo di un collegamento è un numero che esprime quanto conviene usarlo nel calcolo. La <strong>metrica</strong> è il criterio numerico con cui un protocollo confronta i percorsi. Qui la metrica del percorso è la somma dei costi dei collegamenti attraversati.</p>
-<p>In un piccolo esempio, A–C costa 8, mentre A–B e B–C costano 2 ciascuno. La strada diretta richiede un salto e costa 8. Passando da B i salti sono due, ma il costo è 2 + 2 = 4.</p>
-<p>Nel simulatore i costi sono assegnati per rendere visibili le differenze. In una rete reale il valore può essere configurato o ricavato da parametri come la capacità dell’interfaccia, secondo il protocollo e la sua implementazione. Un costo 8 non equivale a 8 millisecondi e non misura automaticamente distanza o congestione.</p>
-<h3>Due strade da A a L nella rete a dodici router</h3>
-<table><thead><tr><th scope="col">Percorso</th><th scope="col">Salti</th><th scope="col">Costo</th></tr></thead><tbody>
-<tr><td>A → C → L</td><td>2</td><td>8 + 20 = 28</td></tr>
-<tr><td>A → B → E → H → K → L</td><td>5</td><td>2 + 2 + 2 + 2 + 2 = 10</td></tr></tbody></table>
-<p>Se conti i salti, scegli il primo. Se sommi i costi, fra questi due scegli il secondo. Dijkstra permette di cercare il costo minimo anche quando i percorsi possibili sono molti.</p></section>
-<section id="sezione-19"><h2>Calcola il costo su quattro nodi</h2>
-<p>Un costo è un numero associato a un collegamento. Per confrontare due percorsi, somma i costi dei collegamenti che attraversano. Qui usiamo quattro nodi per fare il conto a mano prima di passare alla rete grande.</p>
+<p>Nella lezione precedente abbiamo configurato manualmente le rotte necessarie per far comunicare PC1 e PC4.</p>
+<p>Abbiamo anche scoperto un problema: quando un collegamento si interrompe, un router potrebbe continuare a utilizzare una strada che non funziona più.</p>
+<p>In una rete piccola è possibile intervenire manualmente. Ma in una rete con decine o centinaia di router diventerebbe molto difficile aggiornare tutte le rotte a ogni cambiamento.</p>
+<p>Il <strong>routing dinamico</strong> permette ai router di scambiarsi informazioni sulla rete e aggiornare le proprie rotte.</p>
+<p>Vedremo inoltre come l'algoritmo di <strong>Dijkstra</strong> permette di calcolare i percorsi a costo minimo.</p>
+<section id="sezione-18">
+<h2>1. Riprendiamo la rete della lezione precedente</h2>
+<p>Consideriamo la stessa topologia utilizzata per il routing statico:</p>
+<div class="network-scroll"><svg class="network-svg" viewBox="0 0 840 365" role="img" aria-label="PC1 e PC4 collegati attraverso R1 e R4. R3 è sul percorso superiore e R2 su quello inferiore.">
+<line class="edge" x1="65" y1="180" x2="230" y2="180"/><line class="edge" x1="230" y1="180" x2="420" y2="295"/><line class="edge" x1="230" y1="180" x2="420" y2="65"/><line class="edge" x1="420" y1="295" x2="610" y2="180"/><line class="edge" x1="420" y1="65" x2="610" y2="180"/><line class="edge" x1="610" y1="180" x2="775" y2="180"/>
+<g class="node"><circle cx="65" cy="180" r="28"/><text x="65" y="186">PC1</text></g><g class="node"><circle cx="230" cy="180" r="28"/><text x="230" y="186">R1</text></g><g class="node"><circle cx="420" cy="295" r="28"/><text x="420" y="301">R2</text></g><g class="node"><circle cx="420" cy="65" r="28"/><text x="420" y="71">R3</text></g><g class="node"><circle cx="610" cy="180" r="28"/><text x="610" y="186">R4</text></g><g class="node"><circle cx="775" cy="180" r="28"/><text x="775" y="186">PC4</text></g>
+</svg></div>
+<p>PC1 ha indirizzo <code>192.168.1.10</code> e appartiene alla rete <code>192.168.1.0/24</code>.</p>
+<p>PC4 ha indirizzo <code>192.168.4.10</code> e appartiene alla rete <code>192.168.4.0/24</code>.</p>
+<p>Per raggiungere PC4, R1 può utilizzare due percorsi:</p>
+<ul>
+<li><strong>Percorso superiore:</strong> R1 → R3 → R4</li>
+<li><strong>Percorso inferiore:</strong> R1 → R2 → R4</li>
+</ul>
+<p>Nella lezione 06 avevamo scelto manualmente R3 e configurato le rotte di andata e ritorno.</p>
+<p>Quando si interrompeva il collegamento R3–R4, R1 poteva continuare a inviare i pacchetti a R3, perché il collegamento R1–R3 funzionava ancora.</p>
+<p>Con semplici rotte statiche, R1 non riceve automaticamente informazioni su tutti i collegamenti lontani.</p>
+<p>Ora vogliamo ottenere un comportamento diverso:</p>
+<ol>
+<li>I router apprendono quali collegamenti esistono.</li>
+<li>Calcolano quali percorsi permettono di raggiungere le varie reti.</li>
+<li>Quando un collegamento cambia stato, aggiornano le informazioni.</li>
+<li>Ricalcolano i percorsi e modificano le rotte quando necessario.</li>
+</ol>
+<p>Questo è il principio del routing dinamico.</p>
+</section>
+<section id="parte-2">
+<h2>2. Che cos'è il routing dinamico?</h2>
+<p>Nel <strong>routing statico</strong>, l'amministratore inserisce manualmente le rotte.</p>
+<p>Per esempio, su R1 avevamo configurato:</p>
+<table><thead><tr><th scope="col">Destinazione</th><th scope="col">Next hop</th></tr></thead><tbody>
+<tr><td><code>192.168.4.0/24</code></td><td><code>10.0.13.2</code> (R3)</td></tr>
+</tbody></table>
+<p>R1 utilizzava questa informazione per raggiungere la rete di PC4.</p>
+<p>Nel <strong>routing dinamico</strong>, invece, i router utilizzano un protocollo per scambiarsi informazioni e apprendere i percorsi verso le reti remote.</p>
+<p>Un protocollo di routing stabilisce quali informazioni vengono scambiate, come vengono elaborate e quando devono essere aggiornate.</p>
+<p>Esempi di protocolli di routing dinamico sono RIP, OSPF e IS-IS.</p>
+<p>Questi protocolli non funzionano tutti allo stesso modo, ma hanno un obiettivo comune: permettere ai router di adattare le proprie rotte alla struttura della rete.</p>
+<h3>Routing statico e dinamico a confronto</h3>
+<table><thead><tr><th scope="col">Routing statico</th><th scope="col">Routing dinamico</th></tr></thead><tbody>
+<tr><td>Le rotte vengono inserite manualmente.</td><td>Le rotte vengono apprese e aggiornate attraverso un protocollo.</td></tr>
+<tr><td>L'amministratore definisce il percorso.</td><td>Il protocollo calcola o seleziona i percorsi secondo le proprie regole.</td></tr>
+<tr><td>Non richiede lo scambio di informazioni di routing.</td><td>Richiede comunicazioni fra i router partecipanti.</td></tr>
+<tr><td>È semplice da gestire in reti piccole.</td><td>È adatto anche a reti grandi e con percorsi alternativi.</td></tr>
+<tr><td>I guasti possono richiedere interventi o meccanismi aggiuntivi.</td><td>Può adattarsi ai guasti mediante i meccanismi del protocollo.</td></tr>
+</tbody></table>
+<p>Il routing dinamico non elimina la necessità di configurare correttamente i router. È comunque necessario abilitare e configurare il protocollo e stabilire quali reti ne fanno parte.</p>
+</section>
+<section id="parte-3">
+<h2>3. Come fanno i router a conoscere la rete?</h2>
+<p>Immaginiamo di voler scegliere il percorso migliore da R1 a R4.</p>
+<p>R1 conosce direttamente R2 e R3.</p>
+<p>Ma per scegliere correttamente fra i due percorsi deve avere anche informazioni sui collegamenti successivi.</p>
+<p>Per esempio, gli sarebbe utile sapere:</p>
+<ul>
+<li>Che R2 è collegato a R4.</li>
+<li>Che R3 è collegato a R4.</li>
+<li>Se questi collegamenti sono funzionanti.</li>
+<li>Quale costo è associato a ogni collegamento.</li>
+</ul>
+<p>Uno dei modi per ottenere queste informazioni è utilizzare un protocollo <strong>Link State</strong>, cioè basato sullo stato dei collegamenti.</p>
+<h3>Il funzionamento generale dei protocolli Link State</h3>
+<p>Consideriamo i quattro router R1, R2, R3 e R4.</p>
+<p>R1 conosce i propri collegamenti verso R2 e R3.</p>
+<p>R2 conosce i collegamenti verso R1 e R4.</p>
+<p>R3 conosce i collegamenti verso R1 e R4.</p>
+<p>R4 conosce i collegamenti verso R2 e R3, oltre alla propria LAN.</p>
+<p>Ogni router può comunicare agli altri router interessati informazioni sullo stato dei propri collegamenti.</p>
+<p>Queste informazioni vengono diffuse attraverso un meccanismo chiamato <strong>flooding</strong>.</p>
+<p>Il flooding, in questo contesto, non significa inviare tutti i normali pacchetti IP su ogni collegamento: serve a diffondere le informazioni del protocollo di routing, evitando che restino conosciute soltanto dai router direttamente vicini.</p>
+<p>Quando lo scambio è completato, i router della stessa area Link State possono disporre di una rappresentazione coerente della topologia.</p>
+<p>Questa rappresentazione viene memorizzata in una base di dati detta <strong>Link State Database (LSDB)</strong>.</p>
+<p>Da queste informazioni ciascun router può calcolare i percorsi verso le destinazioni.</p>
+<p>Uno dei protocolli che adotta questo principio è OSPF, che verrà approfondito nella lezione successiva.</p>
+<h3>Un punto fondamentale</h3>
+<p><strong>I router non hanno bisogno di chiedere a un unico router centrale quale percorso utilizzare.</strong></p>
+<p>In un protocollo Link State, ogni router calcola i propri percorsi utilizzando le informazioni di topologia apprese.</p>
+<p>Per esempio, R1 calcola i percorsi partendo da R1, mentre R4 effettua un proprio calcolo partendo da R4.</p>
+</section>
+<section id="parte-4">
+<h2>4. Che cosa significa scegliere il percorso migliore?</h2>
+<p>Sapere quali strade esistono non basta.</p>
+<p>Bisogna stabilire quale conviene utilizzare.</p>
+<p>Il percorso con meno router non è necessariamente il migliore.</p>
+<p>Per confrontare i percorsi, i protocolli di routing utilizzano una <strong>metrica</strong>, cioè un criterio numerico.</p>
+<p>Nel nostro esempio utilizzeremo il <strong>costo</strong> associato a ogni collegamento.</p>
+<p>Supponiamo di assegnare questi valori:</p>
+<table><thead><tr><th scope="col">Collegamento</th><th scope="col">Costo</th></tr></thead><tbody>
+<tr><td>R1–R3</td><td>2</td></tr>
+<tr><td>R3–R4</td><td>2</td></tr>
+<tr><td>R1–R2</td><td>3</td></tr>
+<tr><td>R2–R4</td><td>3</td></tr>
+</tbody></table>
+<p>Per semplicità supponiamo che il costo sia uguale nelle due direzioni del collegamento.</p>
+<p>In un protocollo reale, come OSPF, il costo è associato alle interfacce e può anche differire a seconda della direzione.</p>
+<h3>Confrontiamo i due percorsi</h3>
+<p><strong>Percorso attraverso R3:</strong></p>
+<p>R1 → R3 → R4</p>
+<p>Costo totale:</p>
+<p><code>2 + 2 = 4</code></p>
+<p><strong>Percorso attraverso R2:</strong></p>
+<p>R1 → R2 → R4</p>
+<p>Costo totale:</p>
+<p><code>3 + 3 = 6</code></p>
+<p>Fra questi due percorsi, quello attraverso R3 ha il costo minore.</p>
+<p>Se il nostro criterio consiste nel minimizzare la somma dei costi, la scelta è R3.</p>
+<h3>Che cosa rappresenta realmente il costo?</h3>
+<p>Il costo non indica necessariamente la lunghezza fisica del collegamento né il tempo impiegato da un pacchetto.</p>
+<p>È un valore utilizzato per confrontare i percorsi.</p>
+<p>A seconda del protocollo, il costo può essere configurato dall'amministratore oppure derivare da caratteristiche del collegamento, come la capacità dell'interfaccia.</p>
+<p>Per esempio, un collegamento veloce potrebbe avere un costo inferiore a un collegamento più lento, secondo le regole utilizzate dal protocollo.</p>
+<p>Nel nostro esercizio i costi sono valori assegnati per semplificare il ragionamento.</p>
+<p><strong>Un costo pari a 4 non significa quattro millisecondi o quattro chilometri.</strong></p>
+</section>
+<section id="parte-5">
+<h2>5. Il percorso con meno collegamenti non sempre costa meno</h2>
+<div class="network-scroll"><svg class="network-svg" viewBox="0 0 840 365" role="img" aria-label="A–C costa 8. Il percorso A–B–C evidenziato costa 2 più 2, cioè 4.">
+<line class="edge active" x1="140" y1="260" x2="420" y2="65"/><text class="link-label" x="298" y="150.5">2</text><line class="edge active" x1="420" y1="65" x2="700" y2="260"/><text class="link-label" x="578" y="150.5">2</text><line class="edge" x1="140" y1="260" x2="700" y2="260"/><text class="link-label" x="438" y="248">8</text>
+<g class="node"><circle cx="140" cy="260" r="28"/><text x="140" y="266">A</text></g><g class="node"><circle cx="420" cy="65" r="28"/><text x="420" y="71">B</text></g><g class="node"><circle cx="700" cy="260" r="28"/><text x="700" y="266">C</text></g>
+</svg></div>
+<p>Consideriamo una piccola rete composta da tre router.</p>
+<p>A è collegato direttamente a C con costo 8.</p>
+<p>Esiste anche un percorso alternativo che passa per B:</p>
+<ul>
+<li>A–B ha costo 2.</li>
+<li>B–C ha costo 2.</li>
+</ul>
+<p>Confrontiamo i due percorsi.</p>
+<table><thead><tr><th scope="col">Percorso</th><th scope="col">Numero di collegamenti</th><th scope="col">Costo totale</th></tr></thead><tbody>
+<tr><td>A → C</td><td>1</td><td>8</td></tr>
+<tr><td>A → B → C</td><td>2</td><td>4</td></tr>
+</tbody></table>
+<p>La strada diretta attraversa un solo collegamento, ma costa 8.</p>
+<p>La strada attraverso B attraversa due collegamenti, ma costa soltanto 4.</p>
+<p><strong>Se la metrica è il costo complessivo, il percorso migliore è A → B → C.</strong></p>
+<p>Questo esempio mostra perché non basta contare il numero di router attraversati.</p>
+<p>Nelle reti grandi, però, possono esistere moltissimi percorsi possibili.</p>
+<p>Come si trova quello meno costoso senza provarli tutti manualmente?</p>
+</section>
+<section id="parte-6">
+<h2>6. L'algoritmo di Dijkstra</h2>
+<p>L'<strong>algoritmo di Dijkstra</strong> permette di individuare i percorsi a costo minimo da un nodo di partenza verso tutti gli altri nodi raggiungibili di un grafo, quando i pesi dei collegamenti non sono negativi.</p>
+<p>Un grafo è una rappresentazione composta da:</p>
+<ul>
+<li><strong>Nodi:</strong> nella nostra rete rappresentano i router.</li>
+<li><strong>Archi:</strong> rappresentano i collegamenti.</li>
+<li><strong>Pesi:</strong> rappresentano i costi associati ai collegamenti.</li>
+</ul>
+<p>Dijkstra non è un protocollo di routing.</p>
+<p>È un algoritmo matematico utilizzabile da protocolli come OSPF per calcolare i percorsi a costo minimo.</p>
+<p>Il suo principio è semplice: <strong>si parte dal nodo iniziale e si costruiscono progressivamente le distanze minime, scegliendo ogni volta il nodo ancora da elaborare con il costo provvisorio più basso.</strong></p>
+</section>
+<section id="sezione-19">
+<h2>7. Un esempio completo con quattro nodi</h2>
 <div class="network-scroll"><svg class="network-svg" viewBox="0 0 840 365" role="img" aria-label="A–B costa 2, A–C costa 5, B–C costa 1, B–D costa 4 e C–D costa 2.">
 <line class="edge" x1="140" y1="180" x2="380" y2="65"/><text class="link-label" x="278" y="110.5">2</text><line class="edge" x1="140" y1="180" x2="380" y2="300"/><text class="link-label" x="278" y="228">5</text><line class="edge" x1="380" y1="65" x2="380" y2="300"/><text class="link-label" x="398" y="170.5">1</text><line class="edge" x1="380" y1="65" x2="670" y2="180"/><text class="link-label" x="543" y="110.5">4</text><line class="edge" x1="380" y1="300" x2="670" y2="180"/><text class="link-label" x="543" y="228">2</text>
 <g class="node"><circle cx="140" cy="180" r="28"/><text x="140" y="186">A</text></g><g class="node"><circle cx="380" cy="65" r="28"/><text x="380" y="71">B</text></g><g class="node"><circle cx="380" cy="300" r="28"/><text x="380" y="306">C</text></g><g class="node"><circle cx="670" cy="180" r="28"/><text x="670" y="186">D</text></g>
 </svg></div>
-<ol><li><strong>Inizializza.</strong> A ha costo 0. Gli altri nodi partono senza un costo noto, indicato con ∞.</li>
-<li><strong>Elabora A.</strong> I collegamenti diretti danno B = 2 e C = 5. D resta ancora a ∞.</li>
-<li><strong>Scegli il costo provvisorio minore.</strong> Tocca a B. Da B arrivi a C con 2 + 1 = 3, meglio di 5. Arrivi anche a D con 2 + 4 = 6. Aggiorni entrambi e annoti B come nodo precedente.</li>
-<li><strong>Ripeti.</strong> Ora C ha il costo provvisorio minore, 3. Da C arrivi a D con 3 + 2 = 5. Sostituisci il 6 con 5 e annoti C come nodo precedente. Quando elabori D, il suo costo è definitivo.</li>
-<li><strong>Ricostruisci.</strong> Risali da D attraverso i nodi precedenti, D ← C ← B ← A. Letto al contrario è il percorso A → B → C → D.</li></ol>
-<details><summary>Verifica · Quale strada ha meno collegamenti? Quale costa meno?</summary><p>A → B → D usa due collegamenti e costa 6. A → B → C → D ne usa tre e costa 5.</p></details></section>
+<p>Consideriamo una rete con quattro router: A, B, C e D.</p>
+<p>I collegamenti hanno questi costi:</p>
+<table><thead><tr><th scope="col">Collegamento</th><th scope="col">Costo</th></tr></thead><tbody>
+<tr><td>A–B</td><td>2</td></tr>
+<tr><td>A–C</td><td>5</td></tr>
+<tr><td>B–C</td><td>1</td></tr>
+<tr><td>B–D</td><td>4</td></tr>
+<tr><td>C–D</td><td>2</td></tr>
+</tbody></table>
+<p>Vogliamo trovare il percorso a costo minimo per raggiungere D partendo da A.</p>
+<p>Prima di utilizzare Dijkstra possiamo confrontare alcuni percorsi.</p>
+<table><thead><tr><th scope="col">Percorso</th><th scope="col">Costo</th></tr></thead><tbody>
+<tr><td>A → B → D</td><td>2 + 4 = 6</td></tr>
+<tr><td>A → C → D</td><td>5 + 2 = 7</td></tr>
+<tr><td>A → B → C → D</td><td>2 + 1 + 2 = 5</td></tr>
+</tbody></table>
+<p>Il percorso meno costoso tra questi è:</p>
+<p><strong>A → B → C → D, costo totale 5</strong></p>
+<p>Dijkstra permette di ottenere il risultato senza dover elencare ogni possibile percorso.</p>
+<p>Vediamo come.</p>
+</section>
+<section id="parte-8">
+<h2>8. Dijkstra passo per passo</h2>
+<p>Durante l'esecuzione dell'algoritmo, per ogni nodo manteniamo due informazioni:</p>
+<p><strong>Distanza:</strong> il costo minimo attualmente conosciuto per arrivare al nodo partendo da A.</p>
+<p><strong>Precedente:</strong> il nodo attraverso il quale è stato ottenuto quel costo.</p>
+<p>Le distanze possono essere:</p>
+<ul>
+<li><strong>Provvisorie:</strong> possono ancora migliorare.</li>
+<li><strong>Definitive:</strong> per le regole dell'algoritmo, non possono più essere migliorate.</li>
+</ul>
+<p>Il simbolo <code>∞</code> (infinito) indica che non abbiamo ancora trovato un percorso verso quel nodo.</p>
+<h3>Passo 1 — Inizializzazione</h3>
+<p>Partiamo da A.</p>
+<p>Per raggiungere A da A il costo è zero.</p>
+<p>Non conosciamo ancora i costi per raggiungere gli altri nodi.</p>
+<table><thead><tr><th scope="col">Nodo</th><th scope="col">Distanza</th><th scope="col">Precedente</th><th scope="col">Stato</th></tr></thead><tbody>
+<tr><td>A</td><td>0</td><td>—</td><td>Provvisoria</td></tr>
+<tr><td>B</td><td>∞</td><td>—</td><td>Provvisoria</td></tr>
+<tr><td>C</td><td>∞</td><td>—</td><td>Provvisoria</td></tr>
+<tr><td>D</td><td>∞</td><td>—</td><td>Provvisoria</td></tr>
+</tbody></table>
+<p>Il nodo con distanza provvisoria minore è A, quindi iniziamo da lui.</p>
+<h3>Passo 2 — Elaboriamo A</h3>
+<p>A ha due collegamenti:</p>
+<ul>
+<li>A–B, costo 2.</li>
+<li>A–C, costo 5.</li>
+</ul>
+<p>Possiamo quindi raggiungere B con costo 2 e C con costo 5.</p>
+<p>Aggiorniamo le distanze.</p>
+<table><thead><tr><th scope="col">Nodo</th><th scope="col">Distanza</th><th scope="col">Precedente</th><th scope="col">Stato</th></tr></thead><tbody>
+<tr><td>A</td><td>0</td><td>—</td><td>Definitiva</td></tr>
+<tr><td>B</td><td>2</td><td>A</td><td>Provvisoria</td></tr>
+<tr><td>C</td><td>5</td><td>A</td><td>Provvisoria</td></tr>
+<tr><td>D</td><td>∞</td><td>—</td><td>Provvisoria</td></tr>
+</tbody></table>
+<p>D non è direttamente collegato ad A, quindi rimane a distanza infinita.</p>
+<h3>Passo 3 — Scegliamo B</h3>
+<p>Fra i nodi ancora da elaborare, B ha la distanza provvisoria minore: 2.</p>
+<p>Elaboriamo B.</p>
+<p>Da B possiamo raggiungere:</p>
+<ul>
+<li>C, attraverso un collegamento di costo 1.</li>
+<li>D, attraverso un collegamento di costo 4.</li>
+</ul>
+<p><strong>Raggiungere C passando per B</strong></p>
+<p>Il costo complessivo è:</p>
+<p><code>2 + 1 = 3</code></p>
+<p>Prima conoscevamo un percorso verso C con costo 5.</p>
+<p>Il nuovo percorso costa 3, quindi è migliore.</p>
+<p>Sostituiamo la distanza di C da 5 a 3 e indichiamo B come precedente.</p>
+<p><strong>Raggiungere D passando per B</strong></p>
+<p>Il costo complessivo è:</p>
+<p><code>2 + 4 = 6</code></p>
+<p>Non conoscevamo ancora alcun percorso verso D.</p>
+<p>Registriamo quindi distanza 6, con precedente B.</p>
+<p>La tabella diventa:</p>
+<table><thead><tr><th scope="col">Nodo</th><th scope="col">Distanza</th><th scope="col">Precedente</th><th scope="col">Stato</th></tr></thead><tbody>
+<tr><td>A</td><td>0</td><td>—</td><td>Definitiva</td></tr>
+<tr><td>B</td><td>2</td><td>A</td><td>Definitiva</td></tr>
+<tr><td>C</td><td>3</td><td>B</td><td>Provvisoria</td></tr>
+<tr><td>D</td><td>6</td><td>B</td><td>Provvisoria</td></tr>
+</tbody></table>
+<p>Notiamo che la distanza di C è migliorata da 5 a 3.</p>
+<p>Questo aggiornamento è una delle operazioni fondamentali di Dijkstra: quando si trova un percorso meno costoso, si sostituisce il costo provvisorio precedente.</p>
+<h3>Passo 4 — Scegliamo C</h3>
+<p>Fra i nodi non ancora definitivi:</p>
+<ul>
+<li>C ha costo 3.</li>
+<li>D ha costo 6.</li>
+</ul>
+<p>Scegliamo C perché ha la distanza provvisoria minore.</p>
+<p>Da C possiamo raggiungere D attraverso un collegamento di costo 2.</p>
+<p>Il costo totale per arrivare a D passando per C è:</p>
+<p><code>3 + 2 = 5</code></p>
+<p>Prima avevamo registrato costo 6, passando per B.</p>
+<p>Il nuovo percorso è migliore.</p>
+<p>Sostituiamo:</p>
+<ul>
+<li>Distanza di D: da 6 a 5.</li>
+<li>Precedente di D: da B a C.</li>
+</ul>
+<p>La tabella diventa:</p>
+<table><thead><tr><th scope="col">Nodo</th><th scope="col">Distanza</th><th scope="col">Precedente</th><th scope="col">Stato</th></tr></thead><tbody>
+<tr><td>A</td><td>0</td><td>—</td><td>Definitiva</td></tr>
+<tr><td>B</td><td>2</td><td>A</td><td>Definitiva</td></tr>
+<tr><td>C</td><td>3</td><td>B</td><td>Definitiva</td></tr>
+<tr><td>D</td><td>5</td><td>C</td><td>Provvisoria</td></tr>
+</tbody></table>
+<h3>Passo 5 — Elaboriamo D</h3>
+<p>È rimasto soltanto D.</p>
+<p>La sua distanza provvisoria è 5.</p>
+<p>Lo scegliamo e la rendiamo definitiva.</p>
+<table><thead><tr><th scope="col">Nodo</th><th scope="col">Distanza minima</th><th scope="col">Precedente</th></tr></thead><tbody>
+<tr><td>A</td><td>0</td><td>—</td></tr>
+<tr><td>B</td><td>2</td><td>A</td></tr>
+<tr><td>C</td><td>3</td><td>B</td></tr>
+<tr><td>D</td><td>5</td><td>C</td></tr>
+</tbody></table>
+<p>Ora conosciamo i costi minimi da A verso tutti gli altri nodi.</p>
+</section>
+<section id="parte-9">
+<h2>9. Come si ricostruisce il percorso?</h2>
+<p>Abbiamo calcolato che la distanza minima da A a D è 5.</p>
+<p>Ma quali nodi dobbiamo attraversare?</p>
+<p>Per rispondere utilizziamo la colonna <strong>Precedente</strong>.</p>
+<p>Partiamo da D.</p>
+<p>Il precedente di D è C.</p>
+<p>Il precedente di C è B.</p>
+<p>Il precedente di B è A.</p>
+<p>Seguendo i precedenti otteniamo:</p>
+<p><code>D ← C ← B ← A</code></p>
+<p>Leggendo il risultato al contrario troviamo il percorso:</p>
+<p><strong>A → B → C → D</strong></p>
+<p>Il costo totale è:</p>
+<p><code>2 + 1 + 2 = 5</code></p>
+<p>Dijkstra non ha trovato soltanto il costo minimo: attraverso le informazioni sui nodi precedenti possiamo anche ricostruire il percorso.</p>
+<h3>Riassunto dei passaggi</h3>
+<table><thead><tr><th scope="col">Nodo elaborato</th><th scope="col">Costo per B</th><th scope="col">Costo per C</th><th scope="col">Costo per D</th></tr></thead><tbody>
+<tr><td>Inizializzazione</td><td>∞</td><td>∞</td><td>∞</td></tr>
+<tr><td>A</td><td>2</td><td>5</td><td>∞</td></tr>
+<tr><td>B</td><td>2</td><td>3</td><td>6</td></tr>
+<tr><td>C</td><td>2</td><td>3</td><td><strong>5</strong></td></tr>
+<tr><td>D</td><td>2</td><td>3</td><td><strong>5</strong></td></tr>
+</tbody></table>
+<p>La distanza di D viene prima scoperta con valore 6 e poi migliorata a 5.</p>
+<p>Questa è l'idea fondamentale dell'algoritmo: mantenere e migliorare i costi provvisori fino a individuare quelli minimi.</p>
+</section>
 <section class="lab-panel" id="dijkstra-quattro-nodi" data-routing-visual="spf-small" data-level="base">
-<h2>Osserva le distanze cambiare</h2><p>Avanza sul grafo a quattro nodi. Segui la riga di D: prima il costo è sconosciuto, poi vale 6 via B e infine 5 via C.</p>
+<h2>Osserva le distanze cambiare</h2><p>Avanza sul grafo a quattro nodi e confronta le distanze con le tabelle appena lette.</p>
 <noscript>Abilita JavaScript per usare i comandi della simulazione.</noscript>
+</section>
+<section id="parte-10">
+<h2>10. Le regole generali di Dijkstra</h2>
+<p>L'algoritmo può essere riassunto in cinque operazioni.</p>
+<p><strong>1. Inizializzare le distanze.</strong></p>
+<p>Il nodo di partenza ha distanza zero. Tutti gli altri hanno distanza infinita.</p>
+<p><strong>2. Scegliere il nodo provvisorio con distanza minore.</strong></p>
+<p>Il nodo scelto viene elaborato e la sua distanza diventa definitiva.</p>
+<p><strong>3. Esaminare i collegamenti del nodo scelto.</strong></p>
+<p>Per ogni vicino non ancora definitivo, si calcola il possibile nuovo costo:</p>
+<p><code>Nuovo costo = distanza del nodo corrente + costo del collegamento</code></p>
+<p><strong>4. Aggiornare le distanze se il nuovo percorso è migliore.</strong></p>
+<p>Se il nuovo costo è inferiore alla distanza registrata, quest'ultima viene sostituita. Si aggiorna anche il nodo precedente.</p>
+<p><strong>5. Ripetere.</strong></p>
+<p>Si continua finché tutti i nodi raggiungibili sono stati elaborati, oppure finché è stato reso definitivo il nodo di destinazione che interessa.</p>
+<p>Il risultato permette di costruire un <strong>albero dei percorsi minimi</strong>, chiamato anche <em>Shortest Path Tree</em>.</p>
+<p>Un albero dei percorsi minimi rappresenta, a partire dal nodo scelto come origine, i collegamenti attraverso i quali vengono raggiunti gli altri nodi con il costo minimo.</p>
+</section>
+<section id="parte-11">
+<h2>11. Torniamo ai router R1, R2, R3 e R4</h2>
+<div class="network-scroll"><svg class="network-svg" viewBox="0 0 840 365" role="img" aria-label="I collegamenti via R3 costano 2 ciascuno, quelli via R2 costano 3 ciascuno.">
+<line class="edge" x1="65" y1="180" x2="230" y2="180"/><line class="edge" x1="230" y1="180" x2="420" y2="295"/><text class="link-label" x="343" y="225.5">3</text><line class="edge active" x1="230" y1="180" x2="420" y2="65"/><text class="link-label" x="343" y="110.5">2</text><line class="edge" x1="420" y1="295" x2="610" y2="180"/><text class="link-label" x="533" y="225.5">3</text><line class="edge active" x1="420" y1="65" x2="610" y2="180"/><text class="link-label" x="533" y="110.5">2</text><line class="edge" x1="610" y1="180" x2="775" y2="180"/>
+<g class="node"><circle cx="65" cy="180" r="28"/><text x="65" y="186">PC1</text></g><g class="node"><circle cx="230" cy="180" r="28"/><text x="230" y="186">R1</text></g><g class="node"><circle cx="420" cy="295" r="28"/><text x="420" y="301">R2</text></g><g class="node"><circle cx="420" cy="65" r="28"/><text x="420" y="71">R3</text></g><g class="node"><circle cx="610" cy="180" r="28"/><text x="610" y="186">R4</text></g><g class="node"><circle cx="775" cy="180" r="28"/><text x="775" y="186">PC4</text></g>
+</svg></div>
+<p>Ora applichiamo quanto imparato alla rete della lezione 06.</p>
+<p>Ricordiamo i costi dei collegamenti:</p>
+<table><thead><tr><th scope="col">Collegamento</th><th scope="col">Costo</th></tr></thead><tbody>
+<tr><td>R1–R3</td><td>2</td></tr>
+<tr><td>R3–R4</td><td>2</td></tr>
+<tr><td>R1–R2</td><td>3</td></tr>
+<tr><td>R2–R4</td><td>3</td></tr>
+</tbody></table>
+<p>Supponiamo che i router utilizzino un protocollo Link State e abbiano già acquisito le informazioni necessarie sulla topologia.</p>
+<p>Per semplicità consideriamo un'unica area di routing.</p>
+<h3>R1 calcola il percorso verso R4</h3>
+<p>R1 parte da distanza zero.</p>
+<p>Inizialmente gli altri router hanno distanza infinita.</p>
+<p><strong>Prima elaborazione: R1</strong></p>
+<p>R1 conosce due vicini:</p>
+<ul>
+<li>R3, costo 2.</li>
+<li>R2, costo 3.</li>
+</ul>
+<p>Le distanze diventano:</p>
+<table><thead><tr><th scope="col">Router</th><th scope="col">Distanza da R1</th></tr></thead><tbody>
+<tr><td>R1</td><td>0</td></tr>
+<tr><td>R3</td><td>2</td></tr>
+<tr><td>R2</td><td>3</td></tr>
+<tr><td>R4</td><td>∞</td></tr>
+</tbody></table>
+<p><strong>Seconda elaborazione: R3</strong></p>
+<p>Il nodo provvisorio meno costoso è R3, con distanza 2.</p>
+<p>Da R3 si raggiunge R4 attraverso un collegamento di costo 2.</p>
+<p>Il costo per raggiungere R4 diventa:</p>
+<p><code>2 + 2 = 4</code></p>
+<p><strong>Terza elaborazione: R2</strong></p>
+<p>R2 ha distanza 3.</p>
+<p>Da R2 si può raggiungere R4 con un collegamento di costo 3.</p>
+<p>Il costo complessivo sarebbe:</p>
+<p><code>3 + 3 = 6</code></p>
+<p>Ma abbiamo già trovato un percorso verso R4 con costo 4.</p>
+<p>Non aggiorniamo la distanza.</p>
+<p><strong>Risultato:</strong></p>
+<table><thead><tr><th scope="col">Router</th><th scope="col">Costo minimo da R1</th><th scope="col">Precedente</th></tr></thead><tbody>
+<tr><td>R1</td><td>0</td><td>—</td></tr>
+<tr><td>R3</td><td>2</td><td>R1</td></tr>
+<tr><td>R2</td><td>3</td><td>R1</td></tr>
+<tr><td>R4</td><td>4</td><td>R3</td></tr>
+</tbody></table>
+<p>Il percorso migliore è:</p>
+<p><strong>R1 → R3 → R4</strong></p>
+<p>Costo totale: <strong>4</strong></p>
+</section>
+<section id="parte-12">
+<h2>12. Come il risultato diventa una rotta?</h2>
+<p>Dijkstra ha stabilito che, per raggiungere R4 da R1, il percorso meno costoso passa attraverso R3.</p>
+<p>Ma un router non inoltra i pacchetti consultando ogni volta tutti i collegamenti del grafo.</p>
+<p>Il risultato del calcolo viene utilizzato per ricavare le rotte verso le reti raggiungibili.</p>
+<p>Sappiamo che R4 è collegato alla rete di PC4:</p>
+<p><code>192.168.4.0/24</code></p>
+<p>Supponiamo che anche questa rete venga annunciata attraverso il protocollo di routing.</p>
+<p>R1 può quindi apprendere una rotta di questo tipo:</p>
+<table><thead><tr><th scope="col">Destinazione</th><th scope="col">Next hop</th><th scope="col">Interfaccia</th></tr></thead><tbody>
+<tr><td><code>192.168.4.0/24</code></td><td><code>10.0.13.2</code> (R3)</td><td>Verso R3</td></tr>
+</tbody></table>
+<p>Il costo numerico utilizzato nell'esercizio rappresenta quello dei collegamenti fra router. Eventuali costi aggiuntivi per raggiungere la LAN sono stati omessi per semplicità, perché non modificano il confronto fra i due percorsi.</p>
+<p>Quando arriva a R1 un pacchetto destinato a <code>192.168.4.10</code>, R1 consulta la tabella di inoltro e lo invia a R3.</p>
+<p>R3, a sua volta, consulta la propria tabella e inoltra il pacchetto a R4.</p>
+<p>R4 riconosce la rete di PC4 come direttamente collegata e consegna il pacchetto.</p>
+<h3>La differenza tra calcolo e inoltro</h3>
+<p>È fondamentale distinguere due operazioni.</p>
+<p><strong>Calcolo dei percorsi</strong></p>
+<p>Il protocollo di routing utilizza le informazioni sulla rete e gli algoritmi necessari per individuare i percorsi.</p>
+<p><strong>Inoltro dei pacchetti (forwarding)</strong></p>
+<p>Il router utilizza la tabella di inoltro per scegliere il prossimo salto di ogni pacchetto.</p>
+<p>Dijkstra non viene eseguito nuovamente per ogni pacchetto ricevuto.</p>
+<p>Il calcolo viene effettuato quando necessario, per esempio dopo determinati cambiamenti delle informazioni sulla topologia.</p>
+<p>L'inoltro, invece, avviene continuamente mentre il router riceve pacchetti da trasmettere.</p>
+</section>
+<section id="parte-13">
+<h2>13. Si rompe il collegamento R3–R4</h2>
+<p>Consideriamo nuovamente il guasto della lezione precedente.</p>
+<p>Il collegamento R3–R4 si interrompe, ma R3 continua a funzionare e rimane collegato a R1.</p>
+<div class="network-scroll"><svg class="network-svg" viewBox="0 0 840 365" role="img" aria-label="Il collegamento R3–R4 è guasto, indicato con una linea tratteggiata e una croce.">
+<line class="edge" x1="65" y1="180" x2="230" y2="180"/><line class="edge" x1="230" y1="180" x2="420" y2="295"/><line class="edge" x1="230" y1="180" x2="420" y2="65"/><line class="edge" x1="420" y1="295" x2="610" y2="180"/><line class="edge failed" x1="420" y1="65" x2="610" y2="180"/><text class="link-label" x="533" y="110.5">×</text><line class="edge" x1="610" y1="180" x2="775" y2="180"/>
+<g class="node"><circle cx="65" cy="180" r="28"/><text x="65" y="186">PC1</text></g><g class="node"><circle cx="230" cy="180" r="28"/><text x="230" y="186">R1</text></g><g class="node"><circle cx="420" cy="295" r="28"/><text x="420" y="301">R2</text></g><g class="node"><circle cx="420" cy="65" r="28"/><text x="420" y="71">R3</text></g><g class="node"><circle cx="610" cy="180" r="28"/><text x="610" y="186">R4</text></g><g class="node"><circle cx="775" cy="180" r="28"/><text x="775" y="186">PC4</text></g>
+</svg></div>
+<p>Con il routing statico avevamo visto che R1 poteva continuare a inviare i pacchetti a R3.</p>
+<p>Che cosa cambia utilizzando un protocollo Link State?</p>
+<h3>Passaggio 1 — I router rilevano il guasto</h3>
+<p>R3 e R4 rilevano che il collegamento fra loro non è più disponibile.</p>
+<p>Il rilevamento può avvenire attraverso lo stato fisico dell'interfaccia oppure attraverso i meccanismi del protocollo che controllano la presenza dei vicini.</p>
+<h3>Passaggio 2 — Le informazioni vengono aggiornate</h3>
+<p>I router interessati aggiornano le informazioni sullo stato dei collegamenti.</p>
+<p>Queste informazioni vengono diffuse agli altri router dell'area attraverso il protocollo.</p>
+<p>R1 apprende così che il collegamento R3–R4 non può più essere utilizzato.</p>
+<p>È questo il passaggio che mancava nel nostro esempio con le sole rotte statiche.</p>
+<h3>Passaggio 3 — R1 ricalcola i percorsi</h3>
+<p>R1 utilizza la rappresentazione aggiornata della rete.</p>
+<p>Il collegamento R3–R4 non è più disponibile per il calcolo.</p>
+<p>Rimane il percorso:</p>
+<p><strong>R1 → R2 → R4</strong></p>
+<p>Il costo totale è:</p>
+<p><code>3 + 3 = 6</code></p>
+<p>Dijkstra individua quindi R2 come nuovo prossimo salto verso la rete di PC4.</p>
+<h3>Passaggio 4 — La tabella viene aggiornata</h3>
+<p>Prima del guasto R1 utilizzava:</p>
+<table><thead><tr><th scope="col">Destinazione</th><th scope="col">Next hop</th></tr></thead><tbody>
+<tr><td><code>192.168.4.0/24</code></td><td><code>10.0.13.2</code> (R3)</td></tr>
+</tbody></table>
+<p>Dopo il ricalcolo e l'aggiornamento della tabella, utilizza:</p>
+<table><thead><tr><th scope="col">Destinazione</th><th scope="col">Next hop</th></tr></thead><tbody>
+<tr><td><code>192.168.4.0/24</code></td><td><code>10.0.12.2</code> (R2)</td></tr>
+</tbody></table>
+<p>Ora i pacchetti possono seguire:</p>
+<p><strong>PC1 → R1 → R2 → R4 → PC4</strong></p>
+<p>Non è stato necessario modificare manualmente la rotta statica di R1: il percorso è stato appreso e aggiornato attraverso il protocollo dinamico.</p>
+</section>
+<section id="parte-14">
+<h2>14. Come cambiano le tabelle di tutti i router?</h2>
+<div class="network-scroll"><svg class="network-svg" viewBox="0 0 840 365" role="img" aria-label="Con R3–R4 guasto, il nuovo percorso evidenziato passa attraverso R2 e costa 6.">
+<line class="edge active" x1="65" y1="180" x2="230" y2="180"/><line class="edge active" x1="230" y1="180" x2="420" y2="295"/><text class="link-label" x="343" y="225.5">3</text><line class="edge" x1="230" y1="180" x2="420" y2="65"/><text class="link-label" x="343" y="110.5">2</text><line class="edge active" x1="420" y1="295" x2="610" y2="180"/><text class="link-label" x="533" y="225.5">3</text><line class="edge failed" x1="420" y1="65" x2="610" y2="180"/><text class="link-label" x="533" y="110.5">×</text><line class="edge active" x1="610" y1="180" x2="775" y2="180"/>
+<g class="node"><circle cx="65" cy="180" r="28"/><text x="65" y="186">PC1</text></g><g class="node"><circle cx="230" cy="180" r="28"/><text x="230" y="186">R1</text></g><g class="node"><circle cx="420" cy="295" r="28"/><text x="420" y="301">R2</text></g><g class="node"><circle cx="420" cy="65" r="28"/><text x="420" y="71">R3</text></g><g class="node"><circle cx="610" cy="180" r="28"/><text x="610" y="186">R4</text></g><g class="node"><circle cx="775" cy="180" r="28"/><text x="775" y="186">PC4</text></g>
+</svg></div>
+<p>Il guasto non modifica soltanto le decisioni di R1.</p>
+<p>Anche gli altri router partecipanti al protocollo aggiornano i propri calcoli.</p>
+<p>Supponiamo che la rete sia già stabilizzata dopo il guasto e confrontiamo i prossimi salti per raggiungere le due LAN.</p>
+<h3>Prima del guasto</h3>
+<table><thead><tr><th scope="col">Router</th><th scope="col">Rete di destinazione</th><th scope="col">Next hop</th></tr></thead><tbody>
+<tr><td>R1</td><td><code>192.168.1.0/24</code></td><td>Diretta</td></tr>
+<tr><td>R1</td><td><code>192.168.4.0/24</code></td><td>R3</td></tr>
+<tr><td>R2</td><td><code>192.168.1.0/24</code></td><td>R1</td></tr>
+<tr><td>R2</td><td><code>192.168.4.0/24</code></td><td>R4</td></tr>
+<tr><td>R3</td><td><code>192.168.1.0/24</code></td><td>R1</td></tr>
+<tr><td>R3</td><td><code>192.168.4.0/24</code></td><td>R4</td></tr>
+<tr><td>R4</td><td><code>192.168.1.0/24</code></td><td>R3</td></tr>
+<tr><td>R4</td><td><code>192.168.4.0/24</code></td><td>Diretta</td></tr>
+</tbody></table>
+<p>Il percorso di andata da PC1 a PC4 passa per R3.</p>
+<p>Anche il ritorno verso PC1 passa per R3.</p>
+<h3>Dopo il guasto R3–R4</h3>
+<table><thead><tr><th scope="col">Router</th><th scope="col">Rete di destinazione</th><th scope="col">Next hop</th></tr></thead><tbody>
+<tr><td>R1</td><td><code>192.168.1.0/24</code></td><td>Diretta</td></tr>
+<tr><td>R1</td><td><code>192.168.4.0/24</code></td><td><strong>R2</strong></td></tr>
+<tr><td>R2</td><td><code>192.168.1.0/24</code></td><td>R1</td></tr>
+<tr><td>R2</td><td><code>192.168.4.0/24</code></td><td>R4</td></tr>
+<tr><td>R3</td><td><code>192.168.1.0/24</code></td><td>R1</td></tr>
+<tr><td>R3</td><td><code>192.168.4.0/24</code></td><td><strong>R1</strong></td></tr>
+<tr><td>R4</td><td><code>192.168.1.0/24</code></td><td><strong>R2</strong></td></tr>
+<tr><td>R4</td><td><code>192.168.4.0/24</code></td><td>Diretta</td></tr>
+</tbody></table>
+<p>Osserviamo le tre modifiche più importanti.</p>
+<p><strong>R1 cambia next hop da R3 a R2.</strong></p>
+<p>Per raggiungere PC4 sceglie il percorso inferiore.</p>
+<p><strong>R4 cambia next hop da R3 a R2.</strong></p>
+<p>Anche la risposta diretta verso PC1 può utilizzare il percorso inferiore.</p>
+<p><strong>R3 cambia next hop da R4 a R1 per raggiungere PC4.</strong></p>
+<p>Anche se il collegamento diretto con R4 è guasto, R3 non è isolato.</p>
+<p>Rimane possibile raggiungere PC4 attraversando:</p>
+<p><code>R3 → R1 → R2 → R4</code></p>
+<p>Il costo di questo percorso, considerando soltanto i collegamenti fra router, è:</p>
+<p><code>2 + 3 + 3 = 8</code></p>
+<p>Questo dimostra che il routing dinamico può aggiornare le rotte anche sui router che non si trovano direttamente lungo il nuovo percorso principale.</p>
+<p>Le tabelle dei computer PC1 e PC4 non devono cambiare: continuano a utilizzare rispettivamente R1 e R4 come gateway.</p>
+</section>
+<section id="parte-15">
+<h2>15. La convergenza della rete</h2>
+<p>Il cambiamento delle rotte non avviene necessariamente nello stesso istante su tutti i router.</p>
+<p>Quando il collegamento R3–R4 si interrompe, devono verificarsi diverse operazioni:</p>
+<ol>
+<li>Il guasto viene rilevato.</li>
+<li>Le informazioni aggiornate vengono diffuse.</li>
+<li>I router interessati aggiornano la propria rappresentazione della topologia.</li>
+<li>Vengono ricalcolati i percorsi necessari.</li>
+<li>Le tabelle di routing e di inoltro vengono aggiornate.</li>
+</ol>
+<p>Durante questo processo, alcuni router potrebbero avere già aggiornato le rotte mentre altri utilizzano ancora informazioni precedenti.</p>
+<p>Per un breve periodo alcuni pacchetti potrebbero essere persi o seguire percorsi non più validi.</p>
+<p>Quando i router hanno elaborato le informazioni aggiornate e le loro decisioni si sono stabilizzate, la rete ha raggiunto la <strong>convergenza</strong>.</p>
+<p>Il <strong>tempo di convergenza</strong> è il tempo necessario al sistema di routing per raggiungere questa condizione dopo un cambiamento.</p>
+<p>Un buon protocollo deve adattarsi ai guasti in modo affidabile e cercare di ridurre il tempo durante il quale i percorsi non sono ancora corretti.</p>
+<p>Non si deve però confondere il routing dinamico con una garanzia di continuità assoluta: durante il cambiamento possono verificarsi interruzioni temporanee.</p>
+</section>
+<section id="parte-16">
+<h2>16. E se un percorso cambia costo senza interrompersi?</h2>
+<p>Un collegamento non deve necessariamente guastarsi perché cambi il percorso migliore.</p>
+<p>Supponiamo che i costi iniziali siano:</p>
+<table><thead><tr><th scope="col">Collegamento</th><th scope="col">Costo</th></tr></thead><tbody>
+<tr><td>R1–R3</td><td>2</td></tr>
+<tr><td>R3–R4</td><td>2</td></tr>
+<tr><td>R1–R2</td><td>3</td></tr>
+<tr><td>R2–R4</td><td>3</td></tr>
+</tbody></table>
+<p>La strada via R3 costa 4.</p>
+<p>Quella via R2 costa 6.</p>
+<p>Inizialmente viene scelta R3.</p>
+<p>Ora immaginiamo che il costo del collegamento R3–R4 venga modificato da 2 a 8 e che la modifica venga comunicata e acquisita dai router.</p>
+<p>I nuovi costi saranno:</p>
+<p><strong>Via R3:</strong></p>
+<p><code>2 + 8 = 10</code></p>
+<p><strong>Via R2:</strong></p>
+<p><code>3 + 3 = 6</code></p>
+<p>Adesso il percorso attraverso R2 è meno costoso.</p>
+<p>Il protocollo può quindi aggiornare la rotta verso la rete di PC4, scegliendo R2 anche se tutti i collegamenti sono ancora funzionanti.</p>
+<p>Questo esempio mostra che il routing dinamico può reagire sia a cambiamenti della topologia sia a cambiamenti delle metriche utilizzate per calcolare i percorsi.</p>
+<h3>E se due percorsi hanno lo stesso costo?</h3>
+<p>Supponiamo che entrambi i percorsi costino 6.</p>
+<p>Dijkstra può individuare più percorsi ugualmente minimi.</p>
+<p>Alcuni protocolli e dispositivi permettono di utilizzare più prossimi salti di pari costo, attraverso una tecnica chiamata <strong>ECMP (Equal-Cost Multi-Path)</strong>.</p>
+<p>In questo caso il traffico può essere distribuito fra percorsi equivalenti secondo le regole di inoltro del dispositivo.</p>
+<p>Quindi due rotte con lo stesso costo non significano necessariamente che una sia principale e l'altra di riserva.</p>
+</section>
+<section id="parte-17">
+<h2>17. Qual è la differenza fra costo e distanza amministrativa?</h2>
+<p>Nella lezione 06 abbiamo utilizzato la distanza amministrativa per assegnare una preferenza a due rotte statiche verso la stessa rete.</p>
+<p>Ora abbiamo introdotto il costo dei percorsi.</p>
+<p>Sono due concetti diversi.</p>
+<table><thead><tr><th scope="col">Distanza amministrativa</th><th scope="col">Costo del percorso</th></tr></thead><tbody>
+<tr><td>Esprime la preferenza fra rotte candidate secondo le regole del router.</td><td>Esprime quanto costa raggiungere una destinazione secondo la metrica del protocollo.</td></tr>
+<tr><td>Può essere utilizzata per creare una rotta statica di riserva.</td><td>È utilizzato per confrontare percorsi all'interno di un protocollo come OSPF.</td></tr>
+<tr><td>Non rappresenta la somma dei collegamenti.</td><td>Nel nostro esempio è la somma dei costi dei collegamenti attraversati.</td></tr>
+</tbody></table>
+<p>Il valore della distanza amministrativa non deve quindi essere confuso con il costo calcolato da Dijkstra.</p>
+<p>Il Longest Prefix Match rimane inoltre la regola con cui vengono preferiti i prefissi di destinazione più specifici durante l'inoltro.</p>
+<p>Non si sceglie un prefisso <code>/16</code> al posto di un <code>/24</code> soltanto perché la sua metrica è più bassa: se entrambi corrispondono alla destinazione, il <code>/24</code> è più specifico.</p>
+</section>
+<section id="parte-18">
+<h2>18. Esempio di una rete più grande</h2>
+<p>Consideriamo ora una rete con dodici router, identificati dalle lettere da A a L.</p>
+<p>Supponiamo di voler raggiungere L partendo da A.</p>
+<p>Fra i possibili percorsi troviamo:</p>
+<table><thead><tr><th scope="col">Percorso</th><th scope="col">Salti</th><th scope="col">Costo</th></tr></thead><tbody>
+<tr><td>A → C → L</td><td>2</td><td>8 + 20 = 28</td></tr>
+<tr><td>A → B → E → H → K → L</td><td>5</td><td>2 + 2 + 2 + 2 + 2 = 10</td></tr>
+</tbody></table>
+<p>Il primo percorso attraversa soltanto due collegamenti, ma costa 28.</p>
+<p>Il secondo attraversa cinque collegamenti, ma costa 10.</p>
+<p>Fra queste due possibilità è preferibile il secondo percorso.</p>
+<p>In una rete reale potrebbero però esistere altre strade, con costi ancora differenti.</p>
+<p>Dijkstra permette di confrontare sistematicamente le alternative rappresentate nel grafo e individuare i percorsi a costo minimo.</p>
+<h3>Che cosa succede se E–H si interrompe?</h3>
+<p>Il percorso A → B → E → H → K → L non può più essere utilizzato così com'è.</p>
+<p>I router che rilevano il guasto aggiornano le informazioni sui collegamenti e il cambiamento può essere diffuso agli altri router.</p>
+<p>Quando il protocollo dispone della nuova topologia, i percorsi interessati possono essere ricalcolati.</p>
+<p>Il percorso risultante dipende dai collegamenti rimasti disponibili e dai loro costi.</p>
+<p>La presenza di più percorsi rende la rete potenzialmente più resistente ai guasti, ma soltanto se esistono rotte alternative utilizzabili e i router riescono ad aggiornare correttamente le proprie decisioni.</p>
+</section>
+<section id="parte-19">
+<h2>19. Riepilogo: dalla topologia alla tabella di routing</h2>
+<p>Abbiamo visto che il routing dinamico permette ai router di aggiornare le proprie rotte utilizzando informazioni scambiate attraverso un protocollo.</p>
+<p>Nel caso dei protocolli Link State, possiamo rappresentare il funzionamento attraverso questa sequenza:</p>
+<p><strong>1. Scoperta dei collegamenti</strong></p>
+<p>Ogni router identifica i vicini e le informazioni relative ai collegamenti secondo le regole del protocollo.</p>
+<p><strong>2. Scambio delle informazioni</strong></p>
+<p>I router diffondono le informazioni necessarie affinché venga costruita una rappresentazione della topologia.</p>
+<p><strong>3. Calcolo dei percorsi</strong></p>
+<p>L'algoritmo di Dijkstra utilizza i costi per trovare i percorsi minimi da ciascun router verso i nodi raggiungibili.</p>
+<p><strong>4. Costruzione delle rotte</strong></p>
+<p>Il protocollo ricava dai risultati del calcolo le rotte verso le reti di destinazione.</p>
+<p><strong>5. Inoltro dei pacchetti</strong></p>
+<p>Ogni router utilizza la propria tabella di inoltro per decidere il prossimo salto dei pacchetti ricevuti.</p>
+<p><strong>6. Aggiornamento dopo un cambiamento</strong></p>
+<p>Quando cambiano i collegamenti o i loro costi, vengono diffuse nuove informazioni e possono essere ricalcolate le rotte.</p>
+<p>La distinzione più importante è questa:</p>
+<p><strong>Il protocollo di routing costruisce e aggiorna le informazioni sui percorsi. Il forwarding utilizza quelle informazioni per inoltrare i singoli pacchetti.</strong></p>
+</section>
+<section id="verifica">
+<h2>20. Esercizi di verifica</h2>
+<h3>Esercizio 1 — Percorsi a costo diverso</h3>
+<p>Una rete possiede questi collegamenti:</p>
+<table><thead><tr><th scope="col">Collegamento</th><th scope="col">Costo</th></tr></thead><tbody>
+<tr><td>A–B</td><td>3</td></tr>
+<tr><td>B–D</td><td>4</td></tr>
+<tr><td>A–C</td><td>2</td></tr>
+<tr><td>C–D</td><td>3</td></tr>
+<tr><td>B–C</td><td>1</td></tr>
+</tbody></table>
+<ol>
+<li>Quanto costa il percorso A → B → D?</li>
+<li>Quanto costa il percorso A → C → D?</li>
+<li>Quanto costa il percorso A → B → C → D?</li>
+<li>Qual è il percorso con costo minore fra questi tre?</li>
+<li>Il percorso con meno collegamenti è necessariamente quello meno costoso?</li>
+</ol>
+<h3>Esercizio 2 — Aggiornamento delle distanze</h3>
+<p>Utilizziamo il grafo a quattro nodi studiato nella lezione:</p>
+<ul>
+<li>A–B = 2</li>
+<li>A–C = 5</li>
+<li>B–C = 1</li>
+<li>B–D = 4</li>
+<li>C–D = 2</li>
+</ul>
+<ol>
+<li>Quali distanze conosciamo dopo aver elaborato A?</li>
+<li>Perché viene elaborato B prima di C?</li>
+<li>Perché la distanza di C passa da 5 a 3?</li>
+<li>Perché quella di D passa da 6 a 5?</li>
+<li>Qual è il percorso minimo da A a D?</li>
+</ol>
+<h3>Esercizio 3 — Dijkstra e tabelle di routing</h3>
+<p>R1 calcola che il percorso a costo minimo verso R4 è:</p>
+<p><code>R1 → R3 → R4</code></p>
+<p>La rete di PC4 è <code>192.168.4.0/24</code>.</p>
+<ol>
+<li>Quale rete di destinazione deve comparire nella rotta di R1?</li>
+<li>Quale router deve essere indicato come prossimo salto?</li>
+<li>R1 esegue Dijkstra per ogni pacchetto inviato da PC1?</li>
+<li>Quale tabella viene utilizzata per l'inoltro dei pacchetti?</li>
+</ol>
+<h3>Esercizio 4 — Guasto e convergenza</h3>
+<p>Si interrompe il collegamento R3–R4, ma R1–R3 continua a funzionare.</p>
+<ol>
+<li>Perché, con le sole rotte statiche, R1 potrebbe continuare a inoltrare verso R3?</li>
+<li>Quali router rilevano direttamente il guasto?</li>
+<li>Come può R1 venire informato del cambiamento attraverso un protocollo Link State?</li>
+<li>Qual è il nuovo percorso a costo minimo da R1 a R4?</li>
+<li>Che cosa si intende per convergenza?</li>
+</ol>
+<h3>Esercizio 5 — Modifica dei costi</h3>
+<p>Consideriamo:</p>
+<ul>
+<li>R1–R3 = 2</li>
+<li>R3–R4 = 2</li>
+<li>R1–R2 = 3</li>
+<li>R2–R4 = 3</li>
+</ul>
+<ol>
+<li>Qual è il costo iniziale dei due percorsi da R1 a R4?</li>
+<li>Se il costo R3–R4 aumenta a 5, quale percorso è preferibile?</li>
+<li>Se il costo R3–R4 aumenta a 8, quale percorso è preferibile?</li>
+<li>Se i due percorsi hanno costo uguale, è obbligatorio utilizzare soltanto uno dei due?</li>
+</ol>
+<details><summary>Soluzioni degli esercizi</summary>
+<p><strong>Esercizio 1.</strong> A → B → D costa 7; A → C → D costa 5; A → B → C → D costa 7. Il secondo è il meno costoso fra i tre. Il numero di collegamenti, da solo, non determina il costo.</p>
+<p><strong>Esercizio 2.</strong> Dopo A, B ha distanza 2, C distanza 5 e D distanza infinita. B viene scelto perché ha il costo minore. Passando per B, C costa 2 + 1 = 3. Passando successivamente per C, D costa 3 + 2 = 5. Il percorso minimo è A → B → C → D.</p>
+<p><strong>Esercizio 3.</strong> La destinazione è <code>192.168.4.0/24</code>, il next hop è R3 (<code>10.0.13.2</code>). Dijkstra non viene eseguito per ogni pacchetto: il forwarding utilizza la tabella di inoltro.</p>
+<p><strong>Esercizio 4.</strong> R1 continua a raggiungere R3, quindi una rotta statica potrebbe rimanere utilizzabile dal suo punto di vista. R3 e R4 rilevano il guasto del proprio collegamento. Le informazioni vengono aggiornate e diffuse ai router interessati. Il nuovo percorso è R1 → R2 → R4, con costo 6. La convergenza è la stabilizzazione delle decisioni di routing dopo il cambiamento.</p>
+<p><strong>Esercizio 5.</strong> Inizialmente il percorso via R3 costa 4 e quello via R2 costa 6. Con R3–R4 a costo 5, il percorso via R3 costa 7 e viene preferito R2, che costa 6. Con R3–R4 a costo 8, il percorso via R3 costa 10 e rimane preferibile R2. In caso di parità, alcuni dispositivi possono utilizzare entrambi i percorsi con ECMP.</p>
+</details>
+</section>
+<section id="parte-21">
+<h2>21. Verso OSPF</h2>
+<p>In questa lezione abbiamo imparato tre concetti fondamentali.</p>
+<p>Il primo è che i router possono scambiarsi informazioni sulla rete attraverso protocolli di routing dinamico.</p>
+<p>Il secondo è che il costo permette di confrontare i percorsi e che l'algoritmo di Dijkstra individua quelli a costo minimo.</p>
+<p>Il terzo è che, quando la topologia cambia, i router possono aggiornare le informazioni, ricalcolare i percorsi e modificare le rotte.</p>
+<p>Ma rimangono alcune domande.</p>
+<p>Come scopre un router quali altri router utilizzano lo stesso protocollo?</p>
+<p>Quali messaggi vengono scambiati per descrivere i collegamenti?</p>
+<p>Come vengono diffuse e mantenute aggiornate le informazioni sulla topologia?</p>
+<p>Come viene rilevato un router vicino che non risponde più?</p>
+<p>Nella <a href="08-ospf.html">prossima lezione</a> vedremo come il protocollo <strong>OSPF (Open Shortest Path First)</strong> realizza concretamente questi meccanismi e utilizza Dijkstra per costruire le proprie rotte.</p>
+<p><strong>Dijkstra calcola i percorsi. OSPF organizza lo scambio delle informazioni necessarie per poterli calcolare e aggiornare.</strong></p>
 </section><section class="lab-panel" id="esperimento-visuale" data-routing-visual="spf" data-level="base">
 <h2>Guarda come Dijkstra aggiorna i costi</h2><p>Nella rete di dodici router, A cerca il percorso meno costoso verso L. Avanza e osserva quali distanze cambiano. Poi aumenta il costo di E–H e ripeti.</p>
 <noscript>Abilita JavaScript per usare i comandi della simulazione.</noscript>
