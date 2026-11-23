@@ -53,6 +53,9 @@ function lessonDiagram(name) {
     case 'network-rerouted':
       return diagram(R.nodes, weightedEdges, 'Con R3–R4 guasto, il nuovo percorso evidenziato passa attraverso R2 e costa 6.',
         { failed: ['R3-R4'], route: ['PC1', 'R1', 'R2', 'R4', 'PC4'] });
+    case 'distance-vector-loop':
+      return diagram({ R1: [140, 180], R2: [420, 180], X: [700, 180] }, [['R1', 'R2', 1], ['R2', 'X', 0]],
+        'R1 raggiunge la rete X tramite R2. Il collegamento R1–R2 ha costo 1 e R2 raggiunge direttamente la rete X con costo 0.');
     case 'triangle':
       return diagram({ A: [140, 260], B: [420, 65], C: [700, 260] }, [['A', 'B', 2], ['B', 'C', 2], ['A', 'C', 8]],
         'A–C costa 8. Il percorso A–B–C evidenziato costa 2 più 2, cioè 4.', { route: ['A', 'B', 'C'] });
@@ -71,7 +74,7 @@ const basics = [
   ['03-viaggio-applicazione.html', '03 · Dall’applicazione alla rete']
 ];
 for (const { file, title, lead, body, extra = '', scripts = '' } of lessons) {
-  const key = file.slice(0,2);
+  const key = file.match(/^\d+(?:-\d+)?/)[0].replace('-', '.');
   let content = body;
   if (key === '04') {
     const network = diagram(R.nodes, R.links.map(link => link.slice(0,2)),
@@ -80,7 +83,7 @@ for (const { file, title, lead, body, extra = '', scripts = '' } of lessons) {
   }
   content = content.replace(/<div data-routing-diagram="([\w-]+)"><\/div>/g,
     (_, name) => lessonDiagram(name));
-  page(file, title, lead, content + lessonPanels[key] + extra, key === '12' ? 'exercise' : 'lesson', visualScripts + scripts);
+  page(file, title, lead, content + (lessonPanels[key] ?? '') + extra, key === '12' ? 'exercise' : 'lesson', visualScripts + scripts);
 }
 
 const roadmap = [...basics, ...lessons.map(({file,title}) => [file,title])];

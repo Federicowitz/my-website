@@ -50,7 +50,7 @@ assert.deepEqual(rip,R.distanceVector(R.graph.map(([a,b])=>[a,b,999])),'RIP must
 const folder=path.resolve(__dirname,'../teaching/materials/routing');
 const catalogue={window:{}};vm.runInNewContext(fs.readFileSync(path.resolve(folder,'../../catalog.js'),'utf8'),catalogue);
 const items=catalogue.window.schoolCatalog.items.filter(i=>i.course==='routing');
-assert.equal(items.length,17);assert.equal(items.filter(i=>i.kind==='lab').length,1);
+assert.equal(items.length,18);assert.equal(items.filter(i=>i.kind==='lab').length,1);
 let sectionCount=0;
 for (const item of items) {
   const file=path.basename(item.path),html=fs.readFileSync(path.join(folder,file),'utf8');
@@ -67,7 +67,7 @@ const quiz={window:{}};
 vm.runInNewContext(fs.readFileSync(path.join(folder,'test.html'),'utf8').match(/<script>(window.quizData=[\s\S]*?)<\/script>/)[1],quiz);
 assert.equal(quiz.window.quizData.questions.length,24);
 for(const [question,options,answer,explanation] of quiz.window.quizData.questions){assert.ok(question&&explanation);assert.ok(answer>=0&&answer<options.length);assert.equal(new Set(options).size,options.length);}
-console.log('OK: routing IPv4/LPM, andata/ritorno, scarti e TTL, Dijkstra, RIP, 30 sezioni, 17 pagine e 24 domande.');
+console.log('OK: routing IPv4/LPM, andata/ritorno, scarti e TTL, Dijkstra, RIP, 30 sezioni, 18 pagine e 24 domande.');
 
 // Extended models: compare actual routes, failures and policy outcomes.
 const V = require('../teaching/materials/routing/visual-core.js');
@@ -108,7 +108,11 @@ for (const [configuration,prefix,next] of [['missing',null,'R1'],['default','0.0
 }
 assert.equal(V.simulate('prefix',{ip:'10.1.2.34'}).at(-1).rows[1][1],'10.1.2.34/32');
 assert.equal(V.simulate('prefix',{ip:'203.0.113.10'}).at(-1).rows[1][1],'0.0.0.0/0');
-for(const file of fs.readdirSync(folder).filter(f=>/^(0[4-9]|1[0-3])-.*\.html$/.test(f))) {
+const transition = fs.readFileSync(path.join(folder, '06-5-routing-dinamico.html'), 'utf8');
+assert.equal([...transition.matchAll(/<svg class="network-svg"/g)].length, 4);
+assert.match(transition, /rel="prev" href="06-statico\.html"/);
+assert.match(transition, /rel="next" href="07-dinamico-dijkstra\.html"/);
+for(const file of fs.readdirSync(folder).filter(f=>/^(0[4-9]|1[0-3])-[a-z].*\.html$/.test(f))) {
  const html=fs.readFileSync(path.join(folder,file),'utf8');
  assert.ok(html.includes('data-routing-visual='),file);
  for(const asset of ['routing-core.js','visual-core.js','visual-labs.js'])assert.ok(html.includes(`src="${asset}"`),`${file}: ${asset}`);

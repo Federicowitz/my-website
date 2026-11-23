@@ -359,7 +359,8 @@ window.schoolCatalog = {
           "files": [
             "04-pacchetto.html",
             "05-tabella.html",
-            "06-statico.html"
+            "06-statico.html",
+            "06-5-routing-dinamico.html"
           ]
         },
         {
@@ -1428,6 +1429,15 @@ window.schoolCatalog = {
       "kind": "lesson",
       "path": "materials/routing/06-statico.html",
       "description": "Come si configura una rete affinché due computer possano comunicare? Come si prepara un percorso alternativo quando un router si guasta?",
+      "chapter": "routing-02"
+    },
+    {
+      "id": "routing-06-5-routing-dinamico",
+      "course": "routing",
+      "title": "06.5 · Dal routing statico al routing dinamico",
+      "kind": "lesson",
+      "path": "materials/routing/06-5-routing-dinamico.html",
+      "description": "Come fanno i router a conoscere la rete, scegliere i percorsi e aggiornare automaticamente le proprie tabelle?",
       "chapter": "routing-02"
     },
     {

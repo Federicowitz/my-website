@@ -1,0 +1,731 @@
+<p>Nella lezione precedente abbiamo configurato manualmente le rotte necessarie per far comunicare due computer appartenenti a reti differenti. Abbiamo visto che ogni router deve conoscere il prossimo salto verso la destinazione e che, quando un collegamento si interrompe, può essere necessario modificare le rotte.</p>
+<p>In una rete piccola, con pochi router e collegamenti stabili, la configurazione manuale può essere sufficiente. Quando però aumentano i router, le reti e i percorsi alternativi, diventa difficile conoscere e aggiornare manualmente tutte le informazioni necessarie.</p>
+<p>Per risolvere questo problema esistono diversi approcci all'instradamento. In questa lezione esamineremo come i router possono acquisire informazioni sulla rete, come vengono confrontati i percorsi e quali sono i principali meccanismi utilizzati dai protocolli di <strong>routing dinamico</strong>.</p>
+<h2 id="il-problema-come-fa-un-router-a-conoscere-la-strada">1. Il problema: come fa un router a conoscere la strada?</h2>
+<p>Consideriamo ancora una volta la rete utilizzata nella lezione 06.</p>
+<div data-routing-diagram="network-costs"></div>
+<p>PC1 possiede l'indirizzo <code>192.168.1.10</code> e appartiene alla rete <code>192.168.1.0/24</code>. PC4 possiede l'indirizzo <code>192.168.4.10</code> e appartiene alla rete <code>192.168.4.0/24</code>.</p>
+<p>Per comunicare, i due computer devono attraversare alcuni router. Fra R1 e R4 esistono due percorsi: quello superiore attraverso R3 e quello inferiore attraverso R2.</p>
+<p>I numeri indicati sui collegamenti rappresentano dei <strong>costi</strong>, che utilizzeremo per confrontare le possibili strade.</p>
+<p>Nella lezione 06 avevamo configurato manualmente R1 affinché utilizzasse R3 come prossimo salto per raggiungere la LAN di PC4.</p>
+<table>
+<thead>
+<tr>
+<th>Destinazione</th>
+<th>Next hop</th>
+<th>Interfaccia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>192.168.4.0/24</code></td>
+<td><code>10.0.13.2</code> (R3)</td>
+<td>Verso R3</td>
+</tr>
+</tbody>
+</table>
+<p>Supponiamo ora che il collegamento R3–R4 si interrompa, mentre R1–R3 continua a funzionare.</p>
+<p>R1 riesce ancora a comunicare con R3 e potrebbe quindi continuare a utilizzare la stessa rotta. Il pacchetto raggiungerebbe R3, ma non potrebbe proseguire direttamente verso R4.</p>
+<p>Eppure esiste ancora una strada alternativa, attraverso R2.</p>
+<p><strong>Il problema non è soltanto scegliere dove inviare il pacchetto: è sapere quali percorsi esistono e quali sono ancora funzionanti.</strong></p>
+<p>Un router deve quindi poter ottenere informazioni sulla rete e utilizzarle per costruire o aggiornare le proprie rotte.</p>
+<h2 id="routing-statico-e-routing-dinamico">2. Routing statico e routing dinamico</h2>
+<p>Esistono due principali modalità per ottenere le informazioni di instradamento verso le reti remote.</p>
+<p>Nel <strong>routing statico</strong>, le rotte vengono configurate manualmente dall'amministratore. Si indica al router quale prefisso raggiungere e quale prossimo salto utilizzare.</p>
+<p>Per esempio, su R1 era stata configurata una rotta verso <code>192.168.4.0/24</code> attraverso R3. Questa informazione rimane configurata finché non viene modificata o rimossa; la sua effettiva utilizzabilità dipende anche dallo stato dei collegamenti e dai meccanismi del dispositivo.</p>
+<p>Nel <strong>routing dinamico</strong>, invece, i router utilizzano appositi protocolli per scambiarsi informazioni sulle reti raggiungibili, sui collegamenti o sui percorsi. Queste informazioni vengono elaborate per aggiornare automaticamente le rotte.</p>
+<p>Il routing dinamico è particolarmente utile nelle reti con numerosi router, diversi percorsi alternativi e collegamenti che possono cambiare stato.</p>
+<table>
+<thead>
+<tr>
+<th>Caratteristica</th>
+<th>Routing statico</th>
+<th>Routing dinamico</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Origine delle rotte</td>
+<td>Configurazione manuale</td>
+<td>Informazioni apprese tramite un protocollo</td>
+</tr>
+<tr>
+<td>Adattamento ai cambiamenti</td>
+<td>Manuale o mediante meccanismi aggiuntivi</td>
+<td>Attraverso i meccanismi del protocollo</td>
+</tr>
+<tr>
+<td>Scambio di informazioni di routing</td>
+<td>Non necessario</td>
+<td>Necessario</td>
+</tr>
+<tr>
+<td>Gestione</td>
+<td>Semplice con poche reti</td>
+<td>Più adatta a topologie complesse</td>
+</tr>
+<tr>
+<td>Risorse impiegate</td>
+<td>Generalmente limitate</td>
+<td>Richiede comunicazioni ed elaborazioni aggiuntive</td>
+</tr>
+</tbody>
+</table>
+<p>Il routing dinamico non significa che i router non debbano essere configurati. Occorre comunque assegnare gli indirizzi alle interfacce, abilitare il protocollo e stabilire come debba operare.</p>
+<p>Inoltre, routing statico e dinamico possono coesistere sullo stesso router.</p>
+<h2 id="come-si-stabilisce-quale-percorso-e-migliore">3. Come si stabilisce quale percorso è migliore?</h2>
+<p>Prima di scegliere una strada, bisogna definire secondo quali criteri confrontare i percorsi disponibili.</p>
+<p>L'insieme dei criteri che guida le decisioni di instradamento prende il nome di <strong>politica di routing</strong>.</p>
+<p>Per esempio, una rete potrebbe voler utilizzare il percorso con meno router intermedi, quello con il costo complessivo minore oppure quello che soddisfa determinate preferenze amministrative.</p>
+<p>I protocolli di routing utilizzano una <strong>metrica</strong>, cioè un criterio numerico che permette di confrontare i percorsi.</p>
+<h3 id="il-numero-di-hop">Il numero di hop</h3>
+<p>Una metrica semplice è il numero di salti, chiamato <em>hop count</em>.</p>
+<p>In una rete IP, un hop corrisponde normalmente al passaggio attraverso un router. Un percorso che attraversa più router ha quindi un numero di hop maggiore.</p>
+<p>Questa metrica è utilizzata, per esempio, dal protocollo RIP.</p>
+<p>Contare i salti è semplice, ma non permette di distinguere collegamenti con caratteristiche molto differenti. Un percorso con meno hop potrebbe attraversare collegamenti meno convenienti rispetto a uno più lungo.</p>
+<h3 id="il-costo-dei-collegamenti">Il costo dei collegamenti</h3>
+<p>Un'altra possibilità consiste nell'assegnare un costo numerico a ciascun collegamento.</p>
+<p>Nel nostro esempio abbiamo stabilito:</p>
+<table>
+<thead>
+<tr>
+<th>Collegamento</th>
+<th style="text-align: right;">Costo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1–R3</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td>R3–R4</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td>R1–R2</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr>
+<td>R2–R4</td>
+<td style="text-align: right;">3</td>
+</tr>
+</tbody>
+</table>
+<p>Supponiamo che la metrica del percorso sia la somma dei costi dei collegamenti attraversati.</p>
+<p>Il percorso superiore R1 → R3 → R4 costa:</p>
+<p><code>2 + 2 = 4</code></p>
+<p>Il percorso inferiore R1 → R2 → R4 costa:</p>
+<p><code>3 + 3 = 6</code></p>
+<p>Se vogliamo minimizzare il costo totale, il percorso attraverso R3 è preferibile.</p>
+<p>Il costo è un valore utilizzato per il confronto: non rappresenta necessariamente il tempo in millisecondi, la distanza geografica o il numero di router. Nei protocolli reali può essere configurato oppure derivare da parametri come la capacità del collegamento.</p>
+<p>È importante ricordare anche che il <strong>costo del percorso</strong> non è la stessa cosa della <strong>distanza amministrativa</strong> studiata nella lezione 06. Quest'ultima esprime la preferenza fra rotte candidate secondo le regole del dispositivo, mentre la metrica serve a confrontare percorsi secondo il criterio adottato dal protocollo.</p>
+<h2 id="come-si-possono-organizzare-le-decisioni-di-routing">4. Come si possono organizzare le decisioni di routing?</h2>
+<p>Oltre a stabilire quale percorso sia migliore, bisogna decidere come raccogliere le informazioni necessarie.</p>
+<p>Possiamo distinguere tre approcci generali: centralizzato, isolato e distribuito.</p>
+<h3 id="routing-centralizzato">Routing centralizzato</h3>
+<p>In un approccio centralizzato, un sistema di controllo conosce la topologia della rete, raccoglie le informazioni necessarie e può calcolare i percorsi da assegnare ai router.</p>
+<p>Per esempio, un sistema centrale potrebbe conoscere tutti i collegamenti della nostra rete e stabilire che il percorso R1 → R3 → R4 è preferibile a quello attraverso R2.</p>
+<p>Le decisioni verrebbero poi comunicate ai dispositivi interessati.</p>
+<p>Il vantaggio è che il sistema di controllo può disporre di una visione complessiva della rete e applicare criteri uniformi. Gli svantaggi riguardano la dipendenza dal sistema centrale, la necessità di mantenerne aggiornate le informazioni e i problemi di scalabilità e affidabilità che devono essere affrontati nella progettazione.</p>
+<p>Il routing centralizzato non coincide necessariamente con il routing statico. Una configurazione manuale può essere pianificata centralmente, ma esistono anche sistemi di controllo centralizzati capaci di aggiornare automaticamente le decisioni.</p>
+<h3 id="routing-isolato">Routing isolato</h3>
+<p>In un approccio isolato, un dispositivo prende le proprie decisioni utilizzando soprattutto le informazioni disponibili localmente, senza dipendere da una conoscenza completa della rete.</p>
+<p>Un esempio storico è il <em>backward learning</em>, nel quale un dispositivo può apprendere da quale direzione è raggiungibile una sorgente osservando i messaggi ricevuti.</p>
+<p>Il principio ricorda l'apprendimento degli indirizzi MAC da parte dei bridge e degli switch Ethernet: osservando da quale porta arriva un frame, il dispositivo può imparare dove raggiungere il mittente.</p>
+<p>Non bisogna però confondere questo meccanismo con il normale routing IP dinamico. Protocolli come RIP e OSPF apprendono e scambiano informazioni di routing secondo regole specifiche, anziché limitarsi a osservare gli indirizzi sorgente dei normali pacchetti.</p>
+<h3 id="routing-distribuito">Routing distribuito</h3>
+<p>Nel <strong>routing distribuito</strong>, i router collaborano scambiandosi informazioni. Ogni router partecipa alle decisioni di instradamento e può aggiornare le proprie rotte sulla base di quanto apprende dagli altri.</p>
+<p>Non è necessario che esista un unico dispositivo incaricato di decidere tutti i percorsi.</p>
+<p>Questo approccio è utilizzato da importanti protocolli di routing dinamico, fra cui RIP e OSPF, anche se con modalità differenti.</p>
+<p>Il vantaggio fondamentale è che i router possono adattarsi ai cambiamenti della rete senza richiedere la modifica manuale di ogni tabella.</p>
+<h2 id="il-flooding-diffondere-informazioni-nella-rete">5. Il flooding: diffondere informazioni nella rete</h2>
+<p>Un meccanismo che può essere utilizzato per diffondere informazioni prende il nome di <strong>flooding</strong>, cioè inondazione.</p>
+<p>Per comprendere il principio, immaginiamo che un router riceva un messaggio e ne invii copie a più collegamenti, permettendo al messaggio di propagarsi attraverso la rete.</p>
+<p>In un modello elementare, il router potrebbe inoltrare una copia del messaggio a tutti i vicini, tranne quello dal quale lo ha ricevuto.</p>
+<p>Questo meccanismo non richiede necessariamente di conoscere in anticipo il percorso completo verso una destinazione.</p>
+<p>Il problema è che, in una rete con molti collegamenti e percorsi alternativi, lo stesso messaggio potrebbe essere duplicato numerose volte.</p>
+<p>Se non esistessero opportuni controlli, le copie potrebbero continuare a circolare nei collegamenti che formano dei cicli, consumando banda e risorse.</p>
+<p>Per questo i sistemi che impiegano il flooding devono prevedere meccanismi per limitare la diffusione, riconoscere informazioni già ricevute ed evitare la circolazione incontrollata delle copie.</p>
+<h3 id="flooding-dei-pacchetti-e-flooding-delle-informazioni-di-routing">Flooding dei pacchetti e flooding delle informazioni di routing</h3>
+<p>Dobbiamo distinguere due situazioni.</p>
+<p>Nel <strong>flooding dei pacchetti dati</strong>, un messaggio viene propagato attraverso più collegamenti per cercare di raggiungere una destinazione. Come strategia generale di inoltro è poco efficiente nelle normali reti IP.</p>
+<p>Nel <strong>flooding delle informazioni di routing</strong>, invece, vengono diffuse informazioni necessarie ai router per conoscere la rete.</p>
+<p>Quest'ultimo principio è importante nei protocolli Link State, come OSPF.</p>
+<p>Un router OSPF non invia ogni pacchetto dell'utente indiscriminatamente a tutti i vicini. Diffonde invece informazioni di controllo sulla topologia, che vengono utilizzate per costruire e aggiornare le rotte. I normali pacchetti IP continuano a essere inoltrati attraverso la tabella di forwarding.</p>
+<h2 id="due-grandi-approcci-al-routing-dinamico-distribuito">6. Due grandi approcci al routing dinamico distribuito</h2>
+<p>Fra i protocolli di routing distribuito possiamo distinguere due famiglie fondamentali: <strong>Distance Vector</strong> e <strong>Link State</strong>.</p>
+<p>Entrambi permettono ai router di apprendere le destinazioni raggiungibili, ma differiscono nel tipo di informazioni scambiate.</p>
+<p>Nei protocolli Distance Vector, i router comunicano ai vicini informazioni sulle destinazioni e sulle relative distanze.</p>
+<p>Nei protocolli Link State, i router comunicano informazioni sui propri collegamenti, permettendo di costruire una rappresentazione della topologia.</p>
+<p>Vediamo concretamente come funzionano.</p>
+<h2 id="distance-vector-conoscere-le-distanze-attraverso-i-vicini">7. Distance Vector: conoscere le distanze attraverso i vicini</h2>
+<p>Il termine <em>Distance Vector</em> significa letteralmente «vettore delle distanze».</p>
+<p>Un vettore delle distanze è un insieme di informazioni che indica le destinazioni raggiungibili da un router e il relativo costo, secondo la metrica utilizzata.</p>
+<p>Il principio di funzionamento è il seguente: ogni router conosce i propri collegamenti direttamente disponibili, riceve dai vicini le informazioni sulle destinazioni raggiungibili e utilizza queste informazioni per aggiornare le proprie distanze.</p>
+<p><strong>Il router non deve necessariamente possedere una mappa completa di tutti i collegamenti della rete.</strong></p>
+<p>È sufficiente che possa utilizzare le informazioni ricevute dai vicini per calcolare le proprie rotte.</p>
+<h3 id="un-esempio-concreto">Un esempio concreto</h3>
+<p>Riprendiamo la topologia R1–R2–R3–R4 e supponiamo di voler apprendere il percorso verso la rete di PC4, <code>192.168.4.0/24</code>.</p>
+<p>Per semplificare il calcolo assegniamo alla LAN direttamente collegata a R4 una distanza iniziale pari a zero. Utilizziamo i costi 2 e 3 della nostra topologia come metrica dell'esempio, senza riprodurre esattamente il comportamento di un protocollo specifico come RIP.</p>
+<p>All'inizio R4 conosce direttamente la LAN di PC4, mentre gli altri router non hanno ancora appreso una rotta verso questa rete.</p>
+<table>
+<thead>
+<tr>
+<th>Router</th>
+<th>Distanza iniziale dalla LAN di PC4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R4</td>
+<td>0, direttamente collegata</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>∞, non ancora conosciuta</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>∞, non ancora conosciuta</td>
+</tr>
+<tr>
+<td>R1</td>
+<td>∞, non ancora conosciuta</td>
+</tr>
+</tbody>
+</table>
+<p>Il simbolo <code>∞</code> significa che il router non conosce ancora un percorso utilizzabile verso quella destinazione.</p>
+<h3 id="primo-aggiornamento-r4-comunica-la-propria-rete">Primo aggiornamento: R4 comunica la propria rete</h3>
+<p>R4 annuncia ai propri vicini di poter raggiungere direttamente <code>192.168.4.0/24</code>.</p>
+<p>R3 riceve l'informazione da R4. Poiché il collegamento R3–R4 costa 2, calcola una distanza complessiva pari a:</p>
+<p><code>2 + 0 = 2</code></p>
+<p>R2 riceve la stessa informazione da R4, ma il collegamento R2–R4 costa 3:</p>
+<p><code>3 + 0 = 3</code></p>
+<p>Le nuove informazioni diventano:</p>
+<table>
+<thead>
+<tr>
+<th>Router</th>
+<th style="text-align: right;">Distanza verso PC4</th>
+<th>Next hop</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R4</td>
+<td style="text-align: right;">0</td>
+<td>Diretto</td>
+</tr>
+<tr>
+<td>R3</td>
+<td style="text-align: right;">2</td>
+<td>R4</td>
+</tr>
+<tr>
+<td>R2</td>
+<td style="text-align: right;">3</td>
+<td>R4</td>
+</tr>
+<tr>
+<td>R1</td>
+<td style="text-align: right;">∞</td>
+<td>Non ancora conosciuto</td>
+</tr>
+</tbody>
+</table>
+<p>R3 e R2 hanno quindi appreso una destinazione remota grazie alle informazioni comunicate dal loro vicino R4.</p>
+<h3 id="secondo-aggiornamento-r1-riceve-le-informazioni">Secondo aggiornamento: R1 riceve le informazioni</h3>
+<p>Ora R3 e R2 possono comunicare a R1 le distanze che conoscono.</p>
+<p>R3 annuncia che può raggiungere la rete di PC4 con costo 2.</p>
+<p>R1 sa che per arrivare a R3 deve sostenere un costo pari a 2. Calcola quindi:</p>
+<p><code>2 + 2 = 4</code></p>
+<p>R2 annuncia invece di poter raggiungere la rete di PC4 con costo 3.</p>
+<p>R1 sa che per arrivare a R2 il costo è 3:</p>
+<p><code>3 + 3 = 6</code></p>
+<p>R1 confronta i risultati e sceglie la distanza minore.</p>
+<table>
+<thead>
+<tr>
+<th>Destinazione</th>
+<th>Attraverso</th>
+<th style="text-align: right;">Costo complessivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>192.168.4.0/24</code></td>
+<td>R3</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr>
+<td><code>192.168.4.0/24</code></td>
+<td>R2</td>
+<td style="text-align: right;">6</td>
+</tr>
+</tbody>
+</table>
+<p>Il percorso migliore è quello attraverso R3.</p>
+<p>R1 può quindi installare una rotta verso la LAN di PC4 utilizzando R3 come prossimo salto.</p>
+<p>La tabella risultante per questa destinazione è:</p>
+<table>
+<thead>
+<tr>
+<th>Destinazione</th>
+<th>Next hop</th>
+<th style="text-align: right;">Costo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>192.168.4.0/24</code></td>
+<td><code>10.0.13.2</code> (R3)</td>
+<td style="text-align: right;">4</td>
+</tr>
+</tbody>
+</table>
+<p>La rete è diventata raggiungibile per R1 senza che un amministratore abbia inserito manualmente la rotta.</p>
+<h3 id="la-regola-matematica">La regola matematica</h3>
+<p>Il calcolo appena eseguito esprime il principio dell'algoritmo di <strong>Bellman-Ford</strong>, sul quale si basa il modello Distance Vector classico.</p>
+<p>Per trovare il costo migliore verso una destinazione, il router confronta le possibilità offerte dai propri vicini.</p>
+<p>La regola è:</p>
+<p><strong>Costo attraverso un vicino = costo per raggiungere il vicino + costo annunciato dal vicino per la destinazione.</strong></p>
+<p>Il router seleziona il valore minore fra le alternative disponibili.</p>
+<p>Ogni volta che riceve informazioni nuove o aggiornate, può ripetere il confronto e modificare la propria tabella.</p>
+<p>In questo modo i router aggiornano progressivamente le distanze e possono arrivare a una situazione stabile.</p>
+<h2 id="come-si-aggiornano-le-tabelle-distance-vector">8. Come si aggiornano le tabelle Distance Vector?</h2>
+<p>Supponiamo che R1 abbia già appreso la rotta attraverso R3.</p>
+<p>La situazione è questa:</p>
+<table>
+<thead>
+<tr>
+<th>Router</th>
+<th style="text-align: right;">Distanza da <code>192.168.4.0/24</code></th>
+<th>Next hop</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R4</td>
+<td style="text-align: right;">0</td>
+<td>Diretto</td>
+</tr>
+<tr>
+<td>R3</td>
+<td style="text-align: right;">2</td>
+<td>R4</td>
+</tr>
+<tr>
+<td>R2</td>
+<td style="text-align: right;">3</td>
+<td>R4</td>
+</tr>
+<tr>
+<td>R1</td>
+<td style="text-align: right;">4</td>
+<td>R3</td>
+</tr>
+</tbody>
+</table>
+<p>Ora il collegamento R3–R4 si interrompe.</p>
+<p>R3 non può più utilizzare direttamente R4 per raggiungere PC4.</p>
+<p>Le nuove informazioni devono essere diffuse agli altri router. Attraverso gli aggiornamenti Distance Vector, R1 può apprendere che il percorso attraverso R3 non è più conveniente o non è più disponibile e scegliere l'alternativa attraverso R2.</p>
+<p>Dopo che la rete si è stabilizzata, il percorso migliore da R1 passa per R2 e costa 6.</p>
+<p>Anche R3, che rimane collegato a R1, può eventualmente raggiungere PC4 percorrendo:</p>
+<p><code>R3 → R1 → R2 → R4</code></p>
+<p>Il costo sarà:</p>
+<p><code>2 + 3 + 3 = 8</code></p>
+<p>Le distanze finali risultano:</p>
+<table>
+<thead>
+<tr>
+<th>Router</th>
+<th style="text-align: right;">Nuova distanza</th>
+<th>Next hop</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R4</td>
+<td style="text-align: right;">0</td>
+<td>Diretto</td>
+</tr>
+<tr>
+<td>R2</td>
+<td style="text-align: right;">3</td>
+<td>R4</td>
+</tr>
+<tr>
+<td>R1</td>
+<td style="text-align: right;">6</td>
+<td>R2</td>
+</tr>
+<tr>
+<td>R3</td>
+<td style="text-align: right;">8</td>
+<td>R1</td>
+</tr>
+</tbody>
+</table>
+<p>Il risultato è corretto, ma durante gli aggiornamenti possono verificarsi problemi.</p>
+<h2 id="il-problema-del-count-to-infinity">9. Il problema del Count-to-Infinity</h2>
+<p>Uno dei problemi storici dei protocolli Distance Vector è il <strong>count-to-infinity</strong>, cioè il conteggio verso infinito.</p>
+<p>Il problema nasce quando, dopo un guasto, un router utilizza informazioni non aggiornate ricevute da un vicino e conclude erroneamente che una destinazione sia ancora raggiungibile.</p>
+<p>Consideriamo un esempio semplificato.</p>
+<div data-routing-diagram="distance-vector-loop"></div>
+<p>R2 è direttamente collegato alla rete X. R1 conosce la rete X perché R2 gliela ha annunciata.</p>
+<p>Supponiamo che il collegamento R1–R2 abbia costo 1 e che R2 consideri X direttamente raggiungibile con costo 0.</p>
+<p>Inizialmente:</p>
+<table>
+<thead>
+<tr>
+<th>Router</th>
+<th style="text-align: right;">Distanza verso X</th>
+<th>Next hop</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R2</td>
+<td style="text-align: right;">0</td>
+<td>Diretto</td>
+</tr>
+<tr>
+<td>R1</td>
+<td style="text-align: right;">1</td>
+<td>R2</td>
+</tr>
+</tbody>
+</table>
+<p>Ora la rete X diventa irraggiungibile da R2.</p>
+<p>R2 deve eliminare la vecchia informazione, ma potrebbe ricevere da R1 un annuncio non ancora aggiornato secondo cui X è raggiungibile con costo 1.</p>
+<p>Se non esistessero meccanismi di protezione, R2 potrebbe concludere erroneamente di poter raggiungere X attraverso R1:</p>
+<p><code>1 + 1 = 2</code></p>
+<p>R1, a sua volta, potrebbe apprendere da R2 una distanza pari a 2 e aggiornarla a 3.</p>
+<p>I due router potrebbero quindi continuare ad aumentare le distanze:</p>
+<p><code>1 → 2 → 3 → 4 → 5 ...</code></p>
+<p>Pur non esistendo più un percorso valido verso X, continuerebbero temporaneamente ad annunciarsi informazioni errate.</p>
+<p>Il problema non è soltanto l'aumento dei numeri: i pacchetti potrebbero essere inoltrati da R1 a R2 e da R2 nuovamente a R1, creando un <strong>routing loop</strong>, cioè un ciclo di instradamento.</p>
+<h3 id="come-si-limita-il-problema">Come si limita il problema?</h3>
+<p>I protocolli Distance Vector utilizzano diversi accorgimenti.</p>
+<p><strong>Split Horizon.</strong> Un router evita di annunciare come raggiungibile una destinazione al vicino dal quale ha appreso la rotta. Se R1 ha imparato da R2 come raggiungere X, non ha senso che comunichi a R2 di essere una via valida verso X.</p>
+<p><strong>Poison Reverse.</strong> È una variante nella quale la rotta viene annunciata al vicino da cui è stata appresa, ma con una metrica che indica destinazione irraggiungibile.</p>
+<p><strong>Route Poisoning.</strong> Quando una destinazione diventa irraggiungibile, il router può annunciarla con una metrica di irraggiungibilità, per comunicare il cambiamento.</p>
+<p><strong>Timer e aggiornamenti attivati dai cambiamenti.</strong> I protocolli possono utilizzare intervalli di validità delle informazioni e aggiornamenti inviati quando si verificano modifiche, in modo da limitare l'utilizzo di rotte obsolete.</p>
+<p>Nel protocollo RIP, per esempio, la metrica è il numero di hop e il valore 16 rappresenta una destinazione irraggiungibile. Il numero massimo di hop utilizzabili è quindi 15.</p>
+<p>Questi meccanismi riducono il rischio e la durata di alcuni problemi, ma non eliminano necessariamente ogni possibile ciclo temporaneo.</p>
+<p>Il Distance Vector presenta il vantaggio di non richiedere una rappresentazione completa della topologia, ma la propagazione delle informazioni può rendere complessa la gestione di determinati guasti.</p>
+<h2 id="link-state-conoscere-i-collegamenti-della-rete">10. Link State: conoscere i collegamenti della rete</h2>
+<p>I protocolli <strong>Link State</strong>, cioè basati sullo stato dei collegamenti, affrontano il problema in modo differente.</p>
+<p>Invece di scambiare principalmente le distanze verso le destinazioni, i router diffondono informazioni sui propri collegamenti.</p>
+<p>L'obiettivo è permettere ai router di una stessa area Link State di costruire una rappresentazione coerente della topologia.</p>
+<p>Riprendiamo la rete iniziale.</p>
+<div data-routing-diagram="network-costs"></div>
+<p>Ogni router conosce direttamente i propri collegamenti.</p>
+<p>Per esempio, R1 conosce R2 e R3, ma non ha bisogno di essere direttamente collegato a R4 per poter apprendere l'esistenza del collegamento R3–R4.</p>
+<h3 id="le-informazioni-di-partenza">Le informazioni di partenza</h3>
+<p>Immaginiamo che ciascun router descriva i propri collegamenti e relativi costi.</p>
+<table>
+<thead>
+<tr>
+<th>Router</th>
+<th>Informazioni sui collegamenti</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>R3 costo 2; R2 costo 3</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>R1 costo 3; R4 costo 3</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>R1 costo 2; R4 costo 2</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>R3 costo 2; R2 costo 3</td>
+</tr>
+</tbody>
+</table>
+<p>Queste informazioni descrivono direttamente la struttura della rete.</p>
+<p>Non dicono semplicemente quanto costa raggiungere una destinazione: indicano <strong>quali router sono collegati fra loro e con quali costi</strong>.</p>
+<h3 id="come-vengono-scambiate">Come vengono scambiate?</h3>
+<p>In un protocollo Link State, le informazioni sui collegamenti vengono diffuse agli altri router interessati attraverso un meccanismo di flooding controllato.</p>
+<p>Per esempio, R3 comunica le informazioni sui propri collegamenti. R1 può apprendere che R3 è collegato a R4 con costo 2, pur non essendo direttamente collegato a R4.</p>
+<p>Anche R2 e R4 diffondono le proprie informazioni.</p>
+<p>Quando lo scambio è completato, i router della stessa area dispongono delle informazioni necessarie a ricostruire la topologia.</p>
+<p>Nel caso di OSPF, le informazioni vengono trasmesse attraverso annunci chiamati <strong>LSA (Link State Advertisement)</strong>. Il termine più generale <em>Link State Packet</em> viene utilizzato in alcune spiegazioni dei protocolli Link State, ma in OSPF la denominazione specifica degli annunci è LSA.</p>
+<h2 id="dal-link-state-database-alla-mappa-della-rete">11. Dal Link State Database alla mappa della rete</h2>
+<p>Le informazioni ricevute vengono conservate in una struttura chiamata <strong>Link State Database</strong>, abbreviata <strong>LSDB</strong>.</p>
+<p>Il database raccoglie le informazioni sullo stato dei collegamenti dell'area.</p>
+<p>Nella nostra topologia semplificata, possiamo rappresentarne il contenuto con questa tabella:</p>
+<table>
+<thead>
+<tr>
+<th>Collegamento</th>
+<th style="text-align: right;">Costo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1–R2</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr>
+<td>R1–R3</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td>R2–R4</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr>
+<td>R3–R4</td>
+<td style="text-align: right;">2</td>
+</tr>
+</tbody>
+</table>
+<p>Queste informazioni permettono di ricostruire il disegno della rete.</p>
+<p>Il vantaggio è che R1 non deve limitarsi a fidarsi di una distanza comunicata da R3 o da R2. Può utilizzare una rappresentazione della topologia per calcolare autonomamente i percorsi.</p>
+<h3 id="come-si-passa-dalla-mappa-alla-tabella-di-routing">Come si passa dalla mappa alla tabella di routing?</h3>
+<p>Il router utilizza un algoritmo per individuare i percorsi a costo minimo.</p>
+<p>Nei protocolli Link State come OSPF, questo calcolo si basa sull'<strong>algoritmo di Dijkstra</strong>, che studieremo nella lezione 07.</p>
+<p>Nel nostro esempio, R1 può confrontare:</p>
+<ul>
+<li>R1 → R3 → R4: costo 4.</li>
+<li>R1 → R2 → R4: costo 6.</li>
+</ul>
+<p>Il percorso a costo minimo passa attraverso R3.</p>
+<p>Sapendo che R4 è collegato alla rete <code>192.168.4.0/24</code>, R1 può ricavare una rotta verso quella LAN attraverso R3.</p>
+<table>
+<thead>
+<tr>
+<th>Destinazione</th>
+<th>Next hop</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>192.168.4.0/24</code></td>
+<td><code>10.0.13.2</code> (R3)</td>
+</tr>
+</tbody>
+</table>
+<p>Anche in questo caso il risultato finale è una normale informazione di routing, utilizzabile per inoltrare i pacchetti.</p>
+<p>La differenza rispetto al Distance Vector è il modo in cui il router ha ottenuto e calcolato quella informazione.</p>
+<h2 id="che-cosa-succede-nel-link-state-quando-un-collegamento-si-guasta">12. Che cosa succede nel Link State quando un collegamento si guasta?</h2>
+<p>Supponiamo che il collegamento R3–R4 si interrompa.</p>
+<p>R3 e R4 rilevano il cambiamento attraverso lo stato delle interfacce o i meccanismi di controllo del protocollo.</p>
+<p>Le informazioni sul collegamento vengono aggiornate e diffuse agli altri router dell'area.</p>
+<p>R1 può quindi apprendere che il collegamento R3–R4 non è più disponibile.</p>
+<p>Il database della topologia viene aggiornato e il calcolo dei percorsi viene ripetuto quando necessario.</p>
+<p>Eliminando il collegamento R3–R4, il percorso superiore non è più valido.</p>
+<p>Rimane quello attraverso R2:</p>
+<p><code>R1 → R2 → R4</code></p>
+<p>Costo totale:</p>
+<p><code>3 + 3 = 6</code></p>
+<p>La rotta di R1 verso la LAN di PC4 può cambiare:</p>
+<table>
+<thead>
+<tr>
+<th>Stato della rete</th>
+<th>Next hop verso <code>192.168.4.0/24</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prima del guasto</td>
+<td>R3 (<code>10.0.13.2</code>)</td>
+</tr>
+<tr>
+<td>Dopo il ricalcolo</td>
+<td>R2 (<code>10.0.12.2</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Il router non ha dovuto ricevere una nuova rotta statica da un amministratore. Ha utilizzato le informazioni diffuse dal protocollo e ricalcolato il percorso.</p>
+<h3 id="il-link-state-e-sempre-immediato">Il Link State è sempre immediato?</h3>
+<p>No. Anche nel Link State occorre rilevare il guasto, diffondere le nuove informazioni, aggiornare il database ed eseguire i calcoli necessari.</p>
+<p>Il processo può essere rapido, ma non è istantaneo e dipende dal protocollo, dalla topologia e dai parametri configurati.</p>
+<p>Inoltre, il Link State richiede memoria per conservare le informazioni della topologia e capacità di elaborazione per calcolare i percorsi.</p>
+<div data-routing-diagram="network-rerouted"></div>
+<h2 id="distance-vector-e-link-state-a-confronto">13. Distance Vector e Link State a confronto</h2>
+<p>Ora possiamo confrontare i due modelli.</p>
+<table>
+<thead>
+<tr>
+<th>Caratteristica</th>
+<th>Distance Vector</th>
+<th>Link State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Informazioni diffuse</td>
+<td>Destinazioni e distanze</td>
+<td>Stato dei collegamenti</td>
+</tr>
+<tr>
+<td>Conoscenza della topologia</td>
+<td>Non richiede la mappa completa</td>
+<td>Permette di costruire la mappa dell'area</td>
+</tr>
+<tr>
+<td>Calcolo delle rotte</td>
+<td>Informazioni ricevute dai vicini</td>
+<td>Calcolo sulla topologia conosciuta</td>
+</tr>
+<tr>
+<td>Algoritmo di riferimento</td>
+<td>Bellman-Ford</td>
+<td>Dijkstra</td>
+</tr>
+<tr>
+<td>Esempio di protocollo</td>
+<td>RIP</td>
+<td>OSPF</td>
+</tr>
+<tr>
+<td>Problemi caratteristici</td>
+<td>Possibili cicli e count-to-infinity</td>
+<td>Maggiore complessità di database e calcoli</td>
+</tr>
+</tbody>
+</table>
+<p>La distinzione fondamentale riguarda le informazioni che ogni router utilizza.</p>
+<p>Nel <strong>Distance Vector</strong>, R1 riceve dai vicini informazioni sulle distanze e le combina con i costi dei propri collegamenti.</p>
+<p>Nel <strong>Link State</strong>, R1 riceve informazioni sui collegamenti e può costruire una rappresentazione della rete sulla quale calcolare i percorsi.</p>
+<p>Entrambi gli approcci possono aggiornare le rotte quando cambia la rete, ma seguono procedure differenti.</p>
+<h2 id="convergenza-quando-la-rete-torna-stabile">14. Convergenza: quando la rete torna stabile</h2>
+<p>Quando si verifica un cambiamento, i router non aggiornano necessariamente le proprie informazioni nello stesso istante.</p>
+<p>Alcuni potrebbero aver già ricevuto i nuovi aggiornamenti, mentre altri utilizzano ancora informazioni precedenti.</p>
+<p>Durante questa fase possono verificarsi perdite di pacchetti, percorsi non più validi o cicli temporanei.</p>
+<p>Il processo attraverso il quale i router aggiornano le proprie informazioni e stabilizzano le decisioni di instradamento prende il nome di <strong>convergenza</strong>.</p>
+<p>Il <strong>tempo di convergenza</strong> è il tempo necessario affinché, dopo un cambiamento, il sistema di routing raggiunga una situazione stabile.</p>
+<p>Per esempio, dopo il guasto R3–R4:</p>
+<ol>
+<li>Il guasto viene rilevato.</li>
+<li>Le informazioni vengono aggiornate e diffuse.</li>
+<li>I router elaborano i cambiamenti.</li>
+<li>Vengono selezionate e installate le nuove rotte.</li>
+</ol>
+<p>Quando R1 e R4 hanno aggiornato i percorsi verso le rispettive LAN e gli altri router possiedono informazioni coerenti, la rete può tornare a inoltrare correttamente il traffico.</p>
+<p>Una rete con percorsi alternativi può resistere meglio ai guasti, ma occorre che i router riescano a individuarli e a utilizzare rotte valide.</p>
+<h2 id="routing-e-forwarding-due-operazioni-differenti">15. Routing e forwarding: due operazioni differenti</h2>
+<p>Abbiamo incontrato molti concetti: rotte, metriche, algoritmi, protocolli, scambio di informazioni e database della topologia.</p>
+<p>È importante collegarli al funzionamento concreto di un router.</p>
+<p>Il <strong>routing</strong> comprende i meccanismi che permettono di apprendere, calcolare, selezionare e aggiornare le informazioni sui percorsi.</p>
+<p>Il <strong>forwarding</strong> è invece l'operazione con cui un router inoltra un singolo pacchetto utilizzando le informazioni disponibili.</p>
+<p>Per esempio, supponiamo che OSPF abbia calcolato come miglior percorso da R1 verso la LAN di PC4 quello attraverso R3.</p>
+<p>La rotta selezionata può essere:</p>
+<table>
+<thead>
+<tr>
+<th>Destinazione</th>
+<th>Next hop</th>
+<th>Uscita</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>192.168.4.0/24</code></td>
+<td><code>10.0.13.2</code></td>
+<td>Verso R3</td>
+</tr>
+</tbody>
+</table>
+<p>Quando R1 riceve un pacchetto destinato a <code>192.168.4.10</code>, consulta la tabella di inoltro e lo consegna a R3.</p>
+<p><strong>Non esegue Dijkstra per ogni pacchetto.</strong></p>
+<p>Dijkstra viene eseguito quando è necessario calcolare o ricalcolare i percorsi. Il forwarding utilizza le rotte già disponibili.</p>
+<p>Questa è una differenza fondamentale: gli algoritmi e i protocolli costruiscono le informazioni, mentre i router usano quelle informazioni per far avanzare i pacchetti.</p>
+<h2 id="il-routing-su-internet-autonomous-system-igp-ed-egp">16. Il routing su Internet: Autonomous System, IGP ed EGP</h2>
+<p>Finora abbiamo analizzato una piccola rete aziendale. Internet, però, è composta da moltissime reti appartenenti a organizzazioni differenti.</p>
+<p>Non esiste un unico amministratore che gestisce tutte le reti di Internet.</p>
+<p>Per questo si utilizza il concetto di <strong>Autonomous System</strong>, abbreviato <strong>AS</strong>.</p>
+<p>Un Autonomous System è un insieme di reti e router gestito secondo una comune amministrazione di routing.</p>
+<p>Un grande provider, per esempio, può gestire un proprio Autonomous System, con numerosi router e collegamenti interni.</p>
+<p>Anche altri provider e organizzazioni possiedono reti amministrate separatamente.</p>
+<p>Per permettere la comunicazione fra tutte queste reti si distinguono due categorie di protocolli.</p>
+<h3 id="interior-gateway-protocol-igp">Interior Gateway Protocol (IGP)</h3>
+<p>Gli <strong>IGP</strong> sono protocolli utilizzati per il routing all'interno di un Autonomous System.</p>
+<p>Esempi sono RIP, OSPF e IS-IS.</p>
+<p>Gli IGP permettono di calcolare e aggiornare i percorsi interni alla rete amministrata.</p>
+<h3 id="exterior-gateway-protocol-egp">Exterior Gateway Protocol (EGP)</h3>
+<p>Gli <strong>EGP</strong> riguardano il routing fra Autonomous System differenti.</p>
+<p>Il protocollo utilizzato per il routing interdominio su Internet è <strong>BGP (Border Gateway Protocol)</strong>.</p>
+<p>BGP utilizza un approccio chiamato <em>Path Vector</em> e considera anche le politiche amministrative degli Autonomous System. Non si limita quindi a scegliere il percorso con la semplice somma dei costi dei collegamenti.</p>
+<p>È importante distinguere i due tipi di classificazione: <strong>IGP ed EGP indicano dove viene utilizzato un protocollo, mentre Distance Vector e Link State descrivono come vengono scambiate ed elaborate le informazioni di routing.</strong></p>
+<p>Per il momento è sufficiente conoscere questa distinzione. Il funzionamento dettagliato di BGP appartiene a un argomento successivo.</p>
+<h2 id="riepilogo-generale">17. Riepilogo generale</h2>
+<p>Il routing può essere realizzato attraverso rotte configurate manualmente oppure attraverso protocolli che permettono ai router di apprendere e aggiornare automaticamente le informazioni.</p>
+<p>Nel routing statico l'amministratore stabilisce le rotte. Nel routing dinamico i router utilizzano protocolli di comunicazione e algoritmi per aggiornare le proprie decisioni.</p>
+<p>Per confrontare i percorsi vengono utilizzate metriche, come il numero di hop o il costo dei collegamenti. Il percorso a costo minimo non coincide necessariamente con quello che attraversa meno router.</p>
+<p>Nel routing distribuito i dispositivi collaborano scambiandosi informazioni. I protocolli Distance Vector utilizzano le distanze comunicate dai vicini e seguono principi collegati a Bellman-Ford. I protocolli Link State diffondono informazioni sui collegamenti, permettono di costruire una rappresentazione della topologia e possono utilizzare Dijkstra per calcolare i percorsi minimi.</p>
+<p>I cambiamenti della rete devono essere rilevati, comunicati ed elaborati. Il processo attraverso cui le decisioni di routing tornano a essere stabili è chiamato convergenza.</p>
+<p>Infine, su Internet si distinguono i protocolli IGP, utilizzati all'interno degli Autonomous System, e il routing interdominio, realizzato principalmente attraverso BGP.</p>
+<h2 id="esercizi-di-verifica">18. Esercizi di verifica</h2>
+<h3 id="esercizio-1-routing-statico-e-dinamico">Esercizio 1 — Routing statico e dinamico</h3>
+<p>R1 possiede una rotta statica verso la LAN di PC4 attraverso R3. Si interrompe il collegamento R3–R4, mentre R1–R3 rimane operativo.</p>
+<p>Spiegare perché R1 potrebbe continuare a utilizzare R3 e quale problema deve risolvere un protocollo dinamico.</p>
+<h3 id="esercizio-2-metriche-e-costi">Esercizio 2 — Metriche e costi</h3>
+<p>Consideriamo i seguenti collegamenti:</p>
+<table>
+<thead>
+<tr>
+<th>Collegamento</th>
+<th style="text-align: right;">Costo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1–R3</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td>R3–R4</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr>
+<td>R1–R2</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr>
+<td>R2–R4</td>
+<td style="text-align: right;">3</td>
+</tr>
+</tbody>
+</table>
+<p>Calcolare il costo complessivo dei due percorsi da R1 a R4 e individuare quello preferibile utilizzando come metrica la somma dei costi.</p>
+<h3 id="esercizio-3-distance-vector">Esercizio 3 — Distance Vector</h3>
+<p>R1 possiede due vicini, R2 e R3.</p>
+<p>Per raggiungere R2 il costo è 3; per raggiungere R3 il costo è 2.</p>
+<p>R2 annuncia una distanza pari a 4 verso una certa rete X, mentre R3 annuncia una distanza pari a 6.</p>
+<p>Calcolare il costo totale dei due percorsi e stabilire quale vicino R1 dovrebbe utilizzare.</p>
+<h3 id="esercizio-4-link-state">Esercizio 4 — Link State</h3>
+<p>R1 conosce soltanto i collegamenti diretti con R2 e R3. Attraverso un protocollo Link State riceve anche le informazioni sui collegamenti R2–R4 e R3–R4.</p>
+<p>Spiegare perché queste informazioni permettono a R1 di calcolare autonomamente i percorsi verso R4.</p>
+<h3 id="esercizio-5-count-to-infinity">Esercizio 5 — Count-to-Infinity</h3>
+<p>Una rete diventa irraggiungibile, ma due router continuano temporaneamente ad annunciarsi a vicenda informazioni che la indicano come raggiungibile.</p>
+<p>Spiegare perché possono formarsi cicli e quale problema risolvono meccanismi come Split Horizon e Poison Reverse.</p>
+<h3 id="esercizio-6-routing-e-forwarding">Esercizio 6 — Routing e forwarding</h3>
+<p>Un router ha già calcolato una rotta verso <code>192.168.4.0/24</code> attraverso R3.</p>
+<p>Quando riceve un pacchetto destinato a <code>192.168.4.10</code>, deve eseguire nuovamente Dijkstra oppure utilizzare la tabella di inoltro? Motivare la risposta.</p>
+<h3 id="soluzioni">Soluzioni</h3>
+<p><strong>Esercizio 1.</strong> R1 riesce ancora a raggiungere R3 e può quindi continuare a considerarlo un prossimo salto valido. Un protocollo dinamico deve permettere di apprendere il cambiamento avvenuto sul collegamento successivo e aggiornare il percorso.</p>
+<p><strong>Esercizio 2.</strong> Il percorso via R3 costa <code>2 + 5 = 7</code>, mentre quello via R2 costa <code>3 + 3 = 6</code>. È preferibile R2.</p>
+<p><strong>Esercizio 3.</strong> Attraverso R2 il costo è <code>3 + 4 = 7</code>. Attraverso R3 è <code>2 + 6 = 8</code>. R1 deve preferire R2, secondo la metrica dell'esercizio.</p>
+<p><strong>Esercizio 4.</strong> Le informazioni Link State permettono a R1 di ricostruire i collegamenti della topologia e calcolare i percorsi possibili, senza limitarsi a una distanza complessiva annunciata dai vicini.</p>
+<p><strong>Esercizio 5.</strong> I router possono utilizzare informazioni obsolete e indicarsi reciprocamente come prossimo salto. Split Horizon evita di annunciare al vicino una rotta appresa da quel vicino; Poison Reverse la annuncia invece con una metrica che indica irraggiungibilità. Questi meccanismi aiutano a prevenire alcuni cicli.</p>
+<p><strong>Esercizio 6.</strong> Il router utilizza la tabella di inoltro. Dijkstra serve a calcolare i percorsi, non viene eseguito per ogni pacchetto ricevuto.</p>
+<hr />
+<h2 id="verso-lalgoritmo-di-dijkstra">19. Verso l'algoritmo di Dijkstra</h2>
+<p>Abbiamo visto che i protocolli Link State permettono ai router di apprendere lo stato dei collegamenti e costruire una rappresentazione della topologia.</p>
+<p>Abbiamo anche imparato che scegliere il percorso migliore può significare individuare quello con il costo complessivo minore.</p>
+<p>Ma in una rete con molti router e numerosi collegamenti non è pratico elencare manualmente tutte le strade possibili e confrontarne i costi.</p>
+<p>Serve un algoritmo che permetta di trovare sistematicamente i percorsi minimi.</p>
+<p>Nella prossima lezione studieremo <strong>Dijkstra</strong>, un algoritmo che permette di calcolare i percorsi a costo minimo partendo da un nodo della rete. Vedremo come vengono inizializzate e aggiornate le distanze, come si scelgono progressivamente i nodi da elaborare e come si ricostruisce il percorso finale.</p>
+<p>Il risultato sarà collegato nuovamente alle tabelle di routing, per comprendere come un calcolo su un grafo possa diventare una decisione concreta di inoltro dei pacchetti.</p>

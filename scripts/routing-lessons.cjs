@@ -802,8 +802,14 @@ ${visualPanel('rotta-predefinita', 'default', 'Un pacchetto per 8.8.8.8 arriva a
 <p>In una rete grande, con numerosi router e percorsi alternativi, aggiornare manualmente tutte le rotte può diventare molto complesso.</p>
 <p>Sarebbe utile permettere ai router di scambiarsi informazioni, conoscere i cambiamenti e calcolare il percorso migliore.</p>
 <p>È proprio questo l'obiettivo del <strong>routing dinamico</strong>.</p>
-<p>Nella <a href="07-dinamico-dijkstra.html">prossima lezione</a> studieremo come si possono confrontare i percorsi attraverso una metrica e come l'algoritmo di <strong>Dijkstra</strong> individua i percorsi a costo minimo.</p>
+<p>Nella <a href="06-5-routing-dinamico.html">lezione 06.5</a> studieremo come si possono confrontare i percorsi attraverso una metrica e come i router aggiornano le rotte dopo un guasto.</p>
 </section>`
+  },
+  {
+    file: "06-5-routing-dinamico.html", title: "06.5 · Dal routing statico al routing dinamico",
+    lead: "Come fanno i router a conoscere la rete, scegliere i percorsi e aggiornare automaticamente le proprie tabelle?",
+    body: '<article class="routing-transition">' + require('node:fs').readFileSync(require('node:path').join(__dirname, 'routing-06-5.html'), 'utf8') + '</article>',
+    extra: '<p><a href="07-dinamico-dijkstra.html">07 · Routing dinamico e algoritmo di Dijkstra →</a></p>'
   },
   {
     file: "07-dinamico-dijkstra.html", title: "07 · Routing dinamico e algoritmo di Dijkstra",

@@ -424,6 +424,7 @@
         "04-pacchetto.html",
         "05-tabella.html",
         "06-statico.html",
+        "06-5-routing-dinamico.html",
         "07-dinamico-dijkstra.html",
         "08-ospf.html",
         "09-rip-eigrp-isis.html",
@@ -454,7 +455,8 @@
           "files": [
             "04-pacchetto.html",
             "05-tabella.html",
-            "06-statico.html"
+            "06-statico.html",
+            "06-5-routing-dinamico.html"
           ]
         },
         {
