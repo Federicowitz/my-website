@@ -284,6 +284,7 @@ window.schoolCatalog = {
             "06-simmetrica.html",
             "06-1-aes.html",
             "06-2-modalita-aes-aggiornata.html",
+            "06-3-integrita-autenticazione.html",
             "07-hash-mac-password.html"
           ]
         },
@@ -1217,6 +1218,15 @@ window.schoolCatalog = {
       "kind": "lesson",
       "path": "materials/crittografia/06-2-modalita-aes-aggiornata.html",
       "description": "ECB, CBC e CTR spiegati su tre copie dello stesso blocco MESSAGGIOSEGRETO, con padding, IV, nonce e laboratorio guidato.",
+      "chapter": "crypto-03"
+    },
+    {
+      "id": "crittografia-06-3-integrita-autenticazione",
+      "course": "crittografia",
+      "title": "06.3 · Integrità e autenticazione: il messaggio è stato modificato?",
+      "kind": "lesson",
+      "path": "materials/crittografia/06-3-integrita-autenticazione.html",
+      "description": "Hash, SHA-256, HMAC e AES-GCM spiegati con un messaggio modificato, più un riepilogo di byte, chiavi, AES, modalità, IV e nonce.",
       "chapter": "crypto-03"
     },
     {

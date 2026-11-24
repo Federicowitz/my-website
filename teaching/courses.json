@@ -309,6 +309,7 @@
         "06-simmetrica.html",
         "06-1-aes.html",
         "06-2-modalita-aes-aggiornata.html",
+        "06-3-integrita-autenticazione.html",
         "07-hash-mac-password.html",
         "08-asimmetrica-rsa.html",
         "09-diffie-hellman-tls.html",
@@ -355,6 +356,7 @@
             "06-simmetrica.html",
             "06-1-aes.html",
             "06-2-modalita-aes-aggiornata.html",
+            "06-3-integrita-autenticazione.html",
             "07-hash-mac-password.html"
           ]
         },

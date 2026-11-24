@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>06.3 · Integrità e autenticazione: il messaggio è stato modificato? — Federico Lelli</title>
+<meta name="description" content="Hash, SHA-256, HMAC e AES-GCM spiegati con un messaggio modificato, più un riepilogo di byte, chiavi, AES, modalità, IV e nonce.">
+<meta name="school-kind" content="lesson">
+<link rel="stylesheet" href="../../reader.css">
+<link rel="stylesheet" href="crittografia.css">
+<!-- SCHOOL:HEAD:START --><link rel="canonical" href="https://federicolelli.com/teaching/materials/crittografia/06-3-integrita-autenticazione.html"><meta property="og:title" content="06.3 · Integrità e autenticazione: il messaggio è stato modificato? — Federico Lelli"><meta property="og:type" content="article"><meta property="og:url" content="https://federicolelli.com/teaching/materials/crittografia/06-3-integrita-autenticazione.html"><meta property="og:description" content="06.3 · Integrità e autenticazione: il messaggio è stato modificato?. Crittografia: materiale didattico nella raccolta School curata da Federico Lelli."><link rel="stylesheet" href="../../lesson-page.css"><script>if(self!==top)document.documentElement.classList.add('school-embedded');</script><!-- SCHOOL:HEAD:END --></head>
+<body class="lesson-page"><!-- SCHOOL:TOP:START --><div class="lesson-page-chrome lesson-page-top" data-school-current="crittografia-06-3-integrita-autenticazione"><div class="lesson-identity"><a href="../../../index.html">Federico Lelli <span>/ School</span></a><a href="../../index.html?course=crittografia" data-school-catalog="crittografia">Crittografia</a></div><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-06-2-modalita-aes-aggiornata" rel="prev" href="06-2-modalita-aes-aggiornata.html"><small>← Precedente</small><span>06.2 · AES: come cifrare un file intero?</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>10 / 24</span></a><a class="lesson-neighbor" data-school-link="crittografia-07-hash-mac-password" rel="next" href="07-hash-mac-password.html"><small>Successiva →</small><span>07 · Password, salt e Argon2id</span></a></nav></div><!-- SCHOOL:TOP:END -->
+<main class="reading crypto-reading">
+<p class="eyebrow">LEZIONE 06.3 · INTEGRITÀ E AUTENTICAZIONE</p>
+<h1>Il messaggio è stato modificato?</h1>
+<p class="lead">Alice invia «Importo: 100». Finora abbiamo visto come nascondere i byte usando AES e una modalità operativa. Ora Bob deve anche poter verificare che il messaggio ricevuto sia quello autorizzato da chi possiede il segreto condiviso.</p>
+
+<nav aria-label="Indice della lezione">
+<ol>
+<li><a href="#ripartiamo">Da dove arriviamo</a></li>
+<li><a href="#alterazioni">Cosa succede se qualcuno modifica il cifrato?</a></li>
+<li><a href="#hash">Hash e SHA-256: l’impronta dei dati</a></li>
+<li><a href="#hmac">MAC e HMAC: un controllo con un segreto</a></li>
+<li><a href="#gcm">AES-GCM: cifrare e controllare insieme</a></li>
+<li><a href="#esempio-file">Lo stesso file con AES-GCM, SHA-256 e HMAC</a></li>
+<li><a href="#riepilogo">Il riepilogo dei termini</a></li>
+<li><a href="#verifica">Verifica la comprensione</a></li>
+</ol>
+</nav>
+
+<section aria-labelledby="ripartiamo">
+<h2 id="ripartiamo">1. Da dove arriviamo</h2>
+<p>Nella <a href="06-simmetrica.html">06</a> abbiamo trasformato il testo in byte e provato XOR. Nella <a href="06-1-aes.html">06.1</a> abbiamo seguito i round di AES su un blocco di 16 byte. Nella <a href="06-2-modalita-aes-aggiornata.html">06.2</a> abbiamo usato le modalità ECB, CBC e CTR per ragionare su un file intero, incontrando padding, IV e nonce.</p>
+<p>Con CTR, AES genera una maschera diversa per ogni blocco contatore. Chi conosce un pezzo del testo e il suo cifrato può ricavare la maschera di quella posizione. Senza recuperare la chiave AES, questo non gli permette di generare automaticamente le maschere successive.</p>
+<p>Resta una domanda aperta: <strong>che cosa succede se qualcuno cambia i byte mentre viaggiano?</strong></p>
+</section>
+
+<section aria-labelledby="alterazioni">
+<h2 id="alterazioni">2. Cosa succede se qualcuno modifica il cifrato?</h2>
+<p>Eva intercetta il messaggio cifrato e ne cambia un byte. Bob possiede la chiave e lo decifra. Le modalità ECB, CBC e CTR, usate da sole, non gli forniscono un controllo di autenticazione che faccia rifiutare il messaggio modificato.</p>
+<p>Con CTR, cambiare un bit del cifrato cambia il bit corrispondente del testo recuperato. Se Eva conosce la posizione e il contenuto di un campo, può tentare una modifica mirata anche senza conoscere la chiave.</p>
+<div class="worked-example">
+<p>Alice invia <code>Importo: 100</code>. Eva conosce il formato e altera il byte che rappresenta la prima cifra. Bob potrebbe recuperare <code>Importo: 900</code>. Serve un controllo che faccia rifiutare il pacchetto alterato.</p>
+</div>
+<p><strong>Riservatezza</strong> significa proteggere il contenuto dalla lettura. <strong>Integrità</strong> significa poter rilevare le modifiche. Con un controllo di <strong>autenticazione</strong> basato su un segreto condiviso, Bob verifica anche che il messaggio abbia un controllo valido prodotto da chi possiede quel segreto.</p>
+</section>
+
+<section aria-labelledby="hash">
+<h2 id="hash">3. Hash e SHA-256: l’impronta dei dati</h2>
+<p>Una <strong>funzione hash</strong> prende dei byte e calcola un’impronta di lunghezza fissa. A parità di byte, il risultato è sempre lo stesso. Cambiare anche una lettera o uno spazio produce normalmente un’impronta diversa.</p>
+<p><strong>SHA-256</strong> significa <em>Secure Hash Algorithm</em> con risultato di 256 bit. La sua impronta occupa <strong>32 byte</strong>, che possiamo scrivere con <strong>64 cifre esadecimali</strong>, sia per un testo breve sia per un file grande.</p>
+<p>Per controllare un download, calcoli SHA-256 del file ricevuto e lo confronti con l’impronta pubblicata da una fonte affidabile. Se sono diverse, i dati non coincidono. La corrispondenza con un’impronta autentica fornisce una forte evidenza che il file sia quello atteso.</p>
+<p>Esistono molti più file possibili che impronte: due ingressi diversi possono avere la stessa impronta, una situazione chiamata <strong>collisione</strong>. Una funzione hash crittografica è progettata per rendere impraticabile trovare queste coincidenze intenzionalmente.</p>
+<p>L’hash non richiede una chiave e non prevede una decifratura per recuperare il messaggio. Puoi però provare un testo candidato, calcolarne l’hash e confrontarlo con quello osservato. Riprenderemo questa idea nella lezione sulle password.</p>
+<div class="callout">
+<h3>Se Eva cambia sia il file sia l’impronta?</h3>
+<p>Il confronto può riuscire: Eva può calcolare l’hash del suo file modificato. Per questo l’impronta attesa deve arrivare da una fonte affidabile. Allegare un hash al messaggio, da solo, non dimostra chi lo ha prodotto.</p>
+</div>
+<p>Puoi provare a cambiare una lettera nel <a href="laboratorio.html#hash">laboratorio degli hash</a> e confrontare le due impronte.</p>
+</section>
+
+<section aria-labelledby="hmac">
+<h2 id="hmac">4. MAC e HMAC: un controllo con un segreto</h2>
+<p>Alice e Bob condividono una chiave segreta. Alice usa il messaggio e quella chiave per calcolare un <strong>MAC</strong>, <em>Message Authentication Code</em>, cioè un codice di autenticazione del messaggio. Invia a Bob messaggio e codice.</p>
+<p>Bob ricalcola il codice sul messaggio ricevuto, usando la stessa chiave, e verifica la corrispondenza. Se Eva cambia «100» in «900», senza la chiave non può produrre un nuovo codice valido per quel messaggio.</p>
+<p><strong>HMAC</strong> è una costruzione standard di MAC basata su una funzione hash. HMAC-SHA-256 usa SHA-256 e una chiave segreta. Per capire il suo ruolo basta ricordare i due ingressi, <strong>messaggio e chiave</strong>, e il controllo che il destinatario esegue.</p>
+<p>Il MAC può viaggiare con il messaggio. Il segreto da custodire è la chiave. HMAC da solo lascia leggibile il testo e consente di verificarlo. Chiunque possieda la chiave condivisa può produrre un MAC valido, quindi questo controllo non distingue Alice da Bob.</p>
+<p>Una vecchia richiesta con un MAC valido può essere copiata e reinviata. Per evitare di eseguire due volte un pagamento, l’applicazione deve controllare anche l’identificativo dell’operazione e registrare quelle già accettate.</p>
+</section>
+
+<section aria-labelledby="gcm">
+<h2 id="gcm">5. AES-GCM: cifrare e controllare insieme</h2>
+<p><strong>AES-GCM</strong> unisce la cifratura basata su AES a un controllo di autenticazione. GCM significa <em>Galois/Counter Mode</em>. La parte di cifratura usa il principio dei contatori incontrato in CTR; il meccanismo integrato produce anche un <strong>tag di autenticazione</strong>.</p>
+<p>Alice prepara una chiave segreta e un <strong>nonce che non deve ripetersi con quella chiave</strong>. La cifratura produce il cifrato e il tag. Bob riceve nonce, cifrato e tag, poi usa la chiave per verificarli e recuperare il testo.</p>
+<p>Se la verifica fallisce, il programma deve rifiutare il pacchetto. L’applicazione deve usare il testo soltanto dopo una verifica riuscita. Il tag di GCM svolge un ruolo di autenticazione simile a quello discusso per i MAC; GCM usa una propria costruzione integrata.</p>
+<div class="crypto-demo" data-crypto-demo="gcm">
+<h3>Segui il viaggio di «Importo: 100»</h3>
+<p>Questa sequenza riassume i ruoli dei componenti. Puoi poi cifrare e alterare davvero un pacchetto nel laboratorio.</p>
+<p class="trace-error" role="alert"></p>
+<div class="crypto-stage"><p>Alice cifra, invia nonce, cifrato e tag; Bob verifica prima di accettare il testo.</p></div>
+<script type="application/json">[{"title":"Alice prepara il messaggio","text":"Il testo è «Importo: 100». Alice possiede la chiave segreta e prepara un nonce nuovo per quella chiave.","formula":"Ingressi: testo + chiave + nonce"},{"title":"AES-GCM protegge il messaggio","text":"Il risultato contiene il cifrato e un tag di autenticazione. La chiave resta segreta.","formula":"Pacchetto: nonce | cifrato | tag"},{"title":"Eva altera un byte","text":"Eva modifica il pacchetto intercettato. Senza la chiave non può produrre un nuovo tag valido per la modifica.","formula":"Pacchetto modificato → verifica fallita"},{"title":"Bob controlla e decide","text":"Con il pacchetto originale e la chiave corretta, la verifica riesce e Bob recupera il testo. Se fallisce, rifiuta il pacchetto.","formula":"Verifica riuscita → usa il testo; fallita → rifiuta"}]</script>
+<noscript>La sequenza è descritta nei paragrafi di questa sezione.</noscript>
+</div>
+<p>Prova nel <a href="laboratorio.html#aes">laboratorio AES-GCM</a> a cifrare «Importo: 100», recuperarlo e alterare il pacchetto. Osserva quando la verifica riesce e quando il messaggio viene rifiutato.</p>
+</section>
+
+<section aria-labelledby="esempio-file">
+<h2 id="esempio-file">6. Lo stesso file con AES-GCM, SHA-256 e HMAC</h2>
+<p>Prendiamo <code>importo.txt</code>. Contiene soltanto <code>Importo: 100</code>, salvato in UTF-8 senza un a capo finale. Il programma apre il file e legge questi <strong>12 byte</strong>, dal primo all’ultimo.</p>
+<pre><code>Testo:  I  m  p  o  r  t  o  :     1  0  0
+Byte:  49 6D 70 6F 72 74 6F 3A 20 31 30 30</code></pre>
+<p>Lo spazio dopo i due punti vale <code>20</code>. Aggiungere un a capo cambia i byte letti. Rinominare il file lascia intatti questi byte. Lo stesso vale per una foto o un PDF: il programma legge direttamente i byte del file.</p>
+
+<h3>AES-GCM nasconde il contenuto e controlla le modifiche</h3>
+<p>Il programma usa la <strong>chiave AES e il nonce</strong> per generare una maschera. In GCM, AES trasforma un blocco contatore usando la chiave. Il risultato fornisce i byte della maschera da combinare con quelli del file.</p>
+<p>In questo esempio il primo byte della maschera è <code>93</code>. Il primo byte del file, <code>49</code> (la lettera <code>I</code>), diventa <code>DA</code> perché <code>49 XOR 93 = DA</code>. Il programma ripete l’operazione con i byte successivi e produce <strong>12 byte di cifrato</strong> più il <strong>tag</strong>. Bob riceve nonce, cifrato e tag. Con la stessa chiave può verificare il pacchetto e recuperare il file.</p>
+
+<h3>SHA-256 produce un’impronta da confrontare</h3>
+<p>Il programma dà a SHA-256 <strong>solo i 12 byte del file</strong> e ottiene un’impronta di 32 byte. L’impronta di <code>Importo: 100</code> inizia con <code>6F DE D2 8E</code>. Se cambiamo <code>1</code> in <code>9</code>, il byte <code>31</code> diventa <code>39</code> e la nuova impronta inizia con <code>4B 37 92 72</code>. Bob può confrontare i due risultati se dispone dell’impronta originale da una fonte affidabile.</p>
+
+<h3>HMAC produce un codice che Bob può verificare con la chiave</h3>
+<p>Il programma dà a HMAC-SHA-256 <strong>i 12 byte del file e una chiave segreta condivisa</strong>. Ottiene un codice di 32 byte che, nell’esempio, inizia con <code>02 AB 7B CE</code>. Il file resta leggibile e Alice può inviarlo insieme al codice. Se Eva cambia <code>100</code> in <code>900</code> e lascia il codice originale, Bob ricalcola il codice sul file ricevuto con la chiave: ottiene un risultato che inizia con <code>FD 30 FE 4E</code> e rifiuta il file.</p>
+
+<details>
+<summary>Vedi i valori completi dell’esempio</summary>
+<p>I valori sono scritti in esadecimale. Le chiavi e il nonce sono fissati qui per rendere la prova ripetibile.</p>
+<pre><code>AES-128-GCM · Importo: 100
+Chiave:  000102030405060708090A0B0C0D0E0F
+Nonce:   000102030405060708090A0B
+Cifrato: DA01D7A1146F986E6BE351BA
+Tag:     EB42F0F8E10300E9F5AAEE94EB607344
+
+SHA-256
+100: 6FDED28E4CBD8C4C8E6B49A3043F2FEB5ED39E6EE29A9C710CAF65D364056392
+900: 4B3792727130F7F6C0ADEEB4F8451C642A7789B8FEA284B828964D7CB536F6A9
+
+HMAC-SHA-256
+Chiave: 101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F
+100:    02AB7BCEE1F28078247A180FA9E6E274F9F611FB3FBDDBAE8A3432980BC03B93
+900:    FD30FE4E489F8B70E49D3F3D03FB47E77330FB925E156419CB37F951E5531410</code></pre>
+</details>
+</section>
+
+<section aria-labelledby="riepilogo">
+<h2 id="riepilogo">7. Il riepilogo dei termini, dalla 06 alla 06.3</h2>
+<table>
+<caption>Dai byte alla protezione di un messaggio</caption>
+<thead><tr><th>Termine</th><th>Che cosa ricordare</th></tr></thead>
+<tbody>
+<tr><td>Bit e byte</td><td>Un bit vale 0 o 1. Un byte contiene 8 bit.</td></tr>
+<tr><td>UTF-8</td><td>Una codifica che rappresenta il testo con byte. Alcuni caratteri occupano più di un byte.</td></tr>
+<tr><td>Esadecimale</td><td>Un modo di scrivere i byte: due cifre esadecimali rappresentano un byte.</td></tr>
+<tr><td>Testo in chiaro e cifrato</td><td>I dati prima e dopo la cifratura. Entrambi sono sequenze di byte.</td></tr>
+<tr><td>Algoritmo e chiave</td><td>L’algoritmo descrive le operazioni. La chiave è il segreto che determina la trasformazione.</td></tr>
+<tr><td>Cifratura simmetrica</td><td>Chi cifra e chi decifra condividono la stessa chiave segreta.</td></tr>
+<tr><td>XOR</td><td>Combina bit e permette di recuperare il valore iniziale ripetendo la stessa maschera. Ripetere una chiave corta sui blocchi espone relazioni sfruttabili.</td></tr>
+<tr><td>One-Time Pad</td><td>XOR con una chiave segreta davvero casuale, lunga quanto il messaggio e usata una sola volta garantisce la riservatezza del messaggio.</td></tr>
+<tr><td>AES e blocco</td><td>AES trasforma blocchi di 16 byte. AES-128 usa una chiave di 16 byte; esistono anche chiavi di 24 e 32 byte.</td></tr>
+<tr><td>Stato e round</td><td>Lo stato organizza i 16 byte in una matrice 4×4. I round trasformano quello stato; AES-128 ne esegue dieci.</td></tr>
+<tr><td>SubBytes, ShiftRows, MixColumns, AddRoundKey</td><td>Sostituzione, spostamento, mescolamento dei byte e combinazione con una chiave di round. L’ultimo round omette MixColumns.</td></tr>
+<tr><td>Chiavi di round</td><td>Derivano dalla chiave iniziale e vengono usate nei passaggi di AES.</td></tr>
+<tr><td>Modalità operativa</td><td>Stabilisce come usare AES per proteggere un messaggio formato da molti blocchi.</td></tr>
+<tr><td>ECB, CBC e CTR</td><td>ECB tratta i blocchi separatamente e rivela ripetizioni. CBC collega i blocchi. CTR genera maschere cifrando contatori.</td></tr>
+<tr><td>Padding</td><td>Byte aggiunti per completare i blocchi quando lo schema lo richiede. CTR e GCM possono gestire un ultimo pezzo più corto.</td></tr>
+<tr><td>IV</td><td>Valore iniziale pubblico. In CBC deve essere nuovo e imprevedibile.</td></tr>
+<tr><td>Nonce e contatore</td><td>In CTR distinguono gli ingressi di AES. Con la stessa chiave non si devono ripetere blocchi contatore. Anche GCM richiede nonce distinti per chiave.</td></tr>
+<tr><td>Riservatezza, integrità e autenticazione</td><td>Proteggere dalla lettura, rilevare modifiche e verificare un controllo legato al segreto condiviso.</td></tr>
+<tr><td>Hash e SHA-256</td><td>Servono solo i byte da controllare. SHA-256 produce un’impronta di 32 byte da confrontare con quella attesa.</td></tr>
+<tr><td>MAC e HMAC</td><td>Servono i byte del messaggio e la chiave condivisa. HMAC produce un codice che il destinatario può ricalcolare usando la stessa chiave.</td></tr>
+<tr><td>AES-GCM e tag</td><td>Servono i byte del file, la chiave AES e un nonce nuovo per quella chiave. Il risultato contiene cifrato e tag. Il destinatario verifica il pacchetto prima di usare i dati.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section aria-labelledby="verifica">
+<h2 id="verifica">8. Verifica la comprensione</h2>
+<details><summary>Eva cambia un file e allega l’hash del file modificato. Il confronto può riuscire?</summary><p>Sì. Chiunque può calcolare un hash. Il controllo è utile se l’impronta attesa proviene da una fonte affidabile.</p></details>
+<details><summary>Conoscere la maschera di un blocco CTR significa conoscere la chiave AES?</summary><p>No. Quella maschera è il risultato di AES su uno specifico contatore. Per produrre le altre maschere servono la chiave e i rispettivi contatori.</p></details>
+<details><summary>Bob riceve un pacchetto AES-GCM con tag non valido. Può usare il testo recuperato?</summary><p>Deve rifiutare il pacchetto. Il testo può essere accettato soltanto dopo una verifica riuscita.</p></details>
+<details><summary>Un vecchio messaggio autentico può essere reinviato?</summary><p>Sì. L’applicazione deve gestire anche le ripetizioni, per esempio registrando gli identificativi dei pagamenti già eseguiti.</p></details>
+</section>
+
+<section class="callout" aria-labelledby="verso-password">
+<h2 id="verso-password">E ora, le password</h2>
+<p>Ora sappiamo calcolare un’impronta e confrontarla con un valore atteso. Nella <a href="07-hash-mac-password.html">lezione 07</a> useremo questo ragionamento per capire come un sito verifica una password. Lì introdurremo il <strong>salt</strong> e Argon2id, partendo dal problema dei tentativi contro un database rubato.</p>
+</section>
+</main>
+<script src="animazioni.js"></script>
+<!-- SCHOOL:BOTTOM:START --><div class="lesson-page-chrome lesson-page-bottom"><nav class="lesson-pagination" aria-label="Navigazione nel percorso"><a class="lesson-neighbor" data-school-link="crittografia-06-2-modalita-aes-aggiornata" rel="prev" href="06-2-modalita-aes-aggiornata.html"><small>← Precedente</small><span>06.2 · AES: come cifrare un file intero?</span></a><a class="lesson-catalog" href="../../index.html?course=crittografia" data-school-catalog="crittografia">Tutte le lezioni<span>10 / 24</span></a><a class="lesson-neighbor" data-school-link="crittografia-07-hash-mac-password" rel="next" href="07-hash-mac-password.html"><small>Successiva →</small><span>07 · Password, salt e Argon2id</span></a></nav><p class="lesson-credits">Le fonti e i riferimenti sono indicati nelle introduzioni ai percorsi e nei singoli materiali.</p></div><script src="../../lesson-page.js"></script><!-- SCHOOL:BOTTOM:END --></body>
+</html>
